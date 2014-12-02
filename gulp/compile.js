@@ -47,7 +47,7 @@ gulp.task('index', ['scripts','styles','partials'], function(){
 
 // Cleaning
 gulp.task('clean', function(){
-  return gulp.src('./app/**/*', {read:false})
+  return gulp.src(['./app/**/*', '!./app/bower_components/**/*'], {read:false})
   .pipe(clean())
 })
 

@@ -2,3 +2,49 @@ body {
   background-color: #f5f5f8;
   font: 13px proxima nova, arial, helvetica, sans-serif;
 }
+.CodeMirror {
+  font-family: Cousine, Menlo, Monaco, Courier, monospace;
+  font-size: 11px;
+  background-color: #fff;
+  line-height: 18px;
+  border-radius: 2px;
+  margin: 10px 0;
+  height: 275px;
+  -webkit-box-shadow: 0px 1px 1px rgba(0,0,0,0.1);
+  -moz-box-shadow: 0px 1px 1px rgba(0,0,0,0.1);
+  box-shadow: 0px 1px 1px rgba(0,0,0,0.1);
+}
+.CodeMirror.highlight {
+  opacity: 0.5;
+}
+.CodeMirror .line-error {
+  background-color: #fff3b8;
+  color: #3f403f;
+}
+.CodeMirror .line-error .CodeMirror-linenumber {
+  color: #f00;
+}
+.CodeMirror-activeline {
+  color: #333;
+}
+.CodeMirror-activeline-background {
+  background: rgba(68,204,164,0.18) !important;
+}
+pre.CodeMirror-placeholder {
+  color: #999;
+}
+.CodeMirror-gutters {
+  height: 100%;
+  border: none;
+  background-color: #fff;
+  border-right: 1px solid #eee;
+}
+.CodeMirror-linenumber {
+  color: #bbb;
+}
+.cm-tab {
+  background: url("data:image/png");
+  background-position: right;
+  background-repeat: no-repeat;
+  opacity: 0.3;
+}

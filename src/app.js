@@ -1,9 +1,8 @@
 'use strict';
-console.log('daicazzo')
-angular.module('rawApp', [
+
+angular.module('app', [
   'ngRoute',
-  'rawApp.main',
-//  'rawApp.view2',
+  'ui.codemirror'
 ])
 .config(['$routeProvider', function($routeProvider) {
   $routeProvider
