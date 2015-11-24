@@ -1,0 +1,25 @@
+{
+    "compilerOptions": {
+        "module": "amd",
+        "target": "es5",
+        "rootDir": "app",
+        "outDir": ".tmp"
+    },
+    "filesGlob": [
+        "app/scripts/**/*.ts",
+        "typings/**/*.d.ts"
+    ],
+    "files": [
+        "app/scripts/app.ts",
+        "app/scripts/main-ctrl.ts",
+        "app/scripts/sparql-service.ts",
+        "typings/angular-ui-router/angular-ui-router.d.ts",
+        "typings/angularjs/angular.d.ts",
+        "typings/jquery/jquery.d.ts",
+        "typings/tsd.d.ts"
+    ],
+    "exclude": [],
+    "atom": {
+        "rewriteTsconfig": true
+    }
+}
