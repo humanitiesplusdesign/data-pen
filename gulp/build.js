@@ -17,7 +17,7 @@ gulp.task('scripts', function() {
     .pipe($.sourcemaps.init())
     .pipe($.typescript(tsProject)).js
     .pipe($.typescriptAngular({ moduleName: 'app' }))
-    .pipe($.sourcemaps.write("scripts/tmp/maps"))
+    .pipe($.sourcemaps.write())
     .pipe(gulp.dest(".tmp"));
 });
 
@@ -27,7 +27,7 @@ gulp.task('templates', function() {
     .pipe($.cached())
     .pipe($.sourcemaps.init())
     .pipe($.jade({pretty: true}))
-    .pipe($.sourcemaps.write("./tmp/maps"))
+    .pipe($.sourcemaps.write())
     .pipe(gulp.dest(".tmp"));
 });
 

@@ -8,6 +8,7 @@ gulp.task('serve', ['watch'], function() {
    ".tmp/*.html",
    ".tmp/scripts/**/*.js",
    ".tmp/scripts/*.js",
+   "app/**/*.js",
    ".tmp/partials/**/*.html",
    ".tmp/partials/*.html",
    ".tmp/partials/**/*.js",
