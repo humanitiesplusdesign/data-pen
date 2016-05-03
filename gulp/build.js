@@ -22,7 +22,7 @@ gulp.task('scripts', function() {
 });
 
 gulp.task('templates', function() {
-  return gulp.src("app/**/*.jade")
+  return gulp.src("app/**/*.pug")
     .pipe($.plumber({ errorHandler: $.notify.onError("<%= error.stack %>") }))
     .pipe($.cached())
     .pipe($.sourcemaps.init())

@@ -24,7 +24,7 @@ gulp.task('wiredep:styles', function() {
 });
 
 gulp.task('wiredep:scripts', function() {
-  return gulp.src("app/*.jade")
+  return gulp.src("app/*.pug")
     .pipe(wiredep({
       directory: "app/bower_components"
     }))
