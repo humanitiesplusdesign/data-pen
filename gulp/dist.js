@@ -20,8 +20,7 @@ gulp.task('dist:html', ['dist:partials'], function() {
     .pipe($.plumber({ errorHandler: $.notify.onError("<%= error.stack %>") }))
     .pipe($.print(function(path) { return "dist:html(1) " + path; }))
     .pipe($.size({ title: 'dist:html(1)' }))
-    .pipe($.inject(gulp.src(".tmp/partials/**/*.js"), {
-      read: false,
+    .pipe($.inject(gulp.src(".tmp/partials/**/*.js", {read:false}), {
       starttag: "<!-- inject:partials-->",
       endtag: "<!-- endinject-->",
       addRootSlash: false,
@@ -42,7 +41,7 @@ gulp.task('dist:html', ['dist:partials'], function() {
     .pipe($.size({ title: 'dist:html-css(1)' }))
     .pipe($.replace(/url\(".*?\/(\w+\.(eot|svg|ttf|woff|woff2).*?)"\)/g, 'url("$1")'))
     .pipe($.replace(/url\(".*?\/(\w+?\.(png|jpg|jpeg))"\)/g, 'url("$1")'))
-    .pipe($.minifyCss({ processImport: false }))
+    .pipe($.cleanCss({ processImport: false }))
     .pipe($.print(function(path) { return "dist:html-css(2) " + path; }))
     .pipe($.size({ title: 'dist:html-css(2)' }))
     .pipe(cssFilter.restore)

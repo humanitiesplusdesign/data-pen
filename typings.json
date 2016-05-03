@@ -1,0 +1,9 @@
+{
+  "name": "app",
+  "version": false,
+  "ambientDependencies": {
+    "angular": "github:DefinitelyTyped/DefinitelyTyped/angularjs/angular.d.ts#af5b8275d1f2b92738b93fddabc461fc20c553a1",
+    "jquery": "github:DefinitelyTyped/DefinitelyTyped/jquery/jquery.d.ts#af5b8275d1f2b92738b93fddabc461fc20c553a1",
+    "angular-ui-router": "github:DefinitelyTyped/DefinitelyTyped/angular-ui-router/angular-ui-router.d.ts#002a9a96b116bd3f9053ee1afa02c03636ffebb5"
+  }
+}

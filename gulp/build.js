@@ -26,7 +26,7 @@ gulp.task('templates', function() {
     .pipe($.plumber({ errorHandler: $.notify.onError("<%= error.stack %>") }))
     .pipe($.cached())
     .pipe($.sourcemaps.init())
-    .pipe($.jade({pretty: true}))
+    .pipe($.pug({pretty: true}))
     .pipe($.sourcemaps.write())
     .pipe(gulp.dest(".tmp"));
 });

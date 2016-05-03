@@ -2,11 +2,11 @@
   "name": "app",
   "version": "0.0.0",
   "dependencies": {
-    "angular": "~0.0.0",
-    "jquery": "~0.0.0",
-    "angular-ui-router": "~0.0.0",
-    "angular-http-auth": "~0.0.0",
-    "bootstrap": "~0.0.0"
+    "angular": "*",
+    "jquery": "*",
+    "angular-ui-router": "*",
+    "angular-http-auth": "*",
+    "bootstrap": "*"
   },
   "overrides": {
     "bootstrap": {
