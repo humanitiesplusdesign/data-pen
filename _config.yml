@@ -5,7 +5,7 @@ title:               Fibra Project
 tagline:             'A graphical expression of interpretation.'
 description:         ''
 url:                 'hdlab.stanford.edu/fibra'
-baseurl:             ''
+baseurl:             'hdlab.stanford.edu'
 
 # Permalinks
 permalink: pretty
