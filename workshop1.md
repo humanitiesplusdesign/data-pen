@@ -5,7 +5,7 @@ title: Workshop 1
 
 May 31 - June 3, 2016
 
-The goal of the workshop is to outline the steps necessary to incorporate data editing and entity reconciliation into Palladio components. We will also begin planning a refining of the interface to emphasize layouts for spatial organization of data. 
+The goal of the workshop is to outline the steps necessary to incorporate data editing and entity reconciliation into Palladio components. We will also begin planning a refining of the interface to emphasize layouts for spatial organization of data.
 
 ---
 
@@ -13,7 +13,7 @@ The goal of the workshop is to outline the steps necessary to incorporate data e
 
 9:00-11:00 **Groundwork for Fibra**
 
-1. Review the proposal 
+1. Review the proposal
 2. State of Palladio & where Fibra fits in/does not fit
 
 11:00-12:00 **LD4P and Fibra**
@@ -24,17 +24,25 @@ Bess Sadler, Manager for Application Development, and others from the Digital Li
 
 1:00-3:30 **Review of relevant work at Aalto**  
 
-1. Recon, a multipurpose tool for semi-automatic matching of records against a SPARQL endpoint  
-1. SeCo Lexical Analysis Service, a web service for lexical analysis  
-1. CORE, a contextual reader based on Linked Data  
-4. ARPA, a web service for configurable automated entity recognition from text against a SPARQL endpoint  
-5. VISU, a visual SPARQL query tool  
-6. Aether, a tool for exploring statistics of Linked Data datasets  
-7. Snapper, an editor for the Turtle serialization of RDF  
-  
+ * Data editing -related tools
+   1. [Recon](http://github.com/jiemakel/recon/), a multipurpose tool for semi-automatic matching of records against a SPARQL endpoint (identity reconciliation/resolution)
+   1. [Mare](http://jiemakel.github.io/mare/), a tool for simple map-reducing of CSV Files
+   1. Fica, a tool in development for quickly categorizing and interpreting data.
+   7. [Snapper](http://jiemakel.github.io/snapper/), an editor for the Turtle serialization of RDF
+ * Data visualization tools
+   5. [VISU](http://jiemakel.github.io/visu/), a visual SPARQL query tool
+   8. [SPARQL Faceter](http://www.sotasampo.fi/), a configurable tool for faceted search of Linked Data
+   1. [Khepri](http://jiemakel.github.io/khepri/), Khepri, a modular visual exploratory tool for Linked Data
+   1. [War-Sampo](http://www.sotasampo.fi/), a collection of views into the Second World War in Finland
+   6. [Aether](http://jiemakel.github.io/aether/), a tool for exploring statistics of Linked Data datasets
+ * [CORE](http://demo.seco.tkk.fi/ww1/), a contextual reader based on Linked Data
+ * Support tools
+   4. [ARPA](http://demo.seco.tkk.fi/arpa-demo/), a web service for configurable automated entity recognition from text against a SPARQL endpoint  
+   1. [SeCo Lexical Analysis Service](http://demo.seco.tkk.fi/las/), a web service for lexical analysis  
+
 ---
 
-##Wednesday, June 1: Use Cases and Case Studies 
+##Wednesday, June 1: Use Cases and Case Studies
 
 10:30-12:30 **Cataloging and Context**
 
@@ -42,16 +50,16 @@ From archive processing to research engagement: The Harrison Papers ([About the 
 
 The Stanford University Library recently completed the grant-funded acquisition of The Helen and Newton Harrison Papers. The collection includes a wide range of materials including born-digital files and email accounts.  
 
-Glynn Edwards, who led both the archive project and the development of a [discovery tool for email](http://epadd.stanford.edu/epadd/collections), will share the Library's perspective on processing a complex archive like this for research access. We will then hear from Laura Rogers, a PhD candidate in Modern Thought and Literature who began working with the Harrison Papers while the collection was being processed. This overlap in aquisition and research provides an opportunity to see how a collection is modeled for the Library and how a researcher models the same collection through metadata. 
+Glynn Edwards, who led both the archive project and the development of a [discovery tool for email](http://epadd.stanford.edu/epadd/collections), will share the Library's perspective on processing a complex archive like this for research access. We will then hear from Laura Rogers, a PhD candidate in Modern Thought and Literature who began working with the Harrison Papers while the collection was being processed. This overlap in aquisition and research provides an opportunity to see how a collection is modeled for the Library and how a researcher models the same collection through metadata.
 
-12:30-1:30 Lunch 
+12:30-1:30 Lunch
 
-2:00-4:00 
+2:00-4:00
 
 **Matthew Lincoln @ CESTA Graduate Research Fellows meeting**  
 **Linked Open Realities: The Joys and Pains of Using Linked Data for Research**
 
-Tim Berners Lee painted a picture of an interoperable, online semantic web of knowledge in 1999... and we're all still waiting for it. For infrastructural engineers, a fluid exchange of semantically-meaningful statements between disparate sources seems as distant as ever. But for a researcher getting their hands dirty in data for research, linked data concepts and formats have real uses today. This presentation will explore examples of cultural heritage linked data in art historical research, focusing benefits as well as pain points in trying to discover, search, download, and interconnect.
+Tim Berners Lee painted a picture of an interoperable, online semantic web of knowledge in 1999... and we're all still waiting for it. For infrastructural engineers, a fluid exchange of semantically-meaningful statements between disparate sources seems as distant as ever. But for a researcher getting their hands dirty in data for research, linked data concepts and formats have real uses today. This presentation will explore examples of cultural heritage linked data in art historical research, focusing on benefits as well as pain points in trying to discover, search, download, and interconnect.
 
 ---
 
@@ -71,18 +79,17 @@ LD4P: _linked data both for discovery and internal data structure_
 
 ### Review of graph drawing tools  
 
-1. [Segrada](http://segrada.org/)
-1. [Rhizi](http://demo.rhizi.net/login)  login: demo@rhizi.net password: demodemo
-1. [Sylva](http://sylvadb.com/)
+1. [Segrada](http://segrada.org/) <- not very fluid in interaction
+1. [Rhizi](http://demo.rhizi.net/login)  login: demo@rhizi.net password: demodemo <- nicely intuitive and quick in interaction
+1. [gFacet, RelFinder, SemLens, tFacet](http://www.visualdataweb.org/tools.php) <- these are all nicely designed from an interaction perspective
+1. [Sylva](http://sylvadb.com/) <- data entry relatively clunky
+1. [Welkin](http://simile.mit.edu/welkin/) <- early tool, visualizes pure RDF graphs
 1. [RDF-Studio](http://www.linkeddatatools.com/rdf-studio)
-1. [Welkin](http://simile.mit.edu/welkin/)
-1. [Gravity](http://semweb.salzburgresearch.at/apps/rdf-gravity/user_doc.html)
+1. [Gravity](http://semweb.salzburgresearch.at/apps/rdf-gravity/user_doc.html) <- visualization of pure RDF models, some nice graph visualization modification operations
 1. [Information Workbench](http://iwb.fluidops.com)
-1. [Callimachus](http://callimachusproject.org/)
-1. [gFacet, RelFinder, SemLens, tFacet](http://www.visualdataweb.org/tools.php)
-1. [Sgvizler](http://dev.data2000.no/sgvizler/)
+1. [Callimachus](http://callimachusproject.org/) <- more a platform for building Linked Data apps
 
-
+1. [Sgvizler](http://dev.data2000.no/sgvizler/) <- a more limited precursor to VISU
 
 ##Friday 3 June
 
@@ -91,6 +98,3 @@ LD4P: _linked data both for discovery and internal data structure_
 1. Debrief
 2. Plan for future development
 3. Identify the challenges
-
-
-
