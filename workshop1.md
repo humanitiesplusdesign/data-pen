@@ -9,7 +9,7 @@ The goal of the workshop is to outline the steps necessary to incorporate data e
 
 ---
 
-##Tuesday, May 31: The State of Things
+## Tuesday, May 31: The State of Things
 
 9:00-11:00 **Groundwork for Fibra**
 
@@ -42,7 +42,7 @@ Bess Sadler, Manager for Application Development, and others from the Digital Li
 
 ---
 
-##Wednesday, June 1: Use Cases and Case Studies
+## Wednesday, June 1: Use Cases and Case Studies
 
 10:30-12:30 **Cataloging and Context**
 
@@ -91,9 +91,9 @@ LD4P: _linked data both for discovery and internal data structure_
 
 1. [Sgvizler](http://dev.data2000.no/sgvizler/) <- a more limited precursor to VISU
 
-##Friday 3 June
+## Friday 3 June
 
-###Designing the Research Workflow
+### Designing the Research Workflow
 
 1. Debrief
 2. Plan for future development
