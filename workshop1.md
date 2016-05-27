@@ -77,19 +77,20 @@ LD4P: _linked data both for discovery and internal data structure_
 
 12:00-1:00  Break
 
-### Review of graph drawing tools  
+### Review of graph drawing tools ###
 
-1. [Segrada](http://segrada.org/) <- not very fluid in interaction
-1. [Rhizi](http://demo.rhizi.net/login)  login: demo@rhizi.net password: demodemo <- nicely intuitive and quick in interaction
-1. [gFacet, RelFinder, SemLens, tFacet](http://www.visualdataweb.org/tools.php) <- these are all nicely designed from an interaction perspective
-1. [Sylva](http://sylvadb.com/) <- data entry relatively clunky
-1. [Welkin](http://simile.mit.edu/welkin/) <- early tool, visualizes pure RDF graphs
+See [Graph Tools Study]({{site.baseurl}}/graph_tools/) for notes
+
+1. [Segrada](http://segrada.org/)
+1. [Rhizi](http://demo.rhizi.net/login)  login: demo@rhizi.net password: demodemo
+1. [gFacet, RelFinder, SemLens, tFacet](http://www.visualdataweb.org/tools.php)  perspective
+1. [Sylva](http://sylvadb.com/)
+1. [Welkin](http://simile.mit.edu/welkin/) 
 1. [RDF-Studio](http://www.linkeddatatools.com/rdf-studio)
-1. [Gravity](http://semweb.salzburgresearch.at/apps/rdf-gravity/user_doc.html) <- visualization of pure RDF models, some nice graph visualization modification operations
+1. [Gravity](http://semweb.salzburgresearch.at/apps/rdf-gravity/user_doc.html) visualization modification operations
 1. [Information Workbench](http://iwb.fluidops.com)
-1. [Callimachus](http://callimachusproject.org/) <- more a platform for building Linked Data apps
-
-1. [Sgvizler](http://dev.data2000.no/sgvizler/) <- a more limited precursor to VISU
+1. [Callimachus](http://callimachusproject.org/)
+1. [Sgvizler](http://dev.data2000.no/sgvizler/) 
 
 ## Friday 3 June
 

@@ -14,6 +14,12 @@ permalink: /:title/
 # Set encoding to UTF-8
 encoding: utf-8
 
+# Collections
+collections:
+  studies:
+    output: true
+  designs:
+    output: false
 
 # Markdown specs
 markdown: kramdown
