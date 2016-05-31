@@ -35,12 +35,12 @@ Bess Sadler, Manager for Application Development, and others from the Digital Li
    7. [Snapper](http://jiemakel.github.io/snapper/), an editor for the Turtle serialization of RDF
    1. [Hipla](http://dev.hipla.fi/), an ontology service of historical places
  * Data visualization tools
-   5. [VISU](http://jiemakel.github.io/visu/), a visual SPARQL query tool
+   5. [VISU](http://goo.gl/QtDrzm), a visual SPARQL query tool
    8. [SPARQL Faceter](http://www.sotasampo.fi/en/photographs), a configurable tool for faceted search of Linked Data
    1. [Khepri](http://jiemakel.github.io/khepri/), Khepri, a modular visual exploratory tool for Linked Data
    1. [War-Sampo](http://www.sotasampo.fi/), a collection of views into the Second World War in Finland
    6. [Aether](http://jiemakel.github.io/aether/), a tool for exploring statistics of Linked Data datasets
- * [CORE](http://demo.seco.tkk.fi/ww1/), a contextual reader based on Linked Data
+ * [CORE](http://j.mp/1vnNW8b), a contextual reader based on Linked Data
  * Support tools
    4. [ARPA](http://demo.seco.tkk.fi/arpa-demo/), a web service for configurable automated entity recognition from text against a SPARQL endpoint  
    1. [SeCo Lexical Analysis Service](http://demo.seco.tkk.fi/las/), a web service for lexical analysis  
