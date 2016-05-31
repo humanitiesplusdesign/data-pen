@@ -18,6 +18,8 @@ encoding: utf-8
 collections:
   studies:
     output: true
+  meetings:
+    output: true
   designs:
     output: false
 
