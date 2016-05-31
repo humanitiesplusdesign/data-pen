@@ -11,14 +11,14 @@
         "!app/bower_components/**/node_modules/**/*.ts",
         "!app/bower_components/**/typings/**/*.ts",
         "!app/bower_components/angular-ui-router/api/angular-ui-router.d.ts",
-        "typings/browser/**/*.d.ts"
+        "typings/global/**/*.d.ts"
     ],
     "files": [
         "app/scripts/app.ts",
         "app/scripts/main-ctrl.ts",
-        "typings/browser/ambient/angular-ui-router/index.d.ts",
-        "typings/browser/ambient/angular/index.d.ts",
-        "typings/browser/ambient/jquery/index.d.ts"
+        "typings/global/angular-ui-router/index.d.ts",
+        "typings/global/angular/index.d.ts",
+        "typings/global/jquery/index.d.ts"
     ],
     "atom": {
         "rewriteTsconfig": true
