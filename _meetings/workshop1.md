@@ -29,6 +29,7 @@ Bess Sadler, Manager for Application Development, and others from the Digital Li
 1:00-3:30 **Review of relevant work at Aalto**  
 
  * Data editing -related tools
+   1. [SAHA](http://demo.seco.tkk.fi/saha/), an editor for Linked Data
    1. [Recon](http://github.com/jiemakel/recon/), a multipurpose tool for semi-automatic matching of records against a SPARQL endpoint (identity reconciliation/resolution)
    1. [Mare](http://jiemakel.github.io/mare/), a tool for simple map-reducing of CSV Files
    1. Fica, a tool in development for quickly categorizing and interpreting data.
