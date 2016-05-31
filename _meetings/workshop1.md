@@ -31,9 +31,10 @@ Bess Sadler, Manager for Application Development, and others from the Digital Li
    1. [Mare](http://jiemakel.github.io/mare/), a tool for simple map-reducing of CSV Files
    1. Fica, a tool in development for quickly categorizing and interpreting data.
    7. [Snapper](http://jiemakel.github.io/snapper/), an editor for the Turtle serialization of RDF
+   1. [Hipla](http://dev.hipla.fi/), an ontology service of historical places
  * Data visualization tools
    5. [VISU](http://jiemakel.github.io/visu/), a visual SPARQL query tool
-   8. [SPARQL Faceter](http://www.sotasampo.fi/), a configurable tool for faceted search of Linked Data
+   8. [SPARQL Faceter](http://www.sotasampo.fi/en/photographs), a configurable tool for faceted search of Linked Data
    1. [Khepri](http://jiemakel.github.io/khepri/), Khepri, a modular visual exploratory tool for Linked Data
    1. [War-Sampo](http://www.sotasampo.fi/), a collection of views into the Second World War in Finland
    6. [Aether](http://jiemakel.github.io/aether/), a tool for exploring statistics of Linked Data datasets
@@ -85,14 +86,14 @@ See [Graph Tools Study]({{site.baseurl}}/graph_tools/) for notes
 
 1. [Segrada](http://segrada.org/)
 1. [Rhizi](http://demo.rhizi.net/login)  login: demo@rhizi.net password: demodemo
-1. [gFacet, RelFinder, SemLens, tFacet](http://www.visualdataweb.org/tools.php)  perspective
+1. [gFacet, RelFinder, SemLens, tFacet](http://www.visualdataweb.org/tools.php)
 1. [Sylva](http://sylvadb.com/)
-1. [Welkin](http://simile.mit.edu/welkin/) 
+1. [Welkin](http://simile.mit.edu/welkin/)
 1. [RDF-Studio](http://www.linkeddatatools.com/rdf-studio)
-1. [Gravity](http://semweb.salzburgresearch.at/apps/rdf-gravity/user_doc.html) visualization modification operations
+1. [Gravity](http://semweb.salzburgresearch.at/apps/rdf-gravity/user_doc.html)
 1. [Information Workbench](http://iwb.fluidops.com)
 1. [Callimachus](http://callimachusproject.org/)
-1. [Sgvizler](http://dev.data2000.no/sgvizler/) 
+1. [Sgvizler](http://dev.data2000.no/sgvizler/)
 
 ## Friday 3 June
 
