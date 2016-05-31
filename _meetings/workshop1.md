@@ -22,7 +22,7 @@ The goal of the workshop is to outline the steps necessary to incorporate data e
 
 11:00-12:00 **LD4P and Fibra**
 
-Bess Sadler, Manager for Application Development, and others from the Digital Library Systems and Services team at Stanford University Libraries will come for a discussion about LD4P and Fibra to explore how Fibra can best integrate with future Library infrastructure."
+Bess Sadler, Manager for Application Development, and Laney McGlohon from the Digital Library Systems and Services team at Stanford University Libraries will come for a discussion about LD4P and Fibra to explore how Fibra can best integrate with future Library infrastructure."
 
 12:00-1:00 Lunch
 
