@@ -7,6 +7,9 @@ description:         ''
 url:                 'fibra'
 baseurl:             'http://hdlab.stanford.edu/fibra'
 
+gems:
+  - jekyll-redirect-from
+
 # Permalinks
 permalink: pretty
 permalink: /:title/
