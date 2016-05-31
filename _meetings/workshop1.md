@@ -73,7 +73,7 @@ Tim Berners Lee painted a picture of an interoperable, online semantic web of kn
 
 ### Linked Data Reconciliation and Disambiguation  
 
-9:00 - 10:00 Ruth Ahnert: The Disambiguation Engine for Historical Data + Tudor Networks  
+9:00 - 10:00 Ruth Ahnert and Sarah Ogilvie: The Disambiguation Engine for Tudor Networks  and the OED
 
 10:00-11:00 Phil Schreur, Assistant University Librarian for Technical and Access Services
 
