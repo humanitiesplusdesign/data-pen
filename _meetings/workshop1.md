@@ -84,7 +84,7 @@ LD4P: _linked data both for discovery and internal data structure_
 
 ### Review of graph drawing tools ###
 
-See [Graph Tools Study]({{site.baseurl}}/graph_tools/) for notes
+See [Graph Tools Study]({{site.baseurl}}/studies/graph_tools/) for notes
 
 1. [Segrada](http://segrada.org/)
 1. [Rhizi](http://demo.rhizi.net/login)  login: demo@rhizi.net password: demodemo
