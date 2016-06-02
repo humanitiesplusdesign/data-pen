@@ -39,20 +39,27 @@ login: demo@rhizi.net password: demodemo
 
 ## [Welkin](http://simile.mit.edu/welkin/) ##
 - Early tool, visualizes pure RDF graphs
-- 
+- Interaction between aggregate statistical measure visualization and the graph display (in-bound, out-bound, etc)
+- Ability to control contribution of different predicates to the clustering calculation
 
 ## [RDF-Studio](http://www.linkeddatatools.com/rdf-studio) ##
-
+- No documentation, so we're passing this over
 
 ## [Gravity](http://semweb.salzburgresearch.at/apps/rdf-gravity/user_doc.html) 
-- visualization of pure RDF models, some nice graph visualization modification operations
+- Visualization of pure RDF models, some nice graph visualization modification operations
+- Visualization and filtering tool, rather than an authoring tool
+- Concept of global filters vs. local filters is somewhat interesting
+  - Global filters are persistent and we use them to get rid of things we know we aren't interested in
+  - Local filters are used to modify what is in the current view, but don't restrict new things that are loaded
 
 ## [Information Workbench](http://iwb.fluidops.com) ##
-
+- 
 
 ## [Callimachus](http://callimachusproject.org/) ##
-- more a platform for building Linked Data apps 
-
+- More a platform for building Linked Data apps
 
 ## [Sgvizler](http://dev.data2000.no/sgvizler/)
-- a more limited precursor to VISU
+- A more limited precursor to VISU
+- Pretty much just focused on rendering the output of a SPARQL query
+
+
