@@ -1,5 +1,5 @@
 {
-  "name": "app",
+  "name": "fibra",
   "version": "0.0.0",
   "dependencies": {
     "angular": "~1.5.6",
@@ -18,7 +18,7 @@
         "dist/fonts/glyphicons-halflings-regular.svg",
         "dist/fonts/glyphicons-halflings-regular.ttf",
         "dist/fonts/glyphicons-halflings-regular.woff",
-	"dist/fonts/glyphicons-halflings-regular.woff2"
+	      "dist/fonts/glyphicons-halflings-regular.woff2"
       ]
     }
   },

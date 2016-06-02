@@ -1,6 +1,6 @@
-namespace app {
+namespace fibra {
   'use strict'
-  let m: angular.IModule = angular.module('app', [ 'http-auth-interceptor', 'ui.router' ])
+  let m: angular.IModule = angular.module('fibra', [ 'http-auth-interceptor', 'ui.router' ])
   m.config(($stateProvider: angular.ui.IStateProvider, $urlRouterProvider: angular.ui.IUrlRouterProvider) => {
     $urlRouterProvider.otherwise('/')
     $stateProvider.state('main', {
@@ -9,4 +9,4 @@ namespace app {
       controller: 'MainController'
       })
   })
-  }
+}

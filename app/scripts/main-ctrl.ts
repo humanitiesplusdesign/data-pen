@@ -1,4 +1,4 @@
-namespace app {
+namespace fibra {
   'use strict'
 
   interface IMainScope extends angular.IScope {
