@@ -1,7 +1,7 @@
 ---
 layout: page
 title: Phase 1 Plan
-collection:designs
+collection: designs
 ---
 
 In Phase 1 we are going to focus efforts on importing a single entity from a Linked Data store. We will work out the challenges of querying, presenting the ontology to users, and making selection/addition clean, elegant and intuitive. 
