@@ -22,4 +22,4 @@ The chart below shows where this step fits within the required set of tasks and 
 
 # Notes
 
-[Images and notes captured during workshops]({{site.baseurl}}/designs/phase1_notes)
+[Images and notes captured during workshops]({{site.baseurl}}/designs/phase1_notes/)
