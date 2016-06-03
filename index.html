@@ -24,7 +24,7 @@ title: Home
   <ul class="post">
       {% for item in site.designs limit:3 %}
     <li class="post-title">
-          <a href="{{ site.url }}{{ item.url }}">{{ item.title }}</a> • {{ item.date }}
+          <a href="{{ site.baseurl }}{{ item.url }}">{{ item.title }}</a> • {{ item.date }}
           <p>{{ item.short-description }}</p>
       </li>
       {% endfor %}
