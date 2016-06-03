@@ -6,6 +6,7 @@ tagline:             'A graphical expression of interpretation.'
 description:         ''
 url:                 'fibra'
 baseurl:             'http://hdlab.stanford.edu/fibra'
+urlimg: 	'http://hdlab.stanford.edu/fibra/assets/'
 
 gems:
   - jekyll-redirect-from
