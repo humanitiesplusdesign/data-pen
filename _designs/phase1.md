@@ -4,10 +4,12 @@ title: Phase 1 Plan
 
 ---
 
-[Based on the EMLO ontology](http://demo.seco.tkk.fi/saha/project/index.shtml?model=emlo) we will limit query to one of the following three entity types:
+# Case studies #
 
-Letters
+## Early Modern Correspondence
 
-Places
+[Based on the EMLO ontology](http://demo.seco.tkk.fi/saha/project/index.shtml?model=emlo) we will limit query to one of the following three entity types
 
-People
+## Schoenberg Manuscript Collection
+
+[Ontology](http://demo.seco.tkk.fi/saha/project/index.shtml?model=shoenberg)
