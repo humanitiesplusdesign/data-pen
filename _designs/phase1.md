@@ -20,3 +20,6 @@ The chart below shows where this step fits within the required set of tasks and 
 
 [Ontology](http://demo.seco.tkk.fi/saha/project/index.shtml?model=shoenberg)
 
+# Notes
+
+[Images and notes captured during workshops]({{site.baseurl}}designs/phase1_notes)
