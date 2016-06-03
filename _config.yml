@@ -4,8 +4,8 @@
 title:               Fibra Project
 tagline:             'A graphical expression of interpretation.'
 description:         ''
-url:                 'http://hdlab.stanford.edu'
-baseurl:             'fibra'
+url:                 'fibra'
+baseurl:             'http://hdlab.stanford.edu'
 
 gems:
   - jekyll-redirect-from
