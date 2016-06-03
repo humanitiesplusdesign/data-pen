@@ -16,6 +16,7 @@
     "files": [
         "app/scripts/app.ts",
         "app/scripts/main-ctrl.ts",
+        "app/scripts/add-entity-directive.ts",
         "typings/globals/angular-ui-router/index.d.ts",
         "typings/globals/angular/index.d.ts",
         "typings/globals/jquery/index.d.ts"

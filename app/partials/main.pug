@@ -1,5 +1,5 @@
 html
-  body
+  body(ng-app="fibra")
     nav.navbar.navbar-inverse.navbar-fixed-top
       .container-fluid
         .navbar-header
@@ -7,5 +7,6 @@ html
     .container-fluid.main
       .row.main.no-gutter
         #left-column.col-md-2 Left
-        #middle-column.col-md-7 Middle
+        #middle-column.col-md-7
+          add-entity
         #right-column.col-md-3 Right
