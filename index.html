@@ -12,14 +12,31 @@ title: Home
 
 <div class="toc">
   <h2>Workshops and Meetings</h2>
-  <ul class="post">  
+  <ul class="post">
+      {% for item in site.meetings %}
     <li class="post-title">
-      <a href="meetings/workshop1/">
-        "Palladio :: Fibra Workshop, June 2016"
-      </a>
-    </li>
-  </ul>  
-
+          <a href="{{ item.url }}">{{ item.title }}</a> • {{ item.date }}
+          <p>{{ item.short-description }}</p>
+      </li>
+      {% endfor %}
+  </ul>
+  <h2>Design + Blueprints</h2>
+  <ul class="post">
+      {% for item in site.designs limit:3 %}
+    <li class="post-title">
+          <a href="{{ item.url }}">{{ item.title }}</a> • {{ item.date }}
+          <p>{{ item.short-description }}</p>
+      </li>
+      {% endfor %}
+  </ul>
+  <h2>Studies of similar or related work</h2>
+  <ul class="post">
+      {% for item in site.studies limit:3 %}
+<li class="post-title">
+          <a href="{{ item.url }}">{{ item.title }}</a> • {{ item.date }}
+      </li>
+      {% endfor %}
+  </ul>
 </div>
 
 

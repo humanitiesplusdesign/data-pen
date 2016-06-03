@@ -24,7 +24,7 @@ collections:
   meetings:
     output: true
   designs:
-    output: false
+    output: true
 
 # Markdown specs
 markdown: kramdown
