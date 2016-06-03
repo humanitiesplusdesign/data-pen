@@ -2,3 +2,5 @@
 node_modules
 app/bower_components
 _site
+.tmp
+typings
