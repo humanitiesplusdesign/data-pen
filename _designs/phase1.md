@@ -8,7 +8,7 @@ In Phase 1 we are going to focus efforts on importing a single entity from a Lin
 
 The chart below shows where this step fits within the required set of tasks and functionalities with existing tools. Parentheses indicate that a tool is available, but not quite adequate for our goal.
 
-![Chart/matrix for Fibra development]({{site.urlimg}}/{{page.collection}})
+![Chart/matrix for Fibra development]({{site.urlimg}}{{page.collection}})
 
 # Case studies #
 
