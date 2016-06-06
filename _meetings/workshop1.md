@@ -9,9 +9,7 @@ May 31 - June 3, 2016
 
 The goal of the workshop is to outline the steps necessary to incorporate data editing and entity reconciliation into Palladio components. We will also begin planning a refining of the interface to emphasize layouts for spatial organization of data.
 
-
-
-#Agenda
+# Agenda
 
 ## Tuesday, May 31: The State of Things
 
