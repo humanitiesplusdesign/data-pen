@@ -264,9 +264,9 @@ var fibra;
 
 (function(module) {
 try {
-  module = angular.module('app');
+  module = angular.module('fibra');
 } catch (e) {
-  module = angular.module('app', []);
+  module = angular.module('fibra', []);
 }
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('partials/main.html',
@@ -300,9 +300,9 @@ module.run(['$templateCache', function($templateCache) {
 
 (function(module) {
 try {
-  module = angular.module('app');
+  module = angular.module('fibra');
 } catch (e) {
-  module = angular.module('app', []);
+  module = angular.module('fibra', []);
 }
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('partials/sparql-autocomplete.html',
@@ -325,9 +325,9 @@ module.run(['$templateCache', function($templateCache) {
 
 (function(module) {
 try {
-  module = angular.module('app');
+  module = angular.module('fibra');
 } catch (e) {
-  module = angular.module('app', []);
+  module = angular.module('fibra', []);
 }
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('partials/sparql-tree.html',
