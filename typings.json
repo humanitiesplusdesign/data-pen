@@ -2,8 +2,11 @@
   "name": "app",
   "version": false,
   "globalDependencies": {
-    "angular": "github:DefinitelyTyped/DefinitelyTyped/angularjs/angular.d.ts#af5b8275d1f2b92738b93fddabc461fc20c553a1",
-    "jquery": "github:DefinitelyTyped/DefinitelyTyped/jquery/jquery.d.ts#af5b8275d1f2b92738b93fddabc461fc20c553a1",
-    "angular-ui-router": "github:DefinitelyTyped/DefinitelyTyped/angular-ui-router/angular-ui-router.d.ts#002a9a96b116bd3f9053ee1afa02c03636ffebb5"
+    "angular": "github:DefinitelyTyped/DefinitelyTyped/angularjs/angular.d.ts",
+    "angular-ui-router": "github:DefinitelyTyped/DefinitelyTyped/angular-ui-router/angular-ui-router.d.ts",
+    "jquery": "github:DefinitelyTyped/DefinitelyTyped/jquery/jquery.d.ts"
+  },
+  "globalDevDependencies": {
+    "angular-http-auth": "registry:dt/angular-http-auth#1.2.1+20160317120654"
   }
 }

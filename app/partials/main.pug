@@ -7,7 +7,10 @@ html
             img(src="images/fibra.png" height="23px")
     .container-fluid.main
       .row.main.no-gutter
-        #left-column.col-md-2
-        #middle-column.col-md-7
-          add-entity
-        #right-column.col-md-3
+        #left-column.col-md-3
+          h4 Class tree
+          sparql-tree(endpoint="'http://ldf.fi/procope/sparql'",query="getClassTreeQuery")
+        #middle-column.col-md-4
+          h4 Autocompletion
+          sparql-autocomplete(configurations="acConfig",limit="30")
+        #right-column.col-md-5

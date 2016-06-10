@@ -16,7 +16,12 @@
     "files": [
         "app/scripts/app.ts",
         "app/scripts/main-ctrl.ts",
-        "app/scripts/add-entity-directive.ts",
+        "app/scripts/sparql-autocomplete-component.ts",
+        "app/scripts/sparql-autocomplete-service.ts",
+        "app/scripts/sparql-tree-component.ts",
+        "app/scripts/sparql-tree-service.ts",
+        "app/bower_components/angular-sparql-service/dist/sparql-service.d.ts",
+        "typings/globals/angular-http-auth/index.d.ts",
         "typings/globals/angular-ui-router/index.d.ts",
         "typings/globals/angular/index.d.ts",
         "typings/globals/jquery/index.d.ts"

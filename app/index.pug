@@ -6,6 +6,7 @@ html(lang="en",ng-app="fibra",ng-hint)
     // build:css(app) styles/vendor.css
     // bower:css
     link(rel='stylesheet', href='bower_components/bootstrap/dist/css/bootstrap.css')
+    link(rel='stylesheet', href='bower_components/font-awesome/css/font-awesome.css')
     // endbower
     // endbuild
     // build:css(.tmp) styles/main.css
@@ -14,18 +15,19 @@ html(lang="en",ng-app="fibra",ng-hint)
 
     title app
   body
-    .modal(ng-class="authOpen ? 'modal-open fade in' : ''",ng-style="authOpen ? {display:'block'} : {}"): .modal-dialog(ng-show="authOpen"): form.modal-content
+    .modal(ng-class="authInfo.authOpen ? 'modal-open fade in' : ''",ng-style="authInfo.authOpen ? {display:'block'} : {}"): .modal-dialog(ng-show="authInfo.authOpen"): form.modal-content
       .modal-header: h4.modal-title Authentication required
       .modal-body
         .form-group
           label Username:
-          input.form-control(type='text', ng-model="username")
+          input.form-control(type='text', ng-model="authInfo.username")
         .form-group
           label Password:
-          input.form-control(type='password', ng-model="password")
+          input.form-control(type='password', ng-model="authInfo.password")
       .modal-footer
           button.btn.btn-success(ng-click="setAuth()") Ok
           button.btn.btn-danger(ng-click="dismissAuth()") Cancel
+    main(ui-view="")
     // build:js(app) scripts/vendor.js
     // bower:js
     script(src='bower_components/angular/angular.js')
@@ -33,15 +35,19 @@ html(lang="en",ng-app="fibra",ng-hint)
     script(src='bower_components/angular-ui-router/release/angular-ui-router.js')
     script(src='bower_components/angular-http-auth/src/http-auth-interceptor.js')
     script(src='bower_components/bootstrap/dist/js/bootstrap.js')
+    script(src='bower_components/angular-sparql-service/dist/sparql-service.js')
+    script(src='bower_components/ngstorage/ngStorage.js')
     // endbower
     // endbuild
 
     // build:js(.tmp) scripts/main.js
     script(src="scripts/app.js")
     script(src="scripts/main-ctrl.js")
-    script(src="scripts/add-entity-directive.js")
+    script(src="scripts/sparql-tree-service.js")
+    script(src="scripts/sparql-tree-component.js")
+    script(src="scripts/sparql-autocomplete-service.js")
+    script(src="scripts/sparql-autocomplete-component.js")
     // inject:partials
     // endinject
     // endbuild
-    main(ui-view="")
-    .uib-modal-backdrop.fade.in(ng-show="authOpen")
+    .uib-modal-backdrop.fade.in(ng-show="authInfo.authOpen")
