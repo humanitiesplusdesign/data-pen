@@ -51,6 +51,11 @@ HAVING(BOUND(?id) && COUNT(?altLabel)<10) # workaround for Schoenberg bug
           title: 'Procope',
           endpoint: 'http://ldf.fi/procope/sparql',
           queryTemplate: queryTemplate
+        },
+        { id: 'sdfb',
+          title: 'SDFB',
+          endpoint: 'http://ldf.fi/sdfb/sparql',
+          queryTemplate: queryTemplate
         }
       ]
       $scope.getClassTreeQuery = SparqlTreeService.getClassTreeQuery
