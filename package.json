@@ -28,7 +28,7 @@
     "gulp-sourcemaps": "^1.6.0",
     "gulp-stylus": "^2.4.0",
     "gulp-typescript": "^2.13.5",
-    "gulp-typescript-angular": "^0.1.1",
+    "gulp-typescript-angular": "git://github.com/jiemakel/gulp-typescript-angular",
     "gulp-uglify": "^1.5.3",
     "gulp-useref": "^3.1.0",
     "gulp-watch": "^4.3.6",
