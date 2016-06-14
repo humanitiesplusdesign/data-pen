@@ -1,0 +1,10 @@
+script(type="text/ng-template",id="treenode.html")
+  .checkbox
+    label
+      input(type="checkbox",ng-model="node.selected",ng-click="$ctrl.onSelect({treeNode:node});$event.stopPropagation()")
+      | {{node.label}}
+    span.pull-right {{node.matchingInstances != node.matchingInstances ? node.matchingInstances+'/'+node.instances : node.instances}}
+  ul
+    li(ng-repeat="node in node.children",ng-include="'treenode.html'",ng-click="$ctrl.onSelect({treeNode:node})",ng-class="{selected:node.selected}")
+ul
+  li(ng-repeat="node in $ctrl.tree",ng-include="'treenode.html'",ng-click="$ctrl.onSelect({treeNode:node})",ng-class="{selected:node.selected}")

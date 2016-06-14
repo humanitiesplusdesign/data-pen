@@ -37,16 +37,19 @@ html(lang="en",ng-app="fibra",ng-hint)
     script(src='bower_components/bootstrap/dist/js/bootstrap.js')
     script(src='bower_components/angular-sparql-service/dist/sparql-service.js')
     script(src='bower_components/ngstorage/ngStorage.js')
+    script(src='bower_components/angular-bootstrap/ui-bootstrap-tpls.js')
     // endbower
     // endbuild
 
     // build:js(.tmp) scripts/main.js
     script(src="scripts/app.js")
-    script(src="scripts/main-ctrl.js")
+    script(src="scripts/main-component.js")
     script(src="scripts/sparql-tree-service.js")
-    script(src="scripts/sparql-tree-component.js")
+    script(src="scripts/tree-component.js")
     script(src="scripts/sparql-autocomplete-service.js")
     script(src="scripts/sparql-autocomplete-component.js")
+    script(src="scripts/sparql-item-service.js")
+    script(src="scripts/sparql-item-component.js")
     // inject:partials
     // endinject
     // endbuild

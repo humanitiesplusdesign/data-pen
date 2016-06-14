@@ -1,7 +1,0 @@
-script(type="text/ng-template",id="sparql-treenode.html")
-  span {{node.label}}
-  span.pull-right {{node.matchingInstances != node.matchingInstances ? node.matchingInstances+'/'+node.instances : node.instances}}
-  ul
-    li(ng-repeat="node in node.children",ng-include="'sparql-treenode.html'",ng-click="selectElement(node,$event.ctrlKey);$event.stopPropagation()",ng-class="{selected:isSelected(node)}")
-ul
-  li(ng-repeat="node in $ctrl.tree",ng-include="'sparql-treenode.html'",ng-click="selectElement(node,$event.ctrlKey);$event.stopPropagation()",ng-class="{selected:isSelected(node)}")

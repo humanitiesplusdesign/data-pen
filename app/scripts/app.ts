@@ -11,13 +11,12 @@ namespace fibra {
     }
   }
 
-  let m: angular.IModule = angular.module('fibra', [ 'http-auth-interceptor', 'ngStorage', 'ui.router', 'fi.seco.sparql' ])
+  let m: angular.IModule = angular.module('fibra', [ 'http-auth-interceptor', 'ngStorage', 'ui.router',  'ui.bootstrap', 'ui.bootstrap.tpls', 'fi.seco.sparql' ])
   m.config(($stateProvider: angular.ui.IStateProvider, $urlRouterProvider: angular.ui.IUrlRouterProvider) => {
     $urlRouterProvider.otherwise('/')
     $stateProvider.state('main', {
       url: '/',
-      templateUrl: 'partials/main.html',
-      controller: 'MainController'
+      template: '<main></main>'
       })
   })
   m.config(($localStorageProvider) => {

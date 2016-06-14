@@ -4,7 +4,8 @@ namespace fibra {
   import s = fi.seco.sparql
 
   export class ResultsByDatasource {
-    constructor(public id: string, public title: string, public resultsByGroup: ResultGroup[]) {}
+    public resultsByGroup: ResultGroup[] = []
+    constructor(public configuration: SparqlAutocompletionConfiguration) {}
   }
 
   export class ResultGroup {
@@ -13,35 +14,70 @@ namespace fibra {
   }
 
   export class Result {
-    constructor(public id: string, public matchedLabel: string, public prefLabel: string, public additionalInformation: string) {}
+    constructor(public id: string, public resultGroup: ResultGroup, public datasource: ResultsByDatasource, public matchedLabel: string, public prefLabel: string, public additionalInformation: string) {}
   }
 
-  export interface ISparqlAutocompletionConfiguration {
-    id: string
-    title: string
-    endpoint: string
-    queryTemplate: string
+  export class SparqlAutocompletionConfiguration {
+
+    public constraints: string = ''
+
+    constructor(
+      public id: string,
+      public title: string,
+      public endpoint: string,
+      public queryTemplate: string
+    ) {}
   }
 
   export class SparqlAutocompleteService {
+
+    public static queryTemplate: string = `
+  PREFIX text: <http://jena.apache.org/text#>
+  PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+  PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+  PREFIX sf: <http://ldf.fi/functions#>
+  SELECT ?groupId ?groupLabel ?id ?matchedLabel ?prefLabel (GROUP_CONCAT(?altLabel;SEPARATOR=', ') AS ?additionalInformation) {
+    {
+      SELECT DISTINCT ?groupId ?id ?matchedLabel {
+        BIND(CONCAT(<QUERY>," ",REPLACE(<QUERY>,"([\\\\+\\\\-\\\\&\\\\|\\\\!\\\\(\\\\)\\\\{\\\\}\\\\[\\\\]\\\\^\\\\\\"\\\\~\\\\*\\\\?\\\\:\\\\/\\\\\\\\])","\\\\$1"),"*") AS ?query)
+        ?id text:query ?query .
+        ?id skos:prefLabel|rdfs:label|skos:altLabel ?matchedLabel
+        FILTER (REGEX(LCASE(?matchedLabel),CONCAT("\\\\b",LCASE(<QUERY>))))
+        ?id a ?groupId .
+        FILTER EXISTS {
+          ?groupId skos:prefLabel|rdfs:label ?groupLabel
+        }
+        # CONSTRAINTS
+      } LIMIT <LIMIT>
+    }
+    ?groupId sf:preferredLanguageLiteral (skos:prefLabel rdfs:label skos:altLabel 'en' '' ?groupLabel) .
+    ?id sf:preferredLanguageLiteral (skos:prefLabel rdfs:label skos:altLabel 'en' '' ?prefLabel) .
+    OPTIONAL {
+      ?id skos:altLabel ?altLabel .
+    }
+  }
+  GROUP BY ?groupId ?groupLabel ?id ?matchedLabel ?prefLabel
+  HAVING(BOUND(?id) && COUNT(?altLabel)<10) # workaround for Schoenberg bug
+  `
+
     constructor(private $q: angular.IQService, private sparqlService: s.SparqlService) { }
 
-    public autocomplete(query: string, constraints: string, limit: number, configurations: ISparqlAutocompletionConfiguration[], canceller?: angular.IPromise<any>): angular.IPromise<ResultsByDatasource[]> {
+    public autocomplete(query: string, limit: number, configurations: SparqlAutocompletionConfiguration[], canceller?: angular.IPromise<any>): angular.IPromise<ResultsByDatasource[]> {
       return this.$q.all(configurations.map(configuration => {
         let queryTemplate: string = configuration.queryTemplate
         queryTemplate = queryTemplate.replace(/<QUERY>/g, this.sparqlService.stringToSPARQLString(query))
-        if (constraints) queryTemplate = queryTemplate.replace(/# CONSTRAINTS/g, constraints)
+        queryTemplate = queryTemplate.replace(/# CONSTRAINTS/g, configuration.constraints)
         queryTemplate = queryTemplate.replace(/<LIMIT>/g, '' + limit)
         return this.sparqlService.query(configuration.endpoint, queryTemplate, {timeout: canceller}).then(
           (response: angular.IHttpPromiseCallbackArg<s.ISparqlBindingResult<{[id: string]: s.ISparqlBinding}>>) => {
-            let ret: ResultGroup[] = []
+            let ds: ResultsByDatasource = new ResultsByDatasource(configuration)
             let groupToResults: {[groupId: string]: ResultGroup} = {}
             response.data.results.bindings.forEach(binding => {
               if (!groupToResults[binding['groupId'].value]) groupToResults[binding['groupId'].value] = new ResultGroup(binding['groupLabel'].value)
-              groupToResults[binding['groupId'].value].results.push(new Result(binding['id'].value, binding['matchedLabel'].value, binding['prefLabel'].value, binding['additionalInformation'] ? binding['additionalInformation'].value : ''))
+              groupToResults[binding['groupId'].value].results.push(new Result(binding['id'].value, groupToResults[binding['groupId'].value], ds, binding['matchedLabel'].value, binding['prefLabel'].value, binding['additionalInformation'] ? binding['additionalInformation'].value : ''))
             })
-            for (let groupId in groupToResults) ret.push(groupToResults[groupId])
-            return new ResultsByDatasource(configuration.id, configuration.title, ret)
+            for (let groupId in groupToResults) ds.resultsByGroup.push(groupToResults[groupId])
+            return ds
           }
         )
       }))

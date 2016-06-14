@@ -1,9 +1,11 @@
-.form-group
+script(type="text/ng-template",id="sparql-item-popover")
+  sparql-item(endpoint='datasource.configuration.endpoint',item-id='result.id')
+.form-group.has-feedback
   input.form-control(ng-model="query",ng-model-options='{ debounce: 500 }',ng-change="$ctrl.onChange(query)")
   span.glyphicon.glyphicon-refresh.fa-spin.form-control-feedback(ng-show="$ctrl.queryRunning")
 div(ng-repeat="datasource in $ctrl.resultsByDatasource track by $index")
-  h4 {{datasource.title}}
+  h4 {{datasource.configuration.title}}
   ul: li(ng-repeat="group in datasource.resultsByGroup track by $index") {{group.label}}
-    ul: li(ng-repeat="result in group.results track by $index") {{result.matchedLabel}}
+    ul: li(ng-repeat="result in group.results track by $index",ng-click="$ctrl.onSelect({result:result})",uib-popover-template="'sparql-item-popover'",popover-trigger="mouseenter",popover-placement="right") {{result.matchedLabel}}
       span(ng-if="result.matchedLabel !== result.prefLabel") -&gt; {{result.prefLabel}}
       span(ng-if="result.additionalInformation!=''") &nbsp;({{result.additionalInformation}})

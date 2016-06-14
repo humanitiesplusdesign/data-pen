@@ -3,15 +3,6 @@ namespace fibra {
 
   import s = fi.seco.sparql
 
-  export class TreeNode {
-    // public matchingInstances: number
-    public children: TreeNode[] = []
-    public instances: number
-    constructor(public id: string, public label: string) {
-      // this.matchingInstances = instances
-    }
-  }
-
   export class SparqlTreeService {
     public static getClassTreeQuery: string = `
 PREFIX skos: <http://www.w3.org/2004/02/skos/core#>

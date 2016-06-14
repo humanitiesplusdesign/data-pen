@@ -1,9 +1,8 @@
 namespace fibra {
   'use strict'
   class SparqlAutocompleteComponentController {
-    public configurations: ISparqlAutocompletionConfiguration[]
+    public configurations: SparqlAutocompletionConfiguration[]
     public limit: number
-    public constraints: string
     public queryRunning: boolean
     public onSelect: (selection: Result) => void
     private resultsByDatasource: ResultsByDatasource[]
@@ -12,7 +11,7 @@ namespace fibra {
       this.queryRunning = true
       this.canceller.resolve()
       this.canceller = this.$q.defer()
-      this.sparqlAutocompleteService.autocomplete(query, this.constraints, this.limit, this.configurations, this.canceller.promise).then(
+      this.sparqlAutocompleteService.autocomplete(query, this.limit, this.configurations, this.canceller.promise).then(
         (resultsByDatasource: ResultsByDatasource[]) => {
           this.resultsByDatasource = resultsByDatasource
           this.queryRunning = false
