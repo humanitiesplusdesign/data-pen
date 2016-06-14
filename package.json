@@ -41,5 +41,8 @@
   },
   "engines": {
     "node": ">=5.0.0"
+  },
+  "scripts": {
+    "postinstall": "bower install && typings install"
   }
 }
