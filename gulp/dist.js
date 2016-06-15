@@ -7,7 +7,7 @@ gulp.task('dist:partials', function() {
   return gulp.src(".tmp/partials/**/*.html")
     .pipe($.plumber({ errorHandler: $.notify.onError("<%= error.stack %>") }))
     .pipe($.ngHtml2js({
-      moduleName: "fibra",
+      moduleName: "app",
       prefix: "partials/"
     }))
     .pipe(gulp.dest(".tmp/partials"));

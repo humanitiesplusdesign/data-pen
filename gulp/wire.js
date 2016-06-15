@@ -2,7 +2,7 @@ var gulp = require('gulp');
 var $ = require('gulp-load-plugins')();
 var wiredep = require('wiredep').stream;
 
-gulp.task('wiredep:styles', function() {
+gulp.task('wire:styles', function() {
   return gulp.src("app/styles/*.styl")
     .pipe(wiredep({
       directory: "app/bower_components",
@@ -23,12 +23,21 @@ gulp.task('wiredep:styles', function() {
     .pipe(gulp.dest("app/styles"));
 });
 
-gulp.task('wiredep:scripts', function() {
+gulp.task('wire:scripts', function() {
   return gulp.src("app/*.pug")
     .pipe(wiredep({
       directory: "app/bower_components"
     }))
+    .pipe($.inject(gulp.src("app/scripts/**/*.ts", {read:false}), {
+          starttag: "// inject:scripts",
+          endtag: "// endinject",
+          addRootSlash: false,
+          ignorePath: 'app/',
+          transform: function(filepath) {
+            return 'script(src="'+filepath.replace(/\.ts$/g,'\.js')+'")'
+          }
+        }))
     .pipe(gulp.dest("app"));
 });
 
-gulp.task('wiredep', ['wiredep:styles', 'wiredep:scripts']);
+gulp.task('wire', ['wire:styles', 'wire:scripts'])

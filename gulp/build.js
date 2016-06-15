@@ -16,7 +16,7 @@ gulp.task('scripts', function() {
     .pipe($.plumber({ errorHandler: $.notify.onError("<%= error.stack %>") }))
     .pipe($.sourcemaps.init())
     .pipe($.typescript(tsProject)).js
-    .pipe($.typescriptAngular({ moduleName: 'fibra' }))
+    .pipe($.typescriptAngular({ moduleName: 'app' }))
     .pipe($.sourcemaps.write())
     .pipe(gulp.dest(".tmp"));
 });
@@ -36,5 +36,5 @@ gulp.task('clean', function(cb){
 });
 
 gulp.task('build', function(cb){
-  return require('run-sequence')('clean', ['wiredep', 'templates', 'styles', 'scripts'], cb);
+  return require('run-sequence')('clean', ['wire', 'templates', 'styles', 'scripts'], cb);
 });
