@@ -28,7 +28,7 @@ gulp.task('wire:scripts', function() {
     .pipe(wiredep({
       directory: "app/bower_components"
     }))
-    .pipe($.inject(gulp.src("app/scripts/**/*.ts", {read:false}), {
+    .pipe($.inject(gulp.src(["app/scripts/**/*.ts","!app/scripts/app.ts"], {read:false}), {
           starttag: "// inject:scripts",
           endtag: "// endinject",
           addRootSlash: false,
