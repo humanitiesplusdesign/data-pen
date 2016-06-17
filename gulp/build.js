@@ -16,7 +16,7 @@ gulp.task('scripts', function() {
     .pipe($.plumber({ errorHandler: $.notify.onError("<%= error.stack %>") }))
     .pipe($.sourcemaps.init())
     .pipe($.typescript(tsProject)).js
-    .pipe($.typescriptAngular({ moduleName: 'app' }))
+    .pipe($.typescriptAngular({ moduleName: 'fibra' }))
     .pipe($.sourcemaps.write())
     .pipe(gulp.dest(".tmp"));
 });
