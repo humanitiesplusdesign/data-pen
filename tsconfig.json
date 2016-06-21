@@ -18,6 +18,8 @@
         "app/scripts/main-component.ts",
         "app/scripts/sparql-autocomplete-component.ts",
         "app/scripts/sparql-autocomplete-service.ts",
+        "app/scripts/configuration-service.ts",
+        "app/scripts/configurations-component.ts",
         "app/scripts/sparql-item-component.ts",
         "app/scripts/sparql-item-service.ts",
         "app/scripts/sparql-tree-service.ts",

@@ -1,7 +1,7 @@
 namespace fibra {
   'use strict'
   class SparqlAutocompleteComponentController {
-    public configurations: SparqlAutocompletionConfiguration[]
+    public configurations: SparqlAutocompletionConfiguration[] = this.configurationService.configurations.map(c => c.autocompletionConfiguration)
     public limit: number
     public queryRunning: boolean
     public onSelect: (selection: Result) => void
@@ -18,14 +18,13 @@ namespace fibra {
         }
       )
     }
-    constructor(private $q: angular.IQService, private sparqlAutocompleteService: SparqlAutocompleteService) {
+    constructor(private $q: angular.IQService, private sparqlAutocompleteService: SparqlAutocompleteService, private configurationService: ConfigurationService) {
       this.canceller = $q.defer()
     }
   }
 
   export class SparqlAutocompleteComponent implements angular.IComponentOptions {
       public bindings: {[id: string]: string} = {
-        configurations: '<',
         constraints: '<',
         limit: '@',
         onSelect: '&'

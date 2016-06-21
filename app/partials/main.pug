@@ -6,23 +6,10 @@ nav.navbar.navbar-inverse.navbar-fixed-top
 .container-fluid.main
   .row.main.no-gutter
     #left-column.col-md-3
-      h4 Configure autocompletion for
-      uib-dropdown.btn-group(dropdown-append-to-body)
-        button#btn-append-to-body.btn.btn-primary(uib-dropdown-toggle, type="button") {{$ctrl.selectedConfiguration.title || "Select a provider"}}&nbsp;
-          span.caret
-        ul.dropdown-menu(uib-dropdown-menu, role="menu", aria-labelledby="btn-append-to-body")
-          li(role="menuitem" ng-repeat="configuration in $ctrl.configurations", ng-click="$ctrl.selectConfiguration(configuration)")
-            a(href="#") {{configuration.title}}
-      div
-        span.glyphicon.glyphicon-refresh.fa-spin(ng-show="$ctrl.selectedConfiguration && !$ctrl.selectedConfiguration.classTree")
-      div(ng-show="$ctrl.selectedConfiguration.classTree")
-        .checkbox: label
-          input(type="checkbox",ng-model="$ctrl.selectedConfiguration.allSelected",ng-click="$ctrl.selectedConfiguration.toggleAll();$event.stopPropagation()")
-          | all
-      tree(tree="$ctrl.selectedConfiguration.classTree",on-select="$ctrl.selectedConfiguration.alterSelection(treeNode)", ng-show="$ctrl.selectedConfiguration.classTree")
+      configurations
     #middle-column.col-md-4
       h4 Autocompletion
-      sparql-autocomplete(configurations="$ctrl.autocompletionConfigurations",limit="30",on-select="$ctrl.setItem(result.id,result.datasource.configuration.endpoint)")
+      sparql-autocomplete(limit="30",on-select="$ctrl.setItem(result.id,result.datasource.configuration.endpoint)")
     #right-column.col-md-5
       h4 Item
       sparql-item(endpoint="$ctrl.itemEndpoint",item-id="$ctrl.itemId",on-select="$ctrl.setItem(value.node.value,$ctrl.itemEndpoint)")
