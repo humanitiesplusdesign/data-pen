@@ -5,7 +5,7 @@ namespace fibra {
     constructor(public endpoint: string, public queryTemplate: string) {}
   }
 
-  export class MainComponentController {
+  export class AuthorComponentController {
     public itemId: string
     public itemEndpoint: string
 
@@ -17,8 +17,8 @@ namespace fibra {
     constructor(private configurationService: ConfigurationService) {}
   }
 
-  export class MainComponent implements angular.IComponentOptions {
-      public controller: Function = MainComponentController
-      public templateUrl: string = 'partials/main.html'
+  export class AuthorComponent implements angular.IComponentOptions {
+      public controller: Function = AuthorComponentController
+      public templateUrl: string = 'partials/author.html'
   }
 }

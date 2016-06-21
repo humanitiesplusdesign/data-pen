@@ -1,14 +1,17 @@
-h4 Configure autocompletion for
-uib-dropdown.btn-group(dropdown-append-to-body)
-  button#btn-append-to-body.btn.btn-primary(uib-dropdown-toggle, type="button") {{$ctrl.selectedConfiguration.title || "Select a provider"}}&nbsp;
-    span.caret
-  ul.dropdown-menu(uib-dropdown-menu, role="menu", aria-labelledby="btn-append-to-body")
-    li(role="menuitem" ng-repeat="configuration in $ctrl.configurations", ng-click="$ctrl.selectConfiguration(configuration)")
-      a(href="#") {{configuration.title}}
-div
-  span.glyphicon.glyphicon-refresh.fa-spin(ng-show="$ctrl.selectedConfiguration && !$ctrl.selectedConfiguration.classTree")
-div(ng-show="$ctrl.selectedConfiguration.classTree")
-  .checkbox: label
-    input(type="checkbox",ng-model="$ctrl.selectedConfiguration.allSelected",ng-click="$ctrl.selectedConfiguration.toggleAll();$event.stopPropagation()")
-    | all
-tree(tree="$ctrl.selectedConfiguration.classTree",on-select="$ctrl.selectedConfiguration.alterSelection(treeNode)", ng-show="$ctrl.selectedConfiguration.classTree")
+.container-fluid.main
+  .row.main.no-gutter
+    #left-column.col-md-3
+      h4 Configure autocompletion for
+      uib-dropdown.btn-group(dropdown-append-to-body)
+        button#btn-append-to-body.btn.btn-primary(uib-dropdown-toggle, type="button") {{$ctrl.selectedConfiguration.title || "Select a provider"}}&nbsp;
+          span.caret
+        ul.dropdown-menu(uib-dropdown-menu, role="menu", aria-labelledby="btn-append-to-body")
+          li(role="menuitem" ng-repeat="configuration in $ctrl.configurations", ng-click="$ctrl.selectConfiguration(configuration)")
+            a() {{configuration.title}}
+      div
+        span.glyphicon.glyphicon-refresh.fa-spin(ng-show="$ctrl.selectedConfiguration && !$ctrl.selectedConfiguration.classTree")
+      div(ng-show="$ctrl.selectedConfiguration.classTree")
+        .checkbox: label
+          input(type="checkbox",ng-model="$ctrl.selectedConfiguration.allSelected",ng-click="$ctrl.selectedConfiguration.toggleAll();$event.stopPropagation()")
+          | all
+      tree(tree="$ctrl.selectedConfiguration.classTree",on-select="$ctrl.selectedConfiguration.alterSelection(treeNode)", ng-show="$ctrl.selectedConfiguration.classTree")

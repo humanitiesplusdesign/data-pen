@@ -1,12 +1,6 @@
-nav.navbar.navbar-inverse.navbar-fixed-top
-  .container-fluid
-    .navbar-header
-      .navbar-brand
-        img(src="images/fibra.png" height="23px")
 .container-fluid.main
   .row.main.no-gutter
     #left-column.col-md-3
-      configurations
     #middle-column.col-md-4
       h4 Autocompletion
       sparql-autocomplete(limit="30",on-select="$ctrl.setItem(result.id,result.datasource.configuration.endpoint)")

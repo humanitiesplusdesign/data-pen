@@ -27,7 +27,17 @@ html(lang="en",ng-app="fibra",ng-hint)
       .modal-footer
           button.btn.btn-success(ng-click="setAuth()") Ok
           button.btn.btn-danger(ng-click="dismissAuth()") Cancel
-    main(ui-view="")
+    nav.navbar.navbar-inverse.navbar-fixed-top
+      .container-fluid
+        .navbar-header
+          .navbar-brand
+            img(src="images/fibra.png" height="23px")
+        .nav.navbar-nav
+          li
+            a(ui-sref="author") Author
+          li
+            a(ui-sref="configuration") Configure
+    div(ui-view)
     // build:js(app) scripts/vendor.js
     // bower:js
     script(src='bower_components/angular/angular.js')
@@ -44,6 +54,7 @@ html(lang="en",ng-app="fibra",ng-hint)
     // build:js(.tmp) scripts/main.js
     script(src="scripts/app.js")
     // inject:scripts
+    script(src="scripts/author-component.js")
     script(src="scripts/configuration-service.js")
     script(src="scripts/configurations-component.js")
     script(src="scripts/main-component.js")
