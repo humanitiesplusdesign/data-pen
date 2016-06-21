@@ -17,5 +17,37 @@ gulp.task('serve', ['watch'], function() {
 });
 
 gulp.task('serve:dist', function() {
-  browserSync.init({ server: { baseDir: 'dist' } });
+  browserSync.init({ server: { baseDir: 'dist' }, ghostMode: false });
+});
+
+gulp.task('lserve', ['watch'], function() {
+  gulp.src(['.tmp', 'app']).pipe($.webserver({
+    livereload: true,
+    open: true,
+    port: 3000
+  }));
+});
+
+gulp.task('lserve:dist', function() {
+  gulp.src('dist').pipe($.webserver({
+    livereload: true,
+    open: true,
+    port: 3000
+  }));
+});
+
+gulp.task('sserve', ['watch'], function() {
+  gulp.src(['.tmp', 'app']).pipe($.webserver({
+    livereload: false,
+    open: true,
+    port: 3000
+  }));
+});
+
+gulp.task('sserve:dist', function() {
+  gulp.src('dist').pipe($.webserver({
+    livereload: false,
+    open: true,
+    port: 3000
+  }));
 });

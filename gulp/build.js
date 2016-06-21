@@ -36,5 +36,5 @@ gulp.task('clean', function(cb){
 });
 
 gulp.task('build', function(cb){
-  return require('run-sequence')('clean', ['wire', 'templates', 'styles', 'scripts'], cb);
+  return require('run-sequence')('clean', 'wire', ['templates', 'styles', 'scripts'], cb);
 });
