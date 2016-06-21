@@ -29,27 +29,48 @@ namespace fibra {
       this.allSelected = true
     }
     public alterSelection: (TreeNode) => void = (node: TreeNode) => {
-      node.selected = !node.selected
-      node.recursivelyProcess(n => n.selected = node.selected)
-      if (node.selected) {
-        this.disallowed.splice(this.disallowed.indexOf(node.id), 1)
-        this.allowed.push(node.id)
-      } else {
-        this.allSelected = false
-        this.allowed.splice(this.allowed.indexOf(node.id), 1)
-        this.disallowed.push(node.id)
-      }
+      node.recursivelyProcessChildren(n => {
+        n.selected = node.selected
+        this.setAllowedDisallowed(n)
+      })
+      this.setAllowedDisallowed(node)
       this.updateFilter()
     }
-    public toggleAll: () => void = () => {
-      this.classTree.forEach(tree => tree.recursivelyProcess(tree2 => tree2.selected = this.allSelected))
-      if (this.allSelected) {
-        this.allowed = this.allowed.concat(this.disallowed)
-        this.disallowed = []
+    public setAllowedDisallowed: (TreeNode) => void = (node: TreeNode) => {
+      if (node.selected) {
+        this.removeDisallowed(node)
+        this.addAllowed(node)
       } else {
-        this.disallowed = this.disallowed.concat(this.allowed)
-        this.allowed = []
+        this.allSelected = false
+        this.removeAllowed(node)
+        this.addDisallowed(node)
       }
+    }
+    public addAllowed: (TreeNode) => void = (node: TreeNode) => {
+      if(this.allowed.indexOf(node.id) === -1) {
+        this.allowed.push(node.id)
+      }
+    }
+    public removeAllowed: (TreeNode) => void = (node: TreeNode) => {
+      if(this.allowed.indexOf(node.id) !== -1) {
+        this.allowed.splice(this.allowed.indexOf(node.id), 1)
+      }
+    }
+    public addDisallowed: (TreeNode) => void = (node: TreeNode) => {
+      if(this.disallowed.indexOf(node.id) === -1) {
+        this.disallowed.push(node.id)
+      }
+    }
+    public removeDisallowed: (TreeNode) => void = (node: TreeNode) => {
+      if(this.disallowed.indexOf(node.id) !== -1) {
+        this.disallowed.splice(this.disallowed.indexOf(node.id), 1)
+      }
+    }
+    public toggleAll: () => void = () => {
+      this.classTree.forEach(node => node.recursivelyProcess(n => {
+        n.selected = this.allSelected
+        this.setAllowedDisallowed(n)
+      }))
       this.updateFilter()
     }
 
