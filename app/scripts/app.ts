@@ -25,7 +25,20 @@ namespace fibra {
   m.config(($localStorageProvider) => {
     $localStorageProvider.setKeyPrefix('fibra-');
   })
-  m.run(($rootScope: IAuthenticationRootScopeService, $localStorage: any, $http: angular.IHttpService, authService: angular.httpAuth.IAuthService) => {
+  m.value('workerServiceConfiguration', {
+    appName: 'fibra',
+    workerThreads: 8,
+    angularURL: 'bower_components/angular/angular.min.js',
+    importScripts: [
+      'bower_components/angular-http-auth/src/http-auth-interceptor.js',
+      'bower_components/angular-sparql-service/dist/sparql-service.js',
+      'scripts/sparql-item-service.js',
+      'scripts/worker-app.js',
+      'scripts/sparql-autocomplete-service.js',
+    ],
+    requiredModules: ['fi.seco.sparql', 'http-auth-interceptor']
+  })
+  m.run(($rootScope: IAuthenticationRootScopeService, $localStorage: any, $http: angular.IHttpService, authService: angular.httpAuth.IAuthService, workerService: WorkerService) => {
     $rootScope.authInfo = {
       authOpen: false,
       username: undefined,
@@ -36,6 +49,7 @@ namespace fibra {
       $rootScope.authInfo.authOpen = false
       $localStorage.authorization = 'Basic ' + btoa($rootScope.authInfo.username + ':' + $rootScope.authInfo.password)
       $http.defaults.headers.common['Authorization'] = $localStorage.authorization
+      workerService.$broadcast('main:auth-loginAuthInfo', $localStorage.authorization)
       authService.loginConfirmed()
     }
     $rootScope.dismissAuth = () => {

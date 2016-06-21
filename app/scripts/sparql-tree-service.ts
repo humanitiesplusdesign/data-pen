@@ -25,7 +25,13 @@ SELECT ?subClass ?superClass ?class ?classLabel ?instances {
   ?class sf:preferredLanguageLiteral (skos:prefLabel rdfs:label skos:altLabel 'en' '' ?classLabel) .
 }
 `
+    constructor(private workerService: WorkerService) {}
+    public getTree(endpoint: string, query: string, canceller?: angular.IPromise<any>): angular.IPromise<TreeNode[]> {
+      return this.workerService.call('sparqlTreeWorkerService', 'getTree', [endpoint, query], canceller)
+    }
+  }
 
+  export class SparqlTreeWorkerService {
     constructor(private sparqlService: s.SparqlService) {}
 
     public getTree(endpoint: string, query: string, canceller?: angular.IPromise<any>): angular.IPromise<TreeNode[]> {

@@ -32,34 +32,53 @@ namespace fibra {
   export class SparqlAutocompleteService {
 
     public static queryTemplate: string = `
-  PREFIX text: <http://jena.apache.org/text#>
-  PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-  PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
-  PREFIX sf: <http://ldf.fi/functions#>
-  SELECT ?groupId ?groupLabel ?id ?matchedLabel ?prefLabel (GROUP_CONCAT(?altLabel;SEPARATOR=', ') AS ?additionalInformation) {
-    {
-      SELECT DISTINCT ?groupId ?id ?matchedLabel {
-        BIND(CONCAT(<QUERY>," ",REPLACE(<QUERY>,"([\\\\+\\\\-\\\\&\\\\|\\\\!\\\\(\\\\)\\\\{\\\\}\\\\[\\\\]\\\\^\\\\\\"\\\\~\\\\*\\\\?\\\\:\\\\/\\\\\\\\])","\\\\$1"),"*") AS ?query)
+PREFIX text: <http://jena.apache.org/text#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+PREFIX sf: <http://ldf.fi/functions#>
+SELECT ?groupId ?groupLabel ?id ?matchedLabel ?prefLabel (GROUP_CONCAT(?altLabel;SEPARATOR=', ') AS ?additionalInformation) {
+  {
+    SELECT DISTINCT ?groupId ?id {
+      {
+        SELECT DISTINCT ?groupId ?id ?matchedLabel {
+          BIND(CONCAT("\\"",REPLACE(<QUERY>,"([\\\\+\\\\-\\\\&\\\\|\\\\!\\\\(\\\\)\\\\{\\\\}\\\\[\\\\]\\\\^\\\\\\"\\\\~\\\\*\\\\?\\\\:\\\\/\\\\\\\\])","\\\\$1"),"\\"") AS ?query)
+          ?id text:query ?query .
+          ?id a ?groupId .
+          FILTER EXISTS {
+            ?groupId skos:prefLabel|rdfs:label ?groupLabel
+          }
+          # CONSTRAINTS
+        } LIMIT <LIMIT>
+      } UNION {
+        BIND(CONCAT(REPLACE(<QUERY>,"([\\\\+\\\\-\\\\&\\\\|\\\\!\\\\(\\\\)\\\\{\\\\}\\\\[\\\\]\\\\^\\\\\\"\\\\~\\\\*\\\\?\\\\:\\\\/\\\\\\\\])","\\\\$1"),"*") AS ?query)
         ?id text:query ?query .
-        ?id skos:prefLabel|rdfs:label|skos:altLabel ?matchedLabel
-        FILTER (REGEX(LCASE(?matchedLabel),CONCAT("\\\\b",LCASE(<QUERY>))))
         ?id a ?groupId .
         FILTER EXISTS {
           ?groupId skos:prefLabel|rdfs:label ?groupLabel
         }
         # CONSTRAINTS
-      } LIMIT <LIMIT>
-    }
-    ?groupId sf:preferredLanguageLiteral (skos:prefLabel rdfs:label skos:altLabel 'en' '' ?groupLabel) .
-    ?id sf:preferredLanguageLiteral (skos:prefLabel rdfs:label skos:altLabel 'en' '' ?prefLabel) .
-    OPTIONAL {
-      ?id skos:altLabel ?altLabel .
+      }
     }
   }
-  GROUP BY ?groupId ?groupLabel ?id ?matchedLabel ?prefLabel
-  HAVING(BOUND(?id) && COUNT(?altLabel)<10) # workaround for Schoenberg bug
-  `
+  ?id skos:prefLabel|rdfs:label|skos:altLabel ?matchedLabel
+  FILTER (REGEX(LCASE(?matchedLabel),CONCAT("\\\\b",LCASE(<QUERY>))))
+  ?groupId sf:preferredLanguageLiteral (skos:prefLabel rdfs:label skos:altLabel 'en' '' ?groupLabel) .
+  ?id sf:preferredLanguageLiteral (skos:prefLabel rdfs:label skos:altLabel 'en' '' ?prefLabel) .
+  OPTIONAL {
+    ?id skos:altLabel ?altLabel .
+  }
+}
+GROUP BY ?groupId ?groupLabel ?id ?matchedLabel ?prefLabel
+HAVING(BOUND(?id) && COUNT(?altLabel)<10) # workaround for Schoenberg bug
+`
 
+    constructor(private workerService: WorkerService) {}
+    public autocomplete(query: string, limit: number, configurations: SparqlAutocompletionConfiguration[], canceller?: angular.IPromise<any>): angular.IPromise<ResultsByDatasource[]> {
+      return this.workerService.call('sparqlAutocompleteWorkerService', 'autocomplete', [query, limit, configurations], canceller)
+    }
+  }
+
+  export class SparqlAutocompleteWorkerService {
     constructor(private $q: angular.IQService, private sparqlService: s.SparqlService) { }
 
     public autocomplete(query: string, limit: number, configurations: SparqlAutocompletionConfiguration[], canceller?: angular.IPromise<any>): angular.IPromise<ResultsByDatasource[]> {

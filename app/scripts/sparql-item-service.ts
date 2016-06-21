@@ -94,6 +94,14 @@ SELECT ?itemLabel ?property ?propertyLabel ?object ?objectLabel {
   BIND (IF(ISIRI(?object),COALESCE(?objectLabelP,REPLACE(REPLACE(REPLACE(REPLACE(STR(?object),".*/",""),".*#",""),"_"," "),"([A-ZÅÄÖ])"," $1")),?object) AS ?objectLabel)
 }
 `
+    constructor(private workerService: WorkerService) {}
+    public getItem(endpoint: string, iri: string, canceller?: angular.IPromise<any>): angular.IPromise<Item> {
+      return this.workerService.call('sparqlItemWorkerService', 'getItem', [endpoint, iri], canceller)
+    }
+  }
+
+  export class SparqlItemWorkerService {
+
     constructor(private sparqlService: s.SparqlService) {}
 
     public getItem(endpoint: string, iri: string, canceller?: angular.IPromise<any>): angular.IPromise<Item> {
@@ -107,6 +115,7 @@ SELECT ?itemLabel ?property ?propertyLabel ?object ?objectLabel {
               let propertyToValues: PropertyToValues = propertyMap[b['property'].value]
               if (!propertyToValues) {
                 propertyToValues = new PropertyToValues(b['property'])
+                propertyMap[b['property'].value] = propertyToValues
                 if (b['propertyLabel']) propertyToValues.label = b['propertyLabel'].value
                 item.properties.push(propertyToValues)
               }
@@ -119,7 +128,6 @@ SELECT ?itemLabel ?property ?propertyLabel ?object ?objectLabel {
         }
       )
     }
-
   }
 
 }

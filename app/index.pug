@@ -13,7 +13,7 @@ html(lang="en",ng-app="fibra",ng-hint)
     link(rel="stylesheet" href="styles/main.css")
     // endbuild
 
-    title app
+    title Fibra
   body
     .modal(ng-class="authInfo.authOpen ? 'modal-open fade in' : ''",ng-style="authInfo.authOpen ? {display:'block'} : {}"): .modal-dialog(ng-show="authInfo.authOpen"): form.modal-content
       .modal-header: h4.modal-title Authentication required
@@ -44,7 +44,6 @@ html(lang="en",ng-app="fibra",ng-hint)
     script(src='bower_components/jquery/dist/jquery.js')
     script(src='bower_components/angular-ui-router/release/angular-ui-router.js')
     script(src='bower_components/angular-http-auth/src/http-auth-interceptor.js')
-    script(src='bower_components/bootstrap/dist/js/bootstrap.js')
     script(src='bower_components/angular-sparql-service/dist/sparql-service.js')
     script(src='bower_components/ngstorage/ngStorage.js')
     script(src='bower_components/angular-bootstrap/ui-bootstrap-tpls.js')
@@ -64,6 +63,7 @@ html(lang="en",ng-app="fibra",ng-hint)
     script(src="scripts/sparql-item-service.js")
     script(src="scripts/sparql-tree-service.js")
     script(src="scripts/tree-component.js")
+    script(src="scripts/worker-service.js")
     // endinject
     // inject:partials
     // endinject

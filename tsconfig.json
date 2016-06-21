@@ -24,6 +24,8 @@
         "app/scripts/sparql-item-service.ts",
         "app/scripts/sparql-tree-service.ts",
         "app/scripts/tree-component.ts",
+        "app/scripts/worker-app.ts",
+        "app/scripts/worker-service.ts",
         "app/bower_components/angular-sparql-service/dist/sparql-service.d.ts",
         "typings/globals/angular-http-auth/index.d.ts",
         "typings/globals/angular-ui-router/index.d.ts",

@@ -3,6 +3,7 @@ script(type="text/ng-template",id="sparql-item-popover")
 .form-group.has-feedback
   input.form-control(ng-model="query",ng-model-options='{ debounce: 500 }',ng-change="$ctrl.onChange(query)")
   span.glyphicon.glyphicon-refresh.fa-spin.form-control-feedback(ng-show="$ctrl.queryRunning")
+  span.danger.glyphicon.glyphicon-alert.form-control-feedback(ng-show="$ctrl.error")
 div(ng-repeat="datasource in $ctrl.resultsByDatasource track by $index")
   h4 {{datasource.configuration.title}}
   ul: li(ng-repeat="group in datasource.resultsByGroup track by $index")

@@ -5,16 +5,22 @@ namespace fibra {
     public limit: number
     public queryRunning: boolean
     public onSelect: (selection: Result) => void
+    public error: boolean = false
     private resultsByDatasource: ResultsByDatasource[]
     private canceller: angular.IDeferred<any>
     public onChange: (query: string) => void = (query: string) => {
-      this.queryRunning = true
       this.canceller.resolve()
       this.canceller = this.$q.defer()
+      this.queryRunning = true
+      this.error = false
       this.sparqlAutocompleteService.autocomplete(query, this.limit, this.configurations, this.canceller.promise).then(
         (resultsByDatasource: ResultsByDatasource[]) => {
           this.resultsByDatasource = resultsByDatasource
           this.queryRunning = false
+        },
+        () => {
+          this.queryRunning = false
+          this.error = true
         }
       )
     }

@@ -47,22 +47,22 @@ namespace fibra {
       }
     }
     public addAllowed: (TreeNode) => void = (node: TreeNode) => {
-      if(this.allowed.indexOf(node.id) === -1) {
+      if (this.allowed.indexOf(node.id) === -1) {
         this.allowed.push(node.id)
       }
     }
     public removeAllowed: (TreeNode) => void = (node: TreeNode) => {
-      if(this.allowed.indexOf(node.id) !== -1) {
+      if (this.allowed.indexOf(node.id) !== -1) {
         this.allowed.splice(this.allowed.indexOf(node.id), 1)
       }
     }
     public addDisallowed: (TreeNode) => void = (node: TreeNode) => {
-      if(this.disallowed.indexOf(node.id) === -1) {
+      if (this.disallowed.indexOf(node.id) === -1) {
         this.disallowed.push(node.id)
       }
     }
     public removeDisallowed: (TreeNode) => void = (node: TreeNode) => {
-      if(this.disallowed.indexOf(node.id) !== -1) {
+      if (this.disallowed.indexOf(node.id) !== -1) {
         this.disallowed.splice(this.disallowed.indexOf(node.id), 1)
       }
     }
