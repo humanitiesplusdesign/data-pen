@@ -35,6 +35,8 @@ namespace fibra {
       'scripts/sparql-item-service.js',
       'scripts/worker-app.js',
       'scripts/sparql-autocomplete-service.js',
+      'scripts/sparql-tree-service.js',
+      'scripts/tree-component.js',
     ],
     requiredModules: ['fi.seco.sparql', 'http-auth-interceptor']
   })
@@ -44,7 +46,10 @@ namespace fibra {
       username: undefined,
       password: undefined
     }
-    if ($localStorage.authorization) $http.defaults.headers.common['Authorization'] = $localStorage.authorization
+    if ($localStorage.authorization) {
+      $http.defaults.headers.common['Authorization'] = $localStorage.authorization
+      workerService.$broadcast('main:auth-loginAuthInfo', $localStorage.authorization)
+    }
     $rootScope.setAuth = () => {
       $rootScope.authInfo.authOpen = false
       $localStorage.authorization = 'Basic ' + btoa($rootScope.authInfo.username + ':' + $rootScope.authInfo.password)

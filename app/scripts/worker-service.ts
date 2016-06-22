@@ -36,7 +36,12 @@ namespace fibra {
       angular = window.angular;
       var app = angular.module('<APP_NAME>', ['<DEP_MODULES>']);
       self.$broadcast = function(name,args) {
-        self.postMessage({event:'broadcast', name:name, args:args})
+        try {
+          self.postMessage({event:'broadcast', name:name, args:args})
+        } catch (e) {
+          console.log(args,e)
+          throw e
+        }
       }
       app.value('workerWorkerService',self);
       importScripts('<IMPORT_SCRIPTS>');
@@ -44,7 +49,7 @@ namespace fibra {
       app.run(['$injector','$q','$rootScope', function($injector,$q,$rootScope) {
         self.addEventListener('message', function(e) {
           var id = e.data.id;
-          if (!id) {
+          if (id === undefined) {
             $rootScope.$broadcast(e.data.name, e.data.args);
             $rootScope.$apply();
           } else if (e.data.cancel) {
@@ -57,13 +62,28 @@ namespace fibra {
             cancellers[id] = canceller;
             service[e.data.method].apply(service,e.data.args.concat(canceller.promise)).then(function(success) {
               delete cancellers[id]
-              self.postMessage({event:'success', id: id, data: success});
+              try {
+                self.postMessage({event:'success', id: id, data: success});
+              } catch (e) {
+                console.log(success,e)
+                throw e
+              }
             }, function(error) {
               delete cancellers[id]
-              self.postMessage({event:'failure', id: id, data: stripFunctions(error)});
+              try {
+                self.postMessage({event:'failure', id: id, data: stripFunctions(error)});
+              } catch (e) {
+                console.log(error,e)
+                throw e
+              }
             }, function(update) {
               delete cancellers[id]
-              self.postMessage({event:'update', id: id, data: update});
+              try {
+                self.postMessage({event:'update', id: id, data: update});
+              } catch (e) {
+                console.log(update,e)
+                throw e
+              }
             });
           }
         })

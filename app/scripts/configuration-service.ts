@@ -21,7 +21,7 @@ namespace fibra {
     private allSelected: boolean = true
 
     public setClassTree: (classTree: TreeNode[]) => void = (classTree: TreeNode[]) => {
-      classTree.forEach(tree2 => tree2.recursivelyProcess(treeNode => {
+      classTree.forEach(tree2 => TreeNode.recursivelyProcess(tree2, treeNode => {
         treeNode.selected = true
         this.allowed.push(treeNode.id)
       }))
@@ -29,10 +29,10 @@ namespace fibra {
       this.allSelected = true
     }
     public alterSelection: (TreeNode) => void = (node: TreeNode) => {
-      node.recursivelyProcessChildren(n => {
+      node.children.forEach(cn => TreeNode.recursivelyProcess(cn, n => {
         n.selected = node.selected
         this.setAllowedDisallowed(n)
-      })
+      }))
       this.setAllowedDisallowed(node)
       this.updateFilter()
     }
@@ -67,7 +67,7 @@ namespace fibra {
       }
     }
     public toggleAll: () => void = () => {
-      this.classTree.forEach(node => node.recursivelyProcess(n => {
+      this.classTree.forEach(node => TreeNode.recursivelyProcess(node, n => {
         n.selected = this.allSelected
         this.setAllowedDisallowed(n)
       }))

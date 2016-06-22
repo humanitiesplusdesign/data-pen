@@ -6,4 +6,4 @@
       sparql-autocomplete(limit="30",on-select="$ctrl.setItem(result.id,result.datasource.configuration.endpoint)")
     #right-column.col-md-5
       h4 Item
-      sparql-item(endpoint="$ctrl.itemEndpoint",item-id="$ctrl.itemId",on-select="$ctrl.setItem(value.node.value,$ctrl.itemEndpoint)")
+      sparql-item(endpoint="$ctrl.itemEndpoint",item-id="$ctrl.itemId",on-select="$ctrl.setItem(value.id,$ctrl.itemEndpoint)")

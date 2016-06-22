@@ -10,6 +10,7 @@ namespace fibra {
   }
 
   export interface INode {
+    id: string
     value: string
     type: NodeType
     lang?: string
@@ -17,11 +18,13 @@ namespace fibra {
   }
 
   export class SparqlBindingNode implements INode {
+    public id: string
     public value: string
     public type: NodeType
     public lang: string
     public datatype: string
     constructor(binding: s.ISparqlBinding) {
+      this.id = s.SparqlService.bindingToString(binding)
       this.value = binding.value
       switch (binding.type) {
         case 'literal':
@@ -40,26 +43,69 @@ namespace fibra {
     }
   }
 
+  export class Node implements INode {
+    public type: NodeType
+    public value: string
+    public lang: string
+    public datatype: string
+    constructor(public id: string) {
+      if (id.indexOf('<') === 0) {
+        this.type = NodeType.IRI
+        this.value = id.substring(1, id.length - 1)
+      } else if (id.indexOf('_:') === 0) {
+        this.type = NodeType.BlankNode
+        this.value = id.substring(2)
+      } else if (id.indexOf('"') === 0) {
+        this.type = NodeType.Literal
+        this.value = id.substring(1, id.lastIndexOf('"'))
+        if (id.lastIndexOf('@') === id.lastIndexOf('"') + 1)
+          this.lang = id.substring(id.lastIndexOf('@'))
+        else if (id.lastIndexOf('^^<') === id.lastIndexOf('"') + 1)
+          this.datatype = id.substring(id.lastIndexOf('^^<'), id.length - 1)
+      } else {
+        throw 'Number datatypes not done yet'
+      }
+    }
+  }
+
   export class IRI implements INode {
     public type: NodeType = NodeType.IRI
-    constructor(public value: string) {}
+    public id: string
+    constructor(public value: string) {
+      this.id = '<' + value + '>'
+    }
   }
 
   export class BlankNode implements INode {
     public type: NodeType = NodeType.BlankNode
-    constructor(public value: string) {}
+    public id: string
+    constructor(public value: string) {
+      this.id = '_:' + value
+    }
   }
 
   export class Literal implements INode {
     public type: NodeType = NodeType.Literal
-    constructor(public value: string, public lang?: string, public datatype?: string) {}
+    public id: string
+    constructor(public value: string, public lang?: string, public datatype?: string) {
+      if (datatype) switch (datatype) {
+        case 'http://www.w3.org/2001/XMLSchema#integer':
+        case 'http://www.w3.org/2001/XMLSchema#decimal':
+        case 'http://www.w3.org/2001/XMLSchema#double':
+        case 'http://www.w3.org/2001/XMLSchema#boolean': this.id = value; break
+        case 'http://www.w3.org/2001/XMLSchema#string': this.id = '"' + value + '"'; break
+        default: this.id = '"' + value + '"^^<' + datatype + '>'; break
+      }
+      else if (lang) this.id = '"' + value + '"@' + lang
+      else this.id = '"' + value + '"'
+    }
   }
 
-  export class NodePlusLabel {
-    public label: string
-    constructor(public node: INode, label?: string) {
-      this.label = label
-    }
+  export class NodePlusLabel implements INode {
+    get id(): string { return this.node.id }
+    get value(): string { return this.node.value }
+    get type(): NodeType { return this.node.type }
+    constructor(public node: INode, public label?: string) {}
   }
 
   export class PropertyToValues extends NodePlusLabel {
@@ -104,10 +150,10 @@ SELECT ?itemLabel ?property ?propertyLabel ?object ?objectLabel {
 
     constructor(private sparqlService: s.SparqlService) {}
 
-    public getItem(endpoint: string, iri: string, canceller?: angular.IPromise<any>): angular.IPromise<Item> {
-      return this.sparqlService.query(endpoint, SparqlItemService.getItemPropertiesQuery.replace(/<ID>/g, '<' + iri + '>'), {timeout: canceller}).then(
+    public getItem(endpoint: string, id: string, canceller?: angular.IPromise<any>): angular.IPromise<Item> {
+      return this.sparqlService.query(endpoint, SparqlItemService.getItemPropertiesQuery.replace(/<ID>/g, id), {timeout: canceller}).then(
         (response: angular.IHttpPromiseCallbackArg<s.ISparqlBindingResult<{[id: string]: s.ISparqlBinding}>>) => {
-          let item: Item = new Item(new IRI(iri))
+          let item: Item = new Item(new Node(id))
           let propertyMap: {[property: string]: PropertyToValues} = {}
           response.data.results.bindings.forEach(b => {
             if (b['itemLabel']) item.label = b['itemLabel'].value

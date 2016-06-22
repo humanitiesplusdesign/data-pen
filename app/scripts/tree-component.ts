@@ -7,12 +7,9 @@ namespace fibra {
     public matchingInstances: number
     public selected: boolean = true
     public open: boolean = true
-    public recursivelyProcessChildren: (f: (TreeNode) => void) => void = (f: (TreeNode) => void) => {
-      this.children.forEach(n => n.recursivelyProcess(f))
-    }
-    public recursivelyProcess: (f: (TreeNode) => void) => void = (f: (TreeNode) => void) => {
-      f(this)
-      this.children.forEach(n => n.recursivelyProcess(f))
+    public static recursivelyProcess: (node: TreeNode, f: (TreeNode) => void) => void = (node: TreeNode, f: (TreeNode) => void) => {
+      f(node)
+      node.children.forEach(n => TreeNode.recursivelyProcess(n, f))
     }
     constructor(public id: string, public label: string) {}
   }

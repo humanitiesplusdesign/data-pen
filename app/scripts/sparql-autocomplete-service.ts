@@ -36,11 +36,11 @@ PREFIX text: <http://jena.apache.org/text#>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
 PREFIX sf: <http://ldf.fi/functions#>
-SELECT ?groupId ?groupLabel ?id ?matchedLabel ?prefLabel (GROUP_CONCAT(?altLabel;SEPARATOR=', ') AS ?additionalInformation) {
+SELECT ?groupId ?groupLabel ?id (SAMPLE(?matchedLabelS) AS ?matchedLabel) ?prefLabel (GROUP_CONCAT(?altLabel;SEPARATOR=', ') AS ?additionalInformation) {
   {
     SELECT DISTINCT ?groupId ?id {
       {
-        SELECT DISTINCT ?groupId ?id ?matchedLabel {
+        SELECT DISTINCT ?groupId ?id {
           BIND(CONCAT("\\"",REPLACE(<QUERY>,"([\\\\+\\\\-\\\\&\\\\|\\\\!\\\\(\\\\)\\\\{\\\\}\\\\[\\\\]\\\\^\\\\\\"\\\\~\\\\*\\\\?\\\\:\\\\/\\\\\\\\])","\\\\$1"),"\\"") AS ?query)
           ?id text:query ?query .
           ?id a ?groupId .
@@ -60,15 +60,15 @@ SELECT ?groupId ?groupLabel ?id ?matchedLabel ?prefLabel (GROUP_CONCAT(?altLabel
       }
     }
   }
-  ?id skos:prefLabel|rdfs:label|skos:altLabel ?matchedLabel
-  FILTER (REGEX(LCASE(?matchedLabel),CONCAT("\\\\b",LCASE(<QUERY>))))
+  ?id skos:prefLabel|rdfs:label|skos:altLabel ?matchedLabelS
+  FILTER (REGEX(LCASE(?matchedLabelS),CONCAT("\\\\b",LCASE(<QUERY>))))
   ?groupId sf:preferredLanguageLiteral (skos:prefLabel rdfs:label skos:altLabel 'en' '' ?groupLabel) .
   ?id sf:preferredLanguageLiteral (skos:prefLabel rdfs:label skos:altLabel 'en' '' ?prefLabel) .
   OPTIONAL {
     ?id skos:altLabel ?altLabel .
   }
 }
-GROUP BY ?groupId ?groupLabel ?id ?matchedLabel ?prefLabel
+GROUP BY ?groupId ?groupLabel ?id ?prefLabel
 HAVING(BOUND(?id) && COUNT(?altLabel)<10) # workaround for Schoenberg bug
 `
 
@@ -84,7 +84,7 @@ HAVING(BOUND(?id) && COUNT(?altLabel)<10) # workaround for Schoenberg bug
     public autocomplete(query: string, limit: number, configurations: SparqlAutocompletionConfiguration[], canceller?: angular.IPromise<any>): angular.IPromise<ResultsByDatasource[]> {
       return this.$q.all(configurations.map(configuration => {
         let queryTemplate: string = configuration.queryTemplate
-        queryTemplate = queryTemplate.replace(/<QUERY>/g, this.sparqlService.stringToSPARQLString(query))
+        queryTemplate = queryTemplate.replace(/<QUERY>/g, s.SparqlService.stringToSPARQLString(query))
         queryTemplate = queryTemplate.replace(/# CONSTRAINTS/g, configuration.constraints)
         queryTemplate = queryTemplate.replace(/<LIMIT>/g, '' + limit)
         return this.sparqlService.query(configuration.endpoint, queryTemplate, {timeout: canceller}).then(
@@ -93,7 +93,7 @@ HAVING(BOUND(?id) && COUNT(?altLabel)<10) # workaround for Schoenberg bug
             let groupToResults: {[groupId: string]: ResultGroup} = {}
             response.data.results.bindings.forEach(binding => {
               if (!groupToResults[binding['groupId'].value]) groupToResults[binding['groupId'].value] = new ResultGroup(binding['groupLabel'].value)
-              groupToResults[binding['groupId'].value].results.push(new Result(binding['id'].value, groupToResults[binding['groupId'].value], ds, binding['matchedLabel'].value, binding['prefLabel'].value, binding['additionalInformation'] ? binding['additionalInformation'].value : ''))
+              groupToResults[binding['groupId'].value].results.push(new Result(s.SparqlService.bindingToString(binding['id']), groupToResults[binding['groupId'].value], ds, binding['matchedLabel'].value, binding['prefLabel'].value, binding['additionalInformation'] ? binding['additionalInformation'].value : ''))
             })
             for (let groupId in groupToResults) ds.resultsByGroup.push(groupToResults[groupId])
             return ds
