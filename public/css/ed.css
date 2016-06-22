@@ -144,6 +144,7 @@ h1.post-title {
 	font-size: 1.4rem;
 }
 
+
 h2 {
 	margin-top: 1rem;
 	font-size: 1.2rem;
@@ -341,9 +342,18 @@ h3.masthead-title {
   margin-bottom: 4em;
 }
 
+
+$pagetitlecolor: #404040;
+
 .page-title {
-  color: #404040;
+  color: $pagetitlecolor;
   margin-top: 0;
+}
+
+.small {
+	font-size:70%;
+	font-weight:400;
+	color:lighten($pagetitlecolor, 50%);
 }
 
 
