@@ -5,7 +5,7 @@
     <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, width=device-width">
     <link rel="stylesheet" href="styles/vendor.css">
     <link rel="stylesheet" href="styles/main.css">
-    <title>app</title>
+    <title>Fibra</title>
   </head>
   <body>
     <div class="modal" ng-class="authInfo.authOpen ? 'modal-open fade in' : ''" ng-style="authInfo.authOpen ? {display:'block'} : {}">
@@ -31,7 +31,18 @@
         </form>
       </div>
     </div>
-    <main ui-view=""></main>
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container-fluid">
+        <div class="navbar-header">
+          <div class="navbar-brand"><img src="images/fibra.png" height="23px"></div>
+        </div>
+        <div class="nav navbar-nav">
+          <li><a ui-sref="author">Author</a></li>
+          <li><a ui-sref="configuration">Configure</a></li>
+        </div>
+      </div>
+    </nav>
+    <div ui-view></div>
     <script src="scripts/vendor.js"></script>
     <script src="scripts/main.js"></script>
     <div class="uib-modal-backdrop fade in" ng-show="authInfo.authOpen"></div>

@@ -20,3 +20,16 @@ main {
   padding-right: 0;
   padding-left: 0;
 }
+[tree] li {
+  list-style-type: none;
+}
+ul {
+  padding-left: 15px;
+}
+.group-label {
+  font-weight: bold;
+}
+div.checkbox {
+  margin-top: 3px;
+  margin-bottom: 3px;
+}
