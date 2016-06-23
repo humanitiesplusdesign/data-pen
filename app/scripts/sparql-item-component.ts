@@ -9,12 +9,12 @@ namespace fibra {
 
   class SparqlItemComponentBindings {
     public endpoint: string
-    public itemId: string
+    public itemId: INode
   }
 
   interface ISparqlItemComponentBindingChanges {
     endpoint?: IChangeObject<string>
-    itemId?: IChangeObject<string>
+    itemId?: IChangeObject<INode>
   }
 
   class SparqlItemComponentController extends SparqlItemComponentBindings {

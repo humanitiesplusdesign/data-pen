@@ -3,6 +3,7 @@ namespace fibra {
 
   export class ConfigurationService {
     public configurations: Configuration[] = [
+      new Configuration('local', 'Local', 'http://ldf.fi/fibra/sparql'),
       new Configuration('sdfb', 'Six Degrees of Francis Bacon', 'http://ldf.fi/sdfb/sparql'),
       new Configuration('emlo', 'EMLO', 'http://ldf.fi/emlo/sparql'),
       new Configuration('procope', 'Procope', 'http://ldf.fi/procope/sparql'),

@@ -32,10 +32,12 @@ namespace fibra {
     importScripts: [
       'bower_components/angular-http-auth/src/http-auth-interceptor.js',
       'bower_components/angular-sparql-service/dist/sparql-service.js',
+      'scripts/rdf.js',
       'scripts/sparql-item-service.js',
       'scripts/worker-app.js',
       'scripts/sparql-autocomplete-service.js',
       'scripts/sparql-tree-service.js',
+      'scripts/sparql-update-service.js',
       'scripts/tree-component.js',
     ],
     requiredModules: ['fi.seco.sparql', 'http-auth-interceptor']

@@ -7,6 +7,7 @@ namespace fibra {
 
   export interface IWorkerWorkerService {
     $broadcast: (name: string, args?: any[]) => void
+    stripFunctions: (obj: any) => any
   }
 
   export class WorkerService {
@@ -26,11 +27,12 @@ namespace fibra {
           };
         },
       };
-      function stripFunctions(obj) {
-        for (key in obj) if (obj.hasOwnProperty[key]) {
-          if (typeof obj[key] === 'object') stripFunctions(obj[key])
-          else if (typeof obj[key] === 'function') delete(obj[key])
-        }
+      self.stripFunctions = function(obj) {
+        var ret = {}
+        for (key in obj)
+          if (typeof obj[key] === 'object') ret[key] = self.stripFunctions(obj[key])
+          else if (typeof obj[key] !== 'function') ret[key] = obj[key]
+        return ret
       }
       importScripts('<URL_TO_ANGULAR>')
       angular = window.angular;
@@ -71,7 +73,7 @@ namespace fibra {
             }, function(error) {
               delete cancellers[id]
               try {
-                self.postMessage({event:'failure', id: id, data: stripFunctions(error)});
+                self.postMessage({event:'failure', id: id, data: self.stripFunctions(error)});
               } catch (e) {
                 console.log(error,e)
                 throw e

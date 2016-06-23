@@ -14,7 +14,7 @@ namespace fibra {
   }
 
   export class Result {
-    constructor(public id: string, public resultGroup: ResultGroup, public datasource: ResultsByDatasource, public matchedLabel: string, public prefLabel: string, public additionalInformation: string) {}
+    constructor(public id: INode, public resultGroup: ResultGroup, public datasource: ResultsByDatasource, public matchedLabel: string, public prefLabel: string, public additionalInformation: string) {}
   }
 
   export class SparqlAutocompletionConfiguration {
@@ -93,7 +93,7 @@ HAVING(BOUND(?id) && COUNT(?altLabel)<10) # workaround for Schoenberg bug
             let groupToResults: {[groupId: string]: ResultGroup} = {}
             response.data.results.bindings.forEach(binding => {
               if (!groupToResults[binding['groupId'].value]) groupToResults[binding['groupId'].value] = new ResultGroup(binding['groupLabel'].value)
-              groupToResults[binding['groupId'].value].results.push(new Result(s.SparqlService.bindingToString(binding['id']), groupToResults[binding['groupId'].value], ds, binding['matchedLabel'].value, binding['prefLabel'].value, binding['additionalInformation'] ? binding['additionalInformation'].value : ''))
+              groupToResults[binding['groupId'].value].results.push(new Result(new SparqlBindingNode(binding['id']), groupToResults[binding['groupId'].value], ds, binding['matchedLabel'].value, binding['prefLabel'].value, binding['additionalInformation'] ? binding['additionalInformation'].value : ''))
             })
             for (let groupId in groupToResults) ds.resultsByGroup.push(groupToResults[groupId])
             return ds

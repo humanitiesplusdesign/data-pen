@@ -3,126 +3,12 @@ namespace fibra {
 
   import s = fi.seco.sparql
 
-  export enum NodeType {
-    Literal,
-    IRI,
-    BlankNode
-  }
-
-  export interface INode {
-    id: string
-    value: string
-    type: NodeType
-    lang?: string
-    datatype?: string
-  }
-
-  export class SparqlBindingNode implements INode {
-    public id: string
-    public value: string
-    public type: NodeType
-    public lang: string
-    public datatype: string
-    constructor(binding: s.ISparqlBinding) {
-      this.id = s.SparqlService.bindingToString(binding)
-      this.value = binding.value
-      switch (binding.type) {
-        case 'literal':
-          this.type = NodeType.Literal
-          this.lang = binding['xml:lang']
-          this.datatype = binding.datatype
-          break
-        case 'uri':
-          this.type = NodeType.IRI
-          break
-        case 'bnode':
-          this.type = NodeType.BlankNode
-          break
-        default: throw 'Unknown binding type ' + binding.type + ' for ' + binding
-      }
-    }
-  }
-
-  export class Node implements INode {
-    public type: NodeType
-    public value: string
-    public lang: string
-    public datatype: string
-    constructor(public id: string) {
-      if (id.indexOf('<') === 0) {
-        this.type = NodeType.IRI
-        this.value = id.substring(1, id.length - 1)
-      } else if (id.indexOf('_:') === 0) {
-        this.type = NodeType.BlankNode
-        this.value = id.substring(2)
-      } else if (id.indexOf('"') === 0) {
-        this.type = NodeType.Literal
-        this.value = id.substring(1, id.lastIndexOf('"'))
-        if (id.lastIndexOf('@') === id.lastIndexOf('"') + 1)
-          this.lang = id.substring(id.lastIndexOf('@'))
-        else if (id.lastIndexOf('^^<') === id.lastIndexOf('"') + 1)
-          this.datatype = id.substring(id.lastIndexOf('^^<'), id.length - 1)
-      } else {
-        throw 'Number datatypes not done yet'
-      }
-    }
-  }
-
-  export class IRI implements INode {
-    public type: NodeType = NodeType.IRI
-    public id: string
-    constructor(public value: string) {
-      this.id = '<' + value + '>'
-    }
-  }
-
-  export class BlankNode implements INode {
-    public type: NodeType = NodeType.BlankNode
-    public id: string
-    constructor(public value: string) {
-      this.id = '_:' + value
-    }
-  }
-
-  export class Literal implements INode {
-    public type: NodeType = NodeType.Literal
-    public id: string
-    constructor(public value: string, public lang?: string, public datatype?: string) {
-      if (datatype) switch (datatype) {
-        case 'http://www.w3.org/2001/XMLSchema#integer':
-        case 'http://www.w3.org/2001/XMLSchema#decimal':
-        case 'http://www.w3.org/2001/XMLSchema#double':
-        case 'http://www.w3.org/2001/XMLSchema#boolean': this.id = value; break
-        case 'http://www.w3.org/2001/XMLSchema#string': this.id = '"' + value + '"'; break
-        default: this.id = '"' + value + '"^^<' + datatype + '>'; break
-      }
-      else if (lang) this.id = '"' + value + '"@' + lang
-      else this.id = '"' + value + '"'
-    }
-  }
-
-  export class NodePlusLabel implements INode {
-    get id(): string { return this.node.id }
-    get value(): string { return this.node.value }
-    get type(): NodeType { return this.node.type }
-    constructor(public node: INode, public label?: string) {}
-  }
-
-  export class PropertyToValues extends NodePlusLabel {
-    public values: NodePlusLabel[] = []
-    constructor(property: s.ISparqlBinding) {
-      super(new SparqlBindingNode(property))
-    }
-  }
-
-  export class Item {
-    public properties: PropertyToValues[] = []
-    public inverseProperties: PropertyToValues[] = []
-    public label: string
-    constructor(public node: INode) {}
-  }
-
   export class SparqlItemService {
+
+    public static ns: string = 'http://ldf.fi/fibra/'
+    public static schemaGraph: INode = new IRI(SparqlItemService.ns + 'schema#')
+    public static instanceGraph: INode = new IRI(SparqlItemService.ns + 'main/')
+
     public static getItemPropertiesQuery: string = `
 PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
@@ -140,33 +26,58 @@ SELECT ?itemLabel ?property ?propertyLabel ?object ?objectLabel {
   BIND (IF(ISIRI(?object),COALESCE(?objectLabelP,REPLACE(REPLACE(REPLACE(REPLACE(STR(?object),".*/",""),".*#",""),"_"," "),"([A-ZÅÄÖ])"," $1")),?object) AS ?objectLabel)
 }
 `
-    constructor(private workerService: WorkerService) {}
-    public getItem(endpoint: string, iri: string, canceller?: angular.IPromise<any>): angular.IPromise<Item> {
-      return this.workerService.call('sparqlItemWorkerService', 'getItem', [endpoint, iri], canceller)
+
+    private static lut: string[] = (() => {
+      let lut: string[] = []
+      for (let i: number = 0; i < 256; i++)
+        lut[i] = (i < 16 ? '0' : '') + i.toString(16)
+      return lut
+    })()
+
+    public static UUID(): string {
+      let d0: number = Math.random() * 0xffffffff | 0
+      let d1: number = Math.random() * 0xffffffff | 0
+      let d2: number = Math.random() * 0xffffffff | 0
+      let d3: number = Math.random() * 0xffffffff | 0
+      return SparqlItemService.lut[d0 & 0xff] + SparqlItemService.lut[d0 >> 8 & 0xff] + SparqlItemService.lut[d0 >> 16 & 0xff] + SparqlItemService.lut[d0 >> 24 & 0xff] + '-' +
+        SparqlItemService.lut[d1 & 0xff] + SparqlItemService.lut[d1 >> 8 & 0xff] + '-' + SparqlItemService.lut[d1 >> 16 & 0x0f | 0x40] + SparqlItemService.lut[d1 >> 24 & 0xff] + '-' +
+        SparqlItemService.lut[d2 & 0x3f | 0x80] + SparqlItemService.lut[d2 >> 8 & 0xff] + '-' + SparqlItemService.lut[d2 >> 16 & 0xff] + SparqlItemService.lut[d2 >> 24 & 0xff] +
+        SparqlItemService.lut[d3 & 0xff] + SparqlItemService.lut[d3 >> 8 & 0xff] + SparqlItemService.lut[d3 >> 16 & 0xff] + SparqlItemService.lut[d3 >> 24 & 0xff]
     }
+
+    constructor(private workerService: WorkerService) {}
+
+    public getItem(endpoint: string, id: INode, canceller?: angular.IPromise<any>): angular.IPromise<Item> {
+      return this.workerService.call('sparqlItemWorkerService', 'getItem', [endpoint, id], canceller)
+    }
+
+    public createNewItem(endpoint: string, equivalentNodes: INode[] = [], properties: PropertyToValues[] = []): angular.IPromise<string> {
+      return this.workerService.call('sparqlItemWorkerService', 'createNewItem', [endpoint, equivalentNodes, properties])
+    }
+
   }
 
   export class SparqlItemWorkerService {
 
-    constructor(private sparqlService: s.SparqlService) {}
+    constructor(private sparqlService: s.SparqlService, private $q: angular.IQService, private sparqlUpdateWorkerService: SparqlUpdateWorkerService) {}
 
-    public getItem(endpoint: string, id: string, canceller?: angular.IPromise<any>): angular.IPromise<Item> {
-      return this.sparqlService.query(endpoint, SparqlItemService.getItemPropertiesQuery.replace(/<ID>/g, id), {timeout: canceller}).then(
+    public getItem(endpoint: string, id: INode, canceller?: angular.IPromise<any>): angular.IPromise<Item> {
+      return this.sparqlService.query(endpoint, SparqlItemService.getItemPropertiesQuery.replace(/<ID>/g, id.id), {timeout: canceller}).then(
         (response: angular.IHttpPromiseCallbackArg<s.ISparqlBindingResult<{[id: string]: s.ISparqlBinding}>>) => {
-          let item: Item = new Item(new Node(id))
+          let item: Item = new Item(id)
           let propertyMap: {[property: string]: PropertyToValues} = {}
           response.data.results.bindings.forEach(b => {
-            if (b['itemLabel']) item.label = b['itemLabel'].value
+            if (b['itemLabel']) item.label = new SparqlBindingNode(b['itemLabel'])
             if (b['property']) {
               let propertyToValues: PropertyToValues = propertyMap[b['property'].value]
               if (!propertyToValues) {
                 propertyToValues = new PropertyToValues(b['property'])
                 propertyMap[b['property'].value] = propertyToValues
-                if (b['propertyLabel']) propertyToValues.label = b['propertyLabel'].value
+                if (b['propertyLabel']) propertyToValues.label = new SparqlBindingNode(b['propertyLabel'])
                 item.properties.push(propertyToValues)
               }
               let oNode: NodePlusLabel = new NodePlusLabel(new SparqlBindingNode(b['object']))
-              if (b['objectLabel']) oNode.label = b['objectLabel'].value
+              if (b['objectLabel']) oNode.label = new SparqlBindingNode(b['objectLabel'])
               propertyToValues.values.push(oNode)
             }
           })
@@ -174,6 +85,26 @@ SELECT ?itemLabel ?property ?propertyLabel ?object ?objectLabel {
         }
       )
     }
+
+    public createNewItem(endpoint: string, equivalentNodes: INode[] = [], properties: PropertyToValues[] = []): angular.IPromise<string> {
+      let deferred: angular.IDeferred<string> = this.$q.defer()
+      let subject: INode = new IRI(SparqlItemService.ns + SparqlItemService.UUID())
+      deferred.notify(subject.id)
+      let schemaTriplesToAdd: Triple[] = []
+      let instanceTriplesToAdd: Triple[] = []
+      equivalentNodes.forEach(node => instanceTriplesToAdd.push(new Triple(subject, OWL.sameAs, node)))
+      properties.forEach(property => {
+        if (property.label) schemaTriplesToAdd.push(new Triple(property, SKOS.prefLabel, property.label))
+        property.values.forEach(value => instanceTriplesToAdd.push(new Triple(subject, property, value)))
+      })
+      this.sparqlUpdateWorkerService.updateGraphs(endpoint, [new Graph(SparqlItemService.schemaGraph, schemaTriplesToAdd), new Graph(SparqlItemService.instanceGraph, instanceTriplesToAdd)]).then(
+        () => deferred.resolve(subject.id),
+        deferred.reject,
+        deferred.notify
+      )
+      return deferred.promise
+    }
+
   }
 
 }
