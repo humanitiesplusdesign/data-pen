@@ -24,7 +24,7 @@ namespace fibra {
   export class SparqlUpdateWorkerService {
     private static queryTemplate: string = `DELETE{<DELETE>}INSERT{<INSERT>}WHERE {}`
 
-    constructor(private sparqlService: s.SparqlService, private workerWorkerService: IWorkerWorkerService ) {}
+    constructor(private sparqlService: s.SparqlService, private workerWorkerService: WorkerWorkerService ) {}
 
     public updateQuads(endpoint: string, quadsToAdd: Quad[] = [], quadsToRemove: Quad[] = []): angular.IPromise<any> {
       let graphsToAddMap: {[graphId: string]: Graph} = {}

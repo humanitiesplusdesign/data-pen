@@ -23,7 +23,21 @@ gulp.task('wire:styles', function() {
     .pipe(gulp.dest("app/styles"));
 });
 
-gulp.task('wire:scripts', function() {
+gulp.task('wire:workerscripts-to-scripts', function() {
+  return gulp.src("app/scripts/app.ts")
+    .pipe($.inject(gulp.src("worker.conf"), {
+          starttag: "importScripts: [",
+          endtag: "]",
+          addRootSlash: false,
+          ignorePath: 'app/',
+          transform: function(filepath, file) {
+            return file.contents.toString('utf8').replace(/^/,'\'').replace(/\n/g,'\',\n      \'').replace(/,\n      '$/,'')
+          }
+        }))
+    .pipe(gulp.dest("app/scripts"));
+});
+
+gulp.task('wire:scripts-to-templates', function() {
   return gulp.src("app/*.pug")
     .pipe(wiredep({
       directory: "app/bower_components"
@@ -40,4 +54,4 @@ gulp.task('wire:scripts', function() {
     .pipe(gulp.dest("app"));
 });
 
-gulp.task('wire', ['wire:styles', 'wire:scripts'])
+gulp.task('wire', ['wire:styles', 'wire:workerscripts-to-scripts', 'wire:scripts-to-templates'])

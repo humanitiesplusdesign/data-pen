@@ -1,9 +1,9 @@
 namespace fibra {
   'use strict'
 
-  let m: angular.IModule = angular.module('fibra')
+  let m: angular.IModule = angular.module('fibra', ['fi.seco.sparql', 'http-auth-interceptor'])
 
-  m.run(($rootScope: angular.IRootScopeService, workerWorkerService: IWorkerWorkerService) => {
+  m.run(($rootScope: angular.IRootScopeService, workerWorkerService: WorkerWorkerService) => {
     $rootScope.$on('event:auth-loginRequired', () => workerWorkerService.$broadcast('event:auth-loginRequired'))
   })
 

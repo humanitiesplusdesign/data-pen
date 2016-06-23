@@ -2,20 +2,15 @@ namespace fibra {
   'use strict'
 
   export class WorkerServiceConfiguration {
-    constructor(public appName: string, public workerThreads: number, public angularURL: string, public importScripts: string[], public requiredModules: string[]) {}
-  }
-
-  export interface IWorkerWorkerService {
-    $broadcast: (name: string, args?: any[]) => void
-    stripFunctions: (obj: any) => any
+    constructor(public appName: string, public workerThreads: number, public importScripts: string[]) {}
   }
 
   export class WorkerService {
 
     private static workerTemplate: string = `
-      var window = self;
-      self.history = {};
-      self.Node = function () {};
+      var window = self
+      self.history = {}
+      self.Node = function () {}
       var document = {
         readyState: 'complete',
         cookie: '',
@@ -27,70 +22,11 @@ namespace fibra {
           };
         },
       };
-      self.stripFunctions = function(obj) {
-        var ret = {}
-        for (key in obj)
-          if (typeof obj[key] === 'object') ret[key] = self.stripFunctions(obj[key])
-          else if (typeof obj[key] !== 'function') ret[key] = obj[key]
-        return ret
-      }
-      importScripts('<URL_TO_ANGULAR>')
-      angular = window.angular;
-      var app = angular.module('<APP_NAME>', ['<DEP_MODULES>']);
-      self.$broadcast = function(name,args) {
-        try {
-          self.postMessage({event:'broadcast', name:name, args:args})
-        } catch (e) {
-          console.log(args,e)
-          throw e
-        }
-      }
-      app.value('workerWorkerService',self);
-      importScripts('<IMPORT_SCRIPTS>');
-      var cancellers = [];
-      app.run(['$injector','$q','$rootScope', function($injector,$q,$rootScope) {
-        self.addEventListener('message', function(e) {
-          var id = e.data.id;
-          if (id === undefined) {
-            $rootScope.$broadcast(e.data.name, e.data.args);
-            $rootScope.$apply();
-          } else if (e.data.cancel) {
-            let canceller = cancellers[id];
-            delete cancellers[id];
-            if (canceller) canceller.resolve();
-          } else {
-            var service = $injector.get(e.data.service);
-            var canceller = $q.defer();
-            cancellers[id] = canceller;
-            service[e.data.method].apply(service,e.data.args.concat(canceller.promise)).then(function(success) {
-              delete cancellers[id]
-              try {
-                self.postMessage({event:'success', id: id, data: success});
-              } catch (e) {
-                console.log(success,e)
-                throw e
-              }
-            }, function(error) {
-              delete cancellers[id]
-              try {
-                self.postMessage({event:'failure', id: id, data: self.stripFunctions(error)});
-              } catch (e) {
-                console.log(error,e)
-                throw e
-              }
-            }, function(update) {
-              delete cancellers[id]
-              try {
-                self.postMessage({event:'update', id: id, data: update});
-              } catch (e) {
-                console.log(update,e)
-                throw e
-              }
-            });
-          }
-        })
+      importScripts('<IMPORT_SCRIPTS>')
+      window.angular.module('<APP_NAME>').run(['workerWorkerService', function(workerWorkerService) {
+        self.addEventListener('message', function(e) { workerWorkerService.onMessage(e.data) })
       }])
-      angular.bootstrap(null, ['<APP_NAME>']);
+      window.angular.bootstrap(null, ['<APP_NAME>'])
     `
 
     private workers: Worker[]
@@ -98,14 +34,11 @@ namespace fibra {
     private deferreds: angular.IDeferred<any>[] = []
 
     constructor(workerServiceConfiguration: WorkerServiceConfiguration, $rootScope: angular.IRootScopeService, $window: angular.IWindowService, private $q: angular.IQService) {
-      let angularURL: string = workerServiceConfiguration.angularURL
       let path: string = $window.location.protocol + '//' + $window.location.host
-      if (angularURL.indexOf('http') !== 0)
-        angularURL = path + (angularURL.indexOf('/') !== 0 ? $window.location.pathname : '') + angularURL
       let importScripts: string[] = workerServiceConfiguration.importScripts.map(s =>
         s.indexOf('http') !== 0 ? path + (s.indexOf('/') !== 0 ? $window.location.pathname : '') + s : s
       )
-      let blobURL: string = ($window.URL).createObjectURL(new Blob([WorkerService.workerTemplate.replace(/<APP_NAME>/g, workerServiceConfiguration.appName).replace(/<URL_TO_ANGULAR>/g, angularURL).replace(/<IMPORT_SCRIPTS>/g, importScripts.join('\',\'')).replace(/<DEP_MODULES>/g, workerServiceConfiguration.requiredModules.join('\',\''))], { type: 'application/javascript' }));
+      let blobURL: string = ($window.URL).createObjectURL(new Blob([WorkerService.workerTemplate.replace(/<APP_NAME>/g, workerServiceConfiguration.appName).replace(/<IMPORT_SCRIPTS>/g, importScripts.join('\',\''))], { type: 'application/javascript' }));
       this.workers = []
       for (let i: number = 0; i < workerServiceConfiguration.workerThreads; i++) {
         this.workers.push(new Worker(blobURL))
@@ -156,4 +89,63 @@ namespace fibra {
       return deferred.promise
     }
   }
+
+  declare var self: any
+
+  interface IMessage {
+    id?: number
+    name?: string
+    args?: any[]
+    cancel?: boolean
+    service?: string
+    method?: string
+  }
+
+  export class WorkerWorkerService {
+    private cancellers: angular.IDeferred<any>[] = []
+    public stripFunctions(obj): any {
+      let ret: {} = {}
+      for (let key in obj)
+        if (typeof obj[key] === 'object') ret[key] = this.stripFunctions(obj[key])
+        else if (typeof obj[key] !== 'function') ret[key] = obj[key]
+      return ret
+    }
+    public $broadcast(name: string, args?: any): void {
+      try {
+       self.postMessage({event: 'broadcast', name: name, args: args})
+      } catch (e) {
+        console.log(args, e)
+        throw e
+      }
+    }
+    constructor(private $injector: angular.auto.IInjectorService, private $q: angular.IQService, private $rootScope: angular.IRootScopeService) {}
+    public onMessage(message: IMessage): void {
+      if (message.id === undefined) {
+        this.$rootScope.$broadcast(message.name, message.args)
+        this.$rootScope.$apply()
+      } else if (message.cancel) {
+        let canceller: angular.IDeferred<any> = this.cancellers[message.id];
+        delete this.cancellers[message.id];
+        if (canceller) canceller.resolve();
+      } else {
+        let service: any = this.$injector.get(message.service)
+        let canceller: angular.IDeferred<any> = this.$q.defer();
+        this.cancellers[message.id] = canceller;
+        service[message.method].apply(service, message.args.concat(canceller.promise)).then(
+          (success) => {
+            delete this.cancellers[message.id]
+            self.postMessage({event: 'success', id: message.id, data: success});
+          },
+          (error) => {
+            delete this.cancellers[message.id]
+            self.postMessage({event: 'failure', id: message.id, data: this.stripFunctions(error)})
+          },
+          (update) => {
+            delete this.cancellers[message.id]
+            self.postMessage({event: 'update', id: message.id, data: update});
+        })
+      }
+    }
+  }
+
 }

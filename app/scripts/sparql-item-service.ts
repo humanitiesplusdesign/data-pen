@@ -35,6 +35,7 @@ SELECT ?itemLabel ?property ?propertyLabel ?object ?objectLabel {
     })()
 
     public static UUID(): string {
+      /* tslint:disable:no-bitwise */
       let d0: number = Math.random() * 0xffffffff | 0
       let d1: number = Math.random() * 0xffffffff | 0
       let d2: number = Math.random() * 0xffffffff | 0
@@ -43,6 +44,7 @@ SELECT ?itemLabel ?property ?propertyLabel ?object ?objectLabel {
         SparqlItemService.lut[d1 & 0xff] + SparqlItemService.lut[d1 >> 8 & 0xff] + '-' + SparqlItemService.lut[d1 >> 16 & 0x0f | 0x40] + SparqlItemService.lut[d1 >> 24 & 0xff] + '-' +
         SparqlItemService.lut[d2 & 0x3f | 0x80] + SparqlItemService.lut[d2 >> 8 & 0xff] + '-' + SparqlItemService.lut[d2 >> 16 & 0xff] + SparqlItemService.lut[d2 >> 24 & 0xff] +
         SparqlItemService.lut[d3 & 0xff] + SparqlItemService.lut[d3 >> 8 & 0xff] + SparqlItemService.lut[d3 >> 16 & 0xff] + SparqlItemService.lut[d3 >> 24 & 0xff]
+      /* tslint:enable:no-bitwise */
     }
 
     constructor(private workerService: WorkerService) {}

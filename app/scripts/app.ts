@@ -11,7 +11,7 @@ namespace fibra {
     }
   }
 
-  let m: angular.IModule = angular.module('fibra', [ 'http-auth-interceptor', 'ngStorage', 'ui.router',  'ui.bootstrap', 'ui.bootstrap.tpls', 'fi.seco.sparql' ])
+  let m: angular.IModule = angular.module('fibra', [ 'http-auth-interceptor', 'ngStorage', 'ui.router',  'ui.bootstrap', 'ui.bootstrap.tpls' ])
   m.config(($stateProvider: angular.ui.IStateProvider, $urlRouterProvider: angular.ui.IUrlRouterProvider) => {
     $urlRouterProvider.otherwise('/author')
     $stateProvider.state('author', {
@@ -28,19 +28,19 @@ namespace fibra {
   m.value('workerServiceConfiguration', {
     appName: 'fibra',
     workerThreads: 8,
-    angularURL: 'bower_components/angular/angular.min.js',
     importScripts: [
+      'bower_components/angular/angular.min.js',
       'bower_components/angular-http-auth/src/http-auth-interceptor.js',
       'bower_components/angular-sparql-service/dist/sparql-service.js',
+      'scripts/worker-app.js',
+      'scripts/worker-service.js',
       'scripts/rdf.js',
       'scripts/sparql-item-service.js',
-      'scripts/worker-app.js',
       'scripts/sparql-autocomplete-service.js',
       'scripts/sparql-tree-service.js',
       'scripts/sparql-update-service.js',
-      'scripts/tree-component.js',
-    ],
-    requiredModules: ['fi.seco.sparql', 'http-auth-interceptor']
+      'scripts/tree-component.js'
+      ]
   })
   m.run(($rootScope: IAuthenticationRootScopeService, $localStorage: any, $http: angular.IHttpService, authService: angular.httpAuth.IAuthService, workerService: WorkerService) => {
     $rootScope.authInfo = {
