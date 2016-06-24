@@ -1,22 +1,48 @@
 ---
 layout: page
-title: Phase 1 Plan
+title: Phase 1 Overview
 collection: designs
 updated: 2016-06-22
 ---
 
 
 
+In Phase 1 we are going to focus efforts on importing a single entity from a Linked Data store. We will work out the challenges of querying, presenting the ontology to users, and making selection/addition clean, elegant and intuitive. We've identified three components that will be necessary for Phase 1: Configure, Explore, and Enrich.
 
-In Phase 1 we are going to focus efforts on importing a single entity from a Linked Data store. We will work out the challenges of querying, presenting the ontology to users, and making selection/addition clean, elegant and intuitive.
-
-The chart below shows where this step fits within the required set of tasks and functionalities with existing tools.
+The chart below shows where our Phase 1 fits within the required set of tasks and functionalities with existing tools.
 
 ![Chart/matrix for Fibra development]({{site.urlimg}}{{page.collection}}/Fibra_planning.001.png)
 
 The reasoning behind this focus is that while all of the outlined tasks are in the end necessary, there already exist reasonably adequate tools for most of these tasks, when done in bulk and in a manner focused on just one of them in turn.
 
 However, when locally exploring data, these activities need to be much more fluidly integrated to support the end goal of being able to think through the data. This is also why, while there are tools for some of the individual local tasks, they are not adequate for our goal.
+
+# Components
+
+1. CONFIGURE
+
+  * Select Archives
+  * Choose which you want to use and set limits.
+  * Select Authorities
+  * Set authorities for default entity types
+  * Select from Imported data
+  * Include EDA charts to give a shape of the data
+
+2. EXPLORE
+
+  * add nodes and links to the canvas
+  * group nodes
+  * change the layout
+  * apply weight to nodes and edges to see network measures
+
+3. ENRICH
+
+  * Enrich entities from linked sources by selecting based on an overview of availble data
+  * How much information is available about these entities? (sortable tabular heat map)
+  * What of that available information am I seeing?
+  * Show what is not available, too 
+       1. Entities that do not have an associated date
+       2. Enitities associated to the entities in my query result that don’t have a date.
 
 # Case studies #
 
