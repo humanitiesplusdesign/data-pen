@@ -5,7 +5,7 @@ collection: designs
 updated: 2016-06-24
 ---
 
-#Explore: Add a node
+# Explore: Add a node
 	   
 
 ## Scenario 1: Add node and verify against authority
