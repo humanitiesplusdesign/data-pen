@@ -53,8 +53,8 @@ namespace fibra {
     }
 
     public updateGraphs(endpoint: string, graphsToAdd: Graph[] = [], graphsToRemove: Graph[] = []): angular.IPromise<any> {
-      let addString: string = graphsToAdd.map(graph => 'GRAPH' + graph.graph.id + '{' + graph.triples.map(SparqlUpdateService.serialize).join(' . ') + '}').join()
-      let removeString: string = graphsToRemove.map(graph => 'GRAPH' + graph.graph.id + '{' + graph.triples.map(SparqlUpdateService.serialize).join(' . ') + '}').join()
+      let addString: string = graphsToAdd.map(graph => 'GRAPH' + graph.graph.id + '{' + graph.triples.map(SparqlUpdateService.serialize).join(' . ') + '}').join('')
+      let removeString: string = graphsToRemove.map(graph => 'GRAPH' + graph.graph.id + '{' + graph.triples.map(SparqlUpdateService.serialize).join(' . ') + '}').join('')
       return this.sparqlService.update(endpoint, SparqlUpdateWorkerService.queryTemplate.replace(/<DELETE>/g, removeString).replace(/<INSERT>/g, addString)).then(
         (r) => this.workerWorkerService.stripFunctions(r)
       )

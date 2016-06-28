@@ -34,6 +34,8 @@ namespace fibra {
       'bower_components/angular-sparql-service/dist/sparql-service.js',
       'scripts/worker-app.js',
       'scripts/worker-service.js',
+      'scripts/configuration-service.js',
+      'scripts/collection-utils.js',
       'scripts/rdf.js',
       'scripts/sparql-item-service.js',
       'scripts/sparql-autocomplete-service.js',

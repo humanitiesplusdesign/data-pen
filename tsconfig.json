@@ -16,6 +16,7 @@
     "files": [
         "app/scripts/app.ts",
         "app/scripts/author-component.ts",
+        "app/scripts/collection-utils.ts",
         "app/scripts/configuration-service.ts",
         "app/scripts/configurations-component.ts",
         "app/scripts/rdf.ts",

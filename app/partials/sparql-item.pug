@@ -1,6 +1,9 @@
+script(type="text/ng-template",id="sparql-item-popover")
+  sparql-item(endpoint='$ctrl.endpoint',item-id='value')
+
 h4 {{$ctrl.item.label.value}} ({{$ctrl.item.id}})
 
 table.table.table-striped
   tr(ng-repeat="property in $ctrl.item.properties")
     th {{property.label ? property.label.value : property.value}}
-    td: span(ng-repeat="value in property.values",ng-click="$ctrl.onSelect({value: value})") {{value.label ? value.label.value : value.value}}{{ $last ? '' : ', ' }}
+    td: span(ng-repeat="value in property.values",ng-click="$ctrl.onSelect({value: value})",uib-popover-template="'sparql-item-popover'",popover-trigger="mouseenter",popover-placement="left") {{value.label ? value.label.value : value.value}}{{ $last ? '' : ', ' }}

@@ -4,10 +4,21 @@ namespace fibra {
   export class ConfigurationService {
     public configurations: Configuration[] = [
       new Configuration('local', 'Local', 'http://ldf.fi/fibra/sparql'),
-      new Configuration('sdfb', 'Six Degrees of Francis Bacon', 'http://ldf.fi/sdfb/sparql'),
-      new Configuration('emlo', 'EMLO', 'http://ldf.fi/emlo/sparql'),
-      new Configuration('procope', 'Procope', 'http://ldf.fi/procope/sparql'),
-      new Configuration('schoenberg', 'Schoenberg', 'http://ldf.fi/schoenberg/sparql'),
+      new Configuration('sdfb', 'Six Degrees of Francis Bacon', 'http://ldf.fi/sdfb/sparql', ['http://www.cidoc-crm.org/cidoc-crm/E21_Person']),
+      new Configuration('emlo', 'EMLO', 'http://ldf.fi/emlo/sparql', ['http://www.cidoc-crm.org/cidoc-crm/E21_Person']),
+      new Configuration('procope', 'Procope', 'http://ldf.fi/procope/sparql', ['http://www.cidoc-crm.org/cidoc-crm/E21_Person']),
+      new Configuration('schoenberg', 'Schoenberg', 'http://ldf.fi/schoenberg/sparql', ['http://www.cidoc-crm.org/cidoc-crm/E21_Person']),
+    ]
+  }
+
+  export class ConfigurationWorkerService {
+    // FIXME these are now not synced, needs a watch or explicit update functions
+    public configurations: Configuration[] = [
+      new Configuration('local', 'Local', 'http://ldf.fi/fibra/sparql'),
+      new Configuration('sdfb', 'Six Degrees of Francis Bacon', 'http://ldf.fi/sdfb/sparql', ['http://www.cidoc-crm.org/cidoc-crm/E21_Person']),
+      new Configuration('emlo', 'EMLO', 'http://ldf.fi/emlo/sparql', ['http://www.cidoc-crm.org/cidoc-crm/E21_Person']),
+      new Configuration('procope', 'Procope', 'http://ldf.fi/procope/sparql', ['http://www.cidoc-crm.org/cidoc-crm/E21_Person']),
+      new Configuration('schoenberg', 'Schoenberg', 'http://ldf.fi/schoenberg/sparql', ['http://www.cidoc-crm.org/cidoc-crm/E21_Person']),
     ]
   }
 
@@ -16,7 +27,6 @@ namespace fibra {
 
     public classTree: TreeNode[]
 
-    private allowed: string[] = []
     private disallowed: string[] = []
 
     private allSelected: boolean = true
@@ -75,14 +85,15 @@ namespace fibra {
       this.updateFilter()
     }
 
-    constructor(public id: string, public title: string, public endpoint: string) {
+    constructor(public id: string, public title: string, public endpoint: string, public allowed: string[] = []) {
       this.autocompletionConfiguration = new SparqlAutocompletionConfiguration(id, title, endpoint, SparqlAutocompleteService.queryTemplate)
+      this.updateFilter()
     }
 
     private updateFilter: () => void = () => {
-      if (this.disallowed.length === 0)
+      if (this.disallowed.length === 0 && this.allowed.length === 0)
         this.autocompletionConfiguration.constraints = ''
-      else if (this.disallowed.length < this.allowed.length)
+      else if (this.disallowed.length !== 0 && this.disallowed.length < this.allowed.length)
         this.autocompletionConfiguration.constraints = 'FILTER (?groupId NOT IN (' + this.disallowed.map(id => '<' + id + '>').join(', ') + '))'
       else
         this.autocompletionConfiguration.constraints = 'FILTER (?groupId IN (' + this.allowed.map(id => '<' + id + '>').join(', ') + '))'

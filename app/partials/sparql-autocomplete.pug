@@ -1,13 +1,23 @@
-script(type="text/ng-template",id="sparql-item-popover")
-  sparql-item(endpoint='datasource.configuration.endpoint',item-id='result.id')
+script(type="text/ng-template",id="sparql-autocomplete-item-popover")
+  sparql-item(endpoint='result.datasources[0].endpoint',item-id='result.ids[0]')
 .form-group.has-feedback
   input.form-control(ng-model="query",ng-model-options='{ debounce: 500 }',ng-change="$ctrl.onChange(query)")
   span.glyphicon.glyphicon-refresh.fa-spin.form-control-feedback(ng-show="$ctrl.queryRunning")
   span.danger.glyphicon.glyphicon-alert.form-control-feedback(ng-show="$ctrl.error")
-div(ng-repeat="datasource in $ctrl.resultsByDatasource track by $index")
-  h4 {{datasource.configuration.title}}
-  ul: li(ng-repeat="group in datasource.resultsByGroup track by $index")
+div(ng-repeat="result in $ctrl.results track by $index")
+  h4 {{result.configuration.title || result.label }}
+  ul: li(ng-repeat="result in result.results track by $index",ng-click="$ctrl.onSelect({result:result})",uib-popover-template="'sparql-autocomplete-item-popover'",popover-trigger="mouseenter",popover-placement="right") {{result.matchedLabel.value}}
+    span(ng-if="result.matchedLabel.value !== result.prefLabel.value") -&gt; {{result.prefLabel.value}}
+    span(ng-if="result.additionalInformation['altLabel']") &nbsp;(
+      span(ng-repeat="altLabel in result.additionalInformation['altLabel']") {{$last ? altLabel.value : altLabel.value+', '}}
+      | )
+    | &nbsp;[
+    span(ng-repeat="datasource in result.datasources track by $index") {{$last ? datasource.id : datasource.id+', '}}
+    | ]
+  ul: li(ng-repeat="group in result.resultsByGroup track by $index")
     span.group-label {{group.label}}
-    ul: li(ng-repeat="result in group.results track by $index",ng-click="$ctrl.onSelect({result:result})",uib-popover-template="'sparql-item-popover'",popover-trigger="mouseenter",popover-placement="right") {{result.matchedLabel}}
-      span(ng-if="result.matchedLabel !== result.prefLabel") -&gt; {{result.prefLabel}}
-      span(ng-if="result.additionalInformation!=''") &nbsp;({{result.additionalInformation}})
+    ul: li(ng-repeat="result in group.results track by $index",ng-click="$ctrl.onSelect({result:result})",uib-popover-template="'sparql-autocomplete-item-popover'",popover-trigger="mouseenter",popover-placement="right") {{result.matchedLabel.value}}
+      span(ng-if="result.matchedLabel.value !== result.prefLabel.value") -&gt; {{result.prefLabel.value}}
+      span(ng-if="result.additionalInformation['altLabel']") &nbsp;(
+        span(ng-repeat="altLabel in result.additionalInformation['altLabel']") {{$last ? altLabel.value : altLabel.value+', '}}
+        | )

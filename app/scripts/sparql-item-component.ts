@@ -1,27 +1,19 @@
 namespace fibra {
   'use strict'
 
-  interface IChangeObject<T> {
-    currentValue: T
-    previousValue: T
-    isFirstChange: () => boolean
-  }
-
   class SparqlItemComponentBindings {
-    public endpoint: string
     public itemId: INode
   }
 
   interface ISparqlItemComponentBindingChanges {
-    endpoint?: IChangeObject<string>
-    itemId?: IChangeObject<INode>
+    itemId?: angular.IChangesObject
   }
 
   class SparqlItemComponentController extends SparqlItemComponentBindings {
     private item: Item
     public $onChanges: (changes: ISparqlItemComponentBindingChanges) => void = (changes: ISparqlItemComponentBindingChanges) => {
-      if (this.endpoint && this.itemId)
-        this.sparqlItemService.getItem(this.endpoint, this.itemId).then(
+      if (this.itemId)
+        this.sparqlItemService.getItem(this.itemId).then(
           (item: Item) => this.item = item
         )
     }
@@ -32,7 +24,6 @@ namespace fibra {
 
   export class SparqlItemComponent implements angular.IComponentOptions {
       public bindings: {[id: string]: string} = {
-        endpoint: '<',
         itemId: '<',
         onSelect: '&'
       }

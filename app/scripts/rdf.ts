@@ -116,6 +116,10 @@ namespace fibra {
     }
   }
 
+  export interface ISourcedNode extends INode {
+    sourceEndpoints: string[]
+  }
+
   export interface INodePlusLabel extends INode {
     label: INode
   }
@@ -127,9 +131,9 @@ namespace fibra {
   }
 
   export class PropertyToValues extends NodePlusLabel {
-    public values: NodePlusLabel[] = []
-    constructor(property: s.ISparqlBinding) {
-      super(new SparqlBindingNode(property))
+    public values: (INode|NodePlusLabel)[] = []
+    constructor(property: INode) {
+      super(property)
     }
   }
 
@@ -170,6 +174,11 @@ namespace fibra {
   export class OWL {
     public static ns: string = 'http://www.w3.org/2002/07/owl#'
     public static sameAs: IRI = new IRI(OWL.ns + 'sameAs')
+  }
+
+  export class RDF {
+    public static ns: string = 'http://www.w3.org/1999/02/22-rdf-syntax-ns#'
+    public static type: IRI = new IRI(RDF.ns + 'type')
   }
 
 }
