@@ -4,10 +4,10 @@ namespace fibra {
   export class ConfigurationService {
     public configurations: Configuration[] = [
       new Configuration('local', 'Local', 'http://ldf.fi/fibra/sparql'),
-      new Configuration('sdfb', 'Six Degrees of Francis Bacon', 'http://ldf.fi/sdfb/sparql', ['http://www.cidoc-crm.org/cidoc-crm/E21_Person']),
-      new Configuration('emlo', 'EMLO', 'http://ldf.fi/emlo/sparql', ['http://www.cidoc-crm.org/cidoc-crm/E21_Person']),
-      new Configuration('procope', 'Procope', 'http://ldf.fi/procope/sparql', ['http://www.cidoc-crm.org/cidoc-crm/E21_Person']),
-      new Configuration('schoenberg', 'Schoenberg', 'http://ldf.fi/schoenberg/sparql', ['http://www.cidoc-crm.org/cidoc-crm/E21_Person']),
+      new Configuration('sdfb', 'Six Degrees of Francis Bacon', 'http://ldf.fi/sdfb/sparql', ['http://www.cidoc-crm.org/cidoc-crm/E21_Person', 'http://www.cidoc-crm.org/cidoc-crm/E53_Place']),
+      new Configuration('emlo', 'EMLO', 'http://ldf.fi/emlo/sparql', ['http://www.cidoc-crm.org/cidoc-crm/E21_Person', 'http://www.cidoc-crm.org/cidoc-crm/E53_Place']),
+      new Configuration('procope', 'Procope', 'http://ldf.fi/procope/sparql', ['http://www.cidoc-crm.org/cidoc-crm/E21_Person', 'http://www.cidoc-crm.org/cidoc-crm/E53_Place']),
+      new Configuration('schoenberg', 'Schoenberg', 'http://ldf.fi/schoenberg/sparql', ['http://www.cidoc-crm.org/cidoc-crm/E21_Person', 'http://www.cidoc-crm.org/cidoc-crm/E53_Place']),
     ]
   }
 
@@ -15,10 +15,10 @@ namespace fibra {
     // FIXME these are now not synced, needs a watch or explicit update functions
     public configurations: Configuration[] = [
       new Configuration('local', 'Local', 'http://ldf.fi/fibra/sparql'),
-      new Configuration('sdfb', 'Six Degrees of Francis Bacon', 'http://ldf.fi/sdfb/sparql', ['http://www.cidoc-crm.org/cidoc-crm/E21_Person']),
-      new Configuration('emlo', 'EMLO', 'http://ldf.fi/emlo/sparql', ['http://www.cidoc-crm.org/cidoc-crm/E21_Person']),
-      new Configuration('procope', 'Procope', 'http://ldf.fi/procope/sparql', ['http://www.cidoc-crm.org/cidoc-crm/E21_Person']),
-      new Configuration('schoenberg', 'Schoenberg', 'http://ldf.fi/schoenberg/sparql', ['http://www.cidoc-crm.org/cidoc-crm/E21_Person']),
+      new Configuration('sdfb', 'Six Degrees of Francis Bacon', 'http://ldf.fi/sdfb/sparql', ['http://www.cidoc-crm.org/cidoc-crm/E21_Person', 'http://www.cidoc-crm.org/cidoc-crm/E53_Place']),
+      new Configuration('emlo', 'EMLO', 'http://ldf.fi/emlo/sparql', ['http://www.cidoc-crm.org/cidoc-crm/E21_Person', 'http://www.cidoc-crm.org/cidoc-crm/E53_Place']),
+      new Configuration('procope', 'Procope', 'http://ldf.fi/procope/sparql', ['http://www.cidoc-crm.org/cidoc-crm/E21_Person', 'http://www.cidoc-crm.org/cidoc-crm/E53_Place']),
+      new Configuration('schoenberg', 'Schoenberg', 'http://ldf.fi/schoenberg/sparql', ['http://www.cidoc-crm.org/cidoc-crm/E21_Person', 'http://www.cidoc-crm.org/cidoc-crm/E53_Place']),
     ]
   }
 
