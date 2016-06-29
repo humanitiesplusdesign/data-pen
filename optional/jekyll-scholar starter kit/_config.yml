@@ -28,17 +28,15 @@ kramdown:
 title:               Ed.
 tagline:             'A Jekyll theme for minimal editions'
 description:         'Ed is a Jekyll theme designed for textual editors based on minimal computing principles, and focused on legibility and flexibility.'
-url:                 https://github.com/elotroalex/ed
-baseurl:             '/ed'
+url:                 https://hdlab.stanford.edu/fibra
+baseurl:             '/fibra'
 
 # About/contact
 author:
-  name:              Alex Gil
-  url:               https://twitter.com/elotroalex
-  email:             colibri.alex@gmail.com
+  name:              Humanities + Design
+  url:               http://hdlab.stanford.edu
+  email:             apps@designhumanities.org
 
-# Custom vars
-version:             0.0.5
 
 # Exclude optional folder
 exclude: [optional]
@@ -60,7 +58,7 @@ scholar:
   source: ./_bibliography
   bibliography: references.bib
   bibliography_template: "{{reference}}"
-  relative: "/ed/bibliography.html"
+  relative: "/fibra/bibliography.html"
 
   replace_strings: true
   join_strings:    true
