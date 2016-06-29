@@ -3,6 +3,11 @@ layout: page
 title: Phase 1 Overview
 collection: designs
 updated: 2016-06-22
+toc:
+- Components
+- Case Studies
+- Tool Design
+- Meeting Notes
 ---
 
 
@@ -105,6 +110,6 @@ Of particular interest to us:
  * Change values to resources (e.g. convert all *birth places* to instances of Location)
  * Extract properties (e.g. convert all references to *Author* or *Scholar* in the generic *tags* to *occupation* properties)
 
-# Notes
+# Meeting Notes
 
 [Images and notes captured during workshops]({{site.baseurl}}/designs/phase1_notes/)
