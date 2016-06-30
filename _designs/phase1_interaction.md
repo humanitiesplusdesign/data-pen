@@ -20,10 +20,16 @@ toc:
 
 **LAYERS** 
 
+**STRONGLY IDENTIFIED**  
+
+
+
 
 # Outline  
 ## Configure
 This application is concerned with starting data source selection and configuration. It will include metrics and graphs that convey the shape of potential data sources before we decide which to use.
+
+There will also be a need to map properties from one source to another. Some of this can be done automatically, some will need to be done manually.
 
 The first level options are:  
 	1. Skip
