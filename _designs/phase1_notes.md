@@ -1,6 +1,8 @@
 ---
 layout: page
 title: Phase 1 Notes
+updated: 2016-06-22
+
 ---
 
 ![Wireframe 1]({{site.urlimg}}designs/wireframe1.jpg)

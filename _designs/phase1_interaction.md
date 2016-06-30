@@ -32,10 +32,10 @@ This application is concerned with starting data source selection and configurat
 There will also be a need to map properties from one source to another. Some of this can be done automatically, some will need to be done manually.
 
 The first level options are:  
-	1. Skip
-	2. Upload Data
-	3. Define Authorities
-	4. Define Archive sources
+	1. Skip  
+	2. Upload Data  
+	3. Define Authorities  
+	4. Define Archive sources  
 	
 **Skip** means skip Configure and go directly to Draw and Explore. It is the option selected when one wants to just use the canvas to sketch a data model without reference to anything else. This experience will be the most similar to Rhizi.
 

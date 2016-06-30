@@ -3,6 +3,8 @@ layout: page
 title: Workshop 1
 redirect_from: "/workshop1/"
 redirect_from: "/workshop1"
+updated: 2016-06-03
+
 ---
 
 May 31 - June 3, 2016
