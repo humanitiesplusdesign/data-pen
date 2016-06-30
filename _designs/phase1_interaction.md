@@ -6,7 +6,7 @@ updated: 2016-06-30
 
 ---
 
-#Nomenclature  
+# Nomenclature  
 
 **VERIFY** or **STRONGLY IDENTIFY**  To add a URI to a string or unique controlled string, making it a potent and potentially linked data point. For Fibra the term is used most often when we lookup a value in an Authority and then verify against the Authority. This could also happen by matching a value to an Archive source that includes already verified entities.
 
@@ -18,6 +18,7 @@ updated: 2016-06-30
 
 
 # Outline  
+
 ## Configure
 This application is concerned with starting data source selection and configuration. It will include metrics and graphs that convey the shape of potential data sources before we decide which to use.
 
@@ -25,10 +26,10 @@ There will also be a need to map properties from one source to another. Some of 
 
 The first level options are:  
 
-	1. Skip  
-	2. Upload Data  
-	3. Define Authorities  
-	4. Define Archive sources  
+1. Skip  
+2. Upload Data  
+3. Define Authorities  
+4. Define Archive sources  
 	
 **Skip** means skip Configure and go directly to Draw and Explore. It is the option selected when one wants to just use the canvas to sketch a data model without reference to anything else. This experience will be the most similar to Rhizi.
 
@@ -55,10 +56,10 @@ By default we minimize the use of color. A single color will be used to mark one
 ### Node/Link Editing  
 These actions (defined previously for Idiographic tool) include:  
 
-	1. REMOVE one or more nodes or links from the display and from the tabular view. This does not delete those records from the local dataset, but flags them as removed.
-	2. GROUP This action may be temporary or permanent. Temporarily, it adds the same tag to a set of nodes so that they can be clustered or filtered as a group. Permanently the group defines a new entity that all the grouped nodes are linked to.
-	3. MARK We may want to mark one or more nodes (or links?) in order to follow them through different layouts.  
-	4. MERGE/UNMERGE Combine two nodes into one. This can be used in a curatorial mode to reconcile two entities that are the same. This can also be used in a research mode (temporary) to look at the effects on the graph if two entities are combined and their links are combined. Conflicts or duplications of time and place are allowed. Friends and secretaries can often act as surrogates for another. In this case it can be useful to consider the network as if these two (or more people) have one social network.
+1. REMOVE one or more nodes or links from the display and from the tabular view. This does not delete those records from the local dataset, but flags them as removed.
+2. GROUP This action may be temporary or permanent. Temporarily, it adds the same tag to a set of nodes so that they can be clustered or filtered as a group. Permanently the group defines a new entity that all the grouped nodes are linked to.
+3. MARK We may want to mark one or more nodes (or links?) in order to follow them through different layouts.  
+4. MERGE/UNMERGE Combine two nodes into one. This can be used in a curatorial mode to reconcile two entities that are the same. This can also be used in a research mode (temporary) to look at the effects on the graph if two entities are combined and their links are combined. Conflicts or duplications of time and place are allowed. Friends and secretaries can often act as surrogates for another. In this case it can be useful to consider the network as if these two (or more people) have one social network.
 
 ### Graph Selection
 From one or more nodes, we want to make it easy to select all directly linked nodes, then connections at the second degree and third degree. Select the union of two networks, the intersection of two networks. The REMOVE action above should be applied to the selection or the inverse. 
@@ -77,23 +78,24 @@ Much more work needs to be done to disambiguate the actions that take place in C
 
 ## 1.1 No data
 Actions:  
-	1. Enter a value > Define node type >  <RETURN> to add node to canvas
-	2. Add properties to the record in four ways:  
+
+1. Enter a value > Define node type >  <RETURN> to add node to canvas  
 	
-		1. directly in the tabular view
-		2. Through "add node" field 
-		3. In a pop-up window specific to the node
-		4. By drawing a link to another node  
+2. Add properties to the record in four ways:  
+	1. directly in the tabular view  
+	2. Through "add node" field 
+	3. In a pop-up window specific to the node
+	4. By drawing a link to another node  
 		
-	3. Subsequent nodes can be added individually or linked (Rhizi -style) through the prompt field on the canvas. The default node type is the type defined with the first node added.
+3. Subsequent nodes can be added individually or linked (Rhizi -style) through the prompt field on the canvas. The default node type is the type defined with the first node added.
 	
 	
 ## 1.2 Verify (Authority)  
 Actions:   
 
-	1. Enter a value > Define node type > Select from matched entities or create new > <RETURN> to enter extend mode.  
-	2. if Skip extend: This action will add a new record to the correct node-type table and will add the URI for the selected authority. 
-	3. if Extend: An interactive visual interface showing the number of different entity types linked to the entity. Option to select values to add or drill down for more granular selection.
+1. Enter a value > Define node type > Select from matched entities or create new > <RETURN> to enter extend mode.  
+2. if Skip extend: This action will add a new record to the correct node-type table and will add the URI for the selected authority. 
+3. if Extend: An interactive visual interface showing the number of different entity types linked to the entity. Option to select values to add or drill down for more granular selection.
 
 ## 1.3 local upload
 
@@ -102,9 +104,9 @@ Let's skip this for now. We need to determine whether or not to verify the entit
 ## 1.4 Archive source
 Actions:  
 
-	1. Enter a value > Define node type > Select from matched entities or create new > <RETURN> to enter extend mode.  
-	2. if Skip extend: This action will add a new record to the correct node-type table and will add the URI for the entity in the selected authority and (?) matching URIs for the entity in selected archives. (is this necessary?) 
-	3. if Extend: An interactive visual interface showing the number of different entity types linked to the entity. Option to select values to add or drill down for more granular selection. It seems best at this point to ignore the source of the data in this abbreviated extend view. The high level sources have already been selected in Configure. More detailed information about what comes from which source will be available in the Enrich view. 
+1. Enter a value > Define node type > Select from matched entities or create new > <RETURN> to enter extend mode.  
+2. if Skip extend: This action will add a new record to the correct node-type table and will add the URI for the entity in the selected authority and (?) matching URIs for the entity in selected archives. (is this necessary?) 
+3. if Extend: An interactive visual interface showing the number of different entity types linked to the entity. Option to select values to add or drill down for more granular selection. It seems best at this point to ignore the source of the data in this abbreviated extend view. The high level sources have already been selected in Configure. More detailed information about what comes from which source will be available in the Enrich view. 
 
 Note: make it possible to globally remove values by source.
 
