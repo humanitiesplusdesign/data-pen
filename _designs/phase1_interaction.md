@@ -3,24 +3,16 @@ layout: page
 title: Phase 1 Interaction
 collection: designs
 updated: 2016-06-30
-toc:
-- Nomenclature
-- Outline
-- 1. Adding a node
-	- 1.1 No data
-	- 1.2 Verify (Authority)
-	- 1.3 local upload
-	- 1.4 Archive source
 
 ---
 
 #Nomenclature  
 
-**VERIFY** To add a URI to a literal, making it a potent and potentially linked data point. For Fibre the term is used most often when we lookup a value in an Authority and then verify against the Authority. This could also happen by matching a value to an Archive source that includes already verified entities.
+**VERIFY** or **STRONGLY IDENTIFY**  To add a URI to a string or unique controlled string, making it a potent and potentially linked data point. For Fibra the term is used most often when we lookup a value in an Authority and then verify against the Authority. This could also happen by matching a value to an Archive source that includes already verified entities.
 
 **LAYERS** 
 
-**STRONGLY IDENTIFIED**  
+ 
 
 
 
@@ -32,6 +24,7 @@ This application is concerned with starting data source selection and configurat
 There will also be a need to map properties from one source to another. Some of this can be done automatically, some will need to be done manually.
 
 The first level options are:  
+
 	1. Skip  
 	2. Upload Data  
 	3. Define Authorities  
@@ -61,6 +54,7 @@ By default we minimize the use of color. A single color will be used to mark one
 
 ### Node/Link Editing  
 These actions (defined previously for Idiographic tool) include:  
+
 	1. REMOVE one or more nodes or links from the display and from the tabular view. This does not delete those records from the local dataset, but flags them as removed.
 	2. GROUP This action may be temporary or permanent. Temporarily, it adds the same tag to a set of nodes so that they can be clustered or filtered as a group. Permanently the group defines a new entity that all the grouped nodes are linked to.
 	3. MARK We may want to mark one or more nodes (or links?) in order to follow them through different layouts.  
@@ -84,16 +78,19 @@ Much more work needs to be done to disambiguate the actions that take place in C
 ## 1.1 No data
 Actions:  
 	1. Enter a value > Define node type >  <RETURN> to add node to canvas
-	2. Add properties to the record in four ways:
+	2. Add properties to the record in four ways:  
+	
 		1. directly in the tabular view
 		2. Through "add node" field 
 		3. In a pop-up window specific to the node
-		4. By drawing a link to another node
+		4. By drawing a link to another node  
+		
 	3. Subsequent nodes can be added individually or linked (Rhizi -style) through the prompt field on the canvas. The default node type is the type defined with the first node added.
 	
 	
 ## 1.2 Verify (Authority)  
-Actions:  
+Actions:   
+
 	1. Enter a value > Define node type > Select from matched entities or create new > <RETURN> to enter extend mode.  
 	2. if Skip extend: This action will add a new record to the correct node-type table and will add the URI for the selected authority. 
 	3. if Extend: An interactive visual interface showing the number of different entity types linked to the entity. Option to select values to add or drill down for more granular selection.
@@ -104,6 +101,7 @@ Let's skip this for now. We need to determine whether or not to verify the entit
 	
 ## 1.4 Archive source
 Actions:  
+
 	1. Enter a value > Define node type > Select from matched entities or create new > <RETURN> to enter extend mode.  
 	2. if Skip extend: This action will add a new record to the correct node-type table and will add the URI for the entity in the selected authority and (?) matching URIs for the entity in selected archives. (is this necessary?) 
 	3. if Extend: An interactive visual interface showing the number of different entity types linked to the entity. Option to select values to add or drill down for more granular selection. It seems best at this point to ignore the source of the data in this abbreviated extend view. The high level sources have already been selected in Configure. More detailed information about what comes from which source will be available in the Enrich view. 
