@@ -46,7 +46,7 @@ However, when locally exploring data, these activities need to be much more flui
   * Enrich entities from linked sources by selecting based on an overview of availble data
   * How much information is available about these entities? (sortable tabular heat map)
   * What of that available information am I seeing?
-  * Show what is not available, too 
+  * Show what is not available, too
        1. Entities that do not have an associated date
        2. Enitities associated to the entities in my query result that don’t have a date.
 
@@ -60,7 +60,7 @@ Of particular interest to us:
  * Overlapping data of the same type with EMLO
  * Additional person categorization data of the type we want to support in creating
 
-##Services
+## Archive sources
 ### Early Modern Correspondence
 
 Based on [EMLO](http://demo.seco.tkk.fi/saha/project/index.shtml?model=emlo) we will limit query to one of the following three entity types:
@@ -72,8 +72,6 @@ Of particular interest to us:
  * Rich modeling of dates using CIDOC-CRM, including different types of uncertainty
  * Well thought out data model
  * The EMLO database also contains rich prosopographical data in a rich event-based model to expand to.
-
-
 
 ### Six Degrees of Francis Bacon
 
@@ -88,6 +86,34 @@ The [Linked Data conversion](http://demo.seco.tkk.fi/saha/project/index.shtml?mo
 
 Of particular interest to us:
  * Event-based data model with two different, but connected types of events: transition events such as auctions and donations, as well as possession events
+
+## Authorities
+
+### GeoNames
+
+http://www.geonames.org/
+
+The GeoNames geographical database covers all countries and contains over eight million placenames.
+
+ * SPARQL endpoint: http://ldf.fi/geonames/sparql
+
+### Getty ULAN
+
+http://www.getty.edu/research/tools/vocabularies/ulan/index.html
+
+The ULAN includes proper names or anonymous appellations (e.g., Master of the Aachen Altar), biographies, related people or corporate bodies, and other information about artists, architects, firms, studios, museums, special collections, patrons, donors, sitters, creating cultures (e.g., unknown Etruscan), and other people and groups involved in the creation, distribution, collection, maintenance, and study of art and architecture.
+
+ * SPARQL endpoint: http://vocab.getty.edu/
+
+### Library of Congress Names
+
+http://id.loc.gov/authorities/names
+
+The Library of Congress Name Authority File (NAF) file provides authoritative data for names of persons, organizations, events, places, and titles.
+
+ * SPARQL endpoint: http://ldf.fi/lcnames/sparql
+
+### Virtual International Authority File
 
 # Tool design
 
