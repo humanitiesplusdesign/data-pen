@@ -4,6 +4,7 @@
       h4 Overview
       tree(tree="$ctrl.classTree",on-select="$ctrl.alterSelection(treeNode)")
     #middle-column.col-md-4
+      explore(class-tree-promise="$ctrl.classTreePromise")
       h4 Search
       sparql-autocomplete(limit="30",by="group",on-select="$ctrl.createItem(result)")
     #right-column.col-md-5

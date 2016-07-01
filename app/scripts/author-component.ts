@@ -9,6 +9,7 @@ namespace fibra {
     public itemId: INode
 
     public classTree: TreeNode[]
+    public classTreePromise: angular.IPromise<TreeNode[]>
 
     public createItem(item: Result): void {
       let prefLabel: PropertyToValues = new PropertyToValues(SKOS.prefLabel)
@@ -21,7 +22,8 @@ namespace fibra {
     }
 
     constructor(private configurationService: ConfigurationService, sparqlTreeService: SparqlTreeService, private sparqlItemService: SparqlItemService) {
-      sparqlTreeService.getTree(this.configurationService.configurations[0].endpoint, SparqlTreeService.getClassTreeQuery).then(c => this.classTree = c)
+      this.classTreePromise = sparqlTreeService.getTree(this.configurationService.configurations[0].endpoint, SparqlTreeService.getClassTreeQuery)
+      this.classTreePromise.then(c => this.classTree = c)
     }
   }
 
