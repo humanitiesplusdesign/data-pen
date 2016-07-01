@@ -80,7 +80,7 @@ SELECT ?id ?itemLabel ?property ?propertyLabel ?object ?objectLabel {
       return this.workerService.call('sparqlItemWorkerService', 'getItem', [id], canceller)
     }
 
-    public getAllItems(canceller?: angular.IPromise<any>): angular.IPromise<Item> {
+    public getAllItems(canceller?: angular.IPromise<any>): angular.IPromise<Item[]> {
       return this.workerService.call('sparqlItemWorkerService', 'getAllItems', [], canceller)
     }
 
