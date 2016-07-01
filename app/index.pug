@@ -35,7 +35,7 @@ html(lang="en",ng-app="fibra",ng-hint)
         .nav.navbar-nav
           li
             a(ui-sref="author") Author
-          li
+          //li
             a(ui-sref="configuration") Configure
     div(ui-view)
     // build:js(app) scripts/vendor.js
@@ -51,13 +51,14 @@ html(lang="en",ng-app="fibra",ng-hint)
     // endbuild
 
     // build:js(.tmp) scripts/main.js
-    script(src="scripts/app.js")
+    script(src="scripts/app-configuration-ui.js")
     // inject:scripts
+    script(src="scripts/app-configuration-common.js")
     script(src="scripts/author-component.js")
     script(src="scripts/collection-utils.js")
     script(src="scripts/configuration-service.js")
-    script(src="scripts/configurations-component.js")
     script(src="scripts/rdf.js")
+    script(src="scripts/rdfjs.js")
     script(src="scripts/sparql-autocomplete-component.js")
     script(src="scripts/sparql-autocomplete-service.js")
     script(src="scripts/sparql-item-component.js")

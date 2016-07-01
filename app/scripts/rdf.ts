@@ -3,182 +3,195 @@ namespace fibra {
 
   import s = fi.seco.sparql
 
-  export enum NodeType {
-    Literal,
-    IRI,
-    BlankNode
-  }
-
-  export interface INode {
-    id: string
-    value: string
-    type: NodeType
-    lang?: string
+  export interface INode extends ITerm {
+    language?: string
     datatype?: string
   }
 
-  export class SparqlBindingNode implements INode {
-    public id: string
-    public value: string
-    public type: NodeType
-    public lang: string
-    public datatype: string
+  export class Node implements INode {
+    constructor(public value?: string, public termType?: 'NamedNode' | 'BlankNode' | 'Literal' | 'Variable' | 'DefaultGraph', public language?: string, public datatype?: string) {}
+    public toCanonical(): string {
+      switch (this.termType) {
+        case 'NamedNode': return '<' + this.value + '>'
+        case 'BlankNode': return '_:' + this.value
+        case 'Literal': return JSON.stringify(this.value) + (this.language ? '@' + this.language : '^^<' + this.datatype + '>')
+        case 'Variable': return '?' + this.value
+        case 'DefaultGraph': return ''
+        default: throw 'Unknown term type ' + this.termType
+      }
+    }
+    public equals(other: ITerm): boolean {
+      return this.termType === other.termType && this.value === other.value && (this.termType !== 'Literal' || (this.language === (<ILiteral>other).language && this.datatype === (<ILiteral>other).datatype))
+    }
+  }
+
+  export class SparqlBindingNode extends Node {
+    public termType: 'NamedNode' | 'BlankNode' | 'Literal'
     constructor(binding: s.ISparqlBinding) {
-      this.id = s.SparqlService.bindingToString(binding)
+      super()
       this.value = binding.value
       switch (binding.type) {
         case 'literal':
-          this.type = NodeType.Literal
-          this.lang = binding['xml:lang']
+          this.termType = 'Literal'
+          this.language = binding['xml:lang']
           this.datatype = binding.datatype
           break
         case 'uri':
-          this.type = NodeType.IRI
+          this.termType = 'NamedNode'
           break
         case 'bnode':
-          this.type = NodeType.BlankNode
+          this.termType = 'BlankNode'
           break
         default: throw 'Unknown binding type ' + binding.type + ' for ' + binding
       }
     }
   }
 
-  export class NodeNode implements INode {
-    public id: string
-    public type: NodeType
-    public value: string
-    public lang: string
-    public datatype: string
+  export class NodeFromNode extends Node {
     constructor(public other: INode) {
-      this.id = other.id
-      this.type = other.type
-      this.value = other.value
-      this.lang = other.lang
-      this.datatype = other.datatype
+      super(other.value, other.termType, other.language, other.datatype)
     }
   }
 
-  export class IdNode implements INode {
-    public type: NodeType
-    public value: string
-    public lang: string
+  class CanonicalNode extends Node {
     public datatype: string
-    constructor(public id: string) {
+    public language: string
+    constructor(id: string) {
+      super()
       if (id.indexOf('<') === 0) {
-        this.type = NodeType.IRI
+        this.termType = 'NamedNode'
         this.value = id.substring(1, id.length - 1)
       } else if (id.indexOf('_:') === 0) {
-        this.type = NodeType.BlankNode
+        this.termType = 'BlankNode'
         this.value = id.substring(2)
       } else if (id.indexOf('"') === 0) {
-        this.type = NodeType.Literal
+        this.termType = 'Literal'
         this.value = id.substring(1, id.lastIndexOf('"'))
         if (id.lastIndexOf('@') === id.lastIndexOf('"') + 1)
-          this.lang = id.substring(id.lastIndexOf('@'))
+          this.language = id.substring(id.lastIndexOf('@'))
         else if (id.lastIndexOf('^^<') === id.lastIndexOf('"') + 1)
           this.datatype = id.substring(id.lastIndexOf('^^<'), id.length - 1)
-      } else {
-        throw 'Number datatypes not done yet'
       }
     }
   }
 
-  export class IRI implements INode {
-    public type: NodeType = NodeType.IRI
-    public id: string
-    constructor(public value: string) {
-      this.id = '<' + value + '>'
+  export class DefaultGraph extends Node implements IDefaultGraph {
+    public static instance: IDefaultGraph = new DefaultGraph()
+    public termType: 'DefaultGraph'
+    public toCanonical(): string { return '' }
+    public equals(other: ITerm): boolean { return other.termType === 'DefaultGraph' }
+    constructor() { super('', 'DefaultGraph') }
+  }
+
+  export class Variable extends Node implements IVariable {
+    public termType: 'Variable'
+    constructor(value: string) { super(value, 'Variable') }
+    public toCanonical(): string { return '?' + this.value }
+  }
+
+
+  export class NamedNode extends Node implements INamedNode {
+    public termType: 'NamedNode'
+    constructor(value: string) { super(value, 'NamedNode') }
+    public toCanonical(): string { return '<' + this.value + '>' }
+  }
+
+  export class BlankNode extends Node implements IBlankNode {
+    public termType: 'BlankNode'
+    constructor(value: string) { super(value, 'BlankNode') }
+    public toCanonical(): string { return '?' + this.value }
+  }
+
+  export class Literal extends Node implements ILiteral {
+    public termType: 'Literal'
+    constructor(value: string, language: string = '', datatype?: string) {
+      super(value, 'Literal', language, datatype ? datatype : (language !== '' ? RDF.langString.value : XMLSchema.string.value))
     }
   }
 
-  export class BlankNode implements INode {
-    public type: NodeType = NodeType.BlankNode
-    public id: string
-    constructor(public value: string) {
-      this.id = '_:' + value
-    }
-  }
-
-  export class Literal implements INode {
-    public type: NodeType = NodeType.Literal
-    public id: string
-    constructor(public value: string, public lang?: string, public datatype?: string) {
-      if (datatype) switch (datatype) {
-        case 'http://www.w3.org/2001/XMLSchema#integer':
-        case 'http://www.w3.org/2001/XMLSchema#decimal':
-        case 'http://www.w3.org/2001/XMLSchema#double':
-        case 'http://www.w3.org/2001/XMLSchema#boolean': this.id = value; break
-        case 'http://www.w3.org/2001/XMLSchema#string': this.id = '"' + value + '"'; break
-        default: this.id = '"' + value + '"^^<' + datatype + '>'; break
-      }
-      else if (lang) this.id = '"' + value + '"@' + lang
-      else this.id = '"' + value + '"'
-    }
-  }
-
-  export interface ISourcedNode extends INode {
-    sourceEndpoints: string[]
-  }
-
-  export interface INodePlusLabel extends INode {
-    label: INode
-  }
-
-  export class NodePlusLabel extends NodeNode implements INodePlusLabel {
-    constructor(public node: INode, public label?: INode) {
-      super(node)
-    }
-  }
-
-  export class PropertyToValues extends NodePlusLabel {
-    public values: (INode|NodePlusLabel)[] = []
-    constructor(property: INode) {
-      super(property)
-    }
-  }
-
-  export class Item extends NodePlusLabel {
-    public properties: PropertyToValues[] = []
-    public inverseProperties: PropertyToValues[] = []
-  }
-
-  export class Triple {
+  export class Quad implements IQuad {
     constructor (
       public subject: INode,
-      public property: INode,
-      public object: INode
+      public predicate: INode,
+      public object: INode,
+      public graph: INode
     ) {}
+    public toCanonical(): string {
+     return this.subject.toCanonical() + ' ' + this.predicate.toCanonical() + ' ' + this.object.toCanonical() + (this.graph.termType === 'DefaultGraph' ? '' : (' ' + this.graph.toCanonical()))
+    }
+    public equals(other: IQuad): boolean {
+      return this.subject.equals(other.subject) && this.predicate.equals(other.predicate) && this.object.equals(other.object) && this.graph.equals(other.graph)
+    }
   }
 
-  export class Quad extends Triple {
+  export class Triple implements ITriple {
+    public graph: IDefaultGraph = DefaultGraph.instance
     constructor (
-      subject: INode,
-      property: INode,
-      object: INode,
-      public graph: INode
-    ) { super(subject, property, object) }
+      public subject: INode,
+      public predicate: INode,
+      public object: INode
+    ) {}
+    public toCanonical(): string {
+     return this.subject.toCanonical() + ' ' + this.predicate.toCanonical() + ' ' + this.object.toCanonical()
+    }
+    public equals(other: IQuad): boolean {
+      return this.subject.equals(other.subject) && this.predicate.equals(other.predicate) && this.object.equals(other.object) && this.graph.equals(other.graph)
+    }
   }
+
 
   export class Graph {
     constructor(
       public graph?: INode,
-      public triples: Triple[] = []
+      public triples: IQuad[] = []
     ) {}
+  }
+
+  export class DataFactory implements IDataFactory {
+    public static instance: DataFactory = new DataFactory()
+    public nodeFromBinding(binding: s.ISparqlBinding): INode { return new SparqlBindingNode(binding) }
+    public nodeFromNode(other: ITerm): INode { return new NodeFromNode(other) }
+    public namedNode(value: string): INamedNode { return new NamedNode(value) }
+    public blankNode(value?: string): IBlankNode { return new BlankNode(value) }
+    public literal(value: string, languageOrDatatype?: string): ILiteral {
+      if (languageOrDatatype.indexOf(':/')) return new Literal(value, undefined , languageOrDatatype)
+      else return new Literal(value, languageOrDatatype)
+    }
+    public variable(value: string): IVariable { return new Variable(value) }
+    public defaultGraph(): IDefaultGraph { return DefaultGraph.instance }
+    public triple(subject: ITerm, predicate: ITerm, object: ITerm): IQuad {
+      return new Triple(subject, predicate, object)
+    }
+    public quad(subject: ITerm, predicate: ITerm, object: ITerm, graph?: ITerm): IQuad {
+      return new Quad(subject, predicate, object, graph ? graph : DefaultGraph.instance)
+    }
   }
 
   export class SKOS {
     public static ns: string = 'http://www.w3.org/2004/02/skos/core#'
-    public static prefLabel: IRI = new IRI(SKOS.ns + 'prefLabel')
+    public static prefLabel: INamedNode = new NamedNode(SKOS.ns + 'prefLabel')
   }
 
   export class OWL {
     public static ns: string = 'http://www.w3.org/2002/07/owl#'
-    public static sameAs: IRI = new IRI(OWL.ns + 'sameAs')
+    public static sameAs: INamedNode = new NamedNode(OWL.ns + 'sameAs')
   }
 
   export class RDF {
     public static ns: string = 'http://www.w3.org/1999/02/22-rdf-syntax-ns#'
-    public static type: IRI = new IRI(RDF.ns + 'type')
+    public static type: INamedNode = new NamedNode(RDF.ns + 'type')
+    public static langString: INamedNode = new NamedNode(RDF.ns + 'langString')
+  }
+
+  export class XMLSchema {
+    public static ns: string = 'http://www.w3.org/2001/XMLSchema#'
+    public static string: INamedNode = new NamedNode(XMLSchema.ns + 'string')
+  }
+
+  export class CIDOC {
+    public static ns: string = 'http://www.cidoc-crm.org/cidoc-crm/'
+    public static Person: INamedNode = new NamedNode(CIDOC.ns + 'E21_Person')
+    public static Place: INamedNode = new NamedNode(CIDOC.ns + 'E53_Place')
   }
 
 }

@@ -5,10 +5,6 @@ namespace fibra {
 
   export class SparqlUpdateService {
 
-    public static serialize(s: Triple): string {
-      return s.subject.id + ' ' + s.property.id + ' ' + s.object.id
-    }
-
     constructor(private workerService: WorkerService) {}
 
     public updateQuads(endpoint: string, quadsToAdd: Quad[], quadsToRemove: Quad[]): angular.IPromise<any> {
@@ -24,7 +20,7 @@ namespace fibra {
   export class SparqlUpdateWorkerService {
     private static queryTemplate: string = `DELETE{<DELETE>}INSERT{<INSERT>}WHERE {}`
 
-    constructor(private sparqlService: s.SparqlService, private workerWorkerService: WorkerWorkerService ) {}
+    constructor(private sparqlService: s.SparqlService) {}
 
     public updateQuads(endpoint: string, quadsToAdd: Quad[] = [], quadsToRemove: Quad[] = []): angular.IPromise<any> {
       let graphsToAddMap: {[graphId: string]: Graph} = {}
@@ -32,19 +28,19 @@ namespace fibra {
       let graphsToAdd: Graph[] = []
       let graphsToRemove: Graph[] = []
       quadsToAdd.forEach(q => {
-        let graph: Graph = graphsToAddMap[q.graph.id]
+        let graph: Graph = graphsToAddMap[q.graph.value]
         if (!graph) {
           graph = new Graph(q.graph)
-          graphsToAddMap[q.graph.id] = graph
+          graphsToAddMap[q.graph.value] = graph
           graphsToAdd.push(graph)
         }
         graph.triples.push(q)
       })
       quadsToRemove.forEach(q => {
-        let graph: Graph = graphsToRemoveMap[q.graph.id]
+        let graph: Graph = graphsToRemoveMap[q.graph.value]
         if (!graph) {
           graph = new Graph(q.graph)
-          graphsToRemoveMap[q.graph.id] = graph
+          graphsToRemoveMap[q.graph.value] = graph
           graphsToRemove.push(graph)
         }
         graph.triples.push(q)
@@ -52,11 +48,12 @@ namespace fibra {
       return this.updateGraphs(endpoint, graphsToAdd, graphsToRemove)
     }
 
-    public updateGraphs(endpoint: string, graphsToAdd: Graph[] = [], graphsToRemove: Graph[] = []): angular.IPromise<any> {
-      let addString: string = graphsToAdd.map(graph => 'GRAPH' + graph.graph.id + '{' + graph.triples.map(SparqlUpdateService.serialize).join(' . ') + '}').join('')
-      let removeString: string = graphsToRemove.map(graph => 'GRAPH' + graph.graph.id + '{' + graph.triples.map(SparqlUpdateService.serialize).join(' . ') + '}').join('')
+    public updateGraphs(endpoint: string, graphsToAdd: Graph[] = [], graphsToRemove: Graph[] = []): angular.IPromise<boolean> {
+      let addString: string = graphsToAdd.map(graph => 'GRAPH' + graph.graph.toCanonical() + '{' + graph.triples.map(g => g.toCanonical()).join(' . ') + '}').join('')
+      let removeString: string = graphsToRemove.map(graph => 'GRAPH' + graph.graph.toCanonical() + '{' + graph.triples.map(g => g.toCanonical()).join(' . ') + '}').join('')
       return this.sparqlService.update(endpoint, SparqlUpdateWorkerService.queryTemplate.replace(/<DELETE>/g, removeString).replace(/<INSERT>/g, addString)).then(
-        (r) => this.workerWorkerService.stripFunctions(r)
+        (r) => r.status === 204,
+        (r) => false
       )
     }
 

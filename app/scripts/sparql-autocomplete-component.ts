@@ -36,7 +36,7 @@ namespace fibra {
           }
         )
     }
-    constructor(private $q: angular.IQService, private sparqlAutocompleteService: SparqlAutocompleteService, private configurationService: ConfigurationService) {
+    constructor(private $q: angular.IQService, private sparqlAutocompleteService: SparqlAutocompleteService) {
       this.canceller = $q.defer()
     }
   }

@@ -5,7 +5,7 @@ namespace fibra {
 
   export class ResultsByDatasource {
     public resultsByGroup: ResultGroup[] = []
-    constructor(public configuration: SparqlAutocompletionConfiguration) {}
+    constructor(public configuration: EndpointConfiguration) {}
   }
 
   export class ResultGroup {
@@ -15,24 +15,12 @@ namespace fibra {
 
   export class Result {
     public ids: INode[] = []
-    public datasources: SparqlAutocompletionConfiguration[] = []
+    public datasources: EndpointConfiguration[] = []
     public additionalInformation: {[varName: string]: INode[]} = {}
-    constructor(id: INode, public resultGroup: ResultGroup, datasource: SparqlAutocompletionConfiguration, public matchedLabel: INode, public prefLabel: INode) {
+    constructor(id: INode, public resultGroup: ResultGroup, datasource: EndpointConfiguration, public matchedLabel: INode, public prefLabel: INode) {
       this.ids.push(id)
       this.datasources.push(datasource)
     }
-  }
-
-  export class SparqlAutocompletionConfiguration {
-
-    public constraints: string = ''
-
-    constructor(
-      public id: string,
-      public title: string,
-      public endpoint: string,
-      public queryTemplate: string
-    ) {}
   }
 
   export class SparqlAutocompleteService {
@@ -43,6 +31,7 @@ PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
 PREFIX owl: <http://www.w3.org/2002/07/owl#>
 PREFIX sf: <http://ldf.fi/functions#>
+
 SELECT ?groupId ?groupLabel ?id ?matchedLabel ?prefLabel ?altLabel ?type ?typeLabel ?sameAs ?ifpWikipediaPage ?ifpODBNId {
   {
     SELECT ?groupId ?id (SAMPLE(?matchedLabelS) AS ?matchedLabel) {
@@ -121,7 +110,7 @@ SELECT ?groupId ?groupLabel ?id ?matchedLabel ?prefLabel ?altLabel ?type ?typeLa
     }
 
     public autocompleteByDatasource(query: string, limit: number, canceller?: angular.IPromise<any>): angular.IPromise<ResultsByDatasource[]> {
-      let configurations: SparqlAutocompletionConfiguration[] = this.configurationWorkerService.configurations.map(c => c.autocompletionConfiguration)
+      let configurations: EndpointConfiguration[] = this.configurationWorkerService.configuration.allEndpoints()
       return this.$q.all(this.query(query, limit, configurations).map((promise, index) => promise.then(response => {
         let ds: ResultsByDatasource = new ResultsByDatasource(configurations[index])
         let groupToResults: {[id: string]: ResultGroup} = this.processResults(response, configurations[index])
@@ -131,10 +120,10 @@ SELECT ?groupId ?groupLabel ?id ?matchedLabel ?prefLabel ?altLabel ?type ?typeLa
     }
 
     public autocompleteByGroup(query: string, limit: number, canceller?: angular.IPromise<any>): angular.IPromise<ResultGroup[]> {
-      let configurations: SparqlAutocompletionConfiguration[] = this.configurationWorkerService.configurations.map(c => c.autocompletionConfiguration)
+      let configurations: EndpointConfiguration[] = this.configurationWorkerService.configuration.allEndpoints()
       let groupToResults: {[id: string]: ResultGroup} = {}
       let idToResult: {[id: string]: Result} = {}
-      let idToDatasource: {[id: string]: {[id: string]: SparqlAutocompletionConfiguration}} = {}
+      let idToDatasource: {[id: string]: {[id: string]: EndpointConfiguration}} = {}
       let idToAdditionalInformation: {[id: string]: {[varName: string]: {[aiId: string]: INode}}} = {}
       let ifpToId: {[varName: string]: {[id: string]: string}} = {}
       return this.$q.all(this.query(query, limit, configurations).map((promise, index) => promise.then(response =>
@@ -148,81 +137,81 @@ SELECT ?groupId ?groupLabel ?id ?matchedLabel ?prefLabel ?altLabel ?type ?typeLa
 
     private processResults(
       response: angular.IHttpPromiseCallbackArg<s.ISparqlBindingResult<{[id: string]: s.ISparqlBinding}>>,
-      configuration: SparqlAutocompletionConfiguration,
+      configuration: EndpointConfiguration,
       groupToResults: {[id: string]: ResultGroup} = {},
       idToResult: {[id: string]: Result} = {},
       ifpToId: {[varName: string]: {[id: string]: string}} = {},
-      idToDatasource: {[id: string]: {[id: string]: SparqlAutocompletionConfiguration}} = {},
+      idToDatasource: {[id: string]: {[id: string]: EndpointConfiguration}} = {},
       idToAdditionalInformation: {[id: string]: {[varName: string]: {[aiId: string]: INode}}} = {}): {[id: string]: ResultGroup} {
         let additionalInformationVars: string[] = response.data.head.vars.filter(varName => !SparqlAutocompleteWorkerService.defaultVars[varName] && varName.indexOf('ifp') !== 0)
         let ifpVars: string[] = response.data.head.vars.filter(varName => varName.indexOf('ifp') === 0)
         response.data.results.bindings.forEach(binding => {
           let rg: ResultGroup = goc(groupToResults, binding['groupId'].value, () => new ResultGroup(binding['groupLabel'].value))
           let resultNode: INode = new SparqlBindingNode(binding['id'])
-          let result: Result = idToResult[resultNode.id]
+          let result: Result = idToResult[resultNode.toCanonical()]
           // FIXME refactor into something sensible. This even still does not guarantee unique results
           if (!result && binding['sameAs'])
-            result = idToResult[new SparqlBindingNode(binding['sameAs']).id]
+            result = idToResult[new SparqlBindingNode(binding['sameAs']).toCanonical()]
           if (!result) ifpVars.forEach(ifpVar => {
-            if (binding[ifpVar]) result = idToResult[goc(ifpToId, ifpVar)[new SparqlBindingNode(binding[ifpVar]).id]]
+            if (binding[ifpVar]) result = idToResult[goc(ifpToId, ifpVar)[new SparqlBindingNode(binding[ifpVar]).toCanonical()]]
           })
           if (!result) {
             result = new Result(resultNode, rg, configuration, new SparqlBindingNode(binding['matchedLabel']), new SparqlBindingNode(binding['prefLabel']))
             rg.results.push(result)
-            idToDatasource[resultNode.id] = {}
-            idToDatasource[resultNode.id][result.datasources[0].id] = configuration
-            idToResult[resultNode.id] = result
+            idToDatasource[resultNode.toCanonical()] = {}
+            idToDatasource[resultNode.toCanonical()][result.datasources[0].id] = configuration
+            idToResult[resultNode.toCanonical()] = result
           } else
-            cpush(result.datasources, goc(idToDatasource, resultNode.id), configuration.id, configuration)
+            cpush(result.datasources, goc(idToDatasource, resultNode.toCanonical()), configuration.id, configuration)
           if (binding['sameAs']) {
             let otherNode: INode = new SparqlBindingNode(binding['sameAs'])
-            if (!idToResult[otherNode.id]) {
-              idToResult[otherNode.id] = result
+            if (!idToResult[otherNode.toCanonical()]) {
+              idToResult[otherNode.toCanonical()] = result
               result.ids.push(otherNode)
             } else {
-              let otherResult: Result = idToResult[otherNode.id]
+              let otherResult: Result = idToResult[otherNode.toCanonical()]
               if (otherResult !== result) {
                 otherResult.ids.forEach(otherNode => {
                   otherResult.datasources.forEach(dconfiguration =>
-                    cpush(result.datasources, goc(idToDatasource, resultNode.id), dconfiguration.id, dconfiguration)
+                    cpush(result.datasources, goc(idToDatasource, resultNode.toCanonical()), dconfiguration.id, dconfiguration)
                   )
                   for (let varName in otherResult.additionalInformation)
                     otherResult.additionalInformation[varName].forEach(ai =>
                       cpush(
                         goc(result.additionalInformation, varName, () => []),
-                        goc(goc(idToAdditionalInformation, resultNode.id), varName),
-                        ai.id, ai)
+                        goc(goc(idToAdditionalInformation, resultNode.toCanonical()), varName),
+                        ai.toCanonical(), ai)
                     )
                   result.ids.push(otherNode)
-                  idToResult[otherNode.id] = result
+                  idToResult[otherNode.toCanonical()] = result
                 })
-                idToResult[otherNode.id] = result
+                idToResult[otherNode.toCanonical()] = result
               }
             }
           }
           ifpVars.forEach(ifpVar => {
             if (binding[ifpVar]) {
               let ifp: INode = new SparqlBindingNode(binding[ifpVar])
-              if (!goc(ifpToId, ifpVar)[ifp.id]) {
-                ifpToId[ifpVar][ifp.id] = resultNode.id
+              if (!goc(ifpToId, ifpVar)[ifp.toCanonical()]) {
+                ifpToId[ifpVar][ifp.toCanonical()] = resultNode.toCanonical()
               } else {
-                let otherResult: Result = idToResult[ifpToId[ifpVar][ifp.id]]
+                let otherResult: Result = idToResult[ifpToId[ifpVar][ifp.toCanonical()]]
                 if (otherResult !== result) {
                   otherResult.ids.forEach(otherNode => {
                     otherResult.datasources.forEach(dconfiguration =>
-                      cpush(result.datasources, goc(idToDatasource, resultNode.id), dconfiguration.id, dconfiguration)
+                      cpush(result.datasources, goc(idToDatasource, resultNode.toCanonical()), dconfiguration.id, dconfiguration)
                     )
                     for (let varName in otherResult.additionalInformation)
                       otherResult.additionalInformation[varName].forEach(ai =>
                         cpush(
                           goc(result.additionalInformation, varName, () => []),
-                          goc(goc(idToAdditionalInformation, resultNode.id), varName),
-                          ai.id, ai)
+                          goc(goc(idToAdditionalInformation, resultNode.toCanonical()), varName),
+                          ai.toCanonical(), ai)
                       )
                     result.ids.push(otherNode)
-                    idToResult[otherNode.id] = result
+                    idToResult[otherNode.toCanonical()] = result
                   })
-                  ifpToId[ifpVar][ifp.id] = resultNode.id
+                  ifpToId[ifpVar][ifp.toCanonical()] = resultNode.toCanonical()
                 }
               }
             }
@@ -232,21 +221,21 @@ SELECT ?groupId ?groupLabel ?id ?matchedLabel ?prefLabel ?altLabel ?type ?typeLa
               let ai: INode = new SparqlBindingNode(binding[varName])
               cpush(
                 goc(result.additionalInformation, varName, () => []),
-                goc(goc(idToAdditionalInformation, resultNode.id), varName),
-                ai.id, ai)
+                goc(goc(idToAdditionalInformation, resultNode.toCanonical()), varName),
+                ai.toCanonical(), ai)
             }
           })
         })
         return groupToResults
     }
 
-    private query(query: string, limit: number, configurations: SparqlAutocompletionConfiguration[], canceller?: angular.IPromise<any>): angular.IPromise<angular.IHttpPromiseCallbackArg<s.ISparqlBindingResult<{[id: string]: s.ISparqlBinding}>>>[] {
+    private query(query: string, limit: number, configurations: EndpointConfiguration[], canceller?: angular.IPromise<any>): angular.IPromise<angular.IHttpPromiseCallbackArg<s.ISparqlBindingResult<{[id: string]: s.ISparqlBinding}>>>[] {
       return configurations.map(configuration => {
-        let queryTemplate: string = configuration.queryTemplate
+        let queryTemplate: string = configuration.autocompletionQueryTemplate
         queryTemplate = queryTemplate.replace(/<QUERY>/g, s.SparqlService.stringToSPARQLString(query))
-        queryTemplate = queryTemplate.replace(/# CONSTRAINTS/g, configuration.constraints)
+        queryTemplate = queryTemplate.replace(/# CONSTRAINTS/g, configuration.dataModelConfiguration.typeConstraints)
         queryTemplate = queryTemplate.replace(/<LIMIT>/g, '' + limit)
-        return this.sparqlService.query(configuration.endpoint, queryTemplate, {timeout: canceller})})
+        return this.sparqlService.query(configuration.endpoint.value, queryTemplate, {timeout: canceller})})
     }
 
   }

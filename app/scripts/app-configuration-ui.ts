@@ -17,9 +17,6 @@ namespace fibra {
     $stateProvider.state('author', {
         url: '/author',
         template: '<author></author>'
-      }).state('configuration', {
-        url: '/configuration',
-        template: '<configurations></configurations>'
       })
   })
   m.config(($localStorageProvider) => {
@@ -32,7 +29,8 @@ namespace fibra {
       'bower_components/angular/angular.min.js',
       'bower_components/angular-http-auth/src/http-auth-interceptor.js',
       'bower_components/angular-sparql-service/dist/sparql-service.js',
-      'scripts/worker-app.js',
+      'scripts/app-configuration-worker.js',
+      'scripts/app-configuration-common.js',
       'scripts/worker-service.js',
       'scripts/configuration-service.js',
       'scripts/collection-utils.js',

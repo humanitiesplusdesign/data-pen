@@ -24,7 +24,7 @@ gulp.task('wire:styles', function() {
 });
 
 gulp.task('wire:workerscripts-to-scripts', function() {
-  return gulp.src("app/scripts/app.ts")
+  return gulp.src("app/scripts/app-configuration-ui.ts")
     .pipe($.inject(gulp.src("worker.conf"), {
           starttag: "importScripts: [",
           endtag: "]",
@@ -42,7 +42,7 @@ gulp.task('wire:scripts-to-templates', function() {
     .pipe(wiredep({
       directory: "app/bower_components"
     }))
-    .pipe($.inject(gulp.src(["app/scripts/**/*.ts","!app/scripts/app.ts","!app/scripts/worker-app.ts"], {read:false}), {
+    .pipe($.inject(gulp.src(["app/scripts/**/*.ts","!app/scripts/app-configuration-ui.ts","!app/scripts/app-configuration-worker.ts"], {read:false}), {
           starttag: "// inject:scripts",
           endtag: "// endinject",
           addRootSlash: false,

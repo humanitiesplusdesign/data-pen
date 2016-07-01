@@ -1,5 +1,5 @@
 script(type="text/ng-template",id="sparql-autocomplete-item-popover")
-  sparql-item(endpoint='result.datasources[0].endpoint',item-id='result.ids[0]')
+  sparql-item(item-id='result.ids[0]')
 .form-group.has-feedback
   input.form-control(ng-model="query",ng-model-options='{ debounce: 500 }',ng-change="$ctrl.onChange(query)")
   span.glyphicon.glyphicon-refresh.fa-spin.form-control-feedback(ng-show="$ctrl.queryRunning")

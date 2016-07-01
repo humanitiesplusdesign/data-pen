@@ -3,21 +3,51 @@ namespace fibra {
 
   import s = fi.seco.sparql
 
+  export interface ISourcedNode extends INode {
+    sourceEndpoints: string[]
+  }
+
+  export interface INodePlusLabel extends INode {
+    label: INode
+  }
+
+  export class NodePlusLabel extends NodeFromNode implements INodePlusLabel {
+    constructor(public node: INode, public label?: INode) {
+      super(node)
+    }
+  }
+
+  export interface IPropertyToValues extends INodePlusLabel {
+    values: (INode|NodePlusLabel)[]
+  }
+
+  export class PropertyToValues extends NodePlusLabel {
+    public values: (INode|NodePlusLabel)[] = []
+    constructor(property: INode) {
+      super(property)
+    }
+  }
+
+  export class Item extends NodePlusLabel {
+    public properties: PropertyToValues[] = []
+    public inverseProperties: PropertyToValues[] = []
+  }
+
   export class SparqlItemService {
 
     public static ns: string = 'http://ldf.fi/fibra/'
-    public static schemaGraph: INode = new IRI(SparqlItemService.ns + 'schema#')
-    public static instanceGraph: INode = new IRI(SparqlItemService.ns + 'main/')
+    public static schemaGraph: INode = new NamedNode(SparqlItemService.ns + 'schema#')
+    public static instanceGraph: INode = new NamedNode(SparqlItemService.ns + 'main/')
 
     public static getItemPropertiesQuery: string = `
 PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX owl: <http://www.w3.org/2002/07/owl#>
 PREFIX sf: <http://ldf.fi/functions#>
-SELECT ?service ?itemLabel ?property ?propertyLabel ?object ?objectLabel {
+SELECT ?serviceId ?service ?itemLabel ?property ?propertyLabel ?object ?objectLabel {
   <ID> owl:sameAs* ?id .
-  VALUES ?service {
-    <SERVICES>
+  VALUES (?serviceId ?service) {
+    (<SERVICES>)
   }
   SERVICE ?service {
     ?id sf:preferredLanguageLiteral (skos:prefLabel rdfs:label skos:altLabel 'en' '' ?itemLabel) .
@@ -54,6 +84,20 @@ SELECT ?id ?itemLabel ?property ?propertyLabel ?object ?objectLabel {
 }
 `
 
+    public static deleteItemQuery: string = `
+DELETE {
+  GRAPH ?g {
+    <ID> ?p ?o .
+    ?s ?p <ID> .
+  }
+}
+WHERE {
+  GRAPH ?g {
+    { <ID> ?p ?o } UNION { ?s ?p <ID> }
+  }
+}
+`
+
     private static lut: string[] = (() => {
       let lut: string[] = []
       for (let i: number = 0; i < 256; i++)
@@ -84,10 +128,17 @@ SELECT ?id ?itemLabel ?property ?propertyLabel ?object ?objectLabel {
       return this.workerService.call('sparqlItemWorkerService', 'getAllItems', [], canceller)
     }
 
-    public createNewItem(equivalentNodes: INode[] = [], properties: PropertyToValues[] = []): angular.IPromise<INode> {
+    public createNewItem(equivalentNodes: INode[] = [], properties: IPropertyToValues[] = []): angular.IPromise<INode> {
       return this.workerService.call('sparqlItemWorkerService', 'createNewItem', [equivalentNodes, properties])
     }
 
+    public alterItem(id: INode, propertiesToAdd: IPropertyToValues[], propertiesToRemove: IPropertyToValues[] = []): angular.IPromise<string> {
+      return this.workerService.call('sparqlItemWorkerService', 'alterItem', [id, propertiesToAdd, propertiesToRemove])
+    }
+
+    public deleteItem(id: INode): angular.IPromise<string> {
+      return this.workerService.call('sparqlItemWorkerService', 'deleteItem', [id])
+    }
   }
 
   export class SparqlItemWorkerService {
@@ -96,9 +147,9 @@ SELECT ?id ?itemLabel ?property ?propertyLabel ?object ?objectLabel {
 
     public getItem(id: INode, canceller?: angular.IPromise<any>): angular.IPromise<Item> {
       let queryTemplate: string = SparqlItemService.getItemPropertiesQuery
-      queryTemplate = queryTemplate.replace(/<ID>/g, id.id)
-      queryTemplate = queryTemplate.replace(/<SERVICES>/g, this.configurationWorkerService.configurations.map(c => '<' + c.endpoint + '>').join(''))
-      return this.sparqlService.query(this.configurationWorkerService.configurations[0].endpoint, queryTemplate, {timeout: canceller}).then(
+      queryTemplate = queryTemplate.replace(/<ID>/g, id.toCanonical())
+      queryTemplate = queryTemplate.replace(/\(<SERVICES>\)/g, this.configurationWorkerService.configuration.allEndpoints().map(c => '(' + s.SparqlService.stringToSPARQLString(c.id) + c.endpoint.toCanonical() + ')').join(''))
+      return this.sparqlService.query(this.configurationWorkerService.configuration.primaryEndpoint.endpoint.value, queryTemplate, {timeout: canceller}).then(
         (response: angular.IHttpPromiseCallbackArg<s.ISparqlBindingResult<{[id: string]: s.ISparqlBinding}>>) => {
           let item: Item = new Item(id)
           let propertyMap: {[property: string]: PropertyToValues} = {}
@@ -124,8 +175,7 @@ SELECT ?id ?itemLabel ?property ?propertyLabel ?object ?objectLabel {
 
     public getAllItems(canceller?: angular.IPromise<any>): angular.IPromise<Item[]> {
       let queryTemplate: string = SparqlItemService.getAllItemPropertiesQuery
-      queryTemplate = queryTemplate.replace(/<SERVICES>/g, this.configurationWorkerService.configurations.map(c => '<' + c.endpoint + '>').join(''))
-      return this.sparqlService.query(this.configurationWorkerService.configurations[0].endpoint, queryTemplate, {timeout: canceller}).then(
+      return this.sparqlService.query(this.configurationWorkerService.configuration.primaryEndpoint.endpoint.value, queryTemplate, {timeout: canceller}).then(
         (response: angular.IHttpPromiseCallbackArg<s.ISparqlBindingResult<{[id: string]: s.ISparqlBinding}>>) => {
           let items: EnsuredOrderedMap<Item> = new EnsuredOrderedMap<Item>()
           let itemPropertyMap: EnsuredMap<{[property: string]: PropertyToValues}> = new EnsuredMap<{[property: string]: PropertyToValues}>()
@@ -133,7 +183,7 @@ SELECT ?id ?itemLabel ?property ?propertyLabel ?object ?objectLabel {
             let item: Item = items.goc(b['id'].value, () => new Item(new SparqlBindingNode(b['id'])))
             if (b['itemLabel']) item.label = new SparqlBindingNode(b['itemLabel'])
             if (b['property']) {
-              let propertyToValues: PropertyToValues = goc(itemPropertyMap.goc(item.id), b['property'].value, () => {
+              let propertyToValues: PropertyToValues = goc(itemPropertyMap.goc(item.toCanonical()), b['property'].value, () => {
                 propertyToValues = new PropertyToValues(new SparqlBindingNode(b['property']))
                 if (b['propertyLabel']) propertyToValues.label = new SparqlBindingNode(b['propertyLabel'])
                 item.properties.push(propertyToValues)
@@ -149,9 +199,31 @@ SELECT ?id ?itemLabel ?property ?propertyLabel ?object ?objectLabel {
       )
     }
 
+    public deleteItem(id: INode): angular.IPromise<boolean> {
+      return this.sparqlService.update(this.configurationWorkerService.configuration.primaryEndpoint.updateEndpoint.value, this.configurationWorkerService.configuration.deleteItemQuery.replace(/<ID>/g, id.toCanonical())).then(
+        (r) => r.status === 204,
+        (r) => false
+      )
+    }
+
+    public alterItem(id: INode, propertiesToAdd: IPropertyToValues[], propertiesToRemove: IPropertyToValues[] = []): angular.IPromise<boolean> {
+      let instanceTriplesToAdd: ITriple[] = []
+      let schemaTriplesToAdd: ITriple[] = []
+      let instanceTriplesToRemove: ITriple[] = []
+      propertiesToAdd.forEach(property => {
+        if (property.label) schemaTriplesToAdd.push(new Triple(property, SKOS.prefLabel, property.label))
+        property.values.forEach(value => {
+          instanceTriplesToAdd.push(new Triple(id, property, value))
+          if ((<NodePlusLabel>value).label) instanceTriplesToAdd.push(new Triple(value, SKOS.prefLabel, (<NodePlusLabel>value).label))
+        })
+      })
+      propertiesToRemove.forEach(property => property.values.forEach(value => instanceTriplesToRemove.push(new Triple(id, property, value))))
+      return this.sparqlUpdateWorkerService.updateGraphs(this.configurationWorkerService.configuration.primaryEndpoint.updateEndpoint.value, [new Graph(SparqlItemService.schemaGraph, schemaTriplesToAdd), new Graph(SparqlItemService.instanceGraph, instanceTriplesToAdd)])
+    }
+
     public createNewItem(equivalentNodes: INode[] = [], properties: PropertyToValues[] = []): angular.IPromise<INode> {
       let deferred: angular.IDeferred<INode> = this.$q.defer()
-      let subject: INode = new IRI(SparqlItemService.ns + SparqlItemService.UUID())
+      let subject: INode = new NamedNode(SparqlItemService.ns + SparqlItemService.UUID())
       deferred.notify(subject)
       let schemaTriplesToAdd: Triple[] = []
       let instanceTriplesToAdd: Triple[] = []
@@ -163,7 +235,7 @@ SELECT ?id ?itemLabel ?property ?propertyLabel ?object ?objectLabel {
           if ((<NodePlusLabel>value).label) instanceTriplesToAdd.push(new Triple(value, SKOS.prefLabel, (<NodePlusLabel>value).label))
         })
       })
-      this.sparqlUpdateWorkerService.updateGraphs(this.configurationWorkerService.configurations[0].endpoint, [new Graph(SparqlItemService.schemaGraph, schemaTriplesToAdd), new Graph(SparqlItemService.instanceGraph, instanceTriplesToAdd)]).then(
+      this.sparqlUpdateWorkerService.updateGraphs(this.configurationWorkerService.configuration.primaryEndpoint.updateEndpoint.value, [new Graph(SparqlItemService.schemaGraph, schemaTriplesToAdd), new Graph(SparqlItemService.instanceGraph, instanceTriplesToAdd)]).then(
         () => deferred.resolve(subject),
         deferred.reject,
         deferred.notify
