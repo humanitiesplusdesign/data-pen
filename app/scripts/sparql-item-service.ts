@@ -34,6 +34,26 @@ SELECT ?service ?itemLabel ?property ?propertyLabel ?object ?objectLabel {
 }
 `
 
+    public static getAllItemPropertiesQuery: string = `
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX owl: <http://www.w3.org/2002/07/owl#>
+PREFIX sf: <http://ldf.fi/functions#>
+SELECT ?id ?itemLabel ?property ?propertyLabel ?object ?objectLabel {
+  ?id a ?type .
+  ?id sf:preferredLanguageLiteral (skos:prefLabel rdfs:label skos:altLabel 'en' '' ?itemLabel) .
+  ?id ?property ?object .
+  OPTIONAL {
+    ?property sf:preferredLanguageLiteral (skos:prefLabel rdfs:label skos:altLabel 'en' '' ?propertyLabelP)
+  }
+  BIND(COALESCE(?propertyLabelP,REPLACE(REPLACE(REPLACE(REPLACE(STR(?property),".*/",""),".*#",""),"_"," "),"([A-ZÅÄÖ])"," $1")) AS ?propertyLabel)
+  OPTIONAL {
+    ?object sf:preferredLanguageLiteral (skos:prefLabel rdfs:label skos:altLabel 'en' '' ?objectLabelP) .
+  }
+  BIND (IF(ISIRI(?object),COALESCE(?objectLabelP,REPLACE(REPLACE(REPLACE(REPLACE(STR(?object),".*/",""),".*#",""),"_"," "),"([A-ZÅÄÖ])"," $1")),?object) AS ?objectLabel)
+}
+`
+
     private static lut: string[] = (() => {
       let lut: string[] = []
       for (let i: number = 0; i < 256; i++)
@@ -58,6 +78,10 @@ SELECT ?service ?itemLabel ?property ?propertyLabel ?object ?objectLabel {
 
     public getItem(id: INode, canceller?: angular.IPromise<any>): angular.IPromise<Item> {
       return this.workerService.call('sparqlItemWorkerService', 'getItem', [id], canceller)
+    }
+
+    public getAllItems(canceller?: angular.IPromise<any>): angular.IPromise<Item> {
+      return this.workerService.call('sparqlItemWorkerService', 'getAllItems', [], canceller)
     }
 
     public createNewItem(equivalentNodes: INode[] = [], properties: PropertyToValues[] = []): angular.IPromise<INode> {
@@ -94,6 +118,33 @@ SELECT ?service ?itemLabel ?property ?propertyLabel ?object ?objectLabel {
             }
           })
           return item
+        }
+      )
+    }
+
+    public getAllItems(canceller?: angular.IPromise<any>): angular.IPromise<Item[]> {
+      let queryTemplate: string = SparqlItemService.getAllItemPropertiesQuery
+      queryTemplate = queryTemplate.replace(/<SERVICES>/g, this.configurationWorkerService.configurations.map(c => '<' + c.endpoint + '>').join(''))
+      return this.sparqlService.query(this.configurationWorkerService.configurations[0].endpoint, queryTemplate, {timeout: canceller}).then(
+        (response: angular.IHttpPromiseCallbackArg<s.ISparqlBindingResult<{[id: string]: s.ISparqlBinding}>>) => {
+          let items: EnsuredOrderedMap<Item> = new EnsuredOrderedMap<Item>()
+          let itemPropertyMap: EnsuredMap<{[property: string]: PropertyToValues}> = new EnsuredMap<{[property: string]: PropertyToValues}>()
+          response.data.results.bindings.forEach(b => {
+            let item: Item = items.goc(b['id'].value, () => new Item(new SparqlBindingNode(b['id'])))
+            if (b['itemLabel']) item.label = new SparqlBindingNode(b['itemLabel'])
+            if (b['property']) {
+              let propertyToValues: PropertyToValues = goc(itemPropertyMap.goc(item.id), b['property'].value, () => {
+                propertyToValues = new PropertyToValues(new SparqlBindingNode(b['property']))
+                if (b['propertyLabel']) propertyToValues.label = new SparqlBindingNode(b['propertyLabel'])
+                item.properties.push(propertyToValues)
+                return propertyToValues
+              })
+              let oNode: NodePlusLabel = new NodePlusLabel(new SparqlBindingNode(b['object']))
+              if (b['objectLabel']) oNode.label = new SparqlBindingNode(b['objectLabel'])
+              propertyToValues.values.push(oNode)
+            }
+          })
+          return items.array()
         }
       )
     }
