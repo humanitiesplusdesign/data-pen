@@ -20,6 +20,7 @@
         "app/scripts/author-component.ts",
         "app/scripts/collection-utils.ts",
         "app/scripts/configuration-service.ts",
+        "app/scripts/explore-component.ts",
         "app/scripts/rdf.ts",
         "app/scripts/rdfjs.ts",
         "app/scripts/sparql-autocomplete-component.ts",
