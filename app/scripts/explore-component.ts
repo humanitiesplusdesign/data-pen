@@ -7,16 +7,16 @@ namespace fibra {
     public selectedItem: INode
     public properties: {}[]
     public classTreePromise: angular.IPromise<TreeNode[]>
-    public callbackRegistrator: Function
 
-    public queryAndBuild(): void {
-      this.classTreePromise.then(ct => {
-        this.itemService.getAllItems().then(
+    public queryAndBuild(): angular.IPromise<String> {
+      return this.classTreePromise.then(ct => {
+        return this.itemService.getAllItems().then(
           (items: Item[]) => {
             this.items = items
             this.properties = this.items[0].properties.map((p) => {
               return {key: p.toCanonical(), value: p.label.value }
             })
+            return 'ok'
           }
         )
       })
@@ -32,8 +32,12 @@ namespace fibra {
       return prom
     }
 
-    constructor(private sparqlItemService: SparqlItemService) {
-      this.callbackRegistrator(this.queryAndBuild)
+    constructor(private sparqlItemService: SparqlItemService,
+                private fibraService: FibraService,
+                private $q: angular.IQService) {
+      this.fibraService.on('change', () => {
+        return this.queryAndBuild()
+      })
       this.itemService = sparqlItemService
       this.queryAndBuild()
     }
@@ -42,10 +46,9 @@ namespace fibra {
   export class ExploreComponent implements angular.IComponentOptions {
     public bindings: {[id: string]: string} = {
       classTreePromise: '<',
-      callbackRegistrator: '=',
       selectedItem: '='
     }
     public controller: Function = SparqlExploreComponentController
-    public templateUrl: string = 'partials/explore.html'
+    public templateUrl: string = 'partials/explore.html'   
   }
 }

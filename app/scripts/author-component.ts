@@ -11,11 +11,6 @@ namespace fibra {
     public classTreePromise: angular.IPromise<TreeNode[]>
     public selectedItem: INode
 
-    public onChange: Function[] = []
-    public registerCallback: (f: Function) => void = (f: Function) => {
-      this.onChange.push(f)
-    }
-
     public createItem(item: Result): angular.IPromise<INode> {
       let prefLabel: PropertyToValues = new PropertyToValues(SKOS.prefLabel)
       prefLabel.values.push(item.prefLabel)
@@ -23,12 +18,15 @@ namespace fibra {
       type.values.push(new NodePlusLabel(item.additionalInformation['type'][0], item.additionalInformation['typeLabel'][0]))
       let prom = this.sparqlItemService.createNewItem(item.ids, [prefLabel, type])
       prom.then(() => {
-        this.onChange.forEach(f => f())
+        this.fibraService.dispatch('change')
       })
       return prom
     }
 
-    constructor(private configurationService: ConfigurationService, sparqlTreeService: SparqlTreeService, private sparqlItemService: SparqlItemService) {
+    constructor(private configurationService: ConfigurationService,
+                sparqlTreeService: SparqlTreeService,
+                private sparqlItemService: SparqlItemService,
+                private fibraService: FibraService) {
       this.classTreePromise = sparqlTreeService.getTree(this.configurationService.configuration.primaryEndpoint.endpoint.value, SparqlTreeService.getClassTreeQuery)
       this.classTreePromise.then(c => this.classTree = c)
     }
