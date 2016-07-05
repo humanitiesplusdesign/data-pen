@@ -3,7 +3,11 @@
     #left-column.col-md-2
       h4 Overview
       tree(tree="$ctrl.classTree",on-select="$ctrl.alterSelection(treeNode)")
-    #middle-column.col-md-10
-      explore(class-tree-promise="$ctrl.classTreePromise", callback-registrator="$ctrl.registerCallback")
+    #middle-column.col-md-6
+      h4 Current Entities
+      explore(class-tree-promise="$ctrl.classTreePromise", selected-item="$ctrl.selectedItem", callback-registrator="$ctrl.registerCallback")
       h4 Search
       sparql-autocomplete(limit="30",by="group",on-select="$ctrl.createItem(result)")
+    #right-column.col-md-4
+      h4 Selected Entity
+      sparql-item(item-id="$ctrl.selectedItem")

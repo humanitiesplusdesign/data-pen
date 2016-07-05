@@ -4,6 +4,7 @@ namespace fibra {
   class SparqlExploreComponentController {
     public itemService: SparqlItemService
     public items: Item[]
+    public selectedItem: INode
     public properties: {}[]
     public classTreePromise: angular.IPromise<TreeNode[]>
     public callbackRegistrator: Function
@@ -19,6 +20,10 @@ namespace fibra {
           }
         )
       })
+    }
+
+    public selectItem(id: INode): void {
+      this.selectedItem = id
     }
 
     public delete(id: INode): angular.IPromise<string> {
@@ -37,7 +42,8 @@ namespace fibra {
   export class ExploreComponent implements angular.IComponentOptions {
     public bindings: {[id: string]: string} = {
       classTreePromise: '<',
-      callbackRegistrator: '='
+      callbackRegistrator: '=',
+      selectedItem: '='
     }
     public controller: Function = SparqlExploreComponentController
     public templateUrl: string = 'partials/explore.html'

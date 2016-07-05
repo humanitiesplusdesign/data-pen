@@ -9,6 +9,7 @@ namespace fibra {
 
     public classTree: TreeNode[]
     public classTreePromise: angular.IPromise<TreeNode[]>
+    public selectedItem: INode
 
     public onChange: Function[] = []
     public registerCallback: (f: Function) => void = (f: Function) => {
