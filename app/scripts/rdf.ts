@@ -5,11 +5,11 @@ namespace fibra {
 
   export interface INode extends ITerm {
     language?: string
-    datatype?: string
+    datatype?: INamedNode
   }
 
   export class Node implements INode {
-    constructor(public value?: string, public termType?: 'NamedNode' | 'BlankNode' | 'Literal' | 'Variable' | 'DefaultGraph', public language?: string, public datatype?: string) {}
+    constructor(public value?: string, public termType?: 'NamedNode' | 'BlankNode' | 'Literal' | 'Variable' | 'DefaultGraph', public language?: string, public datatype?: INamedNode) {}
     public toCanonical(): string {
       switch (this.termType) {
         case 'NamedNode': return '<' + this.value + '>'
@@ -33,8 +33,8 @@ namespace fibra {
       switch (binding.type) {
         case 'literal':
           this.termType = 'Literal'
-          this.language = binding['xml:lang']
-          this.datatype = binding.datatype
+          this.language = binding['xml:lang'] ? binding['xml:lang'] : ''
+          this.datatype = binding.datatype ? new NamedNode(binding.datatype) : (this.language !== '' ? RDF.langString : XMLSchema.string)
           break
         case 'uri':
           this.termType = 'NamedNode'
@@ -54,7 +54,7 @@ namespace fibra {
   }
 
   class CanonicalNode extends Node {
-    public datatype: string
+    public datatype: INamedNode
     public language: string
     constructor(id: string) {
       super()
@@ -67,10 +67,12 @@ namespace fibra {
       } else if (id.indexOf('"') === 0) {
         this.termType = 'Literal'
         this.value = id.substring(1, id.lastIndexOf('"'))
-        if (id.lastIndexOf('@') === id.lastIndexOf('"') + 1)
+        if (id.lastIndexOf('@') === id.lastIndexOf('"') + 1) {
           this.language = id.substring(id.lastIndexOf('@'))
-        else if (id.lastIndexOf('^^<') === id.lastIndexOf('"') + 1)
-          this.datatype = id.substring(id.lastIndexOf('^^<'), id.length - 1)
+          this.datatype = RDF.langString
+        } else if (id.lastIndexOf('^^<') === id.lastIndexOf('"') + 1)
+          this.datatype = new NamedNode(id.substring(id.lastIndexOf('^^<'), id.length - 1))
+        else this.datatype = XMLSchema.string
       }
     }
   }
@@ -104,8 +106,8 @@ namespace fibra {
 
   export class Literal extends Node implements ILiteral {
     public termType: 'Literal'
-    constructor(value: string, language: string = '', datatype?: string) {
-      super(value, 'Literal', language, datatype ? datatype : (language !== '' ? RDF.langString.value : XMLSchema.string.value))
+    constructor(value: string, language: string = '', datatype?: INamedNode) {
+      super(value, 'Literal', language, datatype ? datatype : (language !== '' ? RDF.langString : XMLSchema.string))
     }
   }
 
@@ -153,9 +155,9 @@ namespace fibra {
     public nodeFromNode(other: ITerm): INode { return new NodeFromNode(other) }
     public namedNode(value: string): INamedNode { return new NamedNode(value) }
     public blankNode(value?: string): IBlankNode { return new BlankNode(value) }
-    public literal(value: string, languageOrDatatype?: string): ILiteral {
-      if (languageOrDatatype.indexOf(':/')) return new Literal(value, undefined , languageOrDatatype)
-      else return new Literal(value, languageOrDatatype)
+    public literal(value: string, languageOrDatatype?: string|NamedNode): ILiteral {
+      if (typeof(languageOrDatatype) === 'string') return new Literal(value, <string>languageOrDatatype)
+      else return new Literal(value, undefined , <NamedNode>languageOrDatatype)
     }
     public variable(value: string): IVariable { return new Variable(value) }
     public defaultGraph(): IDefaultGraph { return DefaultGraph.instance }

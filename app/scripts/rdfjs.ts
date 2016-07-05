@@ -19,7 +19,7 @@ namespace fibra {
   export interface ILiteral extends ITerm {
     termType: 'Literal'
     language: string
-    datatype: string
+    datatype: INamedNode
   }
 
   export interface IVariable extends ITerm {
@@ -46,7 +46,7 @@ namespace fibra {
   export interface IDataFactory {
     namedNode(value: string): INamedNode
     blankNode(value?: string): IBlankNode
-    literal(value: string, languageOrDatatype?: string): ILiteral
+    literal(value: string, languageOrDatatype?: string|NamedNode): ILiteral
     variable(value: string): IVariable
     defaultGraph(): IDefaultGraph
     triple(subject: ITerm, predicate: ITerm, object: ITerm): IQuad
