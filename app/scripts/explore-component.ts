@@ -9,18 +9,22 @@ namespace fibra {
     public callbackRegistrator: Function
 
     public queryAndBuild(): void {
-      console.log('Query and Build')
       this.classTreePromise.then(ct => {
         this.itemService.getAllItems().then(
           (items: Item[]) => {
             this.items = items
-            console.log(this.items)
             this.properties = this.items[0].properties.map((p) => {
               return {key: p.toCanonical(), value: p.label.value }
             })
           }
         )
       })
+    }
+
+    public delete(id: INode): angular.IPromise<string> {
+      let prom = this.itemService.deleteItem(id)
+      prom.then(() => { this.queryAndBuild() })
+      return prom
     }
 
     constructor(private sparqlItemService: SparqlItemService) {
@@ -33,7 +37,7 @@ namespace fibra {
   export class ExploreComponent implements angular.IComponentOptions {
     public bindings: {[id: string]: string} = {
       classTreePromise: '<',
-      callbackRegistrator: '&'
+      callbackRegistrator: '='
     }
     public controller: Function = SparqlExploreComponentController
     public templateUrl: string = 'partials/explore.html'

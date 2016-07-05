@@ -15,14 +15,16 @@ namespace fibra {
       this.onChange.push(f)
     }
 
-    public createItem(item: Result): void {
+    public createItem(item: Result): angular.IPromise<INode> {
       let prefLabel: PropertyToValues = new PropertyToValues(SKOS.prefLabel)
       prefLabel.values.push(item.prefLabel)
       let type: PropertyToValues = new PropertyToValues(RDF.type)
       type.values.push(new NodePlusLabel(item.additionalInformation['type'][0], item.additionalInformation['typeLabel'][0]))
-      this.sparqlItemService.createNewItem(item.ids, [prefLabel, type]).then(() => {
+      let prom = this.sparqlItemService.createNewItem(item.ids, [prefLabel, type])
+      prom.then(() => {
         this.onChange.forEach(f => f())
       })
+      return prom
     }
 
     constructor(private configurationService: ConfigurationService, sparqlTreeService: SparqlTreeService, private sparqlItemService: SparqlItemService) {

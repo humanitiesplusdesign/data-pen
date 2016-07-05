@@ -2,8 +2,11 @@ table
   tr
     th Label
     th(ng-repeat="p in $ctrl.properties") {{ p.value }}
+    th Actions
   tr(ng-repeat="item in $ctrl.items")
     td {{ item.label.value }}
     td(ng-repeat="p in item.properties") {{ p.values[0].label.value }}
+    td
+      a(ng-click="$ctrl.delete(item)") Delete
 
 svg#explore
