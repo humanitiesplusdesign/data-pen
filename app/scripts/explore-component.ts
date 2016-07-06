@@ -18,7 +18,7 @@ namespace fibra {
     private svgSel: any
     private d3: any
 
-    public $onInit: () => void = () => {
+    public $postLink: () => void = () => {
       this.svgSel = this.$window.d3.select(this.$element[0]).select('svg')
       this.queryAndBuild()
     }
