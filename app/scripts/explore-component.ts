@@ -28,7 +28,7 @@ namespace fibra {
 
     public delete(id: INode): angular.IPromise<string> {
       let prom = this.itemService.deleteItem(id)
-      prom.then(() => { this.queryAndBuild() })
+      prom.then(() => this.fibraService.dispatch('change'))
       return prom
     }
 
