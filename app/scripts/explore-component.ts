@@ -18,10 +18,11 @@ namespace fibra {
     private svgSel: any
     private d3: any
 
-    public qbInitial():void {
-      // A hack until we can get $onInit accessible in the component controller
-      this.$timeout(this.queryAndBuild.bind(this), 3000)
+    public $onInit: () => void = () => {
+      this.svgSel = this.$window.d3.select(this.$element[0]).select('svg')
+      this.queryAndBuild()
     }
+
     public queryAndBuild(): angular.IPromise<String> {
       return this.classTreePromise.then(ct => {
         return this.itemService.getAllItems().then(
@@ -74,10 +75,7 @@ namespace fibra {
         return this.queryAndBuild()
       })
       this.itemService = sparqlItemService
-      this.svgSel = this.$window.d3.select(this.$element[0]).select('svg')
       this.d3 = this.$window.d3
-
-      this.qbInitial()
     }
   }
 
