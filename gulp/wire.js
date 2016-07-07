@@ -31,7 +31,7 @@ gulp.task('wire:workerscripts-to-scripts', function() {
           addRootSlash: false,
           ignorePath: 'app/',
           transform: function(filepath, file) {
-            return file.contents.toString('utf8').replace(/^/,'\'').replace(/\n/g,'\',\n      \'').replace(/,\n      '$/,'')
+            return file.contents.toString('utf8').replace(/^/,'\'').replace(/[\n\r]+/g,'\',\n      \'').replace(/,[\n\r]+      '$/,'')
           }
         }))
     .pipe(gulp.dest("app/scripts"));
