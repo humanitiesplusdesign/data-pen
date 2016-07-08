@@ -35,8 +35,8 @@ gulp.task('docs', function() {
   return tsProject.src()
     .pipe($.plumber({ errorHandler: $.notify.onError("<%= error.stack %>") }))
     .pipe($.typedoc({
-        module: "es2015",
-        target: "es2015",
+        module: "es6",
+        target: "es6",
         mode: 'file',
         out: "docs/",
         name: "Fibra"
