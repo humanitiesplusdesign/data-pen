@@ -52,11 +52,16 @@ namespace fibra {
       if (args instanceof Array) args.forEach(arg => WorkerService.savePrototypes(arg))
       else {
         if (args.constructor.name !== 'Object') {
-          for (let prop in args.__proto__)
-            if (prop !== 'constructor' && typeof(args.__proto__[prop]) === 'function') {
-              args.__className = args.constructor.name
-              break
+          let currentPrototype: {} = Object.getPrototypeOf(args)
+          out: while (currentPrototype !== Object.prototype) {
+            for (let prop of Object.getOwnPropertyNames(currentPrototype)) {
+              if (prop !== 'constructor' && typeof(args.__proto__[prop]) === 'function') {
+                args.__className = args.constructor.name
+                break out
+              }
             }
+            currentPrototype = Object.getPrototypeOf(currentPrototype)
+          }
           if (!args.__className) args.__className = 'Object'
         }
         for (let key in args) if (args.hasOwnProperty(key))

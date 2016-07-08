@@ -1,0 +1,14 @@
+{
+  "dependencies": {
+    "falafel": {
+      "version": "1.2.0",
+      "from": "falafel@>=1.2.0 <2.0.0",
+      "dependencies": {
+        "acorn": {
+          "version": "3.0.0",
+          "from": "acorn@>=1.0.3 <2.0.0"
+        }
+      }
+    }
+  }
+}
