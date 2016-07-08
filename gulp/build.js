@@ -31,6 +31,18 @@ gulp.task('templates', function() {
     .pipe(gulp.dest(".tmp"));
 });
 
+gulp.task('docs', function() {
+  return tsProject.src()
+    .pipe($.plumber({ errorHandler: $.notify.onError("<%= error.stack %>") }))
+    .pipe($.typedoc({
+        module: "es2015",
+        target: "es2015",
+        mode: 'file',
+        out: "docs/",
+        name: "Fibra"
+    }))
+})
+
 gulp.task('clean', function(cb){
   return require('del')(['.tmp', 'dist'], cb);
 });

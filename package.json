@@ -30,6 +30,7 @@
     "gulp-sourcemaps": "^1.6.0",
     "gulp-stylus": "^2.4.0",
     "gulp-transform": "^1.0.7",
+    "gulp-typedoc": "^2.0.0",
     "gulp-typescript": "^2.13.5",
     "gulp-typescript-angular": "git://github.com/jiemakel/gulp-typescript-angular",
     "gulp-uglify": "^1.5.3",
@@ -40,6 +41,7 @@
     "nib": "^1.1.0",
     "require-dir": "^0.3.0",
     "run-sequence": "^1.2.1",
+    "typedoc": "^0.4.4",
     "uglify-save-license": "^0.4.1",
     "wiredep": "^4.0.0"
   },
