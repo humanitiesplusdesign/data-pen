@@ -14,7 +14,7 @@ namespace fibra {
       switch (this.termType) {
         case 'NamedNode': return '<' + this.value + '>'
         case 'BlankNode': return '_:' + this.value
-        case 'Literal': return JSON.stringify(this.value) + (this.language ? '@' + this.language : '^^<' + this.datatype + '>')
+        case 'Literal': return JSON.stringify(this.value) + (this.language ? '@' + this.language : (this.datatype.equals(XMLSchema.string) ? '' : '^^' + this.datatype.toCanonical()))
         case 'Variable': return '?' + this.value
         case 'DefaultGraph': return ''
         default: throw 'Unknown term type ' + this.termType
@@ -48,7 +48,7 @@ namespace fibra {
   }
 
   export class NodeFromNode extends Node {
-    constructor(public other: INode) {
+    constructor(other: INode) {
       super(other.value, other.termType, other.language, other.datatype)
     }
   }
