@@ -7,11 +7,6 @@ body {
   height:100%
 }
 
-.links line {
-stroke: gray
-stroke-width: 1px
-}
-
 #left-column {
 text-align: center
 width: 8px
@@ -56,7 +51,6 @@ main {
 
 #explore {
   height: 400px
-  width: 1100px
   border: 1px solid gray
 }
 
@@ -70,10 +64,12 @@ main {
   transition: .2s
 }
 
+.node-circle:hover {
+r: 11px
+}
 
 .node-text {
 transition: .1s
-display: none
 }
 
 .node-text:hover {
