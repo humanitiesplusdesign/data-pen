@@ -42,6 +42,22 @@ namespace fibra {
       let svg_height = +this.d3.select("#explore").style('height').replace("px", "")
       let radius = 8
 
+      let tooltip = this.d3.select("body").append("div")
+        .style("position", "absolute")
+        .style("z-index", "20")
+        .style("background-color", "gray")
+        .style("padding", "3px")
+        .style("border-radius", "2px")
+        .style("visibility", "hidden")
+
+      let tooltip2 = this.d3.select("body").append("div")
+        .style("position", "absolute")
+        .style("z-index", "20")
+        .style("background-color", "gray")
+        .style("padding", "3px")
+        .style("border-radius", "2px")
+        .style("visibility", "hidden")
+
       let demo_links = [
         {"source": 1, "target": 3},
         {"source": 4, "target": 2},
@@ -62,7 +78,7 @@ namespace fibra {
       ]
 
       let test_simulation = this.d3.forceSimulation()
-        .force("charge", this.d3.forceManyBody(-5).distanceMax(200))
+        .force("charge", this.d3.forceManyBody(3))
         .force("center", this.d3.forceCenter(500, 190))
         .force("link", this.d3.forceLink().distance(40).strength(1).iterations(1).id(function(d) {return d.index}))
 
@@ -70,11 +86,13 @@ namespace fibra {
       .attr("class", "links").selectAll("line")
        .data(demo_links)
        .enter().append("line")
+        .attr("id", (d,i) => {return "link-" + i})
 
       let items = this.svgSel.selectAll("circle").data(this.items, (d) =>  {return d.value })
         items.exit().remove()
 
       let node = items.enter().append("g")
+        .attr("id", (d,i) => {return "node-" + i})
         .attr("class", "node")
         .append("circle")
           .attr("class", "node-circle")
@@ -83,32 +101,59 @@ namespace fibra {
           .style("stroke", "black")
           .attr("r", radius + "px")
           .call(this.d3.drag()
-              .on("start", (d) => {
-                 if (!this.d3.event.active) test_simulation.alphaTarget(.2).restart();
-                 d.fx = d.x;
-                 d.fy = d.y;
-               })
-              .on("drag", (d) => {
-                 d.fx = this.d3.event.x;
-                 d.fy = this.d3.event.y;
-               })
-              .on("end",  (d) =>   {
-                 if (!this.d3.event.active) test_simulation.alphaTarget(0);
-                 d.fx = null;
-                 d.fy = null;
-               }))
-               .on("mouseover", (d,i) => {
-            if (!this.d3.select("#node-circle-" + i).classed("selected-circle")) {
-              this.d3.select("#node-circle-text-" + i).style("opacity", 1)
+              .on("start", (d,i) => {
+               if (!this.d3.event.active) test_simulation.alphaTarget(.04).restart()
 
+                 d.fx = d.x
+                 d.fy = d.y
+               })
+              .on("drag", (d,i) => {
+                this.d3.select("#node-" + i).classed("fixed", true)
+                d.fx = this.d3.event.x
+                d.fy = this.d3.event.y
+                if (this.d3.select("#node-circle-" + i).classed("selected-circle")) {
+                //  tooltip2.attr("transform", "translate(" + this.d3.event.x + ", " + this.d3.event.y + ")")
+                tooltip2.style("top", (this.d3.event.y + 145)+"px")
+                .style("left", (this.d3.event.x+ 65)+"px")
+                }
+               })
+              .on("end",  (d,i) =>   {
+                 if (!this.d3.event.active) test_simulation.alphaTarget(0)
+                 if (!this.d3.select("#node-" + i).classed("fixed")) {
+                   d.fx = null
+                   d.fy = null
+                 }
+
+               }))
+          .on("mouseover", (d,i) => {
+            this.hightlightLinks(d,i, demo_links)
+            if (!this.d3.select("#node-circle-" + i).classed("selected-circle")) {
+              tooltip.style("top", (this.d3.event.pageY - 10)+"px")
+              .style("left", (this.d3.event.pageX + 10)+"px")
+              .style("visibility", "visible")
+              .text(d.label.value)
             }
           })
           .on("mouseout", (d,i) => {
-            if (!this.d3.select("#node-circle-" + i).classed("selected-circle")) {
-            this.d3.select("#node-circle-text-" + i).style("opacity", 0)
+            this.d3.selectAll("line").classed("relevant", false)
+            for (let j = 0; j < this.svgSel.selectAll("circle").size(); j++) {
+              if (this.d3.select("#node-circle-" + j).classed("selected-circle")) {
+                  this.hightlightLinks(d, j, demo_links)
+              }
             }
+
+            tooltip.style("visibility", "hidden")
           })
           .on('click', (d:INode, i) => {
+            this.hightlightLinks(d, i, demo_links)
+
+            let data:any = d
+            tooltip2.style("top", (this.d3.event.pageY -10)+"px")
+            .style("left", (this.d3.event.pageX + 17)+"px")
+            .style("visibility", "visible")
+            .text(data.label.value)
+
+            tooltip.style("visibility", "hidden")
 
             //unselects each circle
             for (let j = 0; j < this.svgSel.selectAll("circle").size(); j++) {
@@ -131,13 +176,13 @@ namespace fibra {
               test_simulation.nodes(this.items)
               .on("tick", () => {
                 node
-                  .attr("transform", function(d) {
-                    let x = d.x, y = d.y
-                    if (d.x > svg_width - radius) x = svg_width - radius
-                    if (d.x < radius) x = radius
-                    if (d.y > svg_height - radius) y = svg_height - radius
-                    if (d.y < radius) y = radius
-                     return "translate(" + x + ", " + y + ")";
+                  .attr("transform", (d,i) => {
+                      let x = d.x, y = d.y
+                      if (d.x > svg_width - radius) x = svg_width - radius
+                      if (d.x < radius) x = radius
+                      if (d.y > svg_height - radius) y = svg_height - radius
+                      if (d.y < radius) y = radius
+                       return "translate(" + x + ", " + y + ")"
                     })
 
                 link
@@ -165,6 +210,17 @@ namespace fibra {
             })
 
       return 'ok'
+    }
+
+    public hightlightLinks(d, i, linkArray):void {
+      this.d3.selectAll("line").classed("relevant", false)
+        for (let j = 0; j < linkArray.length; j++) {
+            let linksource:any = linkArray[j].source
+            let linktarget:any = linkArray[j].target
+            if (linksource.index == i || linktarget.index == i) {
+                this.d3.select("#link-" + j).classed("relevant", true)
+        }
+      }
     }
 
     public selectItem(id: INode): void {

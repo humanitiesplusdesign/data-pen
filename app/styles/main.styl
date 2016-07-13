@@ -26,6 +26,24 @@ stroke: gray
 stroke-width: 1px
 }
 
+.fixed circle {
+transition: 1.5s
+fill: black
+}
+
+.links line:hover, {
+stroke: red
+stroke-width: 2px
+transition: .5s
+cursor: pointer
+}
+
+.relevant {
+stroke: black !important
+transition: .25s
+stroke-width: 2.5px !important
+}
+
 
 #left-column h4 {
 color: red
@@ -60,13 +78,23 @@ main {
   border: 1px solid gray
 }
 
+.tooltip {
+position: absolute
+z-index: 20
+visibility: hidden
+color: black
+background-color: gray
+padding: 2px
+border-radius: 2px
+}
+
 .node-container {
   width: 50px;
   height: 50px;
 }
 
 .node-circle {
-  fill: black
+  fill: gray
   transition: .2s
 }
 
@@ -84,7 +112,7 @@ cursor: default
 }
 
 .selected-circle {
-  fill: green
+  fill: green !important
 }
 
 .not-selected {
