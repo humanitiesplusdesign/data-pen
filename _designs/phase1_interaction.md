@@ -10,11 +10,9 @@ updated: 2016-06-30
 
 **VERIFY** or **STRONGLY IDENTIFY**  To add a URI to a string or unique controlled string, making it a potent and potentially linked data point. For Fibra the term is used most often when we lookup a value in an Authority and then verify against the Authority. This could also happen by matching a value to an Archive source that includes already verified entities.
 
-**LAYERS** 
+**LAYERS**  In the CONSTRUCT component graph interface we will use layers to contain entity types. For each entity type defined, a layer is added. We use layers to manage the complexity. The default being to show one entity type at a time. 
 
  
-
-
 
 
 # Outline  
@@ -28,20 +26,19 @@ The first level options are:
 
 1. **Skip**  
 2. **Select a pre-configured data set**
-2. Upload Data  
 3. Define Authorities  
 4. Define Archive sources  
 	
 **Skip** means skip Configure and go directly to Draw and Explore. It is the option selected when one wants to just use the canvas to sketch a data model without reference to anything else. This experience will be the most similar to Rhizi.
 
-Options 2-4 can be used alone or in any combination. 
+##Select/Load
 
-Open questions:  
+Filter the configured sources and/or upload a data set locally and filter.
 
-* Uploaded data may or may not include URIs. How do we identify or let the user group attributes that are related. Each record might include a URI for the primary enitity (let's say a person) and a URI for that person's place of birth.
-* When we upload data, is there an option to **verify** at that first stage or should this only happen through the canvas? 
+* Converting uploaded table to rdf
+* Verify and reconciliation will need to be part of this step 
 	
-## Draw and Explore
+## Construct (Draw and explore)
 This application lets us create data and access the data linked or loaded in the Configure phase. For Phase 1, we will use default node types: person, place, event, letter, publication. Custom node types can also be defined when generating new data.
 
 ### Display  
@@ -65,7 +62,7 @@ These actions (defined previously for Idiographic tool) include:
 ### Graph Selection
 From one or more nodes, we want to make it easy to select all directly linked nodes, then connections at the second degree and third degree. Select the union of two networks, the intersection of two networks. The REMOVE action above should be applied to the selection or the inverse. 
 
-## Enrich
+## Enrich/Extend
 Whereas Configure is oriented to defining the data sources, whether uploaded, linked archives, or authorities, the Enrich application is oriented toward extending the entities in the local dataset with metadata from more sources. There will be some overlap. 
 
 The primary visual model for Enrich is the matrix and the heatmap. We want to see where our current data set is thin and where it is rich. We then want to see how adding from linked sources might help to fill it out and where there are still gaps.
