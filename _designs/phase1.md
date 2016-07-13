@@ -13,7 +13,7 @@ toc:
 
 
 
-In Phase 1 we are going to focus efforts on importing a single entity from a Linked Data store. We will work out the challenges of querying, presenting the ontology to users, and making selection/addition clean, elegant and intuitive. We've identified three components that will be necessary for Phase 1: Configure, Explore, and Enrich.
+In Phase 1 we are going to focus efforts on importing a single entity from a Linked Data store. We will work out the challenges of querying, presenting the ontology to users, and making selection/addition clean, elegant and intuitive. We've identified four components that will be necessary for Phase 1: Configure, Select/Load, Construct, and Enrich/Extend.
 
 The chart below shows where our Phase 1 fits within the required set of tasks and functionalities with existing tools.
 
@@ -24,29 +24,36 @@ The reasoning behind this focus is that while all of the outlined tasks are in t
 However, when locally exploring data, these activities need to be much more fluidly integrated to support the end goal of being able to think through the data. This is also why, while there are tools for some of the individual local tasks, they are not adequate for our goal.
 
 # Components
+1. CONFIGURE - This is your university library
 
-1. CONFIGURE
+  * Construct a query of existing LOD sources: archives and authorities.
+  * Review the shape of these sources with respect to high level metrics and graphics.
+  * Alternatively, choose a pre-existing configuration.
+  * Save a configuration.
+  * Note: A configuration may be broad and thematic, it may be just a single authority, it my be constructed by entity type. The possibilities are many.
 
-  * Select Archives
-  * Choose which you want to use and set limits.
-  * Select Authorities
-  * Set authorities for default entity types
-  * Select from Imported data
-  * Include EDA charts to give a shape of the data
+2. SELECT/LOAD - This is the set of books you have checked out from the library
 
-2. EXPLORE
+  * Shape a local dataset by uploading data, importing a configuration from Linked Data sources.
+  * Use temporal and geospatial filters to further constrain and shape the local data set.
+  * This component will have overlap with the Enrich/Extend component (maybe even is the same) but the emphasis is different: with this component we are looking at refining and sculpting sources whereas Extend/Enrich operates from the entity and is additive.
 
-  * add nodes and links to the canvas
-  * group nodes
-  * change the layout
-  * apply weight to nodes and edges to see network measures
+3. CONSTRUCT - These are the books currently open on your desk
 
-3. ENRICH
+  A. Graphic view
+   * add nodes and links to the canvas
+   * group nodes
+   * change the layout 
+   * apply weight to nodes and edges to see network measures
 
-  * Enrich entities from linked sources by selecting based on an overview of availble data
-  * How much information is available about these entities? (sortable tabular heat map)
+  B. Tabular view
+   * add records and dimensions
+
+4. ENRICH/EXTEND - Add depth to the materials you already have in your office
+
+  * How much information is available about these entities? 
   * What of that available information am I seeing?
-  * Show what is not available, too
+  * e.g. First, I need the overview to see what I can’t see 
        1. Entities that do not have an associated date
        2. Enitities associated to the entities in my query result that don’t have a date.
 
