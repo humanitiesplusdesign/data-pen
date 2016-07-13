@@ -3,7 +3,7 @@
 # Setup
 title:               Fibra Project
 tagline:             'A graphical expression of interpretation.'
-description:         ''
+description:         'Fibra is a data modeling tool with the ability to connect to rich data stores. With Fibra, when you add a record to your local data set, you can pull all the related data you want from open, digitized, and strongly linked sources around the world. Through the graphical interface you can add your own categorizations to the records you create and publish them.'
 url:                 'fibra'
 baseurl:             'http://hdlab.stanford.edu/fibra'
 urlimg: 	'http://hdlab.stanford.edu/fibra/assets/'

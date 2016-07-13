@@ -26,7 +26,8 @@ There will also be a need to map properties from one source to another. Some of 
 
 The first level options are:  
 
-1. Skip  
+1. **Skip**  
+2. **Select a pre-configured data set**
 2. Upload Data  
 3. Define Authorities  
 4. Define Archive sources  
@@ -110,5 +111,6 @@ Actions:
 
 Note: make it possible to globally remove values by source.
 
-# 2. Switch projections
+# 2. Switch projections  
+
 # 3. Time and Filtering
