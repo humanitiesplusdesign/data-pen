@@ -1,10 +1,7 @@
-ul.nav.nav-tabs
-  li(role="presentation", ng-class="{ 'active': mode==='table' }")
-    a(ng-click="mode='table'") Table
-  li(role="presentation", , ng-class="{ 'active': mode==='explore' }")
-    a(ng-click="mode='explore'") Explore
+div
+  svg(width="100%", height="400px")#explore
 
-div(ng-show="mode==='table'", ng-init="mode='table'")
+div
   table
     tr
       th Label
@@ -15,6 +12,3 @@ div(ng-show="mode==='table'", ng-init="mode='table'")
       td(ng-repeat="p in item.properties", ng-click="$ctrl.selectItem(item)") {{ p.values[0].label.value }}
       td
         a(ng-click="$ctrl.delete(item)") Delete
-
-div(ng-show="mode==='explore'")
-  svg(width="100%", height="400px")#explore

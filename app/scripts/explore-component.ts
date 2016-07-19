@@ -38,19 +38,50 @@ namespace fibra {
     }
 
     public updateExplore(): string {
+      //to do: fix highlightLinks, fix display issues in item_info_tip when hovering, allow item_info_tip to expand somehow
+      // add delete and alter ability to sparql-item.pug, add shift + drag line for linking
+      let viewport_width = window.innerWidth;
+      let viewport_height = window.innerHeight;
+      let drawmode = false;
+
+      this.$window.addEventListener('keydown', (event) => {
+          if (event.keyCode === 16) {
+            drawmode = drawmode ? false : true
+            this.d3.select("#explore").style("background-color", drawmode ? "#bfbfbf" : "white")
+            if (drawmode) {
+              this.d3.select("#explore").append("text")
+                .attr("id", "drawmodetext")
+                .html("Draw Mode engaged; to link two nodes, drag from one to the other")
+                .style("stroke", "red")
+                .style("fill", "blue")
+                .attr("y", 100)
+            } else {
+              this.d3.select("#drawmodetext").remove()
+            }
+
+          }
+      })
+
+
+      this.d3.select("#explore").style('width', viewport_width + "px")
+        .style("height", viewport_height - 50 + "px")
+        .on("dblclick", () => {
+          this.$scope.$apply(() => {
+            this.itemService.createNewItem();
+          })
+        });
+
+      this.d3.select("#exploretable").style('width', viewport_width + "px")
+        .style("height", viewport_height - 50 + "px")
+
       let svg_width = +this.d3.select("#explore").style('width').replace("px", "")
       let svg_height = +this.d3.select("#explore").style('height').replace("px", "")
+
+      let item_info_tip = this.d3.select("#right-column")
+
       let radius = 8
 
       let tooltip = this.d3.select("body").append("div")
-        .style("position", "absolute")
-        .style("z-index", "20")
-        .style("background-color", "gray")
-        .style("padding", "3px")
-        .style("border-radius", "2px")
-        .style("visibility", "hidden")
-
-      let tooltip2 = this.d3.select("body").append("div")
         .style("position", "absolute")
         .style("z-index", "20")
         .style("background-color", "gray")
@@ -77,16 +108,32 @@ namespace fibra {
         {"source": 10, "target": 9}
       ]
 
+      let dragline;
+
       let test_simulation = this.d3.forceSimulation()
         .force("charge", this.d3.forceManyBody(3))
         .force("center", this.d3.forceCenter(500, 190))
         .force("link", this.d3.forceLink().distance(40).strength(1).iterations(1).id(function(d) {return d.index}))
 
-      let link = this.svgSel.append("g")
+      let linked = this.svgSel.append("g")
       .attr("class", "links").selectAll("line")
        .data(demo_links)
+
+       linked.exit().remove()
+
+      let link = linked
        .enter().append("line")
         .attr("id", (d,i) => {return "link-" + i})
+        .on("click", (d,i) => {
+          this.d3.select("#link-" + i).remove()
+
+          for (let j = 0; j < demo_links.length; j++) {
+            let linksource:any = demo_links[j].source
+            let linktarget:any = demo_links[j].target
+            if (linksource.index == d.source.index && linktarget.index == d.target.index) demo_links.splice(j, 1)
+
+          }
+        })
 
       let items = this.svgSel.selectAll("circle").data(this.items, (d) =>  {return d.value })
         items.exit().remove()
@@ -102,27 +149,66 @@ namespace fibra {
           .attr("r", radius + "px")
           .call(this.d3.drag()
               .on("start", (d,i) => {
-               if (!this.d3.event.active) test_simulation.alphaTarget(.04).restart()
-
-                 d.fx = d.x
-                 d.fy = d.y
+                if (!drawmode) {
+                  if (!this.d3.event.active) test_simulation.alphaTarget(.1).restart()
+                    d.fx = d.x
+                    d.fy = d.y
+                } else {
+                    dragline = this.svgSel.append("line")
+                    .attr("id", "dragLine")
+                }
                })
               .on("drag", (d,i) => {
-                this.d3.select("#node-" + i).classed("fixed", true)
-                d.fx = this.d3.event.x
-                d.fy = this.d3.event.y
-                if (this.d3.select("#node-circle-" + i).classed("selected-circle")) {
-                //  tooltip2.attr("transform", "translate(" + this.d3.event.x + ", " + this.d3.event.y + ")")
-                tooltip2.style("top", (this.d3.event.y + 145)+"px")
-                .style("left", (this.d3.event.x+ 65)+"px")
+                if (!drawmode) {
+                  this.d3.select("#node-" + i).classed("fixed", true)
+                  d.fx = this.d3.event.x
+                  d.fy = this.d3.event.y
+                  if (this.d3.select("#node-circle-" + i).classed("selected-circle")) {
+                  item_info_tip.style("top", (this.d3.event.y + 30)+"px")
+                  .style("left", (this.d3.event.x + 30)+"px")
+                  }
+                } else {
+                    dragline.attr("x1", d.x)
+                    .attr("y1", d.y)
+                    .attr("x2", this.d3.event.x)
+                    .attr("y2", this.d3.event.y)
                 }
                })
               .on("end",  (d,i) =>   {
-                 if (!this.d3.event.active) test_simulation.alphaTarget(0)
-                 if (!this.d3.select("#node-" + i).classed("fixed")) {
-                   d.fx = null
-                   d.fy = null
-                 }
+                if (!drawmode) {
+                  if (!this.d3.event.active) test_simulation.alphaTarget(0)
+                  if (!this.d3.select("#node-" + i).classed("fixed")) {
+                    d.fx = null
+                    d.fy = null
+                  }
+                } else {
+                  let lineX = dragline.attr("x2")
+                  let lineY = dragline.attr("y2")
+
+                  this.d3.selectAll(".node")
+                    .each((f,j) => {
+                      if (Math.abs(lineX - f.x) < radius && Math.abs(lineY - f.y) < radius) {
+                        demo_links.push({"source": i, "target": j})
+                      //  make line show up
+                          dragline.remove();
+                      } else {
+                        dragline.remove();
+                      }
+                    })
+                      // this seems to work, but might be cleaner way
+                      this.svgSel.select(".links").remove()
+                      let linkUpdate = this.svgSel.append("g").attr("class", "links").selectAll("line").data(demo_links)
+                      let linkExit = linkUpdate.exit().remove()
+                      let linkEnter = linkUpdate.enter().append("line")
+                        .attr("id", (d,i) => {return "link-" + i})
+                        .attr("x1", (d) => {return d.source.x})
+                        .attr("y1", (d) => {return d.source.y})
+                        .attr("x2", (d) => {return d.target.x})
+                        .attr("y2", (d) => {return d.target.y})
+                      link = linkUpdate.merge(linkEnter)
+
+                      test_simulation.force("link").links(demo_links)
+                }
 
                }))
           .on("mouseover", (d,i) => {
@@ -146,14 +232,11 @@ namespace fibra {
           })
           .on('click', (d:INode, i) => {
             this.hightlightLinks(d, i, demo_links)
+            tooltip.style("visibility", "hidden")
 
-            let data:any = d
-            tooltip2.style("top", (this.d3.event.pageY -10)+"px")
+            item_info_tip.style("top", (this.d3.event.pageY -10)+"px")
             .style("left", (this.d3.event.pageX + 17)+"px")
             .style("visibility", "visible")
-            .text(data.label.value)
-
-            tooltip.style("visibility", "hidden")
 
             //unselects each circle
             for (let j = 0; j < this.svgSel.selectAll("circle").size(); j++) {
@@ -173,45 +256,46 @@ namespace fibra {
             })
           })
 
-              test_simulation.nodes(this.items)
-              .on("tick", () => {
-                node
-                  .attr("transform", (d,i) => {
-                      let x = d.x, y = d.y
-                      if (d.x > svg_width - radius) x = svg_width - radius
-                      if (d.x < radius) x = radius
-                      if (d.y > svg_height - radius) y = svg_height - radius
-                      if (d.y < radius) y = radius
-                       return "translate(" + x + ", " + y + ")"
-                    })
-
-                link
-                  .attr("x1", (d) => {return d.source.x})
-                  .attr("y1", (d) => {return d.source.y})
-                  .attr("x2", (d) => {return d.target.x})
-                  .attr("y2", (d) => {return d.target.y})
-              })
-              test_simulation.force("link").links(demo_links)
-
-          //makes the left column pop-out on hover
-          this.d3.select("#left-column").on("mouseover", () => {
-            this.d3.select("#left-column").style("opacity", 1)
-              .style("border-right", "2px solid black")
-              .style("width", "80px")
-              .style("padding-right", "10px")
-              .style("border-bottom-right-radius", "8px")
-          })
-            .on("mouseout", () => {
-              this.d3.select("#left-column").style("opacity", .5)
-              .style("width", "8px")
-              .style("border-right", "8px solid black")
-              .style("border-bottom-right-radius", "1px")
-              .style("padding-right", "0px")
+      test_simulation.nodes(this.items)
+      .on("tick", () => {
+        node
+          .attr("transform", (d,i) => {
+              let x = d.x, y = d.y
+              if (d.x > svg_width - radius) x = svg_width - radius
+              if (d.x < radius) x = radius
+              if (d.y > svg_height - radius) y = svg_height - radius
+              if (d.y < radius) y = radius
+               return "translate(" + x + ", " + y + ")"
             })
+
+        link
+          .attr("x1", (d) => {return d.source.x})
+          .attr("y1", (d) => {return d.source.y})
+          .attr("x2", (d) => {return d.target.x})
+          .attr("y2", (d) => {return d.target.y})
+      })
+      test_simulation.force("link").links(demo_links)
+
+      //makes the left column pop-out on hover
+      this.d3.select("#left-column").on("mouseover", () => {
+        this.d3.select("#left-column").style("opacity", 1)
+          .style("border-right", "2px solid black")
+          .style("width", "80px")
+          .style("padding-right", "10px")
+          .style("border-bottom-right-radius", "8px")
+      })
+        .on("mouseout", () => {
+          this.d3.select("#left-column").style("opacity", .5)
+          .style("width", "8px")
+          .style("border-right", "8px solid black")
+          .style("border-bottom-right-radius", "1px")
+          .style("padding-right", "0px")
+        })
 
       return 'ok'
     }
 
+    // currently broken on deleting a link
     public hightlightLinks(d, i, linkArray):void {
       this.d3.selectAll("line").classed("relevant", false)
         for (let j = 0; j < linkArray.length; j++) {
