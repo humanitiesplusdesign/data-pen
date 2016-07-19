@@ -189,25 +189,24 @@ namespace fibra {
                     .each((f,j) => {
                       if (Math.abs(lineX - f.x) < radius && Math.abs(lineY - f.y) < radius) {
                         demo_links.push({"source": i, "target": j})
-                      //  make line show up
+                        this.svgSel.select(".links").remove()
+                        let linkUpdate = this.svgSel.append("g").attr("class", "links").selectAll("line").data(demo_links)
+                        let linkExit = linkUpdate.exit().remove()
+                        let linkEnter = linkUpdate.enter().append("line")
+                        link = linkUpdate.merge(linkEnter)
+                        test_simulation.force("link").links(demo_links)
+                        linkEnter.attr("id", (d,i) => {return "link-" + i})
+                          .attr("x1", (d) => {return d.source.x})
+                          .attr("y1", (d) => {return d.source.y})
+                          .attr("x2", (d) => {return d.target.x})
+                          .attr("y2", (d) => {return d.target.y})
                           dragline.remove();
                       } else {
                         dragline.remove();
                       }
                     })
                       // this seems to work, but might be cleaner way
-                      this.svgSel.select(".links").remove()
-                      let linkUpdate = this.svgSel.append("g").attr("class", "links").selectAll("line").data(demo_links)
-                      let linkExit = linkUpdate.exit().remove()
-                      let linkEnter = linkUpdate.enter().append("line")
-                        .attr("id", (d,i) => {return "link-" + i})
-                        .attr("x1", (d) => {return d.source.x})
-                        .attr("y1", (d) => {return d.source.y})
-                        .attr("x2", (d) => {return d.target.x})
-                        .attr("y2", (d) => {return d.target.y})
-                      link = linkUpdate.merge(linkEnter)
 
-                      test_simulation.force("link").links(demo_links)
                 }
 
                }))
