@@ -1,8 +1,10 @@
-div
-  svg(width="100%", height="400px")#explore
+div#explorecontainer
+  svg#explore
+  sparql-autocomplete(limit="5",by="group",on-select="$ctrl.createItem(result)")#searchbar
+
 
 div
-  table
+  table#exploretable
     tr
       th Label
       th(ng-repeat="p in $ctrl.properties") {{ p.value }}

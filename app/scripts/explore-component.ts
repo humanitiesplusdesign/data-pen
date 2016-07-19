@@ -39,38 +39,57 @@ namespace fibra {
 
     public updateExplore(): string {
       //to do: fix highlightLinks, fix display issues in item_info_tip when hovering, allow item_info_tip to expand somehow
-      // add delete and alter ability to sparql-item.pug, add shift + drag line for linking
+      // add delete and alter ability to sparql-item.pug
+
+      //fix how links sit on top of nodes
       let viewport_width = window.innerWidth;
       let viewport_height = window.innerHeight;
       let drawmode = false;
 
+      // add shift to enable draw mode - this can easily be changed to require shift to be held
       this.$window.addEventListener('keydown', (event) => {
-          if (event.keyCode === 16) {
+        console.log(document.activeElement)
+          if (event.keyCode === 16 && document.activeElement instanceof HTMLBodyElement) {
             drawmode = drawmode ? false : true
-            this.d3.select("#explore").style("background-color", drawmode ? "#bfbfbf" : "white")
+            this.d3.select("#explore, #explorecontainer").style("background-color", drawmode ? "#d9d9d9" : "#F2F2F2")
             if (drawmode) {
               this.d3.select("#explore").append("text")
                 .attr("id", "drawmodetext")
                 .html("Draw Mode engaged; to link two nodes, drag from one to the other")
                 .style("stroke", "red")
-                .style("fill", "blue")
                 .attr("y", 100)
             } else {
               this.d3.select("#drawmodetext").remove()
+              this.d3.selectAll(".dragLine").remove()
             }
 
           }
       })
 
+      this.d3.selectAll(".treelist, .treelist li, .treelist ul").on("mouseover", () => {
+        console.log(this.d3.event.x)
+        this.d3.selectAll(".treelist").style("left", this.d3.event.x + "px")
+      })
 
+      this.d3.select("#explorecontainer").style('width', viewport_width + "px")
+        .style("height", viewport_height + 20 + "px")
+
+      // dbl click to add - incomplete/broken
       this.d3.select("#explore").style('width', viewport_width + "px")
         .style("height", viewport_height - 50 + "px")
+        .style("top", 25 + "px")
         .on("dblclick", () => {
           this.$scope.$apply(() => {
             this.itemService.createNewItem();
           })
         });
 
+        this.d3.select("#searchbar").style("top", viewport_height * 6 / 7 + "px")
+          .style("left", viewport_width / 2 - 100 + "px")
+
+
+
+      //move table down so top is at bottom of viewport
       this.d3.select("#exploretable").style('width', viewport_width + "px")
         .style("height", viewport_height - 50 + "px")
 
@@ -85,34 +104,20 @@ namespace fibra {
         .style("position", "absolute")
         .style("z-index", "20")
         .style("background-color", "gray")
+        .style("color", "white")
         .style("padding", "3px")
         .style("border-radius", "2px")
         .style("visibility", "hidden")
 
       let demo_links = [
-        {"source": 1, "target": 3},
-        {"source": 4, "target": 2},
-        {"source": 8, "target": 9},
-        {"source": 7, "target": 5},
-        {"source": 12, "target": 13},
-        {"source": 4, "target": 15},
-        {"source": 6, "target": 4},
-        {"source": 1, "target": 5},
-        {"source": 5, "target": 8},
-        {"source": 15, "target": 8},
-        {"source": 1, "target": 2},
-        {"source": 10, "target": 3},
-        {"source": 10, "target": 9},
-        {"source": 11, "target": 5},
-        {"source": 0,  "target": 6},
-        {"source": 10, "target": 9}
+
       ]
 
       let dragline;
 
       let test_simulation = this.d3.forceSimulation()
         .force("charge", this.d3.forceManyBody(3))
-        .force("center", this.d3.forceCenter(500, 190))
+        .force("center", this.d3.forceCenter(svg_width/2, svg_height/2))
         .force("link", this.d3.forceLink().distance(40).strength(1).iterations(1).id(function(d) {return d.index}))
 
       let linked = this.svgSel.append("g")
@@ -155,7 +160,7 @@ namespace fibra {
                     d.fy = d.y
                 } else {
                     dragline = this.svgSel.append("line")
-                    .attr("id", "dragLine")
+                    .attr("class", "dragLine")
                 }
                })
               .on("drag", (d,i) => {
@@ -274,22 +279,6 @@ namespace fibra {
           .attr("y2", (d) => {return d.target.y})
       })
       test_simulation.force("link").links(demo_links)
-
-      //makes the left column pop-out on hover
-      this.d3.select("#left-column").on("mouseover", () => {
-        this.d3.select("#left-column").style("opacity", 1)
-          .style("border-right", "2px solid black")
-          .style("width", "80px")
-          .style("padding-right", "10px")
-          .style("border-bottom-right-radius", "8px")
-      })
-        .on("mouseout", () => {
-          this.d3.select("#left-column").style("opacity", .5)
-          .style("width", "8px")
-          .style("border-right", "8px solid black")
-          .style("border-bottom-right-radius", "1px")
-          .style("padding-right", "0px")
-        })
 
       return 'ok'
     }

@@ -11,18 +11,33 @@ body {
 
 
 #left-column {
-text-align: center
-width: 8px
-height: 500px
-padding-top: 20px
-opacity: .5
-background-color: #333
+width: 100%
+background-color: #ff3333
+color: black
+z-index: 30
+height: 21px
+position: absolute
+top: 45px
+opacity: .7
+transition: .4s
+}
+
+#left-column:hover{
+opacity: 1
+cursor: pointer
+background-color: #262626
 color: white
-transition: .3s ease
-overflow: hidden
-border-right: 8px solid black
-border-bottom: 1px solid black
-display: none;
+}
+
+#left-column ul {
+list-style-type: none
+float: left
+}
+
+#left-column li {
+float: left
+list-style-type: none
+margin-right: 10px
 }
 
 .links line {
@@ -35,11 +50,32 @@ transition: 1.5s
 fill: black
 }
 
+#searchbar {
+z-index: 200
+position: absolute
+top: 600px
+left: 500px
+}
+
+#searchbar input {
+background: #a6a6a6
+width: 200px
+color: white
+border-radius: 6px
+}
+
+input:focus {
+outline: none
+}
+
+.links line {
+stroke: black
+}
+
 .links line:hover, {
-stroke: red
-stroke-width: 2px
+stroke-width: 5px
+
 transition: .5s
-cursor: no-drop
 }
 
 .relevant {
@@ -50,7 +86,9 @@ stroke-width: 2.5px !important
 
 .navbar {
   height: 10px;
+  border-bottom: none
   position: absolute;
+  background-color: #262626
 }
 
 
@@ -100,14 +138,28 @@ main {
   height: 100%
 }
 
-#explore {
-  height: 400px
-  border: 1px solid gray
+#explorecontainer {
+  background-color: #f2f2f2
+  border-bottom: 3px solid #d2d2d2
 }
 
-#dragLine {
-stroke: blue
+#exploretable {
+  background-color: #FFFFFf
+}
+
+#exploretable th {
+  color: #ff3333
+}
+
+#exploretable tr:nth-child(even) {
+  background-color: #d8d8d8
+  width: 50px
+}
+
+.dragLine {
+stroke: #ff3333
 stroke-width: 1px
+stroke-dasharray: 3,3
 }
 
 .tooltip {
