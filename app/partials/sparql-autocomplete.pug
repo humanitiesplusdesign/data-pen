@@ -6,7 +6,7 @@ script(type="text/ng-template",id="sparql-autocomplete-item-popover")
   span.danger.glyphicon.glyphicon-alert.form-control-feedback(ng-show="$ctrl.error")
 div(ng-repeat="result in $ctrl.results track by $index")
   h4 {{result.configuration.title || result.label }}
-  ul: li(ng-repeat="result in result.results track by $index",ng-click="$ctrl.onSelect({result:result})",uib-popover-template="'sparql-autocomplete-item-popover'",popover-trigger="mouseenter",popover-placement="right") {{result.matchedLabel.value}}
+  ul: li(ng-repeat="result in result.results track by $index",ng-click="$ctrl.onSelect({result:result})",uib-popover-template="'sparql-autocomplete-item-popover'",popover-trigger="mouseenter",popover-placement="center") {{result.matchedLabel.value}}
     span(ng-if="result.matchedLabel.value !== result.prefLabel.value") -&gt; {{result.prefLabel.value}}
     span(ng-if="result.additionalInformation['altLabel']") &nbsp;(
       span(ng-repeat="altLabel in result.additionalInformation['altLabel']") {{$last ? altLabel.value : altLabel.value+', '}}
@@ -16,7 +16,7 @@ div(ng-repeat="result in $ctrl.results track by $index")
     | ]
   ul: li(ng-repeat="group in result.resultsByGroup track by $index")
     span.group-label {{group.label}}
-    ul: li(ng-repeat="result in group.results track by $index",ng-click="$ctrl.onSelect({result:result})",uib-popover-template="'sparql-autocomplete-item-popover'",popover-trigger="mouseenter",popover-placement="right") {{result.matchedLabel.value}}
+    ul: li(ng-repeat="result in group.results track by $index",ng-click="$ctrl.onSelect({result:result})",uib-popover-template="'sparql-autocomplete-item-popover'",popover-trigger="mouseenter",popover-placement="center") {{result.matchedLabel.value}}
       span(ng-if="result.matchedLabel.value !== result.prefLabel.value") -&gt; {{result.prefLabel.value}}
       span(ng-if="result.additionalInformation['altLabel']") &nbsp;(
         span(ng-repeat="altLabel in result.additionalInformation['altLabel']") {{$last ? altLabel.value : altLabel.value+', '}}

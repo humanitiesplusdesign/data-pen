@@ -6,3 +6,4 @@
       explore(class-tree-promise="$ctrl.classTreePromise", selected-item="$ctrl.selectedItem")
     #right-column.col-md-4
       sparql-item(item-id="$ctrl.selectedItem")
+    sparql-autocomplete(limit="5",by="group",on-select="$ctrl.createItem(result)")#searchbar
