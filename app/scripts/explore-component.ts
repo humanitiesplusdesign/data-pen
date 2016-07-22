@@ -18,6 +18,7 @@ namespace fibra {
     private svgSel: any
     private d3: any
     private links: any
+    private forceSim: any
 
     public $postLink: () => void = () => {
       this.svgSel = this.$window.d3.select(this.$element[0]).select('svg')
@@ -39,23 +40,24 @@ namespace fibra {
     }
 
     public updateExplore(): string {
+      this.clearSVG()
       // allow item_info_tip to expand somehow
       // add delete and alter ability to sparql-item.pug
       //fix how links sit on top of nodes
       let d3 = this.d3
-      let viewport_width = window.innerWidth;
-      let viewport_height = window.innerHeight;
+      let viewport_width = window.innerWidth
+      let viewport_height = window.innerHeight
       let searchbarwidth =   d3.select("#searchbar").style("width").replace('px','')
-      let drawmode = false;
+      let drawmode = false
 
       // add shift to enable draw mode - this can easily be changed to require shift to be held
       this.$window.addEventListener('keydown', (event) => {
           if (document.activeElement instanceof HTMLBodyElement) {
             if (event.keyCode === 16 ) {
               drawmode = drawmode ? false : true
-              d3.select("#explore, #explorecontainer").style("background-color", drawmode ? "#d9d9d9" : "#F2F2F2")
+              this.svgSel.style("background-color", drawmode ? "#d9d9d9" : "#F2F2F2")
               if (drawmode) {
-                d3.select("#explore").append("text")
+              this.svgSel.append("text")
                   .attr("id", "drawmodetext")
                   .html("Draw Mode engaged; to link two nodes, drag from one to the other")
                   .style("stroke", "red")
@@ -64,6 +66,10 @@ namespace fibra {
                 d3.select("#drawmodetext").remove()
                 d3.selectAll(".dragLine").remove()
               }
+            } else if (event.keyCode === 49) {
+              console.log(this.links)
+            } else if (event.keyCode === 50) {
+              console.log(this.items)
             }
           }
       })
@@ -72,7 +78,7 @@ namespace fibra {
         .style("height", viewport_height + 20 + "px")
 
       // dbl click to add - incomplete/broken
-      d3.select("#explore").style('width', viewport_width + "px")
+    this.svgSel.style('width', viewport_width + "px")
         .style("height", viewport_height - 50 + "px")
         .style("top", 25 + "px")
         .on("dblclick", () => {
@@ -95,8 +101,8 @@ namespace fibra {
       d3.select("#exploretable").style('width', viewport_width + "px")
         .style("height", viewport_height - 50 + "px")
 
-      let svg_width = +d3.select("#explore").style('width').replace("px", "")
-      let svg_height = +d3.select("#explore").style('height').replace("px", "")
+      let svg_width = +this.svgSel.style('width').replace("px", "")
+      let svg_height = +this.svgSel.style('height').replace("px", "")
 
       let item_info_tip = d3.select("#right-column")
 
@@ -112,6 +118,7 @@ namespace fibra {
         .style("visibility", "hidden")
 
       let edittip = d3.select("body").append("div")
+        .attr("id", "edittip")
         .style("position", "absolute")
         .style("z-index", "40")
         .style("background-color", "white")
@@ -123,13 +130,14 @@ namespace fibra {
 
       let dragline;
 
-      let forceSim = this.d3.forceSimulation().force("charge", d3.forceManyBody(3))
+      this.forceSim = this.d3.forceSimulation().force("charge", d3.forceManyBody(3))
         .force("center", d3.forceCenter(svg_width/2, svg_height/2))
         .force("link", d3.forceLink().distance(40).strength(1).iterations(1).id(function(d) {return d.index}))
 
       let linked = this.svgSel.append("g")
       .attr("class", "links").selectAll("line")
        .data(this.links)
+       linked.exit().remove()
 
       let link = linked
        .enter().append("line")
@@ -144,13 +152,13 @@ namespace fibra {
         .append("circle")
           .attr("class", "node-circle")
           .attr("id", (d,i) => { return "node-circle-" + i})
-        .merge(items)
+      //    .merge(items)
           .style("stroke", "black")
           .attr("r", radius + "px")
           .call(d3.drag()
               .on("start", (d,i) => {
                 if (!drawmode) {
-                  if (!d3.event.active) forceSim.alphaTarget(.1).restart()
+                  if (!d3.event.active) this.forceSim.alphaTarget(.1).restart()
                     d.fx = d.x
                     d.fy = d.y
                 } else {
@@ -158,12 +166,12 @@ namespace fibra {
                     .attr("class", "dragLine")
                 }
                })
-              .on("drag", function(d,i) {
+              .on("drag", (d,i) => {
                 if (!drawmode) {
-                  d3.select(this).classed("fixed", true)
+                  d3.select("#node-circle-" + i).classed("fixed", true)
                   d.fx = d3.event.x
                   d.fy = d3.event.y
-                  if (d3.select(this).classed("selected-circle")) {
+                  if (d3.select("#node-circle-" + i).classed("selected-circle")) {
                   item_info_tip.style("top", (d3.event.y + 30)+"px")
                   .style("left", (d3.event.x + 30)+"px")
                   }
@@ -176,8 +184,8 @@ namespace fibra {
                })
               .on("end",  (d,i) => {
                 if (!drawmode) {
-                  if (!d3.event.active) forceSim.alphaTarget(0)
-                  if (d3.select("#node-circle-" + i).classed("fixed")) {
+                  if (!d3.event.active) this.forceSim.alphaTarget(0)
+                  if (!d3.select("#node-circle-" + i).classed("fixed")) {
                     d.fx = null
                     d.fy = null
                   }
@@ -194,7 +202,7 @@ namespace fibra {
                         let linkExit = linkUpdate.exit().remove()
                         let linkEnter = linkUpdate.enter().append("line")
                         link = linkUpdate.merge(linkEnter)
-                        forceSim.force("link").links(this.links)
+                        this.forceSim.force("link").links(this.links)
                         linkEnter.attr("id", (d,i) => {return "link-" + i})
                           .attr("x1", (d) => {return d.source.x})
                           .attr("y1", (d) => {return d.source.y})
@@ -234,7 +242,7 @@ namespace fibra {
             .style("visibility", "visible")
           })
 
-      forceSim.nodes(this.items)
+      this.forceSim.nodes(this.items)
       .on("tick", () => {
         node
           .attr("transform", (d,i) => {
@@ -252,7 +260,7 @@ namespace fibra {
           .attr("x2", (d) => {return d.target.x})
           .attr("y2", (d) => {return d.target.y})
       })
-      forceSim.force("link").links(this.links)
+      this.forceSim.force("link").links(this.links)
 
 
 
@@ -269,6 +277,13 @@ namespace fibra {
                 this.d3.select("#link-" + j).classed("relevant", true)
         }
       }
+    }
+
+    public clearSVG():void {
+      this.svgSel.select("#edittip").remove()
+      this.svgSel.select("g .links").remove()
+      this.svgSel.selectAll(".node").remove()
+      this.forceSim = ""
     }
 
     public selectItem(id: INode): void {
