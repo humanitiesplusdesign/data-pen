@@ -11,7 +11,7 @@ namespace fibra {
 
   class ExploreComponentController {
     public itemService: SparqlItemService
-    public items: Item[]
+    public items: Item[] = []
     public selectedItem: INode
     public properties: {}[]
     public classTreePromise: angular.IPromise<TreeNode[]>
@@ -22,6 +22,12 @@ namespace fibra {
 
     public $postLink: () => void = () => {
       this.svgSel = this.$window.d3.select(this.$element[0]).select('svg')
+
+      this.forceSim = this.d3.forceSimulation()
+        .force("charge", this.d3.forceCollide(20))
+        .force("attract", this.d3.forceManyBody().strength(3))
+        .force("link", this.d3.forceLink().distance(40).strength(1).iterations(1).id(function(d) {return d.index}))
+
       this.queryAndBuild()
     }
 
@@ -29,7 +35,9 @@ namespace fibra {
       return this.classTreePromise.then(ct => {
         return this.itemService.getAllItems().then(
           (items: Item[]) => {
-            this.items = items
+
+            // Merge items
+            this.items = this.mergeItems(this.items, items)
             this.properties = this.items[0].properties.map((p) => {
               return {key: p.toCanonical(), value: p.label.value }
             })
@@ -39,8 +47,41 @@ namespace fibra {
       })
     }
 
+    private mergeItems(oldItems:Item[], newItems: Item[]): Item[] {
+      let items: Item[] = [].concat(oldItems)
+      let j, i: number
+
+      for(i=0; i<oldItems.length; i++) {
+        for(j=0; j<newItems.length; j++) {
+          if(oldItems[i].value === newItems[j].value) {
+            break
+          }
+        }
+
+        if(j === newItems.length) {
+          // Old item is not in new items. Remove.
+          items.splice(items.indexOf(oldItems[i]),1)
+        } 
+      }
+
+      // New item is not in old items. Add.
+      for(j=0; j<newItems.length; j++) {
+        for(i=0; i<oldItems.length; i++) {
+          if(oldItems[i].value === newItems[j].value) {
+            break
+          }
+        }
+
+        if(i === oldItems.length) {
+          items.push(newItems[j])
+        } 
+      }
+
+      return items
+    }
+
     public updateExplore(): string {
-      this.clearSVG()
+
       // allow item_info_tip to expand somehow
       // add delete and alter ability to sparql-item.pug
       //fix how links sit on top of nodes
@@ -104,6 +145,8 @@ namespace fibra {
       let svg_width = +this.svgSel.style('width').replace("px", "")
       let svg_height = +this.svgSel.style('height').replace("px", "")
 
+      this.forceSim.force("center", this.d3.forceCenter(svg_width/2, svg_height/2))
+
       let item_info_tip = d3.select("#right-column")
 
       let radius = 8
@@ -130,29 +173,28 @@ namespace fibra {
 
       let dragline;
 
-      this.forceSim = this.d3.forceSimulation().force("charge", d3.forceManyBody(3))
-        .force("center", d3.forceCenter(svg_width/2, svg_height/2))
-        .force("link", d3.forceLink().distance(40).strength(1).iterations(1).id(function(d) {return d.index}))
-
       let linked = this.svgSel.append("g")
-      .attr("class", "links").selectAll("line")
-       .data(this.links)
-       linked.exit().remove()
+          .attr("class", "links").selectAll("line")
+        .data(this.links)
+      
+      linked.exit().remove()
 
       let link = linked
-       .enter().append("line")
-        .attr("id", (d,i) => {return "link-" + i})
+        .enter().append("line")
+          .attr("id", (d,i) => {return "link-" + i})
+      link = link.merge(linked)
 
       let items = this.svgSel.selectAll("circle").data(this.items, (d) =>  {return d.value })
       items.exit().remove()
 
       let node = items.enter().append("g")
-        .attr("id", (d,i) => {return "node-" + i})
-        .attr("class", "node")
+          .attr("id", (d,i) => {
+            return "node-" + i
+          })
+          .attr("class", "node")
         .append("circle")
           .attr("class", "node-circle")
           .attr("id", (d,i) => { return "node-circle-" + i})
-      //    .merge(items)
           .style("stroke", "black")
           .attr("r", radius + "px")
           .call(d3.drag()
@@ -242,27 +284,33 @@ namespace fibra {
             .style("visibility", "visible")
           })
 
-      this.forceSim.nodes(this.items)
-      .on("tick", () => {
+      node = node.merge(items)
+
+      let onTick = function() {
+        console.log("Tick")
+        
         node
           .attr("transform", (d,i) => {
-              let x = d.x, y = d.y
-              if (d.x > svg_width - radius) x = svg_width - radius
-              if (d.x < radius) x = radius
-              if (d.y > svg_height - radius) y = svg_height - radius
-              if (d.y < radius) y = radius
-               return "translate(" + x + ", " + y + ")"
-            })
+            let x = d.x, y = d.y
+            if (d.x > svg_width - radius) x = svg_width - radius
+            if (d.x < radius) x = radius
+            if (d.y > svg_height - radius) y = svg_height - radius
+            if (d.y < radius) y = radius
+            return "translate(" + x + ", " + y + ")"
+          })
 
         link
           .attr("x1", (d) => {return d.source.x})
           .attr("y1", (d) => {return d.source.y})
           .attr("x2", (d) => {return d.target.x})
           .attr("y2", (d) => {return d.target.y})
-      })
-      this.forceSim.force("link").links(this.links)
+      }
 
-
+      this.forceSim.nodes(this.items)
+        .on("tick", onTick)
+      this.forceSim
+        .force("link").links(this.links)
+      this.forceSim.alpha(1).restart()
 
       return 'ok'
     }
@@ -277,13 +325,6 @@ namespace fibra {
                 this.d3.select("#link-" + j).classed("relevant", true)
         }
       }
-    }
-
-    public clearSVG():void {
-      this.svgSel.select("#edittip").remove()
-      this.svgSel.select("g .links").remove()
-      this.svgSel.selectAll(".node").remove()
-      this.forceSim = ""
     }
 
     public selectItem(id: INode): void {
