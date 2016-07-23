@@ -25,7 +25,6 @@ namespace fibra {
 
       this.forceSim = this.d3.forceSimulation()
         .force("charge", this.d3.forceCollide(20))
-        .force("attract", this.d3.forceManyBody().strength(3))
         .force("link", this.d3.forceLink().distance(40).strength(1).iterations(1).id(function(d) {return d.index}))
 
       this.queryAndBuild()
@@ -146,6 +145,8 @@ namespace fibra {
       let svg_height = +this.svgSel.style('height').replace("px", "")
 
       this.forceSim.force("center", this.d3.forceCenter(svg_width/2, svg_height/2))
+      this.forceSim.force("xposition", this.d3.forceX(svg_width/2).strength(0.01))
+      this.forceSim.force("yposition", this.d3.forceY(svg_height/2).strength(0.01))
 
       let item_info_tip = d3.select("#right-column")
 
