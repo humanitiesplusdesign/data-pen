@@ -23,6 +23,9 @@ namespace fibra {
     public $postLink: () => void = () => {
       this.svgSel = this.$window.d3.select(this.$element[0]).select('svg')
 
+      // Create link g
+      this.svgSel.append('g').attr("class", "links")
+
       this.forceSim = this.d3.forceSimulation()
         .force("charge", this.d3.forceCollide(20))
         .force("link", this.d3.forceLink().distance(40).strength(1).iterations(1).id(function(d) {return d.index}))
@@ -174,8 +177,7 @@ namespace fibra {
 
       let dragline;
 
-      let linked = this.svgSel.append("g")
-          .attr("class", "links").selectAll("line")
+      let linked = this.svgSel.select("g.links").selectAll("line")
         .data(this.links)
       
       linked.exit().remove()
@@ -288,7 +290,6 @@ namespace fibra {
       node = node.merge(items)
 
       let onTick = function() {
-        console.log("Tick")
         
         node
           .attr("transform", (d,i) => {
