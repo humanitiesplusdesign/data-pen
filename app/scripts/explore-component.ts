@@ -17,7 +17,7 @@ namespace fibra {
     public classTreePromise: angular.IPromise<TreeNode[]>
     private svgSel: any
     private d3: any
-    private links: any
+    private links: {source:Item, target:Item}[]
     private forceSim: any
 
     public $postLink: () => void = () => {
@@ -40,6 +40,7 @@ namespace fibra {
 
             // Merge items
             this.items = this.mergeItems(this.items, items)
+            this.links = this.mergeLinks(this.links, items)
             this.properties = this.items[0].properties.map((p) => {
               return {key: p.toCanonical(), value: p.label.value }
             })
@@ -80,6 +81,11 @@ namespace fibra {
       }
 
       return items
+    }
+
+    private mergeLinks(oldLinks:any[], newItems:Item[]):any[] {
+      
+      return oldLinks
     }
 
     public updateExplore(): string {
@@ -241,7 +247,7 @@ namespace fibra {
                   d3.selectAll(".node")
                     .each((f,j) => {
                       if (Math.abs(lineX - f.x) < radius && Math.abs(lineY - f.y) < radius) {
-                        this.links.push({"source": i, "target": j})
+                        this.links.push({"source": d, "target": f})
                         this.svgSel.select(".links").remove()
                         let linkUpdate = this.svgSel.append("g").attr("class", "links").selectAll("line").data(this.links)
                         let linkExit = linkUpdate.exit().remove()
