@@ -40,7 +40,12 @@ namespace fibra {
 
             // Merge items
             this.items = this.mergeItems(this.items, items)
-            this.links = this.mergeLinks(this.links, items)
+            this.$q.all(items.map((it) => {
+              return this.sparqlItemService.getItem(it)
+            })).then((its) => {
+              this.links = this.mergeLinks(this.links, its)
+              this.updateExplore()
+            })
             this.properties = this.items[0].properties.map((p) => {
               return {key: p.toCanonical(), value: p.label.value }
             })
@@ -84,8 +89,49 @@ namespace fibra {
     }
 
     private mergeLinks(oldLinks:any[], newItems:Item[]):any[] {
+      let newLinks: any[] = []
+
+      // Build our external item -> internal item mapping array.
+      // This is temporary until we manage additional properties internally
+      let internalItems: Item[] = [] 
+      for(let i = 0; i < newItems.length; i++) {
+        internalItems[i] = this.items.filter((it) => {
+          return newItems[i].value === it.value 
+        })[0]
+      }
+
+      // First build our sameAs mapping from value -> Item
+      let sameAs = {}
+      for(let i = 0; i < newItems.length; i++) {
+        sameAs[newItems[i].value] = internalItems[i] ? internalItems[i] : newItems[i]
+        let sameAsProp = newItems[i].properties.filter((p) => {
+          return p.label.value === 'same As'
+        })[0]
+        if(sameAsProp && sameAsProp.values) {
+          sameAsProp.values.forEach((n) => { sameAs[n.value] = internalItems[i] ? internalItems[i] : newItems[i] })
+        }
+      }
+
+      // Iterate over item property values to see if they match the id of any
+      // of the items displayed. Also check if they match sameAs values...
+      for(let i = 0; i < newItems.length; i++) {
+        newItems[i].properties.forEach((p) => {
+          p.values.forEach((v) => {
+            if(sameAs[v.value] && internalItems[i]) {
+              // Don't self-link
+              if(newItems[i] !== sameAs[v.value]) {
+                newLinks.push({
+                  source: internalItems[i],
+                  target: sameAs[v.value],
+                  property: p
+                })
+              }
+            }
+          })
+        })
+      }
       
-      return oldLinks
+      return newLinks;
     }
 
     public updateExplore(): string {
