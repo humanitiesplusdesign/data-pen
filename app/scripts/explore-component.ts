@@ -170,12 +170,12 @@ namespace fibra {
       })
 
       d3.select("#explorecontainer").style('width', viewport_width + "px")
-        .style("height", viewport_height + 20 + "px")
+        .style("height", viewport_height - 36 + "px")
 
       // dbl click to add - incomplete/broken
     this.svgSel.style('width', viewport_width + "px")
-        .style("height", viewport_height - 50 + "px")
-        .style("top", 25 + "px")
+        .style("height", viewport_height - 36 + "px")
+        // .style("top", 25 + "px")
         .on("dblclick", () => {
             edittip.style("top", (this.d3.event.pageY - 40)+"px")
             .style("left", (this.d3.event.pageX - 40)+"px")
