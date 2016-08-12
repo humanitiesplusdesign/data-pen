@@ -43,6 +43,7 @@ namespace fibra {
             this.$q.all(items.map((it) => {
               return this.sparqlItemService.getItem(it)
             })).then((its) => {
+              console.log(its)
               this.links = this.mergeLinks(this.links, its)
               this.updateExplore()
             })

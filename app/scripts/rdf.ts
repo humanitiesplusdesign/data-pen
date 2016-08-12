@@ -194,6 +194,7 @@ namespace fibra {
     public static ns: string = 'http://www.cidoc-crm.org/cidoc-crm/'
     public static Person: INamedNode = new NamedNode(CIDOC.ns + 'E21_Person')
     public static Place: INamedNode = new NamedNode(CIDOC.ns + 'E53_Place')
+    public static Group: INamedNode = new NamedNode(CIDOC.ns + 'E74_Group')
   }
 
 }
