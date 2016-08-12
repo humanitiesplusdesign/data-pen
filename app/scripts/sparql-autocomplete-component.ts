@@ -6,6 +6,11 @@ namespace fibra {
     public onSelect: (selection: Result) => void
     public error: boolean = false
     public by: 'datasource' | 'group' = 'datasource'
+    public query: string
+    public clearResults: () => void = () => {
+      this.results = []
+      this.query = ""
+    }
     private results: (ResultsByDatasource|ResultGroup)[]
     private canceller: angular.IDeferred<any>
     public onChange: (query: string) => void = (query: string) => {
