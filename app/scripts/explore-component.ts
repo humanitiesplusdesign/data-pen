@@ -135,6 +135,7 @@ namespace fibra {
       return newLinks;
     }
 
+    private drawmode: boolean = false
     public updateExplore(): string {
 
       // allow item_info_tip to expand somehow
@@ -144,31 +145,6 @@ namespace fibra {
       let viewport_width = window.innerWidth
       let viewport_height = window.innerHeight
       let searchbarwidth =   d3.select("#searchbar").style("width").replace('px','')
-      let drawmode = false
-
-      // add shift to enable draw mode - this can easily be changed to require shift to be held
-      this.$window.addEventListener('keydown', (event) => {
-          if (document.activeElement instanceof HTMLBodyElement) {
-            if (event.keyCode === 16 ) {
-              drawmode = drawmode ? false : true
-              this.svgSel.style("background-color", drawmode ? "#d9d9d9" : "#F2F2F2")
-              if (drawmode) {
-              this.svgSel.append("text")
-                  .attr("id", "drawmodetext")
-                  .html("Draw Mode engaged; to link two nodes, drag from one to the other")
-                  .style("stroke", "red")
-                  .attr("y", 100)
-              } else {
-                d3.select("#drawmodetext").remove()
-                d3.selectAll(".dragLine").remove()
-              }
-            } else if (event.keyCode === 49) {
-              console.log(this.links)
-            } else if (event.keyCode === 50) {
-              console.log(this.items)
-            }
-          }
-      })
 
       d3.select("#explorecontainer").style('width', viewport_width + "px")
         .style("height", viewport_height - 36 + "px")
@@ -255,7 +231,7 @@ namespace fibra {
           .attr("r", radius + "px")
           .call(d3.drag()
               .on("start", (d,i) => {
-                if (!drawmode) {
+                if (!this.drawmode) {
                   if (!d3.event.active) this.forceSim.alphaTarget(.1).restart()
                     d.fx = d.x
                     d.fy = d.y
@@ -265,7 +241,7 @@ namespace fibra {
                 }
                })
               .on("drag", (d,i) => {
-                if (!drawmode) {
+                if (!this.drawmode) {
                   d3.select("#node-circle-" + i).classed("fixed", true)
                   d.fx = d3.event.x
                   d.fy = d3.event.y
@@ -281,7 +257,7 @@ namespace fibra {
                 }
                })
               .on("end",  (d,i) => {
-                if (!drawmode) {
+                if (!this.drawmode) {
                   if (!d3.event.active) this.forceSim.alphaTarget(0)
                   if (!d3.select("#node-circle-" + i).classed("fixed")) {
                     d.fx = null
@@ -295,18 +271,8 @@ namespace fibra {
                     .each((f,j) => {
                       if (Math.abs(lineX - f.x) < radius && Math.abs(lineY - f.y) < radius) {
                         this.links.push({"source": d, "target": f})
-                        this.svgSel.select(".links").remove()
-                        let linkUpdate = this.svgSel.append("g").attr("class", "links").selectAll("line").data(this.links)
-                        let linkExit = linkUpdate.exit().remove()
-                        let linkEnter = linkUpdate.enter().append("line")
-                        link = linkUpdate.merge(linkEnter)
-                        this.forceSim.force("link").links(this.links)
-                        linkEnter.attr("id", (d,i) => {return "link-" + i})
-                          .attr("x1", (d) => {return d.source.x})
-                          .attr("y1", (d) => {return d.source.y})
-                          .attr("x2", (d) => {return d.target.x})
-                          .attr("y2", (d) => {return d.target.y})
-                          dragline.remove();
+                        dragline.remove();
+                        this.updateExplore();
                       } else {
                         dragline.remove();
                       }
@@ -415,6 +381,30 @@ namespace fibra {
       this.itemService = sparqlItemService
       this.d3 = this.$window.d3
       this.links = []
+
+      // add shift to enable draw mode - this can easily be changed to require shift to be held
+      this.$window.addEventListener('keydown', (event) => {
+          if (document.activeElement instanceof HTMLBodyElement) {
+            if (event.keyCode === 16 ) {
+              this.drawmode = this.drawmode ? false : true
+              this.svgSel.style("background-color", this.drawmode ? "#d9d9d9" : "#F2F2F2")
+              if (this.drawmode) {
+              this.svgSel.append("text")
+                  .attr("id", "drawmodetext")
+                  .html("Draw Mode engaged; to link two nodes, drag from one to the other")
+                  .style("stroke", "red")
+                  .attr("y", 100)
+              } else {
+                this.d3.select("#drawmodetext").remove()
+                this.d3.selectAll(".dragLine").remove()
+              }
+            } else if (event.keyCode === 49) {
+              console.log(this.links)
+            } else if (event.keyCode === 50) {
+              console.log(this.items)
+            }
+          }
+      })
     }
   }
 
