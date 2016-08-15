@@ -1,0 +1,10 @@
+script(type="text/ng-template",id="type-pill.html")
+  .checkbox
+    label
+      input(type="checkbox",ng-model="node.selected", ng-change="$ctrl.onSelect({treeNode:node})")
+      | {{node.label}}
+    span.pull-left {{node.matchingInstances != node.matchingInstances ? node.matchingInstances+'/'+node.instances : node.instances}}
+  ul
+    li(ng-repeat="node in node.children",ng-include="'tree-pill.html'",ng-class="{selected:node.selected}")
+ul
+  li(ng-repeat="node in $ctrl.tree",ng-include="'type-pill.html'",ng-class="{selected:node.selected}")

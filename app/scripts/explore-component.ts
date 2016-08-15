@@ -40,19 +40,19 @@ namespace fibra {
 
             // Merge items
             this.items = this.mergeItems(this.items, items)
-            this.$q.all(items.map((it) => {
-              return this.sparqlItemService.getItem(it)
-            })).then((its) => {
-              console.log(its)
-              this.links = this.mergeLinks(this.links, its)
-              this.updateExplore()
-            })
             this.properties = this.items[0].properties.map((p) => {
               return {key: p.toCanonical(), value: p.label.value }
             })
-            return 'ok'
+            return this.$q.all(items.map((it) => {
+              return this.sparqlItemService.getItem(it)
+            })).then((its) => {
+              this.links = this.mergeLinks(this.links, its)
+            })
           }
-        ).then(this.updateExplore.bind(this))
+        ).then(() => {
+          this.updateExplore()
+          return 'ok'
+        })
       })
     }
 

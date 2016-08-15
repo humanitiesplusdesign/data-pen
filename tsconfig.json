@@ -31,6 +31,7 @@
         "app/scripts/sparql-tree-service.ts",
         "app/scripts/sparql-update-service.ts",
         "app/scripts/tree-component.ts",
+        "app/scripts/type-select-component.ts",
         "app/scripts/worker-service.ts",
         "app/bower_components/angular-sparql-service/dist/sparql-service.d.ts",
         "typings/globals/angular-http-auth/index.d.ts",

@@ -3,7 +3,7 @@
     .col-md-12
       .row.no-gutter
         #type-bar.col-md-12
-          tree(tree="$ctrl.classTree",on-select="$ctrl.alterSelection(treeNode)")
+          type-select(tree="$ctrl.classTree",on-select="$ctrl.alterSelection(treeNode)")
       .row.no-gutter
         #middle-column.col-md-12
           explore(class-tree-promise="$ctrl.classTreePromise", selected-item="$ctrl.selectedItem")
