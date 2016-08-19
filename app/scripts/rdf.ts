@@ -9,7 +9,7 @@ namespace fibra {
   }
 
   export class Node implements INode {
-    constructor(public value?: string, public termType?: 'NamedNode' | 'BlankNode' | 'Literal' | 'Variable' | 'DefaultGraph', public language?: string, public datatype?: INamedNode) {}
+    constructor(public value: string = undefined, public termType: 'NamedNode' | 'BlankNode' | 'Literal' | 'Variable' | 'DefaultGraph' = undefined, public language: string = undefined, public datatype: INamedNode = undefined) {}
     public toCanonical(): string {
       switch (this.termType) {
         case 'NamedNode': return '<' + this.value + '>'
@@ -17,7 +17,7 @@ namespace fibra {
         case 'Literal': return JSON.stringify(this.value) + (this.language ? '@' + this.language : (this.datatype.equals(XMLSchema.string) ? '' : '^^' + this.datatype.toCanonical()))
         case 'Variable': return '?' + this.value
         case 'DefaultGraph': return ''
-        default: throw 'Unknown term type ' + this.termType
+        default: throw 'Unknown term type ' + this
       }
     }
     public equals(other: ITerm): boolean {
@@ -53,7 +53,7 @@ namespace fibra {
     }
   }
 
-  class CanonicalNode extends Node {
+  export class CanonicalNode extends Node {
     public datatype: INamedNode
     public language: string
     constructor(id: string) {
@@ -196,5 +196,94 @@ namespace fibra {
     public static Place: INamedNode = new NamedNode(CIDOC.ns + 'E53_Place')
     public static Group: INamedNode = new NamedNode(CIDOC.ns + 'E74_Group')
   }
+
+  export class ENodeMap<V> {
+    constructor(private create: (key?: INode) => V = () => { return <V>{}}, private map: EMap<V> = new EMap<V>()) {}
+    public goc(key: INode, create?: (key?: INode) => V): V {
+      if (!this.has(key))
+        this.set(key, create ? create(key) : this.create(key))
+      return this.get(key)
+    }
+    public get(key: INode): V {
+      return this.map.get(key.toCanonical())
+    }
+    public remove(key: INode): boolean {
+      return this.map.remove(key.toCanonical())
+    }
+    public each(f: (value: V, key: INode, map: ENodeMap<V>) => void): void {
+      this.map.each((value, key, map) => f(value, new CanonicalNode(key), this))
+    }
+    public has(key: INode): boolean {
+      return this.map.has(key.toCanonical())
+    }
+    public set(key: INode, value: V): ENodeMap<V> {
+      this.map.set(key.toCanonical(), value)
+      return this
+    }
+    get size(): number {
+      return this.map.size()
+    }
+    public values(): V[] {
+      return this.map.values()
+    }
+    public keys(): INode[] {
+      return this.map.keys().map(k => new CanonicalNode(k))
+    }
+    public entries(): {key: INode, value: V}[] {
+      return this.map.entries().map(o => { return { key: new CanonicalNode(o.key), value: o.value }})
+    }
+    public clear(): ENodeMap<V> {
+      this.map.clear()
+      return this
+    }
+  }
+
+  export class EONodeMap<V> extends ENodeMap<V> {
+    constructor(create?: (key?: INode) => V ) {
+      super(create, new EOMap<V>())
+    }
+  }
+
+  export class NodeSet<N extends INode> {
+    public m: ENodeMap<N>
+    constructor(map: EMap<N> = new EMap<N>()) {
+      this.m = new ENodeMap<N>(undefined, map)
+    }
+    public add(value: N): NodeSet<N> {
+      this.m.set(value, value)
+      return this
+    }
+    public has(value: N): boolean {
+      return this.m.has(value)
+    }
+    public clear(): NodeSet<N> {
+      this.m.clear()
+      return this
+    }
+
+    public remove(value: N): boolean {
+      return this.m.remove(value)
+    }
+
+    public values(): N[] {
+      return this.m.values()
+    }
+
+    get size(): number {
+      return this.m.size
+    }
+
+    public each(f: (value: N, key: N, set: NodeSet<N>) => void): void {
+      this.m.each((value, key, map) => f(value, value, this))
+    }
+  }
+
+  export class ONodeSet<N extends INode> extends NodeSet<N> {
+    constructor() {
+      super(new EOMap<N>())
+    }
+  }
+
+
 
 }

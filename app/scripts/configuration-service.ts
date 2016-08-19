@@ -2,7 +2,7 @@ namespace fibra {
   'use strict'
 
     export class Configuration {
-      public preferredLanguage: string
+      public preferredLanguage: string = '"en"'
       public primaryEndpoint: PrimaryEndpointConfiguration
       public authorityEndpoints: EndpointConfiguration[] = []
       public archiveEndpoints: EndpointConfiguration[] = []
@@ -12,6 +12,7 @@ namespace fibra {
       public schemaNS: string
       public schemaGraph: string
       public deleteItemQuery: string = SparqlItemService.deleteItemQuery
+      public prefixes: string = ''
       public allEndpoints(): EndpointConfiguration[] {
         let allEndpoints: EndpointConfiguration[] = this.archiveEndpoints.concat(this.authorityEndpoints)
         allEndpoints.push(this.primaryEndpoint)
@@ -20,7 +21,7 @@ namespace fibra {
     }
 
     export class EndpointConfiguration {
-      public autocompletionQueryTemplate: string = SparqlAutocompleteService.queryTemplate
+      public autocompletionTextMatchQueryTemplate: string = SparqlAutocompleteService.defaultMatchQueryTemplate
       public treeQueryTemplate: string = SparqlTreeService.getClassTreeQuery
       public itemQueryTemplate: string = SparqlItemService.getItemPropertiesQuery
       public dataModelConfiguration: DataModelConfiguration = new DataModelConfiguration()
@@ -66,11 +67,37 @@ namespace fibra {
         new EndpointConfiguration('viaf', 'VIAF', new NamedNode('http://ldf.fi/viaf-labels/sparql')), // birth/death dates not yet loaded
         // not yet loaded new EndpointConfiguration('lcnames', 'LC Names', new NamedNode('http://ldf.fi/lcnames/sparql'))
       ]
+      let emloConfiguration: EndpointConfiguration = new EndpointConfiguration('emlo', 'EMLO', new NamedNode('http://ldf.fi/emlo/sparql'), [CIDOC.Person, CIDOC.Place, CIDOC.Group])
+      emloConfiguration.autocompletionTextMatchQueryTemplate = emloConfiguration.autocompletionTextMatchQueryTemplate.replace(/# ADDITIONALCONSTRUCT/g, '?id fibra:ifpWikipediaPage ?ifpWikipediaPage . ?id fibra:ifpODBNId ?ifpODBNId .').replace(/# ADDITIONALSELECT/g, `
+UNION {
+  {
+    ?id <http://emlo.bodleian.ox.ac.uk/schema#cofk_union_relationship_type-is_related_to> ?ref .
+    FILTER(REGEX(STR(?ref),'http://..\\\\.wikipedia\\\\.org/wiki/'))
+    BIND(?ref AS ?ifpWikipediaPage)
+  } UNION {
+    ?id <http://emlo.bodleian.ox.ac.uk/schema#cofk_union_relationship_type-is_related_to> ?ref .
+    FILTER(STRSTARTS(STR(?ref),'http://www.oxforddnb.com/view/article/'))
+    BIND(REPLACE(STR(?ref),'http://www.oxforddnb.com/view/article/([^?]*).*','$1') AS ?ifpODBNId)
+  }
+}`)
+      let sdfbConfiguration: EndpointConfiguration = new EndpointConfiguration('sdfb', 'Six Degrees of Francis Bacon', new NamedNode('http://ldf.fi/sdfb/sparql'), [CIDOC.Person, CIDOC.Place, CIDOC.Group])
+      sdfbConfiguration.autocompletionTextMatchQueryTemplate = sdfbConfiguration.autocompletionTextMatchQueryTemplate.replace(/# ADDITIONALCONSTRUCT/g, '?id fibra:ifpWikipediaPage ?ifpWikipediaPage .').replace(/# ADDITIONALSELECT/g, `
+UNION {
+  ?id <http://ldf.fi/procope-schema#wikipediaUrl> ?ref .
+  BIND(IRI(?ref) AS ?ifpWikipediaPage)
+}
+`)
+      let procopeConfiguration: EndpointConfiguration = new EndpointConfiguration('procope', 'Procope', new NamedNode('http://ldf.fi/procope/sparql'), [CIDOC.Person, CIDOC.Place, CIDOC.Group])
+      procopeConfiguration.autocompletionTextMatchQueryTemplate = procopeConfiguration.autocompletionTextMatchQueryTemplate.replace(/# ADDITIONALCONSTRUCT/g, '?id fibra:ifpODBNId ?ifpODBNId .').replace(/# ADDITIONALSELECT/g, `
+UNION {
+  ?id <http://ldf.fi/sdfb/schema#odbnId> ?ifpODBNId .
+}
+`)
       c.archiveEndpoints = [
-        new EndpointConfiguration('sdfb', 'Six Degrees of Francis Bacon', new NamedNode('http://ldf.fi/sdfb/sparql'), [CIDOC.Person, CIDOC.Place, CIDOC.Group]),
-        new EndpointConfiguration('emlo', 'EMLO', new NamedNode('http://ldf.fi/emlo/sparql'), [CIDOC.Person, CIDOC.Place, CIDOC.Group]),
-        new EndpointConfiguration('procope', 'Procope', new NamedNode('http://ldf.fi/procope/sparql'), [CIDOC.Person, CIDOC.Place, CIDOC.Group]),
-        new EndpointConfiguration('schoenberg', 'Schoenberg', new NamedNode('http://ldf.fi/schoenberg/sparql'), [CIDOC.Person, CIDOC.Place, CIDOC.Group]),
+        sdfbConfiguration,
+        emloConfiguration,
+        procopeConfiguration,
+        new EndpointConfiguration('schoenberg', 'Schoenberg', new NamedNode('http://ldf.fi/schoenberg/sparql'), [CIDOC.Person, CIDOC.Place, CIDOC.Group])
       ]
       c.instanceNS = 'http://ldf.fi/fibra/'
       c.instanceGraph = 'http://ldf.fi/fibra/main/'

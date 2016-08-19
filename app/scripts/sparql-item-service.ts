@@ -12,7 +12,7 @@ namespace fibra {
   }
 
   export class NodePlusLabel extends NodeFromNode implements INodePlusLabel {
-    constructor(public node: INode, public label?: INode) {
+    constructor(public node: INode, public label: INode = undefined) {
       super(node)
     }
   }
@@ -31,6 +31,21 @@ namespace fibra {
   export class Item extends NodePlusLabel {
     public properties: PropertyToValues[] = []
     public inverseProperties: PropertyToValues[] = []
+  }
+
+  export interface IConstraint {
+    /**
+     * Constraint as expressed as a SPARQL expression
+     */
+    constraintString: string
+    /**
+     * Ordering hint for ordering constraints in the SPARQL query. The larger, the more important (where it matters)
+     */
+    priority: number
+  }
+
+  export class SimpleConstraint implements IConstraint {
+    constructor(public constraintString: string, public priority: number = 0) {}
   }
 
   export class SparqlItemService {
@@ -120,6 +135,10 @@ WHERE {
 
     constructor(private workerService: WorkerService) {}
 
+    /**
+     * Get a single item from the local store
+     * @param canceller promise that can be resolved to cancel a remote fetch
+     */
     public getItem(id: INode, canceller?: angular.IPromise<any>): angular.IPromise<Item> {
       return this.workerService.call('sparqlItemWorkerService', 'getItem', [id], canceller)
     }
@@ -153,7 +172,7 @@ WHERE {
         (response: angular.IHttpPromiseCallbackArg<s.ISparqlBindingResult<{[id: string]: s.ISparqlBinding}>>) => {
           let item: Item = new Item(id)
           let propertyMap: {[property: string]: PropertyToValues} = {}
-          response.data.results.bindings.forEach(b => {
+          for (let b of response.data.results.bindings) {
             if (b['itemLabel']) item.label = new SparqlBindingNode(b['itemLabel'])
             if (b['property']) {
               let propertyToValues: PropertyToValues = propertyMap[b['property'].value]
@@ -167,7 +186,7 @@ WHERE {
               if (b['objectLabel']) oNode.label = new SparqlBindingNode(b['objectLabel'])
               propertyToValues.values.push(oNode)
             }
-          })
+          }
           return item
         }
       )
@@ -177,14 +196,14 @@ WHERE {
       let queryTemplate: string = SparqlItemService.getAllItemPropertiesQuery
       return this.sparqlService.query(this.configurationWorkerService.configuration.primaryEndpoint.endpoint.value, queryTemplate, {timeout: canceller}).then(
         (response: angular.IHttpPromiseCallbackArg<s.ISparqlBindingResult<{[id: string]: s.ISparqlBinding}>>) => {
-          let items: EnsuredOrderedMap<Item> = new EnsuredOrderedMap<Item>()
-          let itemPropertyMap: EnsuredMap<{[property: string]: PropertyToValues}> = new EnsuredMap<{[property: string]: PropertyToValues}>()
-          response.data.results.bindings.forEach(b => {
+          let items: EOMap<Item> = new EOMap<Item>()
+          let itemPropertyMap: ENodeMap<EOMap<PropertyToValues>> = new ENodeMap<EOMap<PropertyToValues>>(() => new EOMap<PropertyToValues>())
+          for (let b of response.data.results.bindings) {
             let item: Item = items.goc(b['id'].value, () => new Item(new SparqlBindingNode(b['id'])))
             if (b['itemLabel']) item.label = new SparqlBindingNode(b['itemLabel'])
             if (b['property']) {
-              let propertyToValues: PropertyToValues = goc(itemPropertyMap.goc(item.toCanonical()), b['property'].value, () => {
-                propertyToValues = new PropertyToValues(new SparqlBindingNode(b['property']))
+              let propertyToValues: PropertyToValues = itemPropertyMap.goc(item).goc(b['property'].value, () => {
+                let propertyToValues: PropertyToValues = new PropertyToValues(new SparqlBindingNode(b['property']))
                 if (b['propertyLabel']) propertyToValues.label = new SparqlBindingNode(b['propertyLabel'])
                 item.properties.push(propertyToValues)
                 return propertyToValues
@@ -193,8 +212,8 @@ WHERE {
               if (b['objectLabel']) oNode.label = new SparqlBindingNode(b['objectLabel'])
               propertyToValues.values.push(oNode)
             }
-          })
-          return items.array()
+          }
+          return items.values()
         }
       )
     }

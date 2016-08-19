@@ -11,35 +11,23 @@ namespace fibra {
       this.results = []
       this.query = ""
     }
-    private results: (ResultsByDatasource|ResultGroup)[]
+    private results: ResultGroup[]
     private canceller: angular.IDeferred<any>
     public onChange: (query: string) => void = (query: string) => {
       this.canceller.resolve()
       this.canceller = this.$q.defer()
       this.queryRunning = true
       this.error = false
-      if (this.by === 'datasource')
-        this.sparqlAutocompleteService.autocompleteByDatasource(query, this.limit, this.canceller.promise).then(
-          (resultsByDatasource: ResultsByDatasource[]) => {
-            this.results = resultsByDatasource
-            this.queryRunning = false
-          },
-          () => {
-            this.queryRunning = false
-            this.error = true
-          }
-        )
-      else
-        this.sparqlAutocompleteService.autocompleteByGroup(query, this.limit, this.canceller.promise).then(
-          (resultsByGroup: ResultGroup[]) => {
-            this.results = resultsByGroup
-            this.queryRunning = false
-          },
-          () => {
-            this.queryRunning = false
-            this.error = true
-          }
-        )
+      this.sparqlAutocompleteService.autocomplete(query, this.limit, this.canceller.promise).then(
+        (resultsByGroup: ResultGroup[]) => {
+          this.results = resultsByGroup
+          this.queryRunning = false
+        },
+        () => {
+          this.queryRunning = false
+          this.error = true
+        }
+      )
     }
     constructor(private $q: angular.IQService, private sparqlAutocompleteService: SparqlAutocompleteService) {
       this.canceller = $q.defer()
@@ -51,7 +39,6 @@ namespace fibra {
         constraints: '<',
         limit: '@',
         onSelect: '&',
-        by: '@'
       }
       public controller: Function = SparqlAutocompleteComponentController
       public templateUrl: string = 'partials/sparql-autocomplete.html'

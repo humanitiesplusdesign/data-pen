@@ -10,7 +10,7 @@ gulp.task('styles', function() {
     .pipe(gulp.dest(".tmp/styles"));
 });
 
-var tsProject = $.typescript.createProject('tsconfig.json',{noExternalResolve:true});
+var tsProject = $.typescript.createProject('tsconfig.json',{typescript:require('typescript')});
 gulp.task('scripts', function() {
   return tsProject.src()
     .pipe($.plumber({ errorHandler: $.notify.onError("<%= error.stack %>") }))

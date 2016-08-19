@@ -3,7 +3,8 @@
         "module": "es6",
         "target": "es5",
         "rootDir": "app",
-        "outDir": ".tmp"
+        "outDir": ".tmp",
+        "strictNullChecks": true
     },
     "filesGlob": [
         "app/scripts/**/*.ts",
@@ -11,7 +12,7 @@
         "!app/bower_components/**/node_modules/**/*.ts",
         "!app/bower_components/**/typings/**/*.ts",
         "!app/bower_components/angular-ui-router/api/angular-ui-router.d.ts",
-        "typings/globals/**/*.d.ts"
+        "typings/index.d.ts"
     ],
     "files": [
         "app/scripts/app-configuration-common.ts",
@@ -34,10 +35,7 @@
         "app/scripts/type-select-component.ts",
         "app/scripts/worker-service.ts",
         "app/bower_components/angular-sparql-service/dist/sparql-service.d.ts",
-        "typings/globals/angular-http-auth/index.d.ts",
-        "typings/globals/angular-ui-router/index.d.ts",
-        "typings/globals/angular/index.d.ts",
-        "typings/globals/jquery/index.d.ts"
+        "typings/index.d.ts"
     ],
     "atom": {
         "rewriteTsconfig": true
