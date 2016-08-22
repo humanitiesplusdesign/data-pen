@@ -2,6 +2,7 @@
   "name": "fibra",
   "version": "0.0.0",
   "devDependencies": {
+    "@types/d3": "0.0.31",
     "browser-sync": "^2.12.10",
     "del": "^2.2.0",
     "gulp-autoprefixer": "^3.1.0",

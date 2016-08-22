@@ -6,8 +6,8 @@ namespace fibra {
     dismissAuth: () => void
     authInfo: {
       authOpen: boolean
-      username: string
-      password: string
+      username: string | undefined
+      password: string | undefined
     }
   }
 
@@ -49,13 +49,13 @@ namespace fibra {
       password: undefined
     }
     if ($localStorage.authorization) {
-      $http.defaults.headers.common['Authorization'] = $localStorage.authorization
+      $http.defaults.headers!.common['Authorization'] = $localStorage.authorization
       workerService.$broadcast('main:auth-loginAuthInfo', $localStorage.authorization)
     }
     $rootScope.setAuth = () => {
       $rootScope.authInfo.authOpen = false
       $localStorage.authorization = 'Basic ' + btoa($rootScope.authInfo.username + ':' + $rootScope.authInfo.password)
-      $http.defaults.headers.common['Authorization'] = $localStorage.authorization
+      $http.defaults.headers!.common['Authorization'] = $localStorage.authorization
       workerService.$broadcast('main:auth-loginAuthInfo', $localStorage.authorization)
       authService.loginConfirmed()
     }

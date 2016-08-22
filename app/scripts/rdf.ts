@@ -9,12 +9,12 @@ namespace fibra {
   }
 
   export class Node implements INode {
-    constructor(public value: string = undefined, public termType: 'NamedNode' | 'BlankNode' | 'Literal' | 'Variable' | 'DefaultGraph' = undefined, public language: string = undefined, public datatype: INamedNode = undefined) {}
+    constructor(public value: string, public termType: 'NamedNode' | 'BlankNode' | 'Literal' | 'Variable' | 'DefaultGraph', public language: string | undefined = undefined, public datatype: INamedNode | undefined = undefined) {}
     public toCanonical(): string {
       switch (this.termType) {
         case 'NamedNode': return '<' + this.value + '>'
         case 'BlankNode': return '_:' + this.value
-        case 'Literal': return JSON.stringify(this.value) + (this.language ? '@' + this.language : (this.datatype.equals(XMLSchema.string) ? '' : '^^' + this.datatype.toCanonical()))
+        case 'Literal': return JSON.stringify(this.value) + (this.language ? '@' + this.language : (XMLSchema.string.equals(this.datatype!) ? '' : '^^' + this.datatype!.toCanonical()))
         case 'Variable': return '?' + this.value
         case 'DefaultGraph': return ''
         default: throw 'Unknown term type ' + this
@@ -28,21 +28,10 @@ namespace fibra {
   export class SparqlBindingNode extends Node {
     public termType: 'NamedNode' | 'BlankNode' | 'Literal'
     constructor(binding: s.ISparqlBinding) {
-      super()
-      this.value = binding.value
-      switch (binding.type) {
-        case 'literal':
-          this.termType = 'Literal'
-          this.language = binding['xml:lang'] ? binding['xml:lang'] : ''
-          this.datatype = binding.datatype ? new NamedNode(binding.datatype) : (this.language !== '' ? RDF.langString : XMLSchema.string)
-          break
-        case 'uri':
-          this.termType = 'NamedNode'
-          break
-        case 'bnode':
-          this.termType = 'BlankNode'
-          break
-        default: throw 'Unknown binding type ' + binding.type + ' for ' + binding
+      super(binding.value, binding.type === 'literal' ? 'Literal' : (binding.type === 'uri' ? 'NamedNode' : 'BlankNode'))
+      if (binding.type === 'literal') {
+        this.language = binding['xml:lang'] ? binding['xml:lang'] : ''
+        this.datatype = binding.datatype ? new NamedNode(binding.datatype) : (this.language !== '' ? RDF.langString : XMLSchema.string)
       }
     }
   }
@@ -150,11 +139,14 @@ namespace fibra {
   }
 
   export class DataFactory implements IDataFactory {
+
+    private nextBlankNodeId : number = 0
+
     public static instance: DataFactory = new DataFactory()
     public nodeFromBinding(binding: s.ISparqlBinding): INode { return new SparqlBindingNode(binding) }
     public nodeFromNode(other: ITerm): INode { return new NodeFromNode(other) }
     public namedNode(value: string): INamedNode { return new NamedNode(value) }
-    public blankNode(value?: string): IBlankNode { return new BlankNode(value) }
+    public blankNode(value?: string): IBlankNode { return new BlankNode(value ? value : ('b' + ++nextBlankNodeId)) }
     public literal(value: string, languageOrDatatype?: string|NamedNode): ILiteral {
       if (typeof(languageOrDatatype) === 'string') return new Literal(value, <string>languageOrDatatype)
       else return new Literal(value, undefined , <NamedNode>languageOrDatatype)

@@ -9,7 +9,7 @@ namespace fibra {
 
   m.run(($rootScope: angular.IRootScopeService, authService: angular.httpAuth.IAuthService, $http: angular.IHttpService) => {
     $rootScope.$on('main:auth-loginAuthInfo', (event: angular.IAngularEvent, authorization: string) => {
-      $http.defaults.headers.common['Authorization'] = authorization
+      $http.defaults.headers!.common['Authorization'] = authorization
       authService.loginConfirmed()
     })
   })

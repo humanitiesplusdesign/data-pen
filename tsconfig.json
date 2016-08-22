@@ -12,6 +12,7 @@
         "!app/bower_components/**/node_modules/**/*.ts",
         "!app/bower_components/**/typings/**/*.ts",
         "!app/bower_components/angular-ui-router/api/angular-ui-router.d.ts",
+        "node_modules/@types/**/*.d.ts",
         "typings/index.d.ts"
     ],
     "files": [
@@ -35,6 +36,7 @@
         "app/scripts/type-select-component.ts",
         "app/scripts/worker-service.ts",
         "app/bower_components/angular-sparql-service/dist/sparql-service.d.ts",
+        "node_modules/@types/d3/index.d.ts",
         "typings/index.d.ts"
     ],
     "atom": {
