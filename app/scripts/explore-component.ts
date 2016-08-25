@@ -1,12 +1,14 @@
 namespace fibra {
   'use strict'
 
-  interface WindowServiceWithD3 extends angular.IWindowService {
-    d3: any
+  interface IExploreComponentInterface extends angular.IComponentController {
   }
 
-  interface ExploreComponentInterface extends angular.IComponentController {
+  interface IExploreItem extends Item, d3.SimulationNodeDatum {
+  }
 
+  interface IExploreItemLink extends d3.SimulationLinkDatum<IExploreItem> {
+    property?: PropertyToValues
   }
 
   class ExploreComponentController {
@@ -15,20 +17,21 @@ namespace fibra {
     public selectedItem: INode
     public properties: {}[]
     public classTreePromise: angular.IPromise<TreeNode[]>
-    private svgSel: any
-    private d3: any
-    private links: {source:Item, target:Item}[]
-    private forceSim: any
+    private svgSel: d3.Selection<SVGSVGElement, {}, null, undefined>
+    private links: IExploreItemLink[]
+    private forceSim: d3.Simulation<IExploreItem, IExploreItemLink>
+
+    private drawmode: boolean = false
 
     public $postLink: () => void = () => {
-      this.svgSel = this.$window.d3.select(this.$element[0]).select('svg')
+      this.svgSel = d3.select(this.$element[0]).select<SVGSVGElement>('svg')
 
       // Create link g
-      this.svgSel.append('g').attr("class", "links")
+      this.svgSel.append('g').attr('class', 'links')
 
-      this.forceSim = this.d3.forceSimulation()
-        .force("charge", this.d3.forceCollide(20))
-        .force("link", this.d3.forceLink().distance(40).strength(1).iterations(1).id(function(d) {return d.index}))
+      this.forceSim = d3.forceSimulation<IExploreItem, IExploreItemLink>()
+        .force('charge', d3.forceCollide(20))
+        .force('link', d3.forceLink().distance(40).strength(1).iterations(1).id((d: IExploreItem) => '' + d.index))
 
       this.queryAndBuild()
     }
@@ -40,12 +43,10 @@ namespace fibra {
 
             // Merge items
             this.items = this.mergeItems(this.items, items)
-            this.properties = this.items[0].properties.map((p) => {
+            this.properties = this.items[0].properties.map(p => {
               return {key: p.toCanonical(), value: p.label.value }
             })
-            return this.$q.all(items.map((it) => {
-              return this.sparqlItemService.getItem(it)
-            })).then((its) => {
+            return this.$q.all(items.map(it => this.sparqlItemService.getItem(it))).then((its) => {
               this.links = this.mergeLinks(this.links, its)
             })
           }
@@ -56,71 +57,336 @@ namespace fibra {
       })
     }
 
-    private mergeItems(oldItems:Item[], newItems: Item[]): Item[] {
-      let items: Item[] = [].concat(oldItems)
-      let j, i: number
+    public updateExplore(): string {
 
-      for(i=0; i<oldItems.length; i++) {
-        for(j=0; j<newItems.length; j++) {
-          if(oldItems[i].value === newItems[j].value) {
-            break
+      // allow item_info_tip to expand somehow
+      // add delete and alter ability to sparql-item.pug
+      // fix how links sit on top of nodes
+      let viewport_width: number = window.innerWidth
+      let viewport_height: number = window.innerHeight
+      let searchbarwidth: number = +d3.select('#searchbar').style('width').replace('px', '')
+
+      d3.select('#explorecontainer').style('width', viewport_width + 'px')
+        .style('height', viewport_height - 36 + 'px')
+
+      d3.select('#searchbar').style('top', viewport_height * 6 / 7 + 'px')
+        .style('left', viewport_width / 2 - searchbarwidth / 2 + 'px')
+        .style('display', 'block')
+
+      // move table down so top is at bottom of viewport
+      d3.select('#exploretable').style('width', viewport_width + 'px')
+        .style('height', viewport_height - 50 + 'px')
+
+      this.svgSel.style('width', viewport_width + 'px')
+        .style('height', viewport_height - 36 + 'px')
+        // .style('top', 25 + 'px')
+
+      let svg_width: number = +this.svgSel.style('width').replace('px', '')
+      let svg_height: number = +this.svgSel.style('height').replace('px', '')
+
+      this.forceSim.force('center', d3.forceCenter(svg_width / 2, svg_height / 2))
+      this.forceSim.force('xposition', d3.forceX(svg_width / 2).strength(0.01))
+      this.forceSim.force('yposition', d3.forceY(svg_height / 2).strength(0.01))
+
+      let item_info_tip: d3.Selection<d3.BaseType, {}, HTMLElement, undefined> = d3.select('#right-column')
+
+      let radius: number = 8
+
+      let tooltip: d3.Selection<d3.BaseType, {}, HTMLElement, undefined> = d3.select('body').append('div')
+        .style('position', 'absolute')
+        .style('z-index', '20')
+        .style('background-color', 'gray')
+        .style('color', 'white')
+        .style('padding', '3px')
+        .style('border-radius', '2px')
+        .style('visibility', 'hidden')
+
+      let edittip: d3.Selection<d3.BaseType, {}, HTMLElement, undefined> = d3.select('body').append('div')
+        .attr('id', 'edittip')
+        .style('position', 'absolute')
+        .style('z-index', '40')
+        .style('background-color', 'white')
+        .style('color', 'gray')
+        .style('border', '1px solid gray')
+        .style('padding', '3px')
+        .style('border-radius', '2px')
+        .style('visibility', 'hidden')
+
+      this.svgSel.on('dblclick', () => {
+          edittip.style('top', (d3.event.pageY - 40) + 'px')
+                 .style('left', (d3.event.pageX - 40) + 'px')
+                 .style('visibility', 'visible')
+                 .html('Enter a label: <input type="text" name="label">')
+                 .append('circle')
+                 .attr('r', '4px')
+                 .attr('fill', 'red')
+      //    this.$scope.$apply(() => {
+      //      this.itemService.createNewItem([])
+      //      console.log(this.items)
+      //    })
+        })
+
+
+      let dragline: d3.Selection<SVGLineElement, {}, null, undefined>
+
+      let linked: d3.Selection<SVGLineElement, IExploreItemLink, SVGGElement, {}> = this.svgSel.select<SVGGElement>('g.links').selectAll<SVGLineElement, IExploreItemLink>('line')
+        .data(this.links)
+
+      linked.exit().remove()
+
+      let link: d3.Selection<SVGLineElement, IExploreItemLink, SVGGElement, {}> = linked
+        .enter().append<SVGLineElement>('line')
+          .attr('id', (d: IExploreItemLink, i: number) => 'link-' + i)
+      link = link.merge(linked)
+
+      let items: d3.Selection<d3.BaseType, {}, SVGSVGElement, {}> = this.svgSel.selectAll<SVGElement, IExploreItem>('circle').data(this.items, (d: Item) => d.value)
+      items.exit().remove()
+
+      let node: d3.Selection<d3.BaseType, {}, SVGSVGElement, {}> = items.enter().append('g')
+          .attr('id', (d, i: number) => 'node-' + i)
+          .attr('class', 'node')
+        .append('circle')
+          .attr('class', 'node-circle')
+          .attr('id', (d, i: number) => 'node-circle-' + i)
+          .style('stroke', 'black')
+          .attr('r', radius + 'px')
+          .call(d3.drag()
+              .on('start', (d: IExploreItem, i: number) => {
+                if (!this.drawmode) {
+                  if (!d3.event.active) this.forceSim.alphaTarget(.1).restart()
+                  console.log(d)
+                  d.fx = d.x
+                  d.fy = d.y
+                } else {
+                    dragline = this.svgSel.append<SVGLineElement>('line')
+                    .attr('class', 'dragLine')
+                }
+               })
+              .on('drag', (d: IExploreItem, i: number) => {
+                if (!this.drawmode) {
+                  d3.select('#node-circle-' + i).classed('fixed', true)
+                  d.fx = d3.event.x
+                  d.fy = d3.event.y
+                  if (d3.select('#node-circle-' + i).classed('selected-circle')) {
+                  item_info_tip.style('top', (d3.event.y + 30) + 'px')
+                  .style('left', (d3.event.x + 30) + 'px')
+                  }
+                } else {
+                  dragline.attr('x1', d.x!)
+                    .attr('y1', d.y!)
+                    .attr('x2', d3.event.x)
+                    .attr('y2', d3.event.y)
+                }
+               })
+              .on('end',  (d: IExploreItem, i: number) => {
+                if (!this.drawmode) {
+                  if (!d3.event.active) this.forceSim.alphaTarget(0)
+                  if (!d3.select('#node-circle-' + i).classed('fixed')) {
+                    d.fx = undefined
+                    d.fy = undefined
+                  }
+                } else {
+                  let lineX: string = dragline.attr('x2')
+                  let lineY: string = dragline.attr('y2')
+
+                  d3.selectAll('.node')
+                    .each((f: IExploreItem, j) => {
+                      if (Math.abs(+lineX - f.x) < radius && Math.abs(+lineY - f.y) < radius) {
+                        this.links.push({'source': d, 'target': f, 'property': undefined})
+                        dragline.remove()
+                        this.updateExplore()
+                      } else {
+                        dragline.remove()
+                      }
+                    })
+                }
+
+               }))
+          .on('mouseover', (d: IExploreItem, i: number) => {
+            this.highlightLinks(d, i)
+            tooltip.style('top', (d3.event.pageY - 10) + 'px')
+              .style('left', (d3.event.pageX + 10) + 'px')
+              .style('visibility', 'visible')
+              .text(d.label.value)
+          })
+          .on('mouseout', (d: IExploreItem, i: number) => {
+            d3.selectAll('line').classed('relevant', false)
+            tooltip.style('visibility', 'hidden')
+          })
+          .on('click', (d: IExploreItem, i) => {
+            d3.selectAll('.node').classed('selected-circle', false).attr('r', radius + 'px')
+            d3.select('#node-circle-' + i).classed('selected-circle', true).attr('r', '11px')
+            tooltip.style('visibility', 'hidden')
+            this.highlightLinks(d, i)
+
+            this.$scope.$apply(() => {
+             this.selectItem(d)
+           })
+
+            item_info_tip.style('top', (d3.event.pageY - 10) + 'px')
+            .style('left', (d3.event.pageX + 17) + 'px')
+            .style('visibility', 'visible')
+          })
+
+      node = node.merge(items)
+
+      let onTick: () => void = () => {
+
+        node
+          .attr('transform', (d: IExploreItem, i) => {
+            let x: number = d.x!, y: number = d.y!
+            if (d.x > svg_width - radius) x = svg_width - radius
+            if (d.x < radius) x = radius
+            if (d.y > svg_height - radius) y = svg_height - radius
+            if (d.y < radius) y = radius
+            return 'translate(' + x + ', ' + y + ')'
+          })
+
+        link
+          .attr('x1', (d: IExploreItemLink) => (<IExploreItem>d.source).x!)
+          .attr('y1', (d: IExploreItemLink) => (<IExploreItem>d.source).y!)
+          .attr('x2', (d: IExploreItemLink) => (<IExploreItem>d.target).x!)
+          .attr('y2', (d: IExploreItemLink) => (<IExploreItem>d.target).y!)
+      }
+
+      this.forceSim.nodes(this.items)
+        .on('tick', onTick)
+      this.forceSim
+        .force<d3.ForceLink<IExploreItem, IExploreItemLink>>('link').links(this.links)
+      this.forceSim.alpha(1).restart()
+
+      return 'ok'
+    }
+
+    // currently broken on deleting a link
+    public highlightLinks(d: IExploreItem, i: number): void {
+      d3.selectAll('line').classed('relevant', false)
+      for (let j: number = 0; j < this.links.length; j++) {
+        let linksource: IExploreItem = <IExploreItem>this.links[j].source
+        let linktarget: IExploreItem = <IExploreItem>this.links[j].target
+        if (linksource.index === i || linktarget.index === i)
+            d3.select('#link-' + j).classed('relevant', true)
+      }
+    }
+
+    public selectItem(id: INode): void {
+      this.selectedItem = id
+    }
+
+    // BUG: after deleting item, links think nodes are in old locations and stationary, items are not getting rebound to new nodes
+    public delete(id: INode): angular.IPromise<string> {
+
+      // remove any links from the item -
+      for (let i: number = 0; i < this.links.length; i++) {
+        if (this.links[i].source === id || this.links[i].target === id) {
+          this.links.splice(i, 1)
+        }
+      }
+      // might need more to fully clear svg of deleted links
+
+      let prom: angular.IPromise<string> = this.itemService.deleteItem(id)
+      prom.then(() => this.fibraService.dispatch('change'))
+      return prom
+    }
+
+    constructor(private $element: angular.IAugmentedJQuery,
+                private $window: angular.IWindowService,
+                private $scope: angular.IScope,
+                private $timeout: angular.ITimeoutService,
+                private sparqlItemService: SparqlItemService,
+                private fibraService: FibraService,
+                private $q: angular.IQService) {
+      this.fibraService.on('change', () => this.queryAndBuild())
+      this.itemService = sparqlItemService
+      this.links = []
+
+      // add shift to enable draw mode - this can easily be changed to require shift to be held
+      this.$window.addEventListener('keydown', (event) => {
+          if (document.activeElement instanceof HTMLBodyElement) {
+            if (event.keyCode === 16 ) {
+              this.drawmode = this.drawmode ? false : true
+              this.svgSel.style('background-color', this.drawmode ? '#d9d9d9' : '#F2F2F2')
+              if (this.drawmode) {
+              this.svgSel.append('text')
+                  .attr('id', 'drawmodetext')
+                  .html('Draw Mode engaged; to link two nodes, drag from one to the other')
+                  .style('stroke', 'red')
+                  .attr('y', 100)
+              } else {
+                d3.select('#drawmodetext').remove()
+                d3.selectAll('.dragLine').remove()
+              }
+            } else if (event.keyCode === 49) {
+              console.log(this.links)
+            } else if (event.keyCode === 50) {
+              console.log(this.items)
+            }
           }
+      })
+    }
+
+    private mergeItems(oldItems: Item[], newItems: Item[]): Item[] {
+      let items: Item[] = oldItems.concat([])
+      let j: number, i: number
+
+      for (i = 0; i < oldItems.length; i++) {
+        for (j = 0; j < newItems.length; j++) {
+          if (oldItems[i].value === newItems[j].value)
+            break
         }
 
-        if(j === newItems.length) {
+        if (j === newItems.length) {
           // Old item is not in new items. Remove.
-          items.splice(items.indexOf(oldItems[i]),1)
-        } 
+          items.splice(items.indexOf(oldItems[i]), 1)
+        }
       }
 
       // New item is not in old items. Add.
-      for(j=0; j<newItems.length; j++) {
-        for(i=0; i<oldItems.length; i++) {
-          if(oldItems[i].value === newItems[j].value) {
+      for (j = 0; j < newItems.length; j++) {
+        for (i = 0; i < oldItems.length; i++) {
+          if (oldItems[i].value === newItems[j].value)
             break
-          }
         }
 
-        if(i === oldItems.length) {
+        if (i === oldItems.length)
           items.push(newItems[j])
-        } 
       }
 
       return items
     }
 
-    private mergeLinks(oldLinks:any[], newItems:Item[]):any[] {
-      let newLinks: any[] = []
+    private mergeLinks(oldLinks: IExploreItemLink[], newItems: Item[]): IExploreItemLink[] {
+      let newLinks: IExploreItemLink[] = []
 
       // Build our external item -> internal item mapping array.
       // This is temporary until we manage additional properties internally
-      let internalItems: Item[] = [] 
-      for(let i = 0; i < newItems.length; i++) {
+      let internalItems: Item[] = []
+      for (let i: number = 0; i < newItems.length; i++) {
         internalItems[i] = this.items.filter((it) => {
-          return newItems[i].value === it.value 
+          return newItems[i].value === it.value
         })[0]
       }
 
       // First build our sameAs mapping from value -> Item
-      let sameAs = {}
-      for(let i = 0; i < newItems.length; i++) {
+      let sameAs: {} = {}
+      for (let i: number = 0; i < newItems.length; i++) {
         sameAs[newItems[i].value] = internalItems[i] ? internalItems[i] : newItems[i]
-        let sameAsProp = newItems[i].properties.filter((p) => {
-          return p.label.value === 'same As'
-        })[0]
-        if(sameAsProp && sameAsProp.values) {
+        let sameAsProp: PropertyToValues = newItems[i].properties.filter((p) =>
+          p.label.value === 'same As'
+        )[0]
+        if (sameAsProp && sameAsProp.values) {
           sameAsProp.values.forEach((n) => { sameAs[n.value] = internalItems[i] ? internalItems[i] : newItems[i] })
         }
       }
 
       // Iterate over item property values to see if they match the id of any
       // of the items displayed. Also check if they match sameAs values...
-      for(let i = 0; i < newItems.length; i++) {
+      for (let i: number = 0; i < newItems.length; i++) {
         newItems[i].properties.forEach((p) => {
           p.values.forEach((v) => {
-            if(sameAs[v.value] && internalItems[i]) {
+            if (sameAs[v.value] && internalItems[i]) {
               // Don't self-link
-              if(newItems[i] !== sameAs[v.value]) {
+              if (newItems[i] !== sameAs[v.value]) {
                 newLinks.push({
                   source: internalItems[i],
                   target: sameAs[v.value],
@@ -131,280 +397,8 @@ namespace fibra {
           })
         })
       }
-      
-      return newLinks;
-    }
 
-    private drawmode: boolean = false
-    public updateExplore(): string {
-
-      // allow item_info_tip to expand somehow
-      // add delete and alter ability to sparql-item.pug
-      //fix how links sit on top of nodes
-      let d3 = this.d3
-      let viewport_width = window.innerWidth
-      let viewport_height = window.innerHeight
-      let searchbarwidth =   d3.select("#searchbar").style("width").replace('px','')
-
-      d3.select("#explorecontainer").style('width', viewport_width + "px")
-        .style("height", viewport_height - 36 + "px")
-
-      // dbl click to add - incomplete/broken
-    this.svgSel.style('width', viewport_width + "px")
-        .style("height", viewport_height - 36 + "px")
-        // .style("top", 25 + "px")
-        .on("dblclick", () => {
-            edittip.style("top", (this.d3.event.pageY - 40)+"px")
-            .style("left", (this.d3.event.pageX - 40)+"px")
-            .style("visibility", "visible")
-            .html("Enter a label: <input type='text' name='label'>")
-            .append("circle").attr("r", "4px").attr("fill", "red")
-      //    this.$scope.$apply(() => {
-      //      this.itemService.createNewItem([]);
-      //      console.log(this.items)
-      //    })
-        });
-
-        d3.select("#searchbar").style("top", viewport_height * 6 / 7 + "px")
-          .style("left", viewport_width / 2 - searchbarwidth / 2 + "px")
-          .style("display", "block")
-
-      //move table down so top is at bottom of viewport
-      d3.select("#exploretable").style('width', viewport_width + "px")
-        .style("height", viewport_height - 50 + "px")
-
-      let svg_width = +this.svgSel.style('width').replace("px", "")
-      let svg_height = +this.svgSel.style('height').replace("px", "")
-
-      this.forceSim.force("center", this.d3.forceCenter(svg_width/2, svg_height/2))
-      this.forceSim.force("xposition", this.d3.forceX(svg_width/2).strength(0.01))
-      this.forceSim.force("yposition", this.d3.forceY(svg_height/2).strength(0.01))
-
-      let item_info_tip = d3.select("#right-column")
-
-      let radius = 8
-
-      let tooltip = d3.select("body").append("div")
-        .style("position", "absolute")
-        .style("z-index", "20")
-        .style("background-color", "gray")
-        .style("color", "white")
-        .style("padding", "3px")
-        .style("border-radius", "2px")
-        .style("visibility", "hidden")
-
-      let edittip = d3.select("body").append("div")
-        .attr("id", "edittip")
-        .style("position", "absolute")
-        .style("z-index", "40")
-        .style("background-color", "white")
-        .style("color", "gray")
-        .style("border", "1px solid gray")
-        .style("padding", "3px")
-        .style("border-radius", "2px")
-        .style("visibility", "hidden")
-
-      let dragline;
-
-      let linked = this.svgSel.select("g.links").selectAll("line")
-        .data(this.links)
-      
-      linked.exit().remove()
-
-      let link = linked
-        .enter().append("line")
-          .attr("id", (d,i) => {return "link-" + i})
-      link = link.merge(linked)
-
-      let items = this.svgSel.selectAll("circle").data(this.items, (d) =>  {return d.value })
-      items.exit().remove()
-
-      let node = items.enter().append("g")
-          .attr("id", (d,i) => {
-            return "node-" + i
-          })
-          .attr("class", "node")
-        .append("circle")
-          .attr("class", "node-circle")
-          .attr("id", (d,i) => { return "node-circle-" + i})
-          .style("stroke", "black")
-          .attr("r", radius + "px")
-          .call(d3.drag()
-              .on("start", (d,i) => {
-                if (!this.drawmode) {
-                  if (!d3.event.active) this.forceSim.alphaTarget(.1).restart()
-                    d.fx = d.x
-                    d.fy = d.y
-                } else {
-                    dragline = this.svgSel.append("line")
-                    .attr("class", "dragLine")
-                }
-               })
-              .on("drag", (d,i) => {
-                if (!this.drawmode) {
-                  d3.select("#node-circle-" + i).classed("fixed", true)
-                  d.fx = d3.event.x
-                  d.fy = d3.event.y
-                  if (d3.select("#node-circle-" + i).classed("selected-circle")) {
-                  item_info_tip.style("top", (d3.event.y + 30)+"px")
-                  .style("left", (d3.event.x + 30)+"px")
-                  }
-                } else {
-                    dragline.attr("x1", d.x)
-                    .attr("y1", d.y)
-                    .attr("x2", d3.event.x)
-                    .attr("y2", d3.event.y)
-                }
-               })
-              .on("end",  (d,i) => {
-                if (!this.drawmode) {
-                  if (!d3.event.active) this.forceSim.alphaTarget(0)
-                  if (!d3.select("#node-circle-" + i).classed("fixed")) {
-                    d.fx = null
-                    d.fy = null
-                  }
-                } else {
-                  let lineX = dragline.attr("x2")
-                  let lineY = dragline.attr("y2")
-
-                  d3.selectAll(".node")
-                    .each((f,j) => {
-                      if (Math.abs(lineX - f.x) < radius && Math.abs(lineY - f.y) < radius) {
-                        this.links.push({"source": d, "target": f})
-                        dragline.remove();
-                        this.updateExplore();
-                      } else {
-                        dragline.remove();
-                      }
-                    })
-                }
-
-               }))
-          .on("mouseover", (d,i) => {
-            this.hightlightLinks(d,i)
-              tooltip.style("top", (d3.event.pageY - 10)+"px")
-              .style("left", (d3.event.pageX + 10)+"px")
-              .style("visibility", "visible")
-              .text(d.label.value)
-          })
-          .on("mouseout", (d,i) => {
-            d3.selectAll("line").classed("relevant", false)
-            tooltip.style("visibility", "hidden")
-          })
-          .on('click', (d:INode, i) => {
-            d3.selectAll(".node").classed("selected-circle", false).attr("r", radius + "px")
-            this.d3.select("#node-circle-" + i).classed("selected-circle", true).attr("r", "11px")
-            tooltip.style("visibility", "hidden")
-            this.hightlightLinks(d, i)
-
-            this.$scope.$apply(() => {
-             this.selectItem(d)
-           })
-
-            item_info_tip.style("top", (d3.event.pageY -10)+"px")
-            .style("left", (this.d3.event.pageX + 17)+"px")
-            .style("visibility", "visible")
-          })
-
-      node = node.merge(items)
-
-      let onTick = function() {
-        
-        node
-          .attr("transform", (d,i) => {
-            let x = d.x, y = d.y
-            if (d.x > svg_width - radius) x = svg_width - radius
-            if (d.x < radius) x = radius
-            if (d.y > svg_height - radius) y = svg_height - radius
-            if (d.y < radius) y = radius
-            return "translate(" + x + ", " + y + ")"
-          })
-
-        link
-          .attr("x1", (d) => {return d.source.x})
-          .attr("y1", (d) => {return d.source.y})
-          .attr("x2", (d) => {return d.target.x})
-          .attr("y2", (d) => {return d.target.y})
-      }
-
-      this.forceSim.nodes(this.items)
-        .on("tick", onTick)
-      this.forceSim
-        .force("link").links(this.links)
-      this.forceSim.alpha(1).restart()
-
-      return 'ok'
-    }
-
-    // currently broken on deleting a link
-    public hightlightLinks(d, i):void {
-      this.d3.selectAll("line").classed("relevant", false)
-        for (let j = 0; j < this.links.length; j++) {
-            let linksource:any = this.links[j].source
-            let linktarget:any = this.links[j].target
-            if (linksource.index == i || linktarget.index == i) {
-                this.d3.select("#link-" + j).classed("relevant", true)
-        }
-      }
-    }
-
-    public selectItem(id: INode): void {
-      this.selectedItem = id
-    }
-
-    //BUG: after deleting item, links think nodes are in old locations and stationary, items are not getting rebound to new nodes
-    public delete(id: INode): angular.IPromise<string> {
-
-      // remove any links from the item -
-      for (let i = 0; i < this.links.length; i++) {
-        if (this.links[i].source == id || this.links[i].target == id) {
-          this.links.splice(i, 1)
-        }
-      }
-      // might need more to fully clear svg of deleted links
-
-      let prom = this.itemService.deleteItem(id)
-      prom.then(() => this.fibraService.dispatch('change'))
-      return prom
-    }
-
-    constructor(private $element: any,
-                private $window: WindowServiceWithD3,
-                private $scope: angular.IScope,
-                private $timeout: angular.ITimeoutService,
-                private sparqlItemService: SparqlItemService,
-                private fibraService: FibraService,
-                private $q: angular.IQService) {
-      this.fibraService.on('change', () => {
-        return this.queryAndBuild()
-      })
-      this.itemService = sparqlItemService
-      this.d3 = this.$window.d3
-      this.links = []
-
-      // add shift to enable draw mode - this can easily be changed to require shift to be held
-      this.$window.addEventListener('keydown', (event) => {
-          if (document.activeElement instanceof HTMLBodyElement) {
-            if (event.keyCode === 16 ) {
-              this.drawmode = this.drawmode ? false : true
-              this.svgSel.style("background-color", this.drawmode ? "#d9d9d9" : "#F2F2F2")
-              if (this.drawmode) {
-              this.svgSel.append("text")
-                  .attr("id", "drawmodetext")
-                  .html("Draw Mode engaged; to link two nodes, drag from one to the other")
-                  .style("stroke", "red")
-                  .attr("y", 100)
-              } else {
-                this.d3.select("#drawmodetext").remove()
-                this.d3.selectAll(".dragLine").remove()
-              }
-            } else if (event.keyCode === 49) {
-              console.log(this.links)
-            } else if (event.keyCode === 50) {
-              console.log(this.items)
-            }
-          }
-      })
+      return newLinks
     }
   }
 
