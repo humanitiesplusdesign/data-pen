@@ -1,6 +1,7 @@
 {
     "compilerOptions": {
         "module": "es6",
+        "moduleResolution": "node",
         "target": "es5",
         "rootDir": "app",
         "outDir": ".tmp",
@@ -9,11 +10,8 @@
     "filesGlob": [
         "app/scripts/**/*.ts",
         "app/bower_components/**/*.d.ts",
-        "!app/bower_components/**/node_modules/**/*.ts",
-        "!app/bower_components/**/typings/**/*.ts",
-        "!app/bower_components/angular-ui-router/api/angular-ui-router.d.ts",
         "node_modules/@types/**/*.d.ts",
-        "typings/index.d.ts"
+        "node_modules/d3-v4-definitelytyped/src/d3/*.d.ts"
     ],
     "files": [
         "app/scripts/app-configuration-common.ts",
@@ -36,8 +34,12 @@
         "app/scripts/type-select-component.ts",
         "app/scripts/worker-service.ts",
         "app/bower_components/angular-sparql-service/dist/sparql-service.d.ts",
-        "node_modules/@types/d3/index.d.ts",
-        "typings/index.d.ts"
+        "node_modules/@types/angular-http-auth/index.d.ts",
+        "node_modules/@types/angular-ui-router/index.d.ts",
+        "node_modules/@types/angular/index.d.ts",
+        "node_modules/@types/geojson/index.d.ts",
+        "node_modules/@types/jquery/index.d.ts",
+        "node_modules/d3-v4-definitelytyped/src/d3/index.d.ts"
     ],
     "atom": {
         "rewriteTsconfig": true

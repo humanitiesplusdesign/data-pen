@@ -2,8 +2,10 @@
   "name": "fibra",
   "version": "0.0.0",
   "devDependencies": {
-    "@types/d3": "0.0.31",
+    "@types/angular-http-auth": "^1.2.30",
+    "@types/angular-ui-router": "^1.1.32",
     "browser-sync": "^2.12.10",
+    "d3-v4-definitelytyped": "git+https://git@github.com/jiemakel/d3-v4-definitelytyped.git",
     "del": "^2.2.0",
     "gulp-autoprefixer": "^3.1.0",
     "gulp-batch": "^1.0.5",
@@ -43,7 +45,7 @@
     "require-dir": "^0.3.0",
     "run-sequence": "^1.2.1",
     "typedoc": "^0.4.4",
-    "typescript": "^2.1.0-dev.20160713",
+    "typescript": "^2.0.0",
     "uglify-save-license": "^0.4.1",
     "wiredep": "^4.0.0"
   },
@@ -51,6 +53,6 @@
     "node": ">=5.0.0"
   },
   "scripts": {
-    "postinstall": "bower install && typings install"
+    "postinstall": "bower install"
   }
 }
