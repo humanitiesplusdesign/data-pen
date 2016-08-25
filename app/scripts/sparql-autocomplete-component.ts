@@ -7,12 +7,12 @@ namespace fibra {
     public error: boolean = false
     public by: 'datasource' | 'group' = 'datasource'
     public query: string
-    public clearResults: () => void = () => {
-      this.results = []
-      this.query = ""
-    }
     private results: ResultGroup[]
     private canceller: angular.IDeferred<any>
+    public clearResults: () => void = () => {
+      this.results = []
+      this.query = ''
+    }
     public onChange: (query: string) => void = (query: string) => {
       this.canceller.resolve()
       this.canceller = this.$q.defer()

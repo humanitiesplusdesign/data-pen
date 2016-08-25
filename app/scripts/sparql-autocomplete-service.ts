@@ -90,15 +90,14 @@ SELECT ?groupId ?groupLabel ?id ?prefLabel ?matchedLabel ?sameAs ?altLabel { # A
         queryTemplate = queryTemplate.replace(/<LIMIT>/g, '' + limit)
         queryTemplate = queryTemplate.replace(/<PREFLANG>/g, this.configurationWorkerService.configuration.preferredLanguage)
         return this.sparqlService.query(endpointConfiguration.endpoint.value, queryTemplate, {timeout: canceller}).then(
-          (response) => response.data.results.bindings.forEach(binding => {
+          (response) => response.data!.results.bindings.forEach(binding => {
             let id: string = binding['id'].value
             if (binding['prefLabel']) {
               if (idToPrefLabel.has(id)) idToAltLabelSet.goc(id).add(idToPrefLabel.get(id))
-              idToPrefLabel.set(id, new SparqlBindingNode(binding['prefLabel']))
+              idToPrefLabel.set(id, DataFactory.instance.nodeFromBinding(binding['prefLabel']))
             }
             if (binding['altLabel'])
-              idToAltLabelSet.goc(id).add(new SparqlBindingNode(binding['prefLabel']))
-            console.log(binding)
+              idToAltLabelSet.goc(id).add(DataFactory.instance.nodeFromBinding(binding['altLabel']))
           })
         ).catch(() => undefined)
       })).then(() => {
