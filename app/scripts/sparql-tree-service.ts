@@ -39,7 +39,7 @@ SELECT ?subClass ?superClass ?class ?classLabel ?instances {
         (response: angular.IHttpPromiseCallbackArg<s.ISparqlBindingResult<{[id: string]: s.ISparqlBinding}>>) => {
           let parents: {[id: string]: {[id: string]: boolean}} = {}
           let classes: {[id: string]: TreeNode} = {}
-          response.data.results.bindings.forEach(binding => {
+          response.data!.results.bindings.forEach(binding => {
             if (binding['classLabel'])
               classes[binding['class'].value] = new TreeNode(binding['class'].value, binding['classLabel'].value)
             if (binding['instances'])

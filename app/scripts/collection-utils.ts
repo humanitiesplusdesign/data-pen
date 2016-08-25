@@ -1,7 +1,7 @@
 namespace fibra {
   'use strict'
 
-  export class EMap<V> implements d3.D3Map<V> {
+  export class EMap<V> implements d3.Map<V> {
 
     public s: {[id: string]: V} = {}
 
@@ -15,7 +15,7 @@ namespace fibra {
         this.set(key, create ? create(key) : this.create(key))
       return this.get(key)
     }
-    public set(key: string, value: V): EMap<V> {
+    public set(key: string, value: V): this {
       this.s[key] = value
       return this
     }
@@ -27,15 +27,15 @@ namespace fibra {
       delete this.s[key]
       return contained
     }
-    public sets(obj: {[id: string]: V}): EMap<V> {
+    public sets(obj: {[id: string]: V}): this {
       for (let key in obj) this.set(key, obj[key])
       return this
     }
-    public setm(obj: d3.D3Map<V>): EMap<V> {
+    public setm(obj: d3.Map<V>): this {
       for (let key in obj) this.set(key, obj[key])
       return this
     }
-    public clear(): EMap<V> {
+    public clear(): this {
       this.s = {}
       return this
     }
@@ -54,7 +54,7 @@ namespace fibra {
       for (let key in this.s) ret.push({ key, value: this.s[key] })
       return ret
     }
-    public each(func: (value: V, key: string, map: d3.D3Map<V>) => void): undefined {
+    public each(func: (value: V, key: string, map: EMap<V>) => void): undefined {
       for (let key in this.s)
         func(this.s[key], key, this)
       return undefined
@@ -71,7 +71,7 @@ namespace fibra {
     }
   }
 
-  export class StringSet implements d3.D3Set<string> {
+  export class StringSet implements d3.Set {
     public s: {[id: string]: string} = {}
     public clear(): StringSet {
       this.s = {}
@@ -80,11 +80,11 @@ namespace fibra {
     public has(key: string): boolean {
       return this.s[key] !== undefined
     }
-    public add(key: string): StringSet {
+    public add(key: string): this {
       this.s[key] = key
       return this
     }
-    public adda(arr: string[]): StringSet {
+    public adda(arr: string[]): this {
       arr.forEach(str => this.add(str))
       return this
     }
@@ -93,7 +93,7 @@ namespace fibra {
       delete this.s[key]
       return contained
     }
-    public each(func: (value: string, valueRepeat: string, set: d3.D3Set<string>) => void): undefined {
+    public each(func: (value: string, valueRepeat: string, set: StringSet) => void): undefined {
       for (let key in this.s)
         func(this.s[key], key, this)
       return undefined
@@ -126,7 +126,7 @@ namespace fibra {
         this.set(key, create ? create(key) : this.create(key))
       return this.get(key)
     }
-    public set(key: string, value: V): EOMap<V> {
+    public set(key: string, value: V): this {
       if (!this.has(key)) {
         super.set(key, value)
         this.a.push(value)
@@ -147,7 +147,7 @@ namespace fibra {
     public values(): V[] {
       return this.a
     }
-    public clear(): EOMap<V> {
+    public clear(): this {
       super.clear()
       this.a = []
       return this
@@ -157,7 +157,7 @@ namespace fibra {
   export class OStringSet extends StringSet {
     public a: string[] = []
 
-    public add(key: string): OStringSet {
+    public add(key: string): this {
       if (!this.has(key)) {
         super.add(key)
         this.a.push(key)

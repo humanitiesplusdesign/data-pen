@@ -25,44 +25,9 @@ namespace fibra {
     }
   }
 
-  export class SparqlBindingNode extends Node {
-    public termType: 'NamedNode' | 'BlankNode' | 'Literal'
-    constructor(binding: s.ISparqlBinding) {
-      super(binding.value, binding.type === 'literal' ? 'Literal' : (binding.type === 'uri' ? 'NamedNode' : 'BlankNode'))
-      if (binding.type === 'literal') {
-        this.language = binding['xml:lang'] ? binding['xml:lang'] : ''
-        this.datatype = binding.datatype ? new NamedNode(binding.datatype) : (this.language !== '' ? RDF.langString : XMLSchema.string)
-      }
-    }
-  }
-
-  export class NodeFromNode extends Node {
+   export class NodeFromNode extends Node {
     constructor(other: INode) {
       super(other.value, other.termType, other.language, other.datatype)
-    }
-  }
-
-  export class CanonicalNode extends Node {
-    public datatype: INamedNode
-    public language: string
-    constructor(id: string) {
-      super()
-      if (id.indexOf('<') === 0) {
-        this.termType = 'NamedNode'
-        this.value = id.substring(1, id.length - 1)
-      } else if (id.indexOf('_:') === 0) {
-        this.termType = 'BlankNode'
-        this.value = id.substring(2)
-      } else if (id.indexOf('"') === 0) {
-        this.termType = 'Literal'
-        this.value = id.substring(1, id.lastIndexOf('"'))
-        if (id.lastIndexOf('@') === id.lastIndexOf('"') + 1) {
-          this.language = id.substring(id.lastIndexOf('@'))
-          this.datatype = RDF.langString
-        } else if (id.lastIndexOf('^^<') === id.lastIndexOf('"') + 1)
-          this.datatype = new NamedNode(id.substring(id.lastIndexOf('^^<'), id.length - 1))
-        else this.datatype = XMLSchema.string
-      }
     }
   }
 
@@ -80,7 +45,6 @@ namespace fibra {
     public toCanonical(): string { return '?' + this.value }
   }
 
-
   export class NamedNode extends Node implements INamedNode {
     public termType: 'NamedNode'
     constructor(value: string) { super(value, 'NamedNode') }
@@ -95,6 +59,8 @@ namespace fibra {
 
   export class Literal extends Node implements ILiteral {
     public termType: 'Literal'
+    public language: string
+    public datatype: INamedNode
     constructor(value: string, language: string = '', datatype?: INamedNode) {
       super(value, 'Literal', language, datatype ? datatype : (language !== '' ? RDF.langString : XMLSchema.string))
     }
@@ -133,20 +99,46 @@ namespace fibra {
 
   export class Graph {
     constructor(
-      public graph?: INode,
+      public graph: INode,
       public triples: IQuad[] = []
     ) {}
   }
 
   export class DataFactory implements IDataFactory {
 
-    private nextBlankNodeId : number = 0
-
     public static instance: DataFactory = new DataFactory()
-    public nodeFromBinding(binding: s.ISparqlBinding): INode { return new SparqlBindingNode(binding) }
-    public nodeFromNode(other: ITerm): INode { return new NodeFromNode(other) }
+
+    private nextBlankNodeId: number = 0
+
+    public nodeFromBinding(binding: s.ISparqlBinding): INode {
+      let n: Node = new Node(binding.value, binding.type === 'literal' ? 'Literal' : (binding.type === 'uri' ? 'NamedNode' : 'BlankNode'))
+      if (binding.type === 'literal') {
+        n.language = binding['xml:lang'] ? binding['xml:lang'] : ''
+        n.datatype = binding.datatype ? new NamedNode(binding.datatype) : (n.language !== '' ? RDF.langString : XMLSchema.string)
+      }
+      return n
+    }
+
+    public nodeFromNode(other: ITerm): INode {
+      if (other.termType === 'Literal') return new Literal(other.value, (<ILiteral>other).language, (<ILiteral>other).datatype)
+      else return new Node(other.value, other.termType)
+    }
+    public nodeFromCanonicalRepresentation(id: string): INode {
+      if (id.indexOf('<') === 0)
+        return new NamedNode(id.substring(1, id.length - 1))
+      else if (id.indexOf('_:') === 0)
+        return new BlankNode(id.substring(2))
+      else {
+        let value: string = id.substring(1, id.lastIndexOf('"'))
+        if (id.lastIndexOf('@') === id.lastIndexOf('"') + 1)
+          return new Literal(value, id.substring(id.lastIndexOf('@')))
+        else if (id.lastIndexOf('^^<') === id.lastIndexOf('"') + 1)
+          return new Literal(value, '', new NamedNode(id.substring(id.lastIndexOf('^^<'), id.length - 1)))
+        else return new Literal(value)
+      }
+    }
     public namedNode(value: string): INamedNode { return new NamedNode(value) }
-    public blankNode(value?: string): IBlankNode { return new BlankNode(value ? value : ('b' + ++nextBlankNodeId)) }
+    public blankNode(value?: string): IBlankNode { return new BlankNode(value ? value : ('b' + ++this.nextBlankNodeId)) }
     public literal(value: string, languageOrDatatype?: string|NamedNode): ILiteral {
       if (typeof(languageOrDatatype) === 'string') return new Literal(value, <string>languageOrDatatype)
       else return new Literal(value, undefined , <NamedNode>languageOrDatatype)
@@ -203,7 +195,7 @@ namespace fibra {
       return this.map.remove(key.toCanonical())
     }
     public each(f: (value: V, key: INode, map: ENodeMap<V>) => void): void {
-      this.map.each((value, key, map) => f(value, new CanonicalNode(key), this))
+      this.map.each((value, key, map) => f(value, DataFactory.instance.nodeFromCanonicalRepresentation(key), this))
     }
     public has(key: INode): boolean {
       return this.map.has(key.toCanonical())
@@ -219,10 +211,10 @@ namespace fibra {
       return this.map.values()
     }
     public keys(): INode[] {
-      return this.map.keys().map(k => new CanonicalNode(k))
+      return this.map.keys().map(k => DataFactory.instance.nodeFromCanonicalRepresentation(k))
     }
     public entries(): {key: INode, value: V}[] {
-      return this.map.entries().map(o => { return { key: new CanonicalNode(o.key), value: o.value }})
+      return this.map.entries().map(o => { return { key: DataFactory.instance.nodeFromCanonicalRepresentation(o.key), value: o.value }})
     }
     public clear(): ENodeMap<V> {
       this.map.clear()

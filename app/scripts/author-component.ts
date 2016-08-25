@@ -16,7 +16,7 @@ namespace fibra {
       prefLabel.values.push(item.prefLabel)
       let type: PropertyToValues = new PropertyToValues(RDF.type)
       type.values.push(new NodePlusLabel(item.additionalInformation['type'][0], item.additionalInformation['typeLabel'][0]))
-      let prom = this.sparqlItemService.createNewItem(item.ids, [prefLabel, type])
+      let prom: angular.IPromise<INode> = this.sparqlItemService.createNewItem(item.ids, [prefLabel, type])
       prom.then(() => {
         this.fibraService.dispatch('change')
       })

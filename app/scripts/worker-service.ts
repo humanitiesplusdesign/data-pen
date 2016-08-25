@@ -201,17 +201,17 @@ namespace fibra {
     constructor(private workerServicePrototypeMappingConfiguration:  {[className: string]: Object}, private $injector: angular.auto.IInjectorService, private $q: angular.IQService, private $rootScope: angular.IRootScopeService) {}
     public onMessage(message: IMessage): void {
       if (message.id === undefined) {
-        this.$rootScope.$broadcast(message.name, this.restorePrototypes(message.args))
+        this.$rootScope.$broadcast(message.name!, this.restorePrototypes(message.args))
         this.$rootScope.$apply()
       } else if (message.cancel) {
         let canceller: angular.IDeferred<any> = this.cancellers[message.id];
         delete this.cancellers[message.id];
         if (canceller) canceller.resolve();
       } else {
-        let service: any = this.$injector.get(message.service)
+        let service: any = this.$injector.get(message.service!)
         let canceller: angular.IDeferred<any> = this.$q.defer();
         this.cancellers[message.id] = canceller;
-        let promise: any = service[message.method].apply(service, this.restorePrototypes(message.args).concat(canceller.promise))
+        let promise: any = service[message.method!].apply(service, this.restorePrototypes(message.args).concat(canceller.promise))
         if (!promise || !promise.then) {
           let deferred: angular.IDeferred<any> = this.$q.defer()
           deferred.resolve(promise)
@@ -219,15 +219,15 @@ namespace fibra {
         }
         promise.then(
           (success) => {
-            delete this.cancellers[message.id]
+            delete this.cancellers[message.id!]
             self.postMessage({event: 'success', id: message.id, data: WorkerService.savePrototypes(success)});
           },
           (error) => {
-            delete this.cancellers[message.id]
+            delete this.cancellers[message.id!]
             self.postMessage({event: 'failure', id: message.id, data: WorkerService.savePrototypes(WorkerWorkerService.stripFunctions(error))})
           },
           (update) => {
-            delete this.cancellers[message.id]
+            delete this.cancellers[message.id!]
             self.postMessage({event: 'update', id: message.id, data: WorkerService.savePrototypes(update)});
         })
       }

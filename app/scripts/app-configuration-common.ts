@@ -7,7 +7,7 @@ namespace fibra {
       'Object': Object.prototype,
       'Configuration': Configuration.prototype,
       'NamedNode': NamedNode.prototype,
-      'SparqlBindingNode': SparqlBindingNode.prototype,
+      'Node': Node.prototype,
       'DataModelConfiguration': DataModelConfiguration.prototype,
       'Item': Item.prototype,
       'PropertyToValues': PropertyToValues.prototype,

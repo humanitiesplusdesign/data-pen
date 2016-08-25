@@ -12,8 +12,10 @@ namespace fibra {
   }
 
   export class NodePlusLabel extends NodeFromNode implements INodePlusLabel {
-    constructor(public node: INode, public label: INode = undefined) {
+    public label: INode
+    constructor(public node: INode, label?: INode) {
       super(node)
+      if (label) this.label = label
     }
   }
 
@@ -172,18 +174,18 @@ WHERE {
         (response: angular.IHttpPromiseCallbackArg<s.ISparqlBindingResult<{[id: string]: s.ISparqlBinding}>>) => {
           let item: Item = new Item(id)
           let propertyMap: {[property: string]: PropertyToValues} = {}
-          for (let b of response.data.results.bindings) {
-            if (b['itemLabel']) item.label = new SparqlBindingNode(b['itemLabel'])
+          for (let b of response.data!.results.bindings) {
+            if (b['itemLabel']) item.label = DataFactory.instance.nodeFromBinding(b['itemLabel'])
             if (b['property']) {
               let propertyToValues: PropertyToValues = propertyMap[b['property'].value]
               if (!propertyToValues) {
-                propertyToValues = new PropertyToValues(new SparqlBindingNode(b['property']))
+                propertyToValues = new PropertyToValues(DataFactory.instance.nodeFromBinding(b['property']))
                 propertyMap[b['property'].value] = propertyToValues
-                if (b['propertyLabel']) propertyToValues.label = new SparqlBindingNode(b['propertyLabel'])
+                if (b['propertyLabel']) propertyToValues.label = DataFactory.instance.nodeFromBinding(b['propertyLabel'])
                 item.properties.push(propertyToValues)
               }
-              let oNode: NodePlusLabel = new NodePlusLabel(new SparqlBindingNode(b['object']))
-              if (b['objectLabel']) oNode.label = new SparqlBindingNode(b['objectLabel'])
+              let oNode: NodePlusLabel = new NodePlusLabel(DataFactory.instance.nodeFromBinding(b['object']))
+              if (b['objectLabel']) oNode.label = DataFactory.instance.nodeFromBinding(b['objectLabel'])
               propertyToValues.values.push(oNode)
             }
           }
@@ -198,18 +200,18 @@ WHERE {
         (response: angular.IHttpPromiseCallbackArg<s.ISparqlBindingResult<{[id: string]: s.ISparqlBinding}>>) => {
           let items: EOMap<Item> = new EOMap<Item>()
           let itemPropertyMap: ENodeMap<EOMap<PropertyToValues>> = new ENodeMap<EOMap<PropertyToValues>>(() => new EOMap<PropertyToValues>())
-          for (let b of response.data.results.bindings) {
-            let item: Item = items.goc(b['id'].value, () => new Item(new SparqlBindingNode(b['id'])))
-            if (b['itemLabel']) item.label = new SparqlBindingNode(b['itemLabel'])
+          for (let b of response.data!.results.bindings) {
+            let item: Item = items.goc(b['id'].value, () => new Item(DataFactory.instance.nodeFromBinding(b['id'])))
+            if (b['itemLabel']) item.label = DataFactory.instance.nodeFromBinding(b['itemLabel'])
             if (b['property']) {
               let propertyToValues: PropertyToValues = itemPropertyMap.goc(item).goc(b['property'].value, () => {
-                let propertyToValues: PropertyToValues = new PropertyToValues(new SparqlBindingNode(b['property']))
-                if (b['propertyLabel']) propertyToValues.label = new SparqlBindingNode(b['propertyLabel'])
+                let propertyToValues: PropertyToValues = new PropertyToValues(DataFactory.instance.nodeFromBinding(b['property']))
+                if (b['propertyLabel']) propertyToValues.label = DataFactory.instance.nodeFromBinding(b['propertyLabel'])
                 item.properties.push(propertyToValues)
                 return propertyToValues
               })
-              let oNode: NodePlusLabel = new NodePlusLabel(new SparqlBindingNode(b['object']))
-              if (b['objectLabel']) oNode.label = new SparqlBindingNode(b['objectLabel'])
+              let oNode: NodePlusLabel = new NodePlusLabel(DataFactory.instance.nodeFromBinding(b['object']))
+              if (b['objectLabel']) oNode.label = DataFactory.instance.nodeFromBinding(b['objectLabel'])
               propertyToValues.values.push(oNode)
             }
           }
