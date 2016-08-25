@@ -5,13 +5,12 @@
 ### Prequisites
 
  1. Make sure you have [Node.js](https://nodejs.org/en/) installed (for example using [nvm](https://github.com/creationix/nvm)).
- 1. Make sure you have [Typings](https://github.com/typings/typings) installed (`npm install -g typings`)
  1. Make sure you have [Bower](http://bower.io/) installed (`npm install -g bower`)
  1. Make sure you have [Gulp](http://gulpjs.com/) installed (`npm install -g gulp`)
 
 ### Setting up the build environment
 
-Run `npm install`. This should also automatically run `typings install` and `bower install`, but if it doesn't, run those yourself.
+Run `npm install`. This should also automatically run `bower install`, but if it doesn't, run that yourself.
 
 ### Building
 
