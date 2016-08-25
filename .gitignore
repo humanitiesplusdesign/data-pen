@@ -3,5 +3,4 @@ dist
 docs
 .tmp
 app/bower_components
-typings
 .publish
