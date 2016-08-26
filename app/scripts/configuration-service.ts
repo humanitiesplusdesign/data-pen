@@ -68,7 +68,7 @@ namespace fibra {
         // not yet loaded new EndpointConfiguration('lcnames', 'LC Names', new NamedNode('http://ldf.fi/lcnames/sparql'))
       ]
       let emloConfiguration: EndpointConfiguration = new EndpointConfiguration('emlo', 'EMLO', new NamedNode('http://ldf.fi/emlo/sparql'), [CIDOC.Person, CIDOC.Place, CIDOC.Group])
-      emloConfiguration.autocompletionTextMatchQueryTemplate = emloConfiguration.autocompletionTextMatchQueryTemplate.replace(/# ADDITIONALCONSTRUCT/g, '?id fibra:ifpWikipediaPage ?ifpWikipediaPage . ?id fibra:ifpODBNId ?ifpODBNId .').replace(/# ADDITIONALSELECT/g, `
+      emloConfiguration.autocompletionTextMatchQueryTemplate = emloConfiguration.autocompletionTextMatchQueryTemplate.replace(/\{ # ADDITIONALVARIABLES/g, '?ifpWikipediaPage ?ifpODBNId {').replace(/# ADDITIONALSELECT/g, `
 UNION {
   {
     ?id <http://emlo.bodleian.ox.ac.uk/schema#cofk_union_relationship_type-is_related_to> ?ref .
@@ -81,16 +81,16 @@ UNION {
   }
 }`)
       let sdfbConfiguration: EndpointConfiguration = new EndpointConfiguration('sdfb', 'Six Degrees of Francis Bacon', new NamedNode('http://ldf.fi/sdfb/sparql'), [CIDOC.Person, CIDOC.Place, CIDOC.Group])
-      sdfbConfiguration.autocompletionTextMatchQueryTemplate = sdfbConfiguration.autocompletionTextMatchQueryTemplate.replace(/# ADDITIONALCONSTRUCT/g, '?id fibra:ifpWikipediaPage ?ifpWikipediaPage .').replace(/# ADDITIONALSELECT/g, `
+      sdfbConfiguration.autocompletionTextMatchQueryTemplate = sdfbConfiguration.autocompletionTextMatchQueryTemplate.replace(/\{ # ADDITIONALVARIABLES/g, '?ifpODBNId {').replace(/# ADDITIONALSELECT/g, `
 UNION {
-  ?id <http://ldf.fi/procope-schema#wikipediaUrl> ?ref .
-  BIND(IRI(?ref) AS ?ifpWikipediaPage)
+  ?id <http://ldf.fi/sdfb/schema#odbnId> ?ifpODBNId .
 }
 `)
       let procopeConfiguration: EndpointConfiguration = new EndpointConfiguration('procope', 'Procope', new NamedNode('http://ldf.fi/procope/sparql'), [CIDOC.Person, CIDOC.Place, CIDOC.Group])
-      procopeConfiguration.autocompletionTextMatchQueryTemplate = procopeConfiguration.autocompletionTextMatchQueryTemplate.replace(/# ADDITIONALCONSTRUCT/g, '?id fibra:ifpODBNId ?ifpODBNId .').replace(/# ADDITIONALSELECT/g, `
+      procopeConfiguration.autocompletionTextMatchQueryTemplate = procopeConfiguration.autocompletionTextMatchQueryTemplate.replace(/\{ # ADDITIONALVARIABLES/g, '?ifpWikipediaPage {').replace(/# ADDITIONALSELECT/g, `
 UNION {
-  ?id <http://ldf.fi/sdfb/schema#odbnId> ?ifpODBNId .
+  ?id <http://ldf.fi/procope-schema#wikipediaUrl> ?ref .
+  BIND(IRI(?ref) AS ?ifpWikipediaPage)
 }
 `)
       c.archiveEndpoints = [
