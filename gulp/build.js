@@ -47,6 +47,12 @@ gulp.task('clean', function(cb){
   return require('del')(['.tmp', 'dist'], cb);
 });
 
+gulp.task('lint', function() {
+  return gulp.src('app/scripts/**/*.ts')
+    .pipe($.tslint({ formatter: 'verbose' }))
+    .pipe($.tslint.report())
+})
+
 gulp.task('build', function(cb){
   return require('run-sequence')('clean', 'wire', ['templates', 'styles', 'scripts'], cb);
 });
