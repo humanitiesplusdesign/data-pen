@@ -88,6 +88,10 @@ namespace fibra {
       arr.forEach(str => this.add(str))
       return this
     }
+    public adds(oset: d3.Set): this {
+      oset.each(str => this.add(str))
+      return this
+    }
     public remove(key: string): boolean {
       let contained: boolean = this.has(key)
       delete this.s[key]

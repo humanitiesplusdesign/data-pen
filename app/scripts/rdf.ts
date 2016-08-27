@@ -237,6 +237,14 @@ namespace fibra {
       this.m.set(value, value)
       return this
     }
+    public adda(arr: N[]): this {
+      arr.forEach(n => this.add(n))
+      return this
+    }
+    public adds(oset: NodeSet<N>): this {
+      oset.each(n => this.add(n))
+      return this
+    }
     public has(value: N): boolean {
       return this.m.has(value)
     }
