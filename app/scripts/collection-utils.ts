@@ -71,9 +71,53 @@ namespace fibra {
     }
   }
 
+  export class IdentitySet<V> {
+    public a: V[] = []
+    public clear(): this {
+      this.a = []
+      return this
+    }
+    public has(key: V): boolean {
+      return this.a.indexOf(key) !== -1
+    }
+    public add(key: V): this {
+      if (this.has(key)) return this
+      this.a.push(key)
+      return this
+    }
+    public adda(arr: V[]): this {
+      arr.forEach(v => this.add(v))
+      return this
+    }
+    public adds(oset: IdentitySet<V>): this {
+      oset.each(v => this.add(v))
+      return this
+    }
+    public remove(key: V): boolean {
+      let index: number = this.a.indexOf(key)
+      if (index === -1) return false
+      this.a.splice(index, 1)
+      return true
+    }
+    public each(func: (value: V, valueRepeat: V, set: IdentitySet<V>) => void): undefined {
+      for (let value of this.a)
+        func(value, value, this)
+      return undefined
+    }
+    public size(): number {
+      return this.a.length
+    }
+    public empty(): boolean {
+      return this.size() === 0
+    }
+    public values(): V[] {
+      return this.a
+    }
+  }
+
   export class StringSet implements d3.Set {
     public s: {[id: string]: string} = {}
-    public clear(): StringSet {
+    public clear(): this {
       this.s = {}
       return this
     }
@@ -180,7 +224,7 @@ namespace fibra {
     public values(): string[] {
       return this.a
     }
-    public clear(): OStringSet {
+    public clear(): this {
       super.clear()
       this.a = []
       return this

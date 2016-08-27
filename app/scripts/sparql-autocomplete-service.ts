@@ -77,7 +77,7 @@ SELECT ?groupId ?groupLabel ?id ?prefLabel ?matchedLabel ?sameAs ?altLabel { # A
       let idToPrefLabelSet: EMap<ONodeSet<INode>> = new EMap<ONodeSet<INode>>(() => new ONodeSet<INode>())
       let idToMatchedLabelSet: EMap<ONodeSet<INode>> = new EMap<ONodeSet<INode>>(() => new ONodeSet<INode>())
       let idToAltLabelSet: EMap<ONodeSet<INode>> = new EMap<ONodeSet<INode>>(() => new ONodeSet<INode>())
-      let idToDatasourceSet: EMap<EndpointConfiguration[]> = new EMap<EndpointConfiguration[]>(() => [])
+      let idToDatasourceSet: EMap<IdentitySet<EndpointConfiguration>> = new EMap<IdentitySet<EndpointConfiguration>>(() => new IdentitySet<EndpointConfiguration>())
       return this.$q.all(this.configurationWorkerService.configuration.allEndpoints().map(endpointConfiguration => {
         let queryTemplate: string = endpointConfiguration.autocompletionTextMatchQueryTemplate
         queryTemplate = queryTemplate.replace(/<QUERY>/g, s.SparqlService.stringToSPARQLString(query))
@@ -87,8 +87,7 @@ SELECT ?groupId ?groupLabel ?id ?prefLabel ?matchedLabel ?sameAs ?altLabel { # A
         return this.sparqlService.query(endpointConfiguration.endpoint.value, queryTemplate, {timeout: canceller}).then(
           (response) => response.data!.results.bindings.forEach(binding => {
             let id: string = binding['id'].value
-            let datasourceSet: EndpointConfiguration[] = idToDatasourceSet.goc(id)
-            if (datasourceSet.indexOf(endpointConfiguration) === -1) datasourceSet.push(endpointConfiguration)
+            idToDatasourceSet.goc(id).add(endpointConfiguration)
             if (binding['prefLabel'])
               idToPrefLabelSet.goc(id).add(DataFactory.instance.nodeFromBinding(binding['prefLabel']))
             if (binding['altLabel'])
@@ -117,10 +116,10 @@ SELECT ?groupId ?groupLabel ?id ?prefLabel ?matchedLabel ?sameAs ?altLabel { # A
             if (idSet !== oidSet) {
               idToIdSet.set(oid, idSet)
               idSet.adds(oidSet)
-              let datasourceSet: EndpointConfiguration[] = idToDatasourceSet.get(id)
-              let oDatasourceSet: EndpointConfiguration[] = idToDatasourceSet.get(oid)
+              let datasourceSet: IdentitySet<EndpointConfiguration> = idToDatasourceSet.get(id)
+              let oDatasourceSet: IdentitySet<EndpointConfiguration> = idToDatasourceSet.get(oid)
               if (datasourceSet) {
-                if (oDatasourceSet) for (let ds of oDatasourceSet) if (datasourceSet.indexOf(ds) === -1) datasourceSet.push(ds)
+                if (oDatasourceSet) datasourceSet.adds(oDatasourceSet)
                 idToDatasourceSet.set(oid, datasourceSet)
               } else if (oDatasourceSet) idToDatasourceSet.set(id, oDatasourceSet)
               let groupIdSet: StringSet = idToGroupIdSet.get(id)
@@ -156,7 +155,7 @@ SELECT ?groupId ?groupLabel ?id ?prefLabel ?matchedLabel ?sameAs ?altLabel { # A
         idToIdSet.each((idSet: StringSet, id: string) => {
           if (!seen.has(id)) {
             seen.add(id)
-            let result: Result = new Result(idSet.values().map(oid => DataFactory.instance.namedNode(oid)), idToDatasourceSet.get(id), idToMatchedLabelSet.get(id).values()[0], idToPrefLabelSet.get(id).values()[0])
+            let result: Result = new Result(idSet.values().map(oid => DataFactory.instance.namedNode(oid)), idToDatasourceSet.get(id).values(), idToMatchedLabelSet.get(id).values()[0], idToPrefLabelSet.get(id).values()[0])
             if (idToAltLabelSet.has(id)) result.additionalInformation['altLabel'] = idToAltLabelSet.get(id).values()
             idToGroupIdSet.get(id).each(gid => {
               let resultGroup: ResultGroup = groupIdToGroup.get(gid)
