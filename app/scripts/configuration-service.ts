@@ -18,12 +18,16 @@ namespace fibra {
         allEndpoints.push(this.primaryEndpoint)
         return allEndpoints
       }
+      public remoteEndpoints(): EndpointConfiguration[] {
+        return this.archiveEndpoints.concat(this.authorityEndpoints)
+      }
     }
 
     export class EndpointConfiguration {
       public autocompletionTextMatchQueryTemplate: string = SparqlAutocompleteService.defaultMatchQueryTemplate
       public treeQueryTemplate: string = SparqlTreeService.getClassTreeQuery
-      public itemQueryTemplate: string = SparqlItemService.getItemPropertiesQuery
+      public localItemQueryTemplate: string = SparqlItemService.getLocalItemPropertiesQuery
+      public remoteItemQueryTemplate: string = SparqlItemService.getRemoteItemPropertiesQuery
       public dataModelConfiguration: DataModelConfiguration = new DataModelConfiguration()
       constructor(public id: string, public title: string, public endpoint: INode, selectedTypes: INode[] = []) {
         this.dataModelConfiguration.setSelectedTypes(selectedTypes)

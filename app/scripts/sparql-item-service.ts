@@ -4,7 +4,7 @@ namespace fibra {
   import s = fi.seco.sparql
 
   export interface ISourcedNode extends INode {
-    sourceEndpoints: string[]
+    sourceEndpoints: EndpointConfiguration[]
   }
 
   export interface INodePlusLabel extends INode {
@@ -19,20 +19,25 @@ namespace fibra {
     }
   }
 
-  export interface IPropertyToValues extends INodePlusLabel {
-    values: (INode|NodePlusLabel)[]
+  export interface IPropertyToValues<T extends INode> extends INodePlusLabel {
+    values: T[]
   }
 
-  export class PropertyToValues extends NodePlusLabel {
-    public values: (INode|NodePlusLabel)[] = []
+  export class PropertyToValues<T extends INode> extends NodePlusLabel implements IPropertyToValues<T> {
+    public values: T[] = []
     constructor(property: INode) {
       super(property)
     }
   }
 
+  export class SourcePlusProperties {
+    public properties: PropertyToValues<INodePlusLabel>[] = []
+    constructor(public source: EndpointConfiguration) {}
+  }
+
   export class Item extends NodePlusLabel {
-    public properties: PropertyToValues[] = []
-    public inverseProperties: PropertyToValues[] = []
+    public properties: SourcePlusProperties[] = []
+    public inverseProperties: SourcePlusProperties[] = []
   }
 
   export interface IConstraint {
@@ -56,18 +61,89 @@ namespace fibra {
     public static schemaGraph: INode = new NamedNode(SparqlItemService.ns + 'schema#')
     public static instanceGraph: INode = new NamedNode(SparqlItemService.ns + 'main/')
 
-    public static getItemPropertiesQuery: string = `
+    public static getLocalItemPropertiesQuery: string = `
 PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX owl: <http://www.w3.org/2002/07/owl#>
 PREFIX sf: <http://ldf.fi/functions#>
-SELECT ?serviceId ?service ?itemLabel ?property ?propertyLabel ?object ?objectLabel {
-  <ID> owl:sameAs* ?id .
-  VALUES (?serviceId ?service) {
-    (<SERVICES>)
+SELECT ?itemLabel ?property ?propertyLabel ?object ?objectLabel {
+  {
+    <ID> sf:preferredLanguageLiteral (skos:prefLabel rdfs:label skos:altLabel 'en' '' ?itemLabel) .
+  } UNION {
+    <ID> ?property ?object .
+    OPTIONAL {
+      ?property sf:preferredLanguageLiteral (skos:prefLabel rdfs:label skos:altLabel 'en' '' ?propertyLabelP)
+    }
+    BIND(COALESCE(?propertyLabelP,REPLACE(REPLACE(REPLACE(REPLACE(STR(?property),".*/",""),".*#",""),"_"," "),"([A-ZÅÄÖ])"," $1")) AS ?propertyLabel)
+    OPTIONAL {
+      ?object sf:preferredLanguageLiteral (skos:prefLabel rdfs:label skos:altLabel 'en' '' ?objectLabelP) .
+    }
+    BIND (IF(ISIRI(?object),COALESCE(?objectLabelP,REPLACE(REPLACE(REPLACE(REPLACE(STR(?object),".*/",""),".*#",""),"_"," "),"([A-ZÅÄÖ])"," $1")),?object) AS ?objectLabel)
   }
-  SERVICE ?service {
+}`
+    public static getItemInversePropertiesQuery: string = `
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX owl: <http://www.w3.org/2002/07/owl#>
+PREFIX sf: <http://ldf.fi/functions#>
+SELECT ?property ?propertyLabel ?object ?objectLabel {
+  VALUES ?id { <IDS> }
+  ?object ?property ?id .
+  ?id ?property ?object .
+  OPTIONAL {
+    ?property sf:preferredLanguageLiteral (skos:prefLabel rdfs:label skos:altLabel 'en' '' ?propertyLabelP)
+  }
+  BIND(COALESCE(?propertyLabelP,REPLACE(REPLACE(REPLACE(REPLACE(STR(?property),".*/",""),".*#",""),"_"," "),"([A-ZÅÄÖ])"," $1")) AS ?propertyLabel)
+  OPTIONAL {
+    ?object sf:preferredLanguageLiteral (skos:prefLabel rdfs:label skos:altLabel 'en' '' ?objectLabelP) .
+  }
+  BIND (IF(ISIRI(?object),COALESCE(?objectLabelP,REPLACE(REPLACE(REPLACE(REPLACE(STR(?object),".*/",""),".*#",""),"_"," "),"([A-ZÅÄÖ])"," $1")),?object) AS ?objectLabel)
+}
+`
+    public static getRemoteItemPropertiesQuery: string = `
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX owl: <http://www.w3.org/2002/07/owl#>
+PREFIX sf: <http://ldf.fi/functions#>
+SELECT ?property ?propertyLabel ?object ?objectLabel {
+  VALUES ?id { <IDS> }
+  ?id ?property ?object .
+  OPTIONAL {
+    ?property sf:preferredLanguageLiteral (skos:prefLabel rdfs:label skos:altLabel 'en' '' ?propertyLabelP)
+  }
+  BIND(COALESCE(?propertyLabelP,REPLACE(REPLACE(REPLACE(REPLACE(STR(?property),".*/",""),".*#",""),"_"," "),"([A-ZÅÄÖ])"," $1")) AS ?propertyLabel)
+  OPTIONAL {
+    ?object sf:preferredLanguageLiteral (skos:prefLabel rdfs:label skos:altLabel 'en' '' ?objectLabelP) .
+  }
+  BIND (IF(ISIRI(?object),COALESCE(?objectLabelP,REPLACE(REPLACE(REPLACE(REPLACE(STR(?object),".*/",""),".*#",""),"_"," "),"([A-ZÅÄÖ])"," $1")),?object) AS ?objectLabel)
+}
+`
+    public static getItemsForExploreQuery: string = `
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX owl: <http://www.w3.org/2002/07/owl#>
+PREFIX sf: <http://ldf.fi/functions#>
+SELECT ?id ?itemLabel ?property ?propertyLabel ?object ?objectLabel {
+  ?id a ?type .
+  {
+    ?id owl:sameAs ?oid .
+    VALUES ?service {
+      <SERVICES>
+    }
+    SERVICE ?service {
+      ?oid ?property ?object .
+      OPTIONAL {
+        ?property sf:preferredLanguageLiteral (skos:prefLabel rdfs:label skos:altLabel 'en' '' ?propertyLabelP)
+      }
+      BIND(COALESCE(?propertyLabelP,REPLACE(REPLACE(REPLACE(REPLACE(STR(?property),".*/",""),".*#",""),"_"," "),"([A-ZÅÄÖ])"," $1")) AS ?propertyLabel)
+      OPTIONAL {
+        ?object sf:preferredLanguageLiteral (skos:prefLabel rdfs:label skos:altLabel 'en' '' ?objectLabelP) .
+      }
+      BIND (IF(ISIRI(?object),COALESCE(?objectLabelP,REPLACE(REPLACE(REPLACE(REPLACE(STR(?object),".*/",""),".*#",""),"_"," "),"([A-ZÅÄÖ])"," $1")),?object) AS ?objectLabel)
+    }
+  } UNION {
     ?id sf:preferredLanguageLiteral (skos:prefLabel rdfs:label skos:altLabel 'en' '' ?itemLabel) .
+  } UNION {
     ?id ?property ?object .
     OPTIONAL {
       ?property sf:preferredLanguageLiteral (skos:prefLabel rdfs:label skos:altLabel 'en' '' ?propertyLabelP)
@@ -78,26 +154,6 @@ SELECT ?serviceId ?service ?itemLabel ?property ?propertyLabel ?object ?objectLa
     }
     BIND (IF(ISIRI(?object),COALESCE(?objectLabelP,REPLACE(REPLACE(REPLACE(REPLACE(STR(?object),".*/",""),".*#",""),"_"," "),"([A-ZÅÄÖ])"," $1")),?object) AS ?objectLabel)
   }
-}
-`
-
-    public static getAllItemPropertiesQuery: string = `
-PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
-PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-PREFIX owl: <http://www.w3.org/2002/07/owl#>
-PREFIX sf: <http://ldf.fi/functions#>
-SELECT ?id ?itemLabel ?property ?propertyLabel ?object ?objectLabel {
-  ?id a ?type .
-  ?id sf:preferredLanguageLiteral (skos:prefLabel rdfs:label skos:altLabel 'en' '' ?itemLabel) .
-  ?id ?property ?object .
-  OPTIONAL {
-    ?property sf:preferredLanguageLiteral (skos:prefLabel rdfs:label skos:altLabel 'en' '' ?propertyLabelP)
-  }
-  BIND(COALESCE(?propertyLabelP,REPLACE(REPLACE(REPLACE(REPLACE(STR(?property),".*/",""),".*#",""),"_"," "),"([A-ZÅÄÖ])"," $1")) AS ?propertyLabel)
-  OPTIONAL {
-    ?object sf:preferredLanguageLiteral (skos:prefLabel rdfs:label skos:altLabel 'en' '' ?objectLabelP) .
-  }
-  BIND (IF(ISIRI(?object),COALESCE(?objectLabelP,REPLACE(REPLACE(REPLACE(REPLACE(STR(?object),".*/",""),".*#",""),"_"," "),"([A-ZÅÄÖ])"," $1")),?object) AS ?objectLabel)
 }
 `
 
@@ -145,15 +201,15 @@ WHERE {
       return this.workerService.call('sparqlItemWorkerService', 'getItem', [id], canceller)
     }
 
-    public getAllItems(canceller?: angular.IPromise<any>): angular.IPromise<Item[]> {
-      return this.workerService.call('sparqlItemWorkerService', 'getAllItems', [], canceller)
+    public getItemsForExplore(canceller?: angular.IPromise<any>): angular.IPromise<Item[]> {
+      return this.workerService.call('sparqlItemWorkerService', 'getItemsForExplore', [], canceller)
     }
 
-    public createNewItem(equivalentNodes: INode[] = [], properties: IPropertyToValues[] = []): angular.IPromise<INode> {
+    public createNewItem(equivalentNodes: INode[] = [], properties: IPropertyToValues<INode>[] = []): angular.IPromise<INode> {
       return this.workerService.call('sparqlItemWorkerService', 'createNewItem', [equivalentNodes, properties])
     }
 
-    public alterItem(id: INode, propertiesToAdd: IPropertyToValues[], propertiesToRemove: IPropertyToValues[] = []): angular.IPromise<string> {
+    public alterItem(id: INode, propertiesToAdd: IPropertyToValues<INode>[], propertiesToRemove: IPropertyToValues<INode>[] = []): angular.IPromise<string> {
       return this.workerService.call('sparqlItemWorkerService', 'alterItem', [id, propertiesToAdd, propertiesToRemove])
     }
 
@@ -167,53 +223,46 @@ WHERE {
     constructor(private sparqlService: s.SparqlService, private $q: angular.IQService, private sparqlUpdateWorkerService: SparqlUpdateWorkerService, private configurationWorkerService: ConfigurationWorkerService) {}
 
     public getItem(id: INode, canceller?: angular.IPromise<any>): angular.IPromise<Item> {
-      let queryTemplate: string = SparqlItemService.getItemPropertiesQuery
+      let queryTemplate: string = this.configurationWorkerService.configuration.primaryEndpoint.localItemQueryTemplate
       queryTemplate = queryTemplate.replace(/<ID>/g, id.toCanonical())
-      queryTemplate = queryTemplate.replace(/\(<SERVICES>\)/g, this.configurationWorkerService.configuration.allEndpoints().map(c => '(' + s.SparqlService.stringToSPARQLString(c.id) + c.endpoint.toCanonical() + ')').join(''))
+      let item: Item = new Item(id)
+      item.properties = this.configurationWorkerService.configuration.allEndpoints().map(e => new SourcePlusProperties(e))
       return this.sparqlService.query(this.configurationWorkerService.configuration.primaryEndpoint.endpoint.value, queryTemplate, {timeout: canceller}).then(
         (response: angular.IHttpPromiseCallbackArg<s.ISparqlBindingResult<{[id: string]: s.ISparqlBinding}>>) => {
-          let item: Item = new Item(id)
-          let propertyMap: {[property: string]: PropertyToValues} = {}
+          let propertyMap: EMap<PropertyToValues<INodePlusLabel>> = new EMap<PropertyToValues<INodePlusLabel>>()
           for (let b of response.data!.results.bindings) {
             if (b['itemLabel']) item.label = DataFactory.instance.nodeFromBinding(b['itemLabel'])
-            if (b['property']) {
-              let propertyToValues: PropertyToValues = propertyMap[b['property'].value]
-              if (!propertyToValues) {
-                propertyToValues = new PropertyToValues(DataFactory.instance.nodeFromBinding(b['property']))
-                propertyMap[b['property'].value] = propertyToValues
-                if (b['propertyLabel']) propertyToValues.label = DataFactory.instance.nodeFromBinding(b['propertyLabel'])
-                item.properties.push(propertyToValues)
-              }
-              let oNode: NodePlusLabel = new NodePlusLabel(DataFactory.instance.nodeFromBinding(b['object']))
-              if (b['objectLabel']) oNode.label = DataFactory.instance.nodeFromBinding(b['objectLabel'])
-              propertyToValues.values.push(oNode)
-            }
+            this.processItemResult(item.properties[0], propertyMap, b)
           }
-          return item
+          let sameAses: PropertyToValues<INodePlusLabel> = item.properties[0].properties.filter(p => OWL.sameAs.equals(p))[0]
+          let ids: string[] = [item.toCanonical()]
+          if (sameAses) for (let v of sameAses.values) ids.push(v.toCanonical())
+          return this.$q.all(this.configurationWorkerService.configuration.remoteEndpoints().map(endpoint =>
+            this.sparqlService.query(endpoint.endpoint.value, SparqlItemService.getRemoteItemPropertiesQuery.replace(/<IDS>/g, ids.join('')), {timeout: canceller}).then(
+              (response2: angular.IHttpPromiseCallbackArg<s.ISparqlBindingResult<{[id: string]: s.ISparqlBinding}>>) => {
+                for (let b of response2.data!.results.bindings)
+                  this.processItemResult(item.properties[0], propertyMap, b)
+              })
+          )).then(() => item)
         }
       )
     }
 
-    public getAllItems(canceller?: angular.IPromise<any>): angular.IPromise<Item[]> {
-      let queryTemplate: string = SparqlItemService.getAllItemPropertiesQuery
+    public getItemsForExplore(canceller?: angular.IPromise<any>): angular.IPromise<Item[]> {
+      let queryTemplate: string = SparqlItemService.getItemsForExploreQuery
+      queryTemplate = queryTemplate.replace(/<SERVICES>/g, this.configurationWorkerService.configuration.remoteEndpoints().map(p => p.endpoint.toCanonical()).join(''))
       return this.sparqlService.query(this.configurationWorkerService.configuration.primaryEndpoint.endpoint.value, queryTemplate, {timeout: canceller}).then(
         (response: angular.IHttpPromiseCallbackArg<s.ISparqlBindingResult<{[id: string]: s.ISparqlBinding}>>) => {
           let items: EOMap<Item> = new EOMap<Item>()
-          let itemPropertyMap: ENodeMap<EOMap<PropertyToValues>> = new ENodeMap<EOMap<PropertyToValues>>(() => new EOMap<PropertyToValues>())
+          let itemPropertyMap: ENodeMap<EOMap<PropertyToValues<INodePlusLabel>>> = new ENodeMap<EOMap<PropertyToValues<INodePlusLabel>>>(() => new EOMap<PropertyToValues<INodePlusLabel>>())
           for (let b of response.data!.results.bindings) {
-            let item: Item = items.goc(b['id'].value, () => new Item(DataFactory.instance.nodeFromBinding(b['id'])))
+            let item: Item = items.goc(b['id'].value, () => {
+              let ret: Item = new Item(DataFactory.instance.nodeFromBinding(b['id']))
+              ret.properties = this.configurationWorkerService.configuration.allEndpoints().map(e => new SourcePlusProperties(e))
+              return ret
+            })
             if (b['itemLabel']) item.label = DataFactory.instance.nodeFromBinding(b['itemLabel'])
-            if (b['property']) {
-              let propertyToValues: PropertyToValues = itemPropertyMap.goc(item).goc(b['property'].value, () => {
-                let propertyToValues: PropertyToValues = new PropertyToValues(DataFactory.instance.nodeFromBinding(b['property']))
-                if (b['propertyLabel']) propertyToValues.label = DataFactory.instance.nodeFromBinding(b['propertyLabel'])
-                item.properties.push(propertyToValues)
-                return propertyToValues
-              })
-              let oNode: NodePlusLabel = new NodePlusLabel(DataFactory.instance.nodeFromBinding(b['object']))
-              if (b['objectLabel']) oNode.label = DataFactory.instance.nodeFromBinding(b['objectLabel'])
-              propertyToValues.values.push(oNode)
-            }
+            this.processItemResult(item.properties[0], itemPropertyMap.goc(item), b)
           }
           return items.values()
         }
@@ -227,7 +276,7 @@ WHERE {
       )
     }
 
-    public alterItem(id: INode, propertiesToAdd: IPropertyToValues[], propertiesToRemove: IPropertyToValues[] = []): angular.IPromise<boolean> {
+    public alterItem(id: INode, propertiesToAdd: IPropertyToValues<INode>[], propertiesToRemove: IPropertyToValues<INode>[] = []): angular.IPromise<boolean> {
       let instanceTriplesToAdd: ITriple[] = []
       let schemaTriplesToAdd: ITriple[] = []
       let instanceTriplesToRemove: ITriple[] = []
@@ -242,7 +291,7 @@ WHERE {
       return this.sparqlUpdateWorkerService.updateGraphs(this.configurationWorkerService.configuration.primaryEndpoint.updateEndpoint.value, [new Graph(SparqlItemService.schemaGraph, schemaTriplesToAdd), new Graph(SparqlItemService.instanceGraph, instanceTriplesToAdd)])
     }
 
-    public createNewItem(equivalentNodes: INode[] = [], properties: PropertyToValues[] = []): angular.IPromise<INode> {
+    public createNewItem(equivalentNodes: INode[] = [], properties: PropertyToValues<INode>[] = []): angular.IPromise<INode> {
       let deferred: angular.IDeferred<INode> = this.$q.defer()
       let subject: INode = new NamedNode(SparqlItemService.ns + SparqlItemService.UUID())
       deferred.notify(subject)
@@ -262,6 +311,20 @@ WHERE {
         deferred.notify
       )
       return deferred.promise
+    }
+
+    private processItemResult(properties: SourcePlusProperties, propertyMap: EMap<PropertyToValues<INodePlusLabel>>, b: {[varId: string]: s.ISparqlBinding}): void {
+      if (b['property']) {
+        let propertyToValues: PropertyToValues<INodePlusLabel> = propertyMap.goc(b['property'].value, () => {
+          let ret: PropertyToValues<INodePlusLabel> = new PropertyToValues<INodePlusLabel>(DataFactory.instance.nodeFromBinding(b['property']))
+          if (b['propertyLabel']) ret.label = DataFactory.instance.nodeFromBinding(b['propertyLabel'])
+          properties.properties.push(ret)
+          return ret
+        })
+        let oNode: NodePlusLabel = new NodePlusLabel(DataFactory.instance.nodeFromBinding(b['object']))
+        if (b['objectLabel']) oNode.label = DataFactory.instance.nodeFromBinding(b['objectLabel'])
+        propertyToValues.values.push(oNode)
+      }
     }
 
   }

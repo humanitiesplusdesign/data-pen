@@ -16,14 +16,14 @@
         "!app/bower_components/**/typings"
     ],
     "include": [
-      "app/scripts/**/*.ts",
-      "app/bower_components/**/*.d.ts",
-      "node_modules/@types/**/*.d.ts",
-      "node_modules/d3-v4-definitelytyped/src/d3/*.d.ts"
+        "app/scripts/**/*.ts",
+        "app/bower_components/**/*.d.ts",
+        "node_modules/@types/**/*.d.ts",
+        "node_modules/d3-v4-definitelytyped/src/d3/*.d.ts"
     ],
     "exclude": [
-      "app/bower_components/**/node_modules",
-      "app/bower_components/**/typings"
+        "app/bower_components/**/node_modules",
+        "app/bower_components/**/typings"
     ],
     "files": [
         "app/scripts/app-configuration-common.ts",
