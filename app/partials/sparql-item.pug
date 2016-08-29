@@ -4,6 +4,6 @@ script(type="text/ng-template",id="sparql-item-popover")
 h4 {{$ctrl.item.label.value}}
 
 table.table.table-striped
-  tr(ng-repeat="property in $ctrl.item.properties")
+  tr(ng-repeat="property in $ctrl.item.properties[0].properties")
     th {{property.label ? property.label.value : property.value}}
     td: span(ng-repeat="value in property.values",ng-click="$ctrl.onSelect({value: value})",uib-popover-template="'sparql-item-popover'",popover-trigger="mouseenter",popover-placement="right") {{value.label ? value.label.value : value.value}}{{ $last ? '' : ', ' }}

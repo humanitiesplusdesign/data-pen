@@ -12,9 +12,9 @@ namespace fibra {
     public selectedItem: INode
 
     public createItem(item: Result): angular.IPromise<INode> {
-      let prefLabel: PropertyToValues = new PropertyToValues(SKOS.prefLabel)
+      let prefLabel: PropertyToValues<INode> = new PropertyToValues(SKOS.prefLabel)
       prefLabel.values.push(item.prefLabel)
-      let type: PropertyToValues = new PropertyToValues(RDF.type)
+      let type: PropertyToValues<INode> = new PropertyToValues(RDF.type)
       type.values.push(new NodePlusLabel(item.additionalInformation['type'][0], item.additionalInformation['typeLabel'][0]))
       let prom: angular.IPromise<INode> = this.sparqlItemService.createNewItem(item.ids, [prefLabel, type])
       prom.then(() => {

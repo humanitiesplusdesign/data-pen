@@ -248,6 +248,9 @@ namespace fibra {
     public has(value: N): boolean {
       return this.m.has(value)
     }
+    public get(value: N): N {
+      return this.m.get(value)
+    }
     public clear(): NodeSet<N> {
       this.m.clear()
       return this

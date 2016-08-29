@@ -1,6 +1,6 @@
 div#explorecontainer
   svg#explore
-  
+
 div
   table#exploretable
     tr
@@ -9,6 +9,6 @@ div
       th Actions
     tr(ng-repeat="item in $ctrl.items")
       td(ng-click="$ctrl.selectItem(item)") {{ item.label.value }}
-      td(ng-repeat="p in item.properties", ng-click="$ctrl.selectItem(item)") {{ p.values[0].label.value }}
+      td(ng-repeat="p in item.properties[0].properties", ng-click="$ctrl.selectItem(item)") {{ p.values[0].label.value }}
       td
         a(ng-click="$ctrl.delete(item)") Delete
