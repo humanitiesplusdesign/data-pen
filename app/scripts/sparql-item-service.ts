@@ -11,11 +11,19 @@ namespace fibra {
     label: INode
   }
 
+  export interface ISourcedNodePlusLabel extends INodePlusLabel, ISourcedNode {}
+
   export class NodePlusLabel extends NodeFromNode implements INodePlusLabel {
     public label: INode
-    constructor(public node: INode, label?: INode) {
+    constructor(node: INode, label?: INode) {
       super(node)
       if (label) this.label = label
+    }
+  }
+
+  export class SourcedNodePlusLabel extends NodePlusLabel implements ISourcedNodePlusLabel {
+    constructor(node: INode, label?: INode, public sourceEndpoints: EndpointConfiguration[] = []) {
+      super(node, label)
     }
   }
 
@@ -36,8 +44,10 @@ namespace fibra {
   }
 
   export class Item extends NodePlusLabel {
-    public properties: SourcePlusProperties[] = []
-    public inverseProperties: SourcePlusProperties[] = []
+    public localProperties: PropertyToValues<INodePlusLabel>[] = []
+    public remoteProperties: PropertyToValues<INodePlusLabel>[] = []
+    public localInverseProperties: PropertyToValues<INodePlusLabel>[] = []
+    public remoteInverseProperties: PropertyToValues<INodePlusLabel>[] = []
   }
 
   export interface IConstraint {
@@ -226,22 +236,22 @@ WHERE {
       let queryTemplate: string = this.configurationWorkerService.configuration.primaryEndpoint.localItemQueryTemplate
       queryTemplate = queryTemplate.replace(/<ID>/g, id.toCanonical())
       let item: Item = new Item(id)
-      item.properties = this.configurationWorkerService.configuration.allEndpoints().map(e => new SourcePlusProperties(e))
       return this.sparqlService.query(this.configurationWorkerService.configuration.primaryEndpoint.endpoint.value, queryTemplate, {timeout: canceller}).then(
         (response: angular.IHttpPromiseCallbackArg<s.ISparqlBindingResult<{[id: string]: s.ISparqlBinding}>>) => {
           let propertyMap: EMap<PropertyToValues<INodePlusLabel>> = new EMap<PropertyToValues<INodePlusLabel>>()
+          let propertyValueMap: EMap<EMap<ISourcedNodePlusLabel>> = new EMap<EMap<ISourcedNodePlusLabel>>(() => new EMap<ISourcedNodePlusLabel>())
           for (let b of response.data!.results.bindings) {
             if (b['itemLabel']) item.label = DataFactory.instance.nodeFromBinding(b['itemLabel'])
-            this.processItemResult(item.properties[0], propertyMap, b)
+            this.processItemResult(item.localProperties, propertyMap, propertyValueMap, this.configurationWorkerService.configuration.primaryEndpoint, b)
           }
-          let sameAses: PropertyToValues<INodePlusLabel> = item.properties[0].properties.filter(p => OWL.sameAs.equals(p))[0]
+          let sameAses: PropertyToValues<INodePlusLabel> = item.localProperties.filter(p => OWL.sameAs.equals(p))[0]
           let ids: string[] = [item.toCanonical()]
           if (sameAses) for (let v of sameAses.values) ids.push(v.toCanonical())
           return this.$q.all(this.configurationWorkerService.configuration.remoteEndpoints().map(endpoint =>
             this.sparqlService.query(endpoint.endpoint.value, SparqlItemService.getRemoteItemPropertiesQuery.replace(/<IDS>/g, ids.join('')), {timeout: canceller}).then(
               (response2: angular.IHttpPromiseCallbackArg<s.ISparqlBindingResult<{[id: string]: s.ISparqlBinding}>>) => {
                 for (let b of response2.data!.results.bindings)
-                  this.processItemResult(item.properties[0], propertyMap, b)
+                  this.processItemResult(item.remoteProperties, propertyMap, propertyValueMap, endpoint, b)
               })
           )).then(() => item)
         }
@@ -254,15 +264,12 @@ WHERE {
       return this.sparqlService.query(this.configurationWorkerService.configuration.primaryEndpoint.endpoint.value, queryTemplate, {timeout: canceller}).then(
         (response: angular.IHttpPromiseCallbackArg<s.ISparqlBindingResult<{[id: string]: s.ISparqlBinding}>>) => {
           let items: EOMap<Item> = new EOMap<Item>()
-          let itemPropertyMap: ENodeMap<EOMap<PropertyToValues<INodePlusLabel>>> = new ENodeMap<EOMap<PropertyToValues<INodePlusLabel>>>(() => new EOMap<PropertyToValues<INodePlusLabel>>())
+          let itemPropertyMap: EMap<EMap<PropertyToValues<INodePlusLabel>>> = new EMap<EMap<PropertyToValues<INodePlusLabel>>>(() => new EMap<PropertyToValues<INodePlusLabel>>())
+          let itemPropertyValueMap: EMap<EMap<EMap<ISourcedNodePlusLabel>>> = new EMap<EMap<EMap<ISourcedNodePlusLabel>>>(() => new EMap<EMap<ISourcedNodePlusLabel>>(() => new EMap<ISourcedNodePlusLabel>()))
           for (let b of response.data!.results.bindings) {
-            let item: Item = items.goc(b['id'].value, () => {
-              let ret: Item = new Item(DataFactory.instance.nodeFromBinding(b['id']))
-              ret.properties = this.configurationWorkerService.configuration.allEndpoints().map(e => new SourcePlusProperties(e))
-              return ret
-            })
+            let item: Item = items.goc(b['id'].value, () => new Item(DataFactory.instance.nodeFromBinding(b['id'])))
             if (b['itemLabel']) item.label = DataFactory.instance.nodeFromBinding(b['itemLabel'])
-            this.processItemResult(item.properties[0], itemPropertyMap.goc(item), b)
+            this.processItemResult(item.localProperties, itemPropertyMap.goc(b['id'].value), itemPropertyValueMap.goc(b['id'].value), this.configurationWorkerService.configuration.primaryEndpoint, b)
           }
           return items.values()
         }
@@ -313,17 +320,21 @@ WHERE {
       return deferred.promise
     }
 
-    private processItemResult(properties: SourcePlusProperties, propertyMap: EMap<PropertyToValues<INodePlusLabel>>, b: {[varId: string]: s.ISparqlBinding}): void {
+    private processItemResult(properties: PropertyToValues<INodePlusLabel>[], propertyMap: EMap<PropertyToValues<INodePlusLabel>>, propertyValueMap: EMap<EMap<ISourcedNodePlusLabel>>, endpoint: EndpointConfiguration, b: {[varId: string]: s.ISparqlBinding}): void {
       if (b['property']) {
-        let propertyToValues: PropertyToValues<INodePlusLabel> = propertyMap.goc(b['property'].value, () => {
-          let ret: PropertyToValues<INodePlusLabel> = new PropertyToValues<INodePlusLabel>(DataFactory.instance.nodeFromBinding(b['property']))
-          if (b['propertyLabel']) ret.label = DataFactory.instance.nodeFromBinding(b['propertyLabel'])
-          properties.properties.push(ret)
-          return ret
+        let n: ISourcedNodePlusLabel = propertyValueMap.goc(b['property'].value).goc(b['object'].value, () => {
+          let propertyToValues: PropertyToValues<INodePlusLabel> = propertyMap.goc(b['property'].value, () => {
+            let ret: PropertyToValues<INodePlusLabel> = new PropertyToValues<INodePlusLabel>(DataFactory.instance.nodeFromBinding(b['property']))
+            if (b['propertyLabel']) ret.label = DataFactory.instance.nodeFromBinding(b['propertyLabel'])
+            properties.push(ret)
+            return ret
+          })
+          let oNode: ISourcedNodePlusLabel = new SourcedNodePlusLabel(DataFactory.instance.nodeFromBinding(b['object']))
+          propertyToValues.values.push(oNode)
+          return oNode
         })
-        let oNode: NodePlusLabel = new NodePlusLabel(DataFactory.instance.nodeFromBinding(b['object']))
-        if (b['objectLabel']) oNode.label = DataFactory.instance.nodeFromBinding(b['objectLabel'])
-        propertyToValues.values.push(oNode)
+        n.sourceEndpoints.push(endpoint)
+        if (b['objectLabel'] && !n.label) n.label = DataFactory.instance.nodeFromBinding(b['objectLabel'])
       }
     }
 

@@ -7,6 +7,7 @@ namespace fibra {
 
   export class AuthorComponentController {
 
+    public endpoints: EndpointConfiguration[]
     public classTree: TreeNode[]
     public classTreePromise: angular.IPromise<TreeNode[]>
     public selectedItem: INode
@@ -27,6 +28,7 @@ namespace fibra {
                 sparqlTreeService: SparqlTreeService,
                 private sparqlItemService: SparqlItemService,
                 private fibraService: FibraService) {
+      this.endpoints = configurationService.configuration.remoteEndpoints()
       this.classTreePromise = sparqlTreeService.getTree(this.configurationService.configuration.primaryEndpoint.endpoint.value, SparqlTreeService.getClassTreeQuery)
       this.classTreePromise.then(c => this.classTree = c)
 

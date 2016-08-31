@@ -42,7 +42,7 @@ namespace fibra {
           // Merge items
           this.items = items
           this.properties = []
-          for (let source of this.items[0].properties) for (let p of source.properties)
+          for (let p of this.items[0].localProperties)
             this.properties.push({key: p.toCanonical(), value: p.label.value })
           this.links = this.mergeLinks(this.links)
           this.updateExplore()
@@ -220,7 +220,7 @@ namespace fibra {
             .style('left', (d3.event.pageX + 17) + 'px')
             .style('visibility', 'visible')
             let cscope: angular.IScope = this.$scope.$new(true)
-            cscope['node'] = d.node
+            cscope['node'] = d
             item_info_tip.selectAll('*').remove()
             item_info_tip.node().appendChild(this.$compile('<sparql-item item-id="node"></sparql-item>')(cscope)[0])
           })
@@ -329,7 +329,7 @@ namespace fibra {
       let sameAs: ENodeMap<Item> = new ENodeMap<Item>()
       for (let item of this.items) {
         sameAs.set(item, item)
-        let sameAsProp: PropertyToValues<INodePlusLabel> = item.properties[0].properties.filter((p) =>
+        let sameAsProp: PropertyToValues<INodePlusLabel> = item.localProperties.filter((p) =>
           OWL.sameAs.equals(p)
         )[0]
         if (sameAsProp && sameAsProp.values) for (let n of sameAsProp.values) sameAs.set(n, item)
@@ -338,8 +338,7 @@ namespace fibra {
       // Iterate over item property values to see if they match the id of any
       // of the items displayed. Also check if they match sameAs values...
       for (let item of this.items)
-        for (let source of item.properties)
-          for (let p of source.properties)
+          for (let p of item.localProperties.concat(item.remoteProperties))
             for (let v of p.values)
               if (sameAs.has(v))
                 newLinks.push({

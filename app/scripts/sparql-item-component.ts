@@ -25,7 +25,8 @@ namespace fibra {
   export class SparqlItemComponent implements angular.IComponentOptions {
       public bindings: {[id: string]: string} = {
         itemId: '<',
-        onSelect: '&'
+        onSelect: '&',
+        showRemoteProperties: '@'
       }
       public controller: Function = SparqlItemComponentController
       public templateUrl: string = 'partials/sparql-item.html'

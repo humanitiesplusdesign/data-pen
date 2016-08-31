@@ -24,6 +24,7 @@ namespace fibra {
     }
 
     export class EndpointConfiguration {
+      public class: string = ''
       public autocompletionTextMatchQueryTemplate: string = SparqlAutocompleteService.defaultMatchQueryTemplate
       public treeQueryTemplate: string = SparqlTreeService.getClassTreeQuery
       public localItemQueryTemplate: string = SparqlItemService.getLocalItemPropertiesQuery
@@ -71,6 +72,7 @@ namespace fibra {
         new EndpointConfiguration('viaf', 'VIAF', new NamedNode('http://ldf.fi/viaf-labels/sparql')), // birth/death dates not yet loaded
         // not yet loaded new EndpointConfiguration('lcnames', 'LC Names', new NamedNode('http://ldf.fi/lcnames/sparql'))
       ]
+      c.authorityEndpoints.forEach((e, i) => e.class =  'source' + i)
       let emloConfiguration: EndpointConfiguration = new EndpointConfiguration('emlo', 'EMLO', new NamedNode('http://ldf.fi/emlo/sparql'), [CIDOC.Person, CIDOC.Place, CIDOC.Group])
       emloConfiguration.autocompletionTextMatchQueryTemplate = emloConfiguration.autocompletionTextMatchQueryTemplate.replace(/\{ # ADDITIONALVARIABLES/g, '?ifpWikipediaPage ?ifpODBNId {').replace(/# ADDITIONALSELECT/g, `
 UNION {
@@ -103,6 +105,7 @@ UNION {
         procopeConfiguration,
         new EndpointConfiguration('schoenberg', 'Schoenberg', new NamedNode('http://ldf.fi/schoenberg/sparql'), [CIDOC.Person, CIDOC.Place, CIDOC.Group])
       ]
+      c.archiveEndpoints.forEach((e, i) => e.class =  'source' + (c.authorityEndpoints.length + i))
       c.instanceNS = 'http://ldf.fi/fibra/'
       c.instanceGraph = 'http://ldf.fi/fibra/main/'
       c.schemaNS = 'http://ldf.fi/fibra/schema#'
