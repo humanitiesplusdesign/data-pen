@@ -66,11 +66,15 @@ These actions (defined previously for Idiographic tool) include:
 From one or more nodes, we want to make it easy to select all directly linked nodes, then connections at the second degree and third degree. Select the union of two networks, the intersection of two networks. The REMOVE action above should be applied to the selection or the inverse. 
 
 ## 4. Enrich/Extend
-Whereas Configure is oriented to defining the data sources, whether uploaded, linked archives, or authorities, the Enrich application is oriented toward extending the entities in the local dataset with metadata from more sources. There will be some overlap. 
 
-The primary visual model for Enrich is the matrix and the heatmap. We want to see where our current data set is thin and where it is rich. We then want to see how adding from linked sources might help to fill it out and where there are still gaps.
+Moved the matrix/heatmap to the Select app. Enrich/Extend is now a graphic tool for adding more data to the Construct interface. The idea is a hierarchical map to drill into linked entities and properties for the node. 
 
-Much more work needs to be done to disambiguate the actions that take place in Configure vs Enrich. 
+![sunburst1]
+
+Navigating the available links through the hierarchy can also function as filtering in order to bring more data into focus visually.
+
+![sunburst2]
+
 
 
 
@@ -95,4 +99,11 @@ Much more work needs to be done to disambiguate the actions that take place in C
 
 
 [threejs]: {{ site.baseurl }}/assets/designs2/threejsplane.gif
+{: width="600px"}
+
+[sunburst1]: {{ site.baseurl }}/assets/designs2/Fibra.011.png
+{: width="600px"}
+
+
+[sunburst2]: {{ site.baseurl }}/assets/designs2/Fibra.012.png
 {: width="600px"}
