@@ -72,19 +72,19 @@ Much more work needs to be done to disambiguate the actions that take place in C
 
 
 [select_filters]: {{ site.baseurl }}/assets/designs2/Fibra.002.png
-{: height="500px" width="600px"}
+{: width="600px"}
 
 [select_matrix]: {{ site.baseurl }}/assets/designs2/Fibra.003.png
-{: height="500px" width="600px"}
+{: width="600px"}
 
 [construct_layer]: {{ site.baseurl }}/assets/designs2/Fibra.004.png
-{: height="500px" width="600px"}
+{: width="600px"}
 
 [construct_2layer]: {{ site.baseurl }}/assets/designs2/Fibra.005.png
-{: height="500px" width="600px"}
+{: width="600px"}
 
 [construct_3layer]: {{ site.baseurl }}/assets/designs2/Fibra.006.png
-{: height="500px" width="600px"}
+{: width="600px"}
 
 [threejs]: {{ site.baseurl }}/assets/designs2/threejs.m4v
-{: height="500px" width="600px"}
+{: width="600px"}
