@@ -40,12 +40,15 @@ This application lets us create data and access the data linked or loaded in the
 ### Display  
 The canvas will display node type in layers, by default showing only one entity type at a time. The connections between the nodes are defined by another entity type. This way, each entity-type view represents a different projection of the data. I can look at people connected by places. I can look at people connected by objects (letters, books, etc.). I can look at people connected by events (letters sent/received). I might look at books and see how books are related by place of publication or by people (authors, publishers, etc.)
 ![construct_layer]
-![construct_2layer]
-![construct_3layer]
 
 ### Layout  
 Layout changes, if necessary should happen slowly and minimizing the change in position of nodes.
 The default is an expanding grid layout beginning from the first node in the center. Custom layouts (defined by the user dragging or grouping nodes) are saved. Align horizontal, align vertical, and grid layouts can be applied to all or selected nodes. Geospatial layout is available only when looking at the Places node layer.
+
+![construct_grid1]
+![construct_grid2]
+![construct_grid3]
+
 ![threejs]
 
 ### Size and Color  
@@ -77,14 +80,19 @@ Much more work needs to be done to disambiguate the actions that take place in C
 [select_matrix]: {{ site.baseurl }}/assets/designs2/Fibra.003.png
 {: width="600px"}
 
-[construct_layer]: {{ site.baseurl }}/assets/designs2/Fibra.004.png
+[construct_layer]: {{ site.baseurl }}/assets/designs2/layers.gif
 {: width="600px"}
 
-[construct_2layer]: {{ site.baseurl }}/assets/designs2/Fibra.005.png
+[construct_grid1]: {{ site.baseurl }}/assets/designs2/grid1.png
 {: width="600px"}
 
-[construct_3layer]: {{ site.baseurl }}/assets/designs2/Fibra.006.png
+[construct_grid2]: {{ site.baseurl }}/assets/designs2/grid2.png
 {: width="600px"}
 
-[threejs]: {{ site.baseurl }}/assets/designs2/threejs.m4v
+
+[construct_grid3]: {{ site.baseurl }}/assets/designs2/grid3.png
+{: width="600px"}
+
+
+[threejs]: {{ site.baseurl }}/assets/designs2/threejsplane.gif
 {: width="600px"}
