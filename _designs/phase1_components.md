@@ -86,5 +86,5 @@ Much more work needs to be done to disambiguate the actions that take place in C
 [construct_3layer]: {{ site.baseurl }}/assets/designs2/Fibra.006.png
 {: height="500px" width="600px"}
 
-[threejs]: {{ site.baseurl }}/assets/designs2/PLANE3js.mov
+[threejs]: {{ site.baseurl }}/assets/designs2/threejs.m4v
 {: height="500px" width="600px"}
