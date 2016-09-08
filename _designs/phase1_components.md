@@ -21,7 +21,7 @@ The first level options are:
 	
 **Skip** means skip Configure and go directly to Draw and Explore. It is the option selected when one wants to just use the canvas to sketch a data model without reference to anything else. This experience will be the most similar to Rhizi.
 
-##2. Select/Load
+## 2. Select/Load
 
 Filter the configured sources and/or upload a data set locally and filter.
 
@@ -29,7 +29,10 @@ Filter the configured sources and/or upload a data set locally and filter.
 * Verify and reconciliation will need to be part of this step 
 
 ![select_filters]
+The Select app has intergrated filter visualizations based on dates, geolocation data, and source. We may look to more sophisticated filtering of relationships using an alluvial graph in the future.
 
+![select_matrix]
+The matrix is configurable by entity type and source to show the number of different properties per entity and the number of values per property+source.
 	
 ## 3. Construct (Draw and explore)
 This application lets us create data and access the data linked or loaded in the Configure phase. For Phase 1, we will use default node types: person, place, event, letter, publication. Custom node types can also be defined when generating new data.
@@ -64,7 +67,9 @@ Much more work needs to be done to disambiguate the actions that take place in C
 
 
 
-[select_filters]: {{ site.baseurl }}/assets/designs2/Fibra.001.png
+[select_filters]: {{ site.baseurl }}/assets/designs2/Fibra.002.png
 {: height="500px" width="600px"}
 
+[select_matrix]: {{ site.baseurl }}/assets/designs2/Fibra.002.png
+{: height="500px" width="600px"}
 
