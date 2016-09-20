@@ -22,6 +22,7 @@ PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
 PREFIX owl: <http://www.w3.org/2002/07/owl#>
 PREFIX sf: <http://ldf.fi/functions#>
 PREFIX fibra: <http://ldf.fi/fibra/schema#>
+PREFIX dcterms: <http://purl.org/dc/terms/>
 SELECT ?groupId ?groupLabel ?id ?prefLabel ?matchedLabel ?sameAs ?altLabel { # ADDITIONALVARIABLES
   {
     SELECT ?groupId ?id (SUM(?sc) AS ?score) {
@@ -35,6 +36,8 @@ SELECT ?groupId ?groupLabel ?id ?prefLabel ?matchedLabel ?sameAs ?altLabel { # A
       } UNION {
         BIND(CONCAT("\\"",REPLACE(<QUERY>,"([\\\\+\\\\-\\\\&\\\\|\\\\!\\\\(\\\\)\\\\{\\\\}\\\\[\\\\]\\\\^\\\\\\"\\\\~\\\\*\\\\?\\\\:\\\\/\\\\\\\\])","\\\\$1"),"\\"") AS ?query)
         (?id ?sc) text:query ?query .
+        ?id skos:prefLabel|rdfs:label|skos:altLabel ?matchedLabel
+        FILTER (LCASE(?matchedLabel)=LCASE(<QUERY>))
         ?id a ?groupId .
         # CONSTRAINTS
       }
@@ -42,12 +45,12 @@ SELECT ?groupId ?groupLabel ?id ?prefLabel ?matchedLabel ?sameAs ?altLabel { # A
     GROUP BY ?groupId ?id
     HAVING(BOUND(?id))
   }
+  ?id skos:prefLabel|rdfs:label|skos:altLabel ?matchedLabel
+  FILTER (REGEX(LCASE(?matchedLabel),CONCAT("\\\\b",LCASE(<QUERY>))))
   {
     ?groupId sf:preferredLanguageLiteral (skos:prefLabel rdfs:label skos:altLabel <PREFLANG> '' ?groupLabel) .
-    ?id sf:preferredLanguageLiteral (skos:prefLabel rdfs:label skos:altLabel <PREFLANG> '' ?prefLabel) .
   } UNION {
-    ?id skos:prefLabel|rdfs:label|skos:altLabel ?matchedLabel
-    FILTER (REGEX(LCASE(?matchedLabel),CONCAT("\\\\b",LCASE(<QUERY>))))
+    ?id sf:preferredLanguageLiteral (skos:prefLabel rdfs:label skos:altLabel <PREFLANG> '' ?prefLabel) .
   } UNION {
     ?id owl:sameAs ?sameAs .
   } UNION {
@@ -87,6 +90,7 @@ SELECT ?groupId ?groupLabel ?id ?prefLabel ?matchedLabel ?sameAs ?altLabel { # A
         return this.sparqlService.query(endpointConfiguration.endpoint.value, queryTemplate, {timeout: canceller}).then(
           (response) => response.data!.results.bindings.forEach(binding => {
             let id: string = binding['id'].value
+            idToIdSet.goc(id).add(id)
             idToDatasourceSet.goc(id).add(endpointConfiguration)
             if (binding['prefLabel'])
               idToPrefLabelSet.goc(id).add(DataFactory.instance.nodeFromBinding(binding['prefLabel']))
@@ -100,7 +104,7 @@ SELECT ?groupId ?groupLabel ?id ?prefLabel ?matchedLabel ?sameAs ?altLabel { # A
                 idToPrefLabelSet.goc(binding['groupId'].value).add(DataFactory.instance.nodeFromBinding(binding['groupLabel']))
             }
             if (binding['sameAs']) {
-              idToIdSet.goc(id).add(binding['sameAs'].value)
+              idToIdSet.get(id).add(binding['sameAs'].value)
               idToIdSet.goc(binding['sameAs'].value).add(id)
             }
             for (let v of response.data!.head.vars) if (v.indexOf('ifp') === 0 && binding[v]) ifpVarPlusValueToIdSet.goc(v.substring(3)).goc(binding[v].value).add(id)
@@ -154,7 +158,7 @@ SELECT ?groupId ?groupLabel ?id ?prefLabel ?matchedLabel ?sameAs ?altLabel { # A
         let seen: StringSet = new StringSet()
         idToIdSet.each((idSet: StringSet, id: string) => {
           if (!seen.has(id)) {
-            seen.add(id)
+            seen.adds(idSet)
             let result: Result = new Result(idSet.values().map(oid => DataFactory.instance.namedNode(oid)), idToDatasourceSet.get(id).values(), idToMatchedLabelSet.get(id).values()[0], idToPrefLabelSet.get(id).values()[0])
             if (idToAltLabelSet.has(id)) result.additionalInformation['altLabel'] = idToAltLabelSet.get(id).values()
             idToGroupIdSet.get(id).each(gid => {

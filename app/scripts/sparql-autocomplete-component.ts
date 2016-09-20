@@ -5,7 +5,6 @@ namespace fibra {
     public queryRunning: boolean
     public onSelect: (selection: Result) => void
     public error: boolean = false
-    public by: 'datasource' | 'group' = 'datasource'
     public query: string
     private results: ResultGroup[]
     private canceller: angular.IDeferred<any>

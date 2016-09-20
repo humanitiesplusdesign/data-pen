@@ -66,11 +66,54 @@ namespace fibra {
     constructor(workerService: WorkerService) {
       let c: Configuration = this.configuration
       c.primaryEndpoint = new PrimaryEndpointConfiguration('local', 'Local', new NamedNode('http://ldf.fi/fibra/sparql'), new NamedNode('http://ldf.fi/fibra/sparql'))
+      let gettyAutocompletionQueryTemplate: string = `PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX luc: <http://www.ontotext.com/owlim/lucene#>
+PREFIX gvp: <http://vocab.getty.edu/ontology#>
+PREFIX aat: <http://vocab.getty.edu/aat/>
+PREFIX tgn: <http://vocab.getty.edu/tgn/>
+SELECT ?groupId ?groupLabel ?id ?prefLabel ?matchedLabel ?sameAs ?altLabel {
+  {
+    SELECT ?id ?matchedLabel {
+      BIND(CONCAT(REPLACE(<QUERY>,"([\\\\+\\\\-\\\\&\\\\|\\\\!\\\\(\\\\)\\\\{\\\\}\\\\[\\\\]\\\\^\\\\\\"\\\\~\\\\*\\\\?\\\\:\\\\/\\\\\\\\])","\\\\$1"),"*") AS ?query)
+      ?id luc:term ?query .
+      # CONSTRAINTS
+      ?id rdfs:label ?matchedLabel .
+    } LIMIT <LIMIT>
+  } UNION {
+    BIND(CONCAT("\\"",REPLACE(<QUERY>,"([\\\\+\\\\-\\\\&\\\\|\\\\!\\\\(\\\\)\\\\{\\\\}\\\\[\\\\]\\\\^\\\\\\"\\\\~\\\\*\\\\?\\\\:\\\\/\\\\\\\\])","\\\\$1"),"\\"") AS ?query)
+    ?id luc:term ?query .
+    # CONSTRAINTS
+    ?id rdfs:label ?matchedLabel .
+    FILTER (LCASE(?matchedLabel)=LCASE(<QUERY>))
+  }
+  ?id skos:inScheme <SCHEME> .
+  FILTER (REGEX(LCASE(?matchedLabel),CONCAT("\\\\b",LCASE(<QUERY>))))
+  ?id a ?groupId .
+  ?groupId rdfs:label ?groupLabel .
+  {
+    ?id gvp:prefLabelGVP [xl:literalForm ?prefLabel] .
+  } UNION {
+    ?id skos:exactMatch ?sameAs .
+  }
+}`
+      let ulanConfiguration: EndpointConfiguration = new EndpointConfiguration('ulan', 'ULAN', new NamedNode('http://ldf.fi/corsproxy/vocab.getty.edu/sparql'), [GETTY.PersonConcept, GETTY.GroupConcept])
+      ulanConfiguration.autocompletionTextMatchQueryTemplate = gettyAutocompletionQueryTemplate.replace(/<SCHEME>/g, 'ulan:')
+      let tgnConfiguration: EndpointConfiguration = new EndpointConfiguration('tgn', 'TGN', new NamedNode('http://ldf.fi/corsproxy/vocab.getty.edu/sparql'), [GETTY.AdminPlaceConcept, GETTY.PhysAdminPlaceConcept])
+      tgnConfiguration.autocompletionTextMatchQueryTemplate = gettyAutocompletionQueryTemplate.replace(/<SCHEME>/g, 'tgn:')
+      let viafConfiguration: EndpointConfiguration = new EndpointConfiguration('viaf', 'VIAF', new NamedNode('http://ldf.fi/viaf/sparql'))
+      viafConfiguration.autocompletionTextMatchQueryTemplate = viafConfiguration.autocompletionTextMatchQueryTemplate.replace(/# ADDITIONALSELECT/g, `
+UNION {
+  ?id dcterms:identifier ?rid .
+  FILTER(STRSTARTS(?rid,"LC|n"))
+  BIND(IRI(REPLACE(?rid, "^LC\\\\|n *","http://id.loc.gov/authorities/names/n")) AS ?sameAs)
+}`)
       c.authorityEndpoints = [
-        // ULAN endpoint is not standards compliant, needs further tweaking new EndpointConfiguration('ulan', 'ULAN', new NamedNode('http://ldf.fi/corsproxy/vocab.getty.edu/sparql.json')),
-        new EndpointConfiguration('geonames', 'GeoNames', new NamedNode('http://ldf.fi/geonames/sparql')),
-        new EndpointConfiguration('viaf', 'VIAF', new NamedNode('http://ldf.fi/viaf-labels/sparql')), // birth/death dates not yet loaded
-        // not yet loaded new EndpointConfiguration('lcnames', 'LC Names', new NamedNode('http://ldf.fi/lcnames/sparql'))
+        ulanConfiguration,
+        new EndpointConfiguration('lcnames', 'LC Names', new NamedNode('http://ldf.fi/lcnames/sparql')),
+        viafConfiguration,
+        tgnConfiguration,
+        new EndpointConfiguration('geonames', 'GeoNames', new NamedNode('http://ldf.fi/geonames/sparql'))
       ]
       c.authorityEndpoints.forEach((e, i) => e.class =  'source' + i)
       let emloConfiguration: EndpointConfiguration = new EndpointConfiguration('emlo', 'EMLO', new NamedNode('http://ldf.fi/emlo/sparql'), [CIDOC.Person, CIDOC.Place, CIDOC.Group])
@@ -86,7 +129,7 @@ UNION {
     BIND(REPLACE(STR(?ref),'http://www.oxforddnb.com/view/article/([^?]*).*','$1') AS ?ifpODBNId)
   }
 }`)
-      let sdfbConfiguration: EndpointConfiguration = new EndpointConfiguration('sdfb', 'Six Degrees of Francis Bacon', new NamedNode('http://ldf.fi/sdfb/sparql'), [CIDOC.Person, CIDOC.Place, CIDOC.Group])
+      let sdfbConfiguration: EndpointConfiguration = new EndpointConfiguration('sdfb', 'SDFB', new NamedNode('http://ldf.fi/sdfb/sparql'), [CIDOC.Person, CIDOC.Place, CIDOC.Group])
       sdfbConfiguration.autocompletionTextMatchQueryTemplate = sdfbConfiguration.autocompletionTextMatchQueryTemplate.replace(/\{ # ADDITIONALVARIABLES/g, '?ifpODBNId {').replace(/# ADDITIONALSELECT/g, `
 UNION {
   ?id <http://ldf.fi/sdfb/schema#odbnId> ?ifpODBNId .
@@ -103,6 +146,7 @@ UNION {
         sdfbConfiguration,
         emloConfiguration,
         procopeConfiguration,
+        new EndpointConfiguration('fbtee', 'FBTEE', new NamedNode('http://ldf.fi/fbtee/sparql'), [CIDOC.Person, CIDOC.Place, CIDOC.Group]),
         new EndpointConfiguration('schoenberg', 'Schoenberg', new NamedNode('http://ldf.fi/schoenberg/sparql'), [CIDOC.Person, CIDOC.Place, CIDOC.Group])
       ]
       c.archiveEndpoints.forEach((e, i) => e.class =  'source' + (c.authorityEndpoints.length + i))

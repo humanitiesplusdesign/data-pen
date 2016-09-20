@@ -24,7 +24,6 @@ namespace fibra {
     private drawmode: boolean = false
 
     public $postLink(): void {
-      console.log('postLink')
       this.svgSel = d3.select(this.$element[0]).select<SVGSVGElement>('svg')
 
       // Create link g

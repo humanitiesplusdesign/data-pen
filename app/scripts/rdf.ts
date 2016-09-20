@@ -181,6 +181,15 @@ namespace fibra {
     public static Group: INamedNode = new NamedNode(CIDOC.ns + 'E74_Group')
   }
 
+  export class GETTY {
+    public static ns: string = 'http://vocab.getty.edu/ontology#'
+    public static AdminPlaceConcept: INamedNode = new NamedNode(GETTY.ns + 'AdminPlaceConcept')
+    public static PhysicalPlaceConcept: INamedNode = new NamedNode(GETTY.ns + 'PhysicalPlaceConcept')
+    public static PhysAdminPlaceConcept: INamedNode = new NamedNode(GETTY.ns + 'PhysAdminPlaceConcept')
+    public static PersonConcept: INamedNode = new NamedNode(GETTY.ns + 'PersonConcept')
+    public static GroupConcept: INamedNode = new NamedNode(GETTY.ns + 'GroupConcept')
+  }
+
   export class ENodeMap<V> {
     constructor(private create: (key?: INode) => V = () => { return <V>{}}, private map: EMap<V> = new EMap<V>()) {}
     public goc(key: INode, create?: (key?: INode) => V): V {
