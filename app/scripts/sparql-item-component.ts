@@ -6,7 +6,7 @@ namespace fibra {
   }
 
   interface ISparqlItemComponentBindingChanges {
-    itemId?: angular.IChangesObject
+    itemId?: angular.IChangesObject<Item>
   }
 
   class SparqlItemComponentController extends SparqlItemComponentBindings {
@@ -28,7 +28,7 @@ namespace fibra {
         onSelect: '&',
         showRemoteProperties: '@'
       }
-      public controller: Function = SparqlItemComponentController
+      public controller = SparqlItemComponentController
       public templateUrl: string = 'partials/sparql-item.html'
   }
 }

@@ -43,7 +43,7 @@ namespace fibra {
   }
 
   export class AuthorComponent implements angular.IComponentOptions {
-      public controller: Function = AuthorComponentController
+      public controller = AuthorComponentController
       public templateUrl: string = 'partials/author.html'
   }
 }

@@ -39,7 +39,7 @@ namespace fibra {
         limit: '@',
         onSelect: '&',
       }
-      public controller: Function = SparqlAutocompleteComponentController
+      public controller = SparqlAutocompleteComponentController
       public templateUrl: string = 'partials/sparql-autocomplete.html'
   }
 }

@@ -354,7 +354,7 @@ namespace fibra {
       classTreePromise: '<',
       selectedItem: '='
     }
-    public controller: angular.IComponentController = ExploreComponentController
+    public controller = ExploreComponentController
     public templateUrl: string = 'partials/explore.html'
   }
 }
