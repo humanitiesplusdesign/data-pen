@@ -7,7 +7,7 @@ div
       th Label
       th(ng-repeat="p in $ctrl.properties") {{ p.value }}
       th Actions
-    tr(ng-repeat="item in $ctrl.items")
+    tr(ng-repeat="item in $ctrl.primaryItems.concat($ctrl.secondaryItems)")
       td(ng-click="$ctrl.selectItem(item)") {{ item.label.value }}
       td(ng-repeat="p in item.localProperties", ng-click="$ctrl.selectItem(item)") {{ p.values[0].label.value }}
       td

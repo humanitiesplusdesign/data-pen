@@ -13,13 +13,17 @@ namespace fibra {
 
   class ExploreComponentController {
     public itemService: SparqlItemService
-    public items: Item[] = []
+    // public items: Item[] = []
     public selectedItem: INode
     public properties: {}[]
     public classTreePromise: angular.IPromise<TreeNode[]>
     private svgSel: d3.Selection<SVGSVGElement, {}, null, undefined>
     private links: IExploreItemLink[]
     private forceSim: d3.Simulation<IExploreItem, IExploreItemLink>
+    private orderedTypes: string[] = ['http://www.cidoc-crm.org/cidoc-crm/E21_Person', 'http://www.cidoc-crm.org/cidoc-crm/E53_Place', 'http://www.cidoc-crm.org/cidoc-crm/E74_Group']
+    private primaryItems: Item[] = []
+    private secondaryItems: Item[] = []
+    private tertiaryItems: Item[] = []
 
     private drawmode: boolean = false
 
@@ -39,15 +43,32 @@ namespace fibra {
       return this.classTreePromise.then(ct => this.itemService.getItemsForExplore().then(
         (items: Item[]) => {
           // Merge items
-          this.items = items
+          // this.items = items
+          this.primaryItems = this.filterItemsByType(items, this.orderedTypes[0])
+          this.secondaryItems = this.filterItemsByType(items, this.orderedTypes[1])
+          this.tertiaryItems = this.filterItemsByType(items, this.orderedTypes[2])
           this.properties = []
-          for (let p of this.items[0].localProperties)
+          for (let p of this.primaryItems[0].localProperties)
             this.properties.push({key: p.toCanonical(), value: p.label.value })
           this.links = this.mergeLinks(this.links)
+          console.log(this.links)
           this.updateExplore()
           return 'ok'
         })
       )
+    }
+
+    private filterItemsByType(items: Item[], type: string): Item[] {
+      return items.filter((it) => {
+        let typeProp = it.localProperties.filter((pr) => {
+          return pr.value === 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type'
+        })
+        if(typeProp[0]) {
+          return typeProp[0].values.map((v) => { return v.value; }).indexOf(type) !== -1
+        } else {
+          return false;
+        }
+      })
     }
 
     public updateExplore(): string {
@@ -138,10 +159,15 @@ namespace fibra {
           .attr('id', (d: IExploreItemLink, i: number) => 'link-' + i)
       link = link.merge(linked)
 
-      let items: d3.Selection<d3.BaseType, {}, SVGSVGElement, {}> = this.svgSel.selectAll<SVGElement, IExploreItem>('circle').data(this.items, (d: Item) => d.value)
-      items.exit().remove()
+      // let items: d3.Selection<d3.BaseType, {}, SVGSVGElement, {}> = this.svgSel.selectAll<SVGElement, IExploreItem>('circle').data(this.items, (d: Item) => d.value)
+      let primaryItems: d3.Selection<d3.BaseType, {}, SVGSVGElement, {}> = this.svgSel.selectAll<SVGElement, IExploreItem>('circle').data(this.primaryItems, (d: Item) => d.value)
+      let secondaryItems: d3.Selection<d3.BaseType, {}, SVGSVGElement, {}> = this.svgSel.selectAll<SVGElement, IExploreItem>('circle').data(this.secondaryItems, (d: Item) => d.value)
+      // let tertiaryItems: d3.Selection<d3.BaseType, {}, SVGSVGElement, {}> = this.svgSel.selectAll<SVGElement, IExploreItem>('circle').data(this.tertiaryItems, (d: Item) => d.value)
+      // items.exit().remove()
+      primaryItems.exit().remove()
+      secondaryItems.exit().remove()
 
-      let node: d3.Selection<d3.BaseType, {}, SVGSVGElement, {}> = items.enter().append('g')
+      let node: d3.Selection<d3.BaseType, {}, SVGSVGElement, {}> = primaryItems.enter().merge(secondaryItems.enter()).append('g')
           .attr('id', (d, i: number) => 'node-' + i)
           .attr('class', 'node')
         .append('circle')
@@ -224,7 +250,7 @@ namespace fibra {
             item_info_tip.node().appendChild(this.$compile('<sparql-item item-id="node"></sparql-item>')(cscope)[0])
           })
 
-      node = node.merge(items)
+      node = node.merge(primaryItems).merge(secondaryItems)
 
       let onTick: () => void = () => {
 
@@ -245,7 +271,7 @@ namespace fibra {
           .attr('y2', (d: IExploreItemLink) => (<IExploreItem>d.target).y!)
       }
 
-      this.forceSim.nodes(this.items)
+      this.forceSim.nodes(this.primaryItems.concat(this.secondaryItems))
         .on('tick', onTick)
       this.forceSim
         .force<d3.ForceLink<IExploreItem, IExploreItemLink>>('link').links(this.links)
@@ -316,7 +342,7 @@ namespace fibra {
             } else if (event.keyCode === 49) {
               console.log(this.links)
             } else if (event.keyCode === 50) {
-              console.log(this.items)
+              // console.log(this.items)
             }
           }
       })
@@ -324,9 +350,10 @@ namespace fibra {
 
     private mergeLinks(oldLinks: IExploreItemLink[]): IExploreItemLink[] {
       let newLinks: IExploreItemLink[] = []
+      let items = this.primaryItems.concat(this.secondaryItems)
 
       let sameAs: ENodeMap<Item> = new ENodeMap<Item>()
-      for (let item of this.items) {
+      for (let item of items) {
         sameAs.set(item, item)
         let sameAsProp: PropertyToValues<INodePlusLabel> = item.localProperties.filter((p) =>
           OWL.sameAs.equals(p)
@@ -336,15 +363,16 @@ namespace fibra {
 
       // Iterate over item property values to see if they match the id of any
       // of the items displayed. Also check if they match sameAs values...
-      for (let item of this.items)
-          for (let p of item.localProperties.concat(item.remoteProperties))
+      for (let item of items)
+          for (let p of item.localProperties)
             for (let v of p.values)
-              if (sameAs.has(v))
+              if (sameAs.has(v) && item !== sameAs.get(v) && items.indexOf(sameAs.get(v)) !== -1) {
                 newLinks.push({
                   source: <IExploreItem>item,
                   target: <IExploreItem>sameAs.get(v),
                   property: p
                 })
+              }
       return newLinks
     }
   }
