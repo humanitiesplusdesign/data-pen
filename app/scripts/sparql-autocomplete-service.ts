@@ -161,6 +161,8 @@ SELECT ?groupId ?groupLabel ?id ?prefLabel ?matchedLabel ?sameAs ?altLabel { # A
             seen.adds(idSet)
             let result: Result = new Result(idSet.values().map(oid => DataFactory.instance.namedNode(oid)), idToDatasourceSet.get(id).values(), idToMatchedLabelSet.get(id).values()[0], idToPrefLabelSet.get(id).values()[0])
             if (idToAltLabelSet.has(id)) result.additionalInformation['altLabel'] = idToAltLabelSet.get(id).values()
+            result.additionalInformation['type'] = idToGroupIdSet.get(id).values().map(v => DataFactory.instance.namedNode(v))
+            result.additionalInformation['typeLabel'] = idToGroupIdSet.get(id).values().map(v => idToPrefLabelSet.get(v).values()[0])
             idToGroupIdSet.get(id).each(gid => {
               let resultGroup: ResultGroup = groupIdToGroup.get(gid)
               if (!resultGroup) {
