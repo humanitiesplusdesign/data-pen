@@ -4,7 +4,12 @@ namespace fibra {
   interface IExploreComponentInterface extends angular.IComponentController {
   }
 
-  interface IExploreItem extends Item, d3.SimulationNodeDatum {
+  interface IGridNode extends d3.SimulationNodeDatum {
+    gx?: number
+    gy?: number
+  }
+
+  interface IExploreItem extends Item, IGridNode {
   }
 
   interface IExploreItemLink extends d3.SimulationLinkDatum<IExploreItem> {
@@ -29,6 +34,10 @@ namespace fibra {
     private tooltip: d3.Selection<HTMLDivElement, {}, HTMLBodyElement, undefined>
     private edittip: d3.Selection<HTMLDivElement, {}, HTMLBodyElement, undefined>
     private dragline: d3.Selection<SVGLineElement, {}, null, undefined>
+    private exploreWidth: number
+    private exploreHeight: number
+    private gridOffset: number = 50 // Should be even
+    private chargeForce: d3.ForceCollide<IExploreItem> = d3.forceCollide<IExploreItem>(20)
 
     private drawmode: boolean = false
 
@@ -38,7 +47,7 @@ namespace fibra {
       this.svgSel.append('g').attr('class', 'links')
 
       this.forceSim = d3.forceSimulation<IExploreItem, IExploreItemLink>()
-        .force('charge', d3.forceCollide(20))
+        .force('charge', this.chargeForce)
         .force('link', d3.forceLink().distance(40).strength(1).iterations(1).id((d: IExploreItem) => '' + d.index))
 
       this.item_info_tip = d3.select('body').append<HTMLDivElement>('div')
@@ -111,10 +120,12 @@ namespace fibra {
       let viewport_width: number = window.innerWidth
       let viewport_height: number = window.innerHeight
       let searchbarwidth: number = +d3.select('#searchbar').style('width').replace('px', '')
+      this.exploreWidth = viewport_width
+      this.exploreHeight = viewport_height - 36
 
       d3.select(this.$element[0]).select('#explorecontainer')
-        .style('width', viewport_width + 'px')
-        .style('height', viewport_height - 36 + 'px')
+        .style('width', this.exploreWidth + 'px')
+        .style('height', this.exploreHeight + 'px')
 
       d3.select(this.$element[0].parentElement).select('#searchbar')
         .style('top', viewport_height * 6 / 7 + 'px')
@@ -136,6 +147,9 @@ namespace fibra {
       this.forceSim.force('center', d3.forceCenter(svg_width / 2, svg_height / 2))
       this.forceSim.force('xposition', d3.forceX(svg_width / 2).strength(0.01))
       this.forceSim.force('yposition', d3.forceY(svg_height / 2).strength(0.01))
+
+      // Build grids
+
     }
 
     private appendNodes(enterSelection: d3.Selection<d3.BaseType, {}, SVGSVGElement, {}>, className: string) {
@@ -229,12 +243,30 @@ namespace fibra {
           })
     }
 
-    private tickTransformNodes(sel: d3.Selection<d3.BaseType, {}, SVGSVGElement, {}>) {
+    private snapToGrid(x: number, y: number, primary: boolean = true): number[] {
+      let sx: number, sy: number
+      // Snap to gridOffset with further offset for multiples
+      if(primary) {
+        sx = Math.round(x / this.gridOffset) * this.gridOffset
+        sy = Math.round(y / this.gridOffset) * this.gridOffset
+      } else {
+        sx = Math.round(x / this.gridOffset) * this.gridOffset - this.gridOffset/2
+        sy = Math.round(y / this.gridOffset) * this.gridOffset - this.gridOffset/2
+      }
+      return [sx,sy]
+    }
+
+    private tickTransformNodes(sel: d3.Selection<d3.BaseType, {}, SVGSVGElement, {}>, primary: boolean = true ) {
       sel.attr('transform', (d: IExploreItem, i) => {
         let x: number = d.x!, y: number = d.y!
         if (d.x < this.radius) x = this.radius
         if (d.y < this.radius) y = this.radius
-        return 'translate(' + x + ', ' + y + ')'
+
+        let [gx,gy] = this.snapToGrid(x,y,primary)
+        d.gx = gx
+        d.gy = gy
+
+        return 'translate(' + gx + ', ' + gy + ')'
       })
     }
 
@@ -266,20 +298,22 @@ namespace fibra {
         .merge(linkLines)
 
       let onTick: () => void = () => {
-        this.tickTransformNodes(primaryNodes)
-        this.tickTransformNodes(secondaryNodes)          
+        this.tickTransformNodes(primaryNodes, true)
+        this.tickTransformNodes(secondaryNodes, false)          
 
         linkLines
-          .attr('x1', (d: IExploreItemLink) => (<IExploreItem>d.source).x!)
-          .attr('y1', (d: IExploreItemLink) => (<IExploreItem>d.source).y!)
-          .attr('x2', (d: IExploreItemLink) => (<IExploreItem>d.target).x!)
-          .attr('y2', (d: IExploreItemLink) => (<IExploreItem>d.target).y!)
+          .attr('x1', (d: IExploreItemLink) => (<IExploreItem>d.source).gx!)
+          .attr('y1', (d: IExploreItemLink) => (<IExploreItem>d.source).gy!)
+          .attr('x2', (d: IExploreItemLink) => (<IExploreItem>d.target).gx!)
+          .attr('y2', (d: IExploreItemLink) => (<IExploreItem>d.target).gy!)
       }
 
       this.forceSim.nodes(this.primaryItems.concat(this.secondaryItems))
         .on('tick', onTick)
       this.forceSim
         .force<d3.ForceLink<IExploreItem, IExploreItemLink>>('link').links(this.links)
+      let collide = this.forceSim.force('charge')
+      if(collide.initialize) collide.initialize(this.primaryItems)
       this.forceSim.alpha(1).restart()
 
       return this.$q.resolve('ok')

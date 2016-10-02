@@ -139,8 +139,15 @@ main {
 }
 
 .node-circle {
-  fill: gray
   transition: .2s
+}
+
+.node-circle.primary {
+  fill: darken(gray, 50%)
+}
+
+.node-circle.secondary {
+  fill: lighten(gray, 50%)
 }
 
 .node-circle:hover {
