@@ -4,6 +4,10 @@ namespace fibra {
   interface IExploreComponentInterface extends angular.IComponentController {
   }
 
+  interface IExploreScope extends angular.IScope {
+    layout: { choice: string }
+  }
+
   interface IGridNode extends d3.SimulationNodeDatum {
     gx?: number
     gy?: number
@@ -262,7 +266,10 @@ namespace fibra {
         if (d.x < this.radius) x = this.radius
         if (d.y < this.radius) y = this.radius
 
-        let [gx,gy] = this.snapToGrid(x,y,primary)
+        let [gx,gy] = [x,y]
+        if(this.$scope.layout.choice === 'forcegrid') {
+          [gx,gy] = this.snapToGrid(x,y,primary)
+        }
         d.gx = gx
         d.gy = gy
 
@@ -353,7 +360,7 @@ namespace fibra {
     constructor(private $element: angular.IAugmentedJQuery,
                 private $compile: angular.ICompileService,
                 private $window: angular.IWindowService,
-                private $scope: angular.IScope,
+                private $scope: IExploreScope,
                 private $timeout: angular.ITimeoutService,
                 private sparqlItemService: SparqlItemService,
                 private fibraService: FibraService,
@@ -362,6 +369,11 @@ namespace fibra {
       this.fibraService.on('change', () => this.queryAndBuild())
       this.itemService = sparqlItemService
       this.links = []
+      this.$scope.layout = {
+        'choice': 'force' 
+      }
+
+      this.$scope.$watch('layout.choice', this.updateExplore) 
 
       // add shift to enable draw mode - this can easily be changed to require shift to be held
       this.$window.addEventListener('keydown', (event) => {
