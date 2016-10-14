@@ -260,7 +260,8 @@ namespace fibra {
       return [sx,sy]
     }
 
-    private tickTransformNodes(sel: d3.Selection<d3.BaseType, {}, SVGSVGElement, {}>, primary: boolean = true ) {
+    private tickTransformNodes(sel: d3.Selection<d3.BaseType, {}, SVGSVGElement, {}>|d3.Transition<d3.BaseType, {}, SVGSVGElement, {}>,
+                                primary: boolean = true ) {
       sel.attr('transform', (d: IExploreItem, i) => {
         let x: number = d.x!, y: number = d.y!
         if (d.x < this.radius) x = this.radius
@@ -277,7 +278,31 @@ namespace fibra {
       })
     }
 
-    private updateExplore(): angular.IPromise<string> {
+    private genericTick(primaryNodes: d3.Selection<d3.BaseType, {}, SVGSVGElement, {}>,
+                        secondaryNodes: d3.Selection<d3.BaseType, {}, SVGSVGElement, {}>,
+                        linkLines: d3.Selection<SVGLineElement, IExploreItemLink, SVGGElement, {}>,
+                        transition: boolean = false) {
+
+      let lPrimaryNodes: d3.Selection<d3.BaseType, {}, SVGSVGElement, {}>|d3.Transition<d3.BaseType, {}, SVGSVGElement, {}> = primaryNodes
+      let lSecondaryNodes: d3.Selection<d3.BaseType, {}, SVGSVGElement, {}>|d3.Transition<d3.BaseType, {}, SVGSVGElement, {}> = secondaryNodes
+      let lLinkLines: d3.Selection<SVGLineElement, IExploreItemLink, SVGGElement, {}>|d3.Transition<SVGLineElement, IExploreItemLink, SVGGElement, {}> = linkLines
+      if(transition) {
+        lPrimaryNodes = lPrimaryNodes.transition()
+        lSecondaryNodes = lSecondaryNodes.transition()
+        lLinkLines = lLinkLines.transition()
+      }
+
+      this.tickTransformNodes(lPrimaryNodes, true)
+      this.tickTransformNodes(lSecondaryNodes, false)          
+
+      lLinkLines
+        .attr('x1', (d: IExploreItemLink) => (<IExploreItem>d.source).gx!)
+        .attr('y1', (d: IExploreItemLink) => (<IExploreItem>d.source).gy!)
+        .attr('x2', (d: IExploreItemLink) => (<IExploreItem>d.target).gx!)
+        .attr('y2', (d: IExploreItemLink) => (<IExploreItem>d.target).gy!)
+    }
+
+    private updateExplore(runSim: boolean = true): angular.IPromise<string> {
 
       let primaryNodes: d3.Selection<d3.BaseType, {}, SVGSVGElement, {}> = this.svgSel
           .selectAll<SVGElement, IExploreItem>('circle.primary')
@@ -304,24 +329,20 @@ namespace fibra {
           .attr('id', (d: IExploreItemLink, i: number) => 'link-' + i)
         .merge(linkLines)
 
-      let onTick: () => void = () => {
-        this.tickTransformNodes(primaryNodes, true)
-        this.tickTransformNodes(secondaryNodes, false)          
-
-        linkLines
-          .attr('x1', (d: IExploreItemLink) => (<IExploreItem>d.source).gx!)
-          .attr('y1', (d: IExploreItemLink) => (<IExploreItem>d.source).gy!)
-          .attr('x2', (d: IExploreItemLink) => (<IExploreItem>d.target).gx!)
-          .attr('y2', (d: IExploreItemLink) => (<IExploreItem>d.target).gy!)
-      }
-
+      this.forceSim.stop()
+      let onTick = this.genericTick.bind(this, primaryNodes, secondaryNodes, linkLines, false)
       this.forceSim.nodes(this.primaryItems.concat(this.secondaryItems))
         .on('tick', onTick)
       this.forceSim
         .force<d3.ForceLink<IExploreItem, IExploreItemLink>>('link').links(this.links)
       let collide = this.forceSim.force('charge')
       if(collide.initialize) collide.initialize(this.primaryItems)
-      this.forceSim.alpha(1).restart()
+
+      if(runSim) {
+        this.forceSim.alpha(1).restart()
+      } else {
+        this.genericTick(primaryNodes, secondaryNodes, linkLines, true)
+      }
 
       return this.$q.resolve('ok')
     }
@@ -373,7 +394,7 @@ namespace fibra {
         'choice': 'force' 
       }
 
-      this.$scope.$watch('layout.choice', this.updateExplore) 
+      this.$scope.$watch('layout.choice', this.updateExplore.bind(this, false)) 
 
       // add shift to enable draw mode - this can easily be changed to require shift to be held
       this.$window.addEventListener('keydown', (event) => {
