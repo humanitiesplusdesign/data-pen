@@ -335,8 +335,16 @@ namespace fibra {
         .on('tick', onTick)
       this.forceSim
         .force<d3.ForceLink<IExploreItem, IExploreItemLink>>('link').links(this.links)
-      let collide = this.forceSim.force('charge')
-      if(collide.initialize) collide.initialize(this.primaryItems)
+
+      // Apply forces only to one set of items, depending on force.  
+      let collideForce = this.forceSim.force('charge')
+      let centerForce = this.forceSim.force('center')
+      let xpositionForce = this.forceSim.force('xposition')
+      let ypositionForce = this.forceSim.force('yposition')
+      if(collideForce.initialize) collideForce.initialize(this.primaryItems)
+      // if(centerForce.initialize) centerForce.initialize(this.primaryItems)
+      // if(xpositionForce.initialize) xpositionForce.initialize(this.primaryItems)
+      // if(ypositionForce.initialize) ypositionForce.initialize(this.primaryItems)
 
       if(runSim) {
         this.forceSim.alpha(1).restart()
