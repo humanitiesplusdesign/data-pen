@@ -41,7 +41,8 @@ namespace fibra {
     private exploreWidth: number
     private exploreHeight: number
     private gridOffset: number = 50 // Should be even
-    private chargeForce: d3.ForceCollide<IExploreItem> = d3.forceCollide<IExploreItem>(20)
+    private chargeForce: d3.ForceCollide<IExploreItem> = d3.forceCollide<IExploreItem>(this.gridOffset/1.5)
+    private chargeForce2: d3.ForceCollide<IExploreItem> = d3.forceCollide<IExploreItem>(this.gridOffset/1.5)
 
     private drawmode: boolean = false
 
@@ -52,6 +53,7 @@ namespace fibra {
 
       this.forceSim = d3.forceSimulation<IExploreItem, IExploreItemLink>()
         .force('charge', this.chargeForce)
+        .force('charge2', this.chargeForce2)
         .force('link', d3.forceLink().distance(40).strength(1).iterations(1).id((d: IExploreItem) => '' + d.index))
 
       this.item_info_tip = d3.select('body').append<HTMLDivElement>('div')
@@ -169,7 +171,6 @@ namespace fibra {
           .call(d3.drag()
               .on('start', (d: IExploreItem, i: number) => {
                 if (!this.drawmode) {
-                  if (!d3.event.active) this.forceSim.alphaTarget(.1).restart()
                   d.fx = d.x
                   d.fy = d.y
                 } else {
@@ -180,8 +181,8 @@ namespace fibra {
               .on('drag', (d: IExploreItem, i: number, group) => {
                 if (!this.drawmode) {
                   d3.select(group[i]).classed('fixed', true)
-                  d.fx = d3.event.x
-                  d.fy = d3.event.y
+                  d.x = d3.event.x
+                  d.y = d3.event.y
                   if (d3.select(group[i]).classed('selected-circle')) {
                   this.item_info_tip.style('top', (d3.event.y + 30) + 'px')
                   .style('left', (d3.event.x + 30) + 'px')
@@ -192,10 +193,10 @@ namespace fibra {
                     .attr('x2', d3.event.x)
                     .attr('y2', d3.event.y)
                 }
+                this.updateExplore(false, false)
                })
               .on('end',  (d: IExploreItem, i: number, group) => {
                 if (!this.drawmode) {
-                  if (!d3.event.active) this.forceSim.alphaTarget(0)
                   if (!d3.select(group[i]).classed('fixed')) {
                     d.fx = undefined
                     d.fy = undefined
@@ -208,7 +209,7 @@ namespace fibra {
                     .each((f: IExploreItem, j) => {
                       if (Math.abs(lineX - f.x) < this.radius && Math.abs(lineY - f.y) < this.radius) {
                         this.links.push({'source': d, 'target': f, 'property': undefined})
-                        this.updateExplore()
+                        this.updateExplore(false)
                       }
                     })
                   this.dragline.remove()
@@ -302,7 +303,7 @@ namespace fibra {
         .attr('y2', (d: IExploreItemLink) => (<IExploreItem>d.target).gy!)
     }
 
-    private updateExplore(runSim: boolean = true): angular.IPromise<string> {
+    private updateExplore(runSim: boolean = true, transition: boolean = false): angular.IPromise<string> {
 
       let primaryNodes: d3.Selection<d3.BaseType, {}, SVGSVGElement, {}> = this.svgSel
           .selectAll<SVGElement, IExploreItem>('circle.primary')
@@ -338,10 +339,12 @@ namespace fibra {
 
       // Apply forces only to one set of items, depending on force.  
       let collideForce = this.forceSim.force('charge')
+      let collideForce2 = this.forceSim.force('charge2')
       let centerForce = this.forceSim.force('center')
       let xpositionForce = this.forceSim.force('xposition')
       let ypositionForce = this.forceSim.force('yposition')
       if(collideForce.initialize) collideForce.initialize(this.primaryItems)
+      if(collideForce2.initialize) collideForce2.initialize(this.secondaryItems)
       // if(centerForce.initialize) centerForce.initialize(this.primaryItems)
       // if(xpositionForce.initialize) xpositionForce.initialize(this.primaryItems)
       // if(ypositionForce.initialize) ypositionForce.initialize(this.primaryItems)
@@ -349,7 +352,7 @@ namespace fibra {
       if(runSim) {
         this.forceSim.alpha(1).restart()
       } else {
-        this.genericTick(primaryNodes, secondaryNodes, linkLines, true)
+        this.genericTick(primaryNodes, secondaryNodes, linkLines, transition)
       }
 
       return this.$q.resolve('ok')
