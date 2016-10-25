@@ -140,7 +140,7 @@ namespace fibra {
       d3.select(this.$element[0]).select('#exploretable')
         .style('width', viewport_width + 'px')
         .style('height', viewport_height - 50 + 'px')
-      
+
       this.svgSel.style('width', viewport_width + 'px')
         .style('height', viewport_height - 36 + 'px')
         // .style('top', 25 + 'px')
@@ -227,8 +227,7 @@ namespace fibra {
             this.tooltip.style('visibility', 'hidden')
           })
           .on('click', (d: IExploreItem, i, group) => {
-            console.log(this.svgSel.selectAll('.node'))
-            this.svgSel.selectAll('.node')
+            this.svgSel.selectAll('.node-circle')
               .classed('selected-circle', false)
               .attr('r', this.radius + 'px')
             d3.select(group[i])
@@ -293,7 +292,7 @@ namespace fibra {
       }
 
       this.tickTransformNodes(lPrimaryNodes, true)
-      this.tickTransformNodes(lSecondaryNodes, false)          
+      this.tickTransformNodes(lSecondaryNodes, false)
 
       lLinkLines
         .attr('x1', (d: IExploreItemLink) => (<IExploreItem>d.source).gx!)
@@ -336,7 +335,7 @@ namespace fibra {
       this.forceSim
         .force<d3.ForceLink<IExploreItem, IExploreItemLink>>('link').links(this.links)
 
-      // Apply forces only to one set of items, depending on force.  
+      // Apply forces only to one set of items, depending on force.
       let collideForce = this.forceSim.force('charge')
       let centerForce = this.forceSim.force('center')
       let xpositionForce = this.forceSim.force('xposition')
@@ -399,10 +398,10 @@ namespace fibra {
       this.itemService = sparqlItemService
       this.links = []
       this.$scope.layout = {
-        'choice': 'force' 
+        'choice': 'force'
       }
 
-      this.$scope.$watch('layout.choice', this.updateExplore.bind(this, false)) 
+      this.$scope.$watch('layout.choice', this.updateExplore.bind(this, false))
 
       // add shift to enable draw mode - this can easily be changed to require shift to be held
       this.$window.addEventListener('keydown', (event) => {
