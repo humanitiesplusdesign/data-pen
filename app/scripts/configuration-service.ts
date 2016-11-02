@@ -71,8 +71,10 @@ namespace fibra {
     }
     constructor(private workerService: WorkerService, private $localStorage: any) {
       this.configuration = $localStorage['configuration']
-      this.configuration['__proto__'] = Configuration.prototype
-      if (this.configuration) this.workerService.callAll('configurationWorkerService', 'setConfiguration', [this.configuration])
+      if (this.configuration) {
+        this.configuration['__proto__'] = Configuration.prototype
+        this.workerService.callAll('configurationWorkerService', 'setConfiguration', [this.configuration])
+      }
     }
   }
 
