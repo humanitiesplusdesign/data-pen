@@ -19,6 +19,7 @@ namespace fibra {
 PREFIX text: <http://jena.apache.org/text#>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+PREFIX mads: <http://www.loc.gov/mads/rdf/v1#>
 PREFIX owl: <http://www.w3.org/2002/07/owl#>
 PREFIX sf: <http://ldf.fi/functions#>
 PREFIX fibra: <http://ldf.fi/fibra/schema#>
@@ -28,33 +29,39 @@ SELECT ?groupId ?groupLabel ?id ?prefLabel ?matchedLabel ?sameAs ?altLabel { # A
     SELECT ?groupId ?id (SUM(?sc) AS ?score) {
       {
         SELECT ?groupId ?id ?sc {
-          BIND(CONCAT(REPLACE(<QUERY>,"([\\\\+\\\\-\\\\&\\\\|\\\\!\\\\(\\\\)\\\\{\\\\}\\\\[\\\\]\\\\^\\\\\\"\\\\~\\\\*\\\\?\\\\:\\\\/\\\\\\\\])","\\\\$1"),"*") AS ?query)
-          (?id ?sc) text:query ?query .
-          ?id a ?groupId .
-          # CONSTRAINTS
+          GRAPH <IGRAPH> {
+            BIND(CONCAT(REPLACE(<QUERY>,"([\\\\+\\\\-\\\\&\\\\|\\\\!\\\\(\\\\)\\\\{\\\\}\\\\[\\\\]\\\\^\\\\\\"\\\\~\\\\*\\\\?\\\\:\\\\/\\\\\\\\])","\\\\$1"),"*") AS ?query)
+            (?id ?sc) text:query ?query .
+            ?id a ?groupId .
+            # CONSTRAINTS
+          }
         } LIMIT <LIMIT>
       } UNION {
-        BIND(CONCAT("\\"",REPLACE(<QUERY>,"([\\\\+\\\\-\\\\&\\\\|\\\\!\\\\(\\\\)\\\\{\\\\}\\\\[\\\\]\\\\^\\\\\\"\\\\~\\\\*\\\\?\\\\:\\\\/\\\\\\\\])","\\\\$1"),"\\"") AS ?query)
-        (?id ?sc) text:query ?query .
-        ?id skos:prefLabel|rdfs:label|skos:altLabel ?matchedLabel
-        FILTER (LCASE(?matchedLabel)=LCASE(<QUERY>))
-        ?id a ?groupId .
-        # CONSTRAINTS
+        GRAPH <IGRAPH> {
+          BIND(CONCAT("\\"",REPLACE(<QUERY>,"([\\\\+\\\\-\\\\&\\\\|\\\\!\\\\(\\\\)\\\\{\\\\}\\\\[\\\\]\\\\^\\\\\\"\\\\~\\\\*\\\\?\\\\:\\\\/\\\\\\\\])","\\\\$1"),"\\"") AS ?query)
+          (?id ?sc) text:query ?query .
+          ?id skos:prefLabel|rdfs:label|skos:altLabel|mads:authoritativeLabel|mads:variantLabel ?matchedLabel
+          FILTER (LCASE(?matchedLabel)=LCASE(<QUERY>))
+          ?id a ?groupId .
+          # CONSTRAINTS
+        }
       }
     }
     GROUP BY ?groupId ?id
     HAVING(BOUND(?id))
   }
-  ?id skos:prefLabel|rdfs:label|skos:altLabel ?matchedLabel
+  ?id skos:prefLabel|rdfs:label|skos:altLabel|mads:authoritativeLabel|mads:variantLabel ?matchedLabel
   FILTER (REGEX(LCASE(?matchedLabel),CONCAT("\\\\b",LCASE(<QUERY>))))
   {
-    ?groupId sf:preferredLanguageLiteral (skos:prefLabel rdfs:label skos:altLabel <PREFLANG> '' ?groupLabel) .
+    GRAPH <SGRAPH> {
+      ?groupId sf:preferredLanguageLiteral (skos:prefLabel mads:authoritativeLabel rdfs:label skos:altLabel mads:variantLabel <PREFLANG> '' ?groupLabel) .
+    }
   } UNION {
-    ?id sf:preferredLanguageLiteral (skos:prefLabel rdfs:label skos:altLabel <PREFLANG> '' ?prefLabel) .
+    ?id sf:preferredLanguageLiteral (skos:prefLabel mads:authoritativeLabel rdfs:label skos:altLabel mads:variantLabel <PREFLANG> '' ?prefLabel) .
   } UNION {
     ?id owl:sameAs ?sameAs .
   } UNION {
-    ?id skos:altLabel ?altLabel .
+    ?id skos:altLabel|mads:variantLabel ?altLabel .
   }
   # ADDITIONALSELECT
 }

@@ -5,7 +5,7 @@ namespace fibra {
     constructor(public endpoint: string, public queryTemplate: string) {}
   }
 
-  export class AuthorComponentController {
+  export class ConstructViewComponentController {
 
     public endpoints: EndpointConfiguration[]
     public classTree: TreeNode[]
@@ -44,8 +44,8 @@ namespace fibra {
     }
   }
 
-  export class AuthorComponent implements angular.IComponentOptions {
-      public controller = AuthorComponentController
-      public templateUrl: string = 'partials/author.html'
+  export class ConstructViewComponent implements angular.IComponentOptions {
+      public controller: (new (...args: any[]) => angular.IController) = ConstructViewComponentController
+      public templateUrl: string = 'partials/construct-view.html'
   }
 }

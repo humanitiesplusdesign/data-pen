@@ -2,7 +2,7 @@ namespace fibra {
   'use strict'
 
   export interface ITerm {
-    termType: 'NamedNode' | 'BlankNode' | 'Literal' | 'Variable' | 'DefaultGraph'
+    termType: 'NamedNode' | 'BlankNode' | 'Literal' | 'Variable' | 'DefaultGraph' | 'UNDEF'
     value: string
     equals(other: ITerm): boolean
     toCanonical(): string
@@ -28,6 +28,10 @@ namespace fibra {
 
   export interface IDefaultGraph extends ITerm {
     termType: 'DefaultGraph'
+  }
+
+  export interface IUNDEF extends ITerm {
+    termType: 'UNDEF'
   }
 
   export interface IQuad {

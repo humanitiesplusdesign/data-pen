@@ -11,7 +11,8 @@ namespace fibra {
       'DataModelConfiguration': DataModelConfiguration.prototype,
       'Item': Item.prototype,
       'PropertyToValues': PropertyToValues.prototype,
-      'SourcedNodePlusLabel': SourcedNodePlusLabel.prototype
+      'SourcedNodePlusLabel': SourcedNodePlusLabel.prototype,
+      'UNDEF': UNDEF.prototype
     }
   })
 }

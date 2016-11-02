@@ -9,7 +9,7 @@ namespace fibra {
   }
 
   export class Node implements INode {
-    constructor(public value: string, public termType: 'NamedNode' | 'BlankNode' | 'Literal' | 'Variable' | 'DefaultGraph', public language: string | undefined = undefined, public datatype: INamedNode | undefined = undefined) {}
+    constructor(public value: string, public termType: 'NamedNode' | 'BlankNode' | 'Literal' | 'Variable' | 'DefaultGraph' | 'UNDEF', public language: string | undefined = undefined, public datatype: INamedNode | undefined = undefined) {}
     public toCanonical(): string {
       switch (this.termType) {
         case 'NamedNode': return '<' + this.value + '>'
@@ -17,6 +17,7 @@ namespace fibra {
         case 'Literal': return JSON.stringify(this.value) + (this.language ? '@' + this.language : (XMLSchema.string.equals(this.datatype!) ? '' : '^^' + this.datatype!.toCanonical()))
         case 'Variable': return '?' + this.value
         case 'DefaultGraph': return ''
+        case 'UNDEF': return 'UNDEF'
         default: throw 'Unknown term type ' + this
       }
     }
@@ -37,6 +38,14 @@ namespace fibra {
     public toCanonical(): string { return '' }
     public equals(other: ITerm): boolean { return other.termType === 'DefaultGraph' }
     constructor() { super('', 'DefaultGraph') }
+  }
+
+  export class UNDEF extends Node implements IUNDEF {
+    public static instance: IUNDEF = new UNDEF()
+    public termType: 'UNDEF'
+    public toCanonical(): string { return '' }
+    public equals(other: ITerm): boolean { return other.termType === 'UNDEF' }
+    constructor() { super('', 'UNDEF') }
   }
 
   export class Variable extends Node implements IVariable {

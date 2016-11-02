@@ -13,11 +13,23 @@ namespace fibra {
 
   let m: angular.IModule = angular.module('fibra', [ 'http-auth-interceptor', 'ngStorage', 'ui.router',  'ui.bootstrap', 'ui.bootstrap.tpls' ])
   m.config(($stateProvider: angular.ui.IStateProvider, $urlRouterProvider: angular.ui.IUrlRouterProvider) => {
-    $urlRouterProvider.otherwise('/author')
+    $urlRouterProvider.otherwise('/configure')
+    $stateProvider.state('configure', {
+      url: '/configure',
+      template: '<configure-view></configure-view>'
+    })
+    $stateProvider.state('select', {
+      url: '/select',
+      template: '<select-view></select-view>'
+    })
+    $stateProvider.state('construct', {
+      url: '/construct',
+      template: '<construct-view></construct-view>'
+    })
     $stateProvider.state('author', {
-        url: '/author',
-        template: '<author></author>'
-      })
+      url: '/author',
+      template: '<author-view></author-view>'
+    })
   })
   m.config(($localStorageProvider) => {
     $localStorageProvider.setKeyPrefix('fibra-');
