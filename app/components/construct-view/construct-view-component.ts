@@ -31,7 +31,7 @@ namespace fibra {
                 private sparqlItemService: SparqlItemService,
                 private fibraService: FibraService) {
       this.endpoints = configurationService.configuration.remoteEndpoints()
-      this.classTreePromise = sparqlTreeService.getTree(this.configurationService.configuration.primaryEndpoint.endpoint.value, SparqlTreeService.getClassTreeQuery)
+      this.classTreePromise = sparqlTreeService.getTree(this.configurationService.configuration.primaryEndpoint.endpoint.value, this.configurationService.configuration.primaryEndpoint.treeQueryTemplate)
       this.classTreePromise.then(c => this.classTree = c)
 
       this.fibraService.on('change', () => {

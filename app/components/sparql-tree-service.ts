@@ -9,20 +9,22 @@ PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX sf: <http://ldf.fi/functions#>
 SELECT ?subClass ?superClass ?class ?classLabel ?instances {
-  {
-    ?subClass rdfs:subClassOf ?class .
-    FILTER EXISTS {
-      ?p a ?subClass .
-    }
-  } UNION {
+  GRAPH <GRAPH> {
     {
-      SELECT ?class (COUNT(DISTINCT ?p) AS ?instances) {
-        ?p a ?class .
+      ?subClass rdfs:subClassOf ?class .
+      FILTER EXISTS {
+        ?p a ?subClass .
       }
-      GROUP BY ?class
+    } UNION {
+      {
+        SELECT ?class (COUNT(DISTINCT ?p) AS ?instances) {
+          ?p a ?class .
+        }
+        GROUP BY ?class
+      }
     }
+    ?class sf:preferredLanguageLiteral (skos:prefLabel rdfs:label skos:altLabel 'en' '' ?classLabel) .
   }
-  ?class sf:preferredLanguageLiteral (skos:prefLabel rdfs:label skos:altLabel 'en' '' ?classLabel) .
 }
 `
     constructor(private workerService: WorkerService) {}

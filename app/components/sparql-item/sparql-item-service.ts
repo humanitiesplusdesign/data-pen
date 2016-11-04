@@ -124,7 +124,7 @@ SELECT ?property ?propertyLabel ?object ?objectLabel {
   VALUES ?id { <IDS> }
   ?id ?property ?object .
   OPTIONAL {
-    ?property sf:preferredLanguageLiteral skos:prefLabel mads:authoritativeLabel rdfs:label skos:altLabel mads:variantLabel <PREFLANG> '' ?propertyLabelP)
+    ?property sf:preferredLanguageLiteral (skos:prefLabel mads:authoritativeLabel rdfs:label skos:altLabel mads:variantLabel <PREFLANG> '' ?propertyLabelP)
   }
   BIND(COALESCE(?propertyLabelP,REPLACE(REPLACE(REPLACE(REPLACE(STR(?property),".*/",""),".*#",""),"_"," "),"([A-ZÅÄÖ])"," $1")) AS ?propertyLabel)
   OPTIONAL {

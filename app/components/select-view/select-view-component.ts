@@ -6,6 +6,7 @@ namespace fibra {
       let c: Configuration = this.configurationService.configuration
       c.primaryEndpoint.localItemQueryTemplate = c.primaryEndpoint.localItemQueryTemplate.replace(/GRAPH <GRAPH>/g, 'GRAPH <http://ldf.fi/fibra/' + identifier + '/>')
       c.primaryEndpoint.autocompletionTextMatchQueryTemplate = c.primaryEndpoint.autocompletionTextMatchQueryTemplate.replace(/GRAPH <GRAPH>/g, 'GRAPH <http://ldf.fi/fibra/' + identifier + '/>')
+      c.primaryEndpoint.treeQueryTemplate = c.primaryEndpoint.treeQueryTemplate.replace(/GRAPH <GRAPH>/g, 'GRAPH <http://ldf.fi/fibra/' + identifier + '/>')
       this.configurationService.setConfiguration(c)
       this.$state.go('construct')
     }
