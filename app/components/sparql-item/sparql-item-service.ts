@@ -241,6 +241,7 @@ WHERE {
     public getItem(id: INode, canceller?: angular.IPromise<any>): angular.IPromise<Item> {
       let queryTemplate: string = this.configurationWorkerService.configuration.primaryEndpoint.localItemQueryTemplate
       queryTemplate = queryTemplate.replace(/<ID>/g, id.toCanonical())
+      queryTemplate = queryTemplate.replace(/<PREFLANG>/g, this.configurationWorkerService.configuration.preferredLanguage)
       let item: Item = new Item(id)
       return this.sparqlService.query(this.configurationWorkerService.configuration.primaryEndpoint.endpoint.value, queryTemplate, {timeout: canceller}).then(
         (response: angular.IHttpPromiseCallbackArg<s.ISparqlBindingResult<{[id: string]: s.ISparqlBinding}>>) => {
@@ -253,13 +254,16 @@ WHERE {
           let sameAses: PropertyToValues<INodePlusLabel> = item.localProperties.filter(p => OWL.sameAs.equals(p))[0]
           let ids: string[] = [item.toCanonical()]
           if (sameAses) for (let v of sameAses.values) ids.push(v.toCanonical())
-          return this.$q.all(this.configurationWorkerService.configuration.remoteEndpoints().map(endpoint =>
-            this.sparqlService.query(endpoint.endpoint.value, SparqlItemService.getRemoteItemPropertiesQuery.replace(/<IDS>/g, ids.join('')), {timeout: canceller}).then(
+          return this.$q.all(this.configurationWorkerService.configuration.remoteEndpoints().map(endpoint => {
+            let queryTemplate2: string = endpoint.remoteItemQueryTemplate
+            queryTemplate2 = queryTemplate2.replace(/<IDS>/g, ids.join(''))
+            queryTemplate2 = queryTemplate2.replace(/<PREFLANG>/g, this.configurationWorkerService.configuration.preferredLanguage)
+            return this.sparqlService.query(endpoint.endpoint.value, queryTemplate2, {timeout: canceller}).then(
               (response2: angular.IHttpPromiseCallbackArg<s.ISparqlBindingResult<{[id: string]: s.ISparqlBinding}>>) => {
                 for (let b of response2.data!.results.bindings)
                   this.processItemResult(item.remoteProperties, propertyMap, propertyValueMap, endpoint, b)
               })
-          )).then(() => item)
+          })).then(() => item)
         }
       )
     }
@@ -267,6 +271,7 @@ WHERE {
     public getItemsForExplore(canceller?: angular.IPromise<any>): angular.IPromise<Item[]> {
       let queryTemplate: string = SparqlItemService.getItemsForExploreQuery
       queryTemplate = queryTemplate.replace(/<SERVICES>/g, this.configurationWorkerService.configuration.remoteEndpoints().map(p => p.endpoint.toCanonical()).join(''))
+      queryTemplate = queryTemplate.replace(/<PREFLANG>/g, this.configurationWorkerService.configuration.preferredLanguage)
       return this.sparqlService.query(this.configurationWorkerService.configuration.primaryEndpoint.endpoint.value, queryTemplate, {timeout: canceller}).then(
         (response: angular.IHttpPromiseCallbackArg<s.ISparqlBindingResult<{[id: string]: s.ISparqlBinding}>>) => {
           let items: EOMap<Item> = new EOMap<Item>()

@@ -65,10 +65,20 @@ SELECT ?groupId ?groupLabel ?id ?prefLabel ?matchedLabel ?sameAs ?altLabel {
     ?id skos:exactMatch ?sameAs .
   }
 }`
+      let gettyRemoteItemQueryTemplate: string = `PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX gvp: <http://vocab.getty.edu/ontology#>
+SELECT ?property ?propertyLabel ?object ?objectLabel {
+  VALUES ?id { <IDS> }
+  ?id ?property ?object .
+  ?property rdfs:label ?propertyLabel .
+  ?object gvp:prefLabelGVP [xl:literalForm ?objectLabel] .
+}`
       let ulanConfiguration: EndpointConfiguration = new EndpointConfiguration('ulan', 'ULAN', new NamedNode('http://ldf.fi/corsproxy/vocab.getty.edu/sparql'), [GETTY.PersonConcept, GETTY.GroupConcept])
       ulanConfiguration.autocompletionTextMatchQueryTemplate = gettyAutocompletionQueryTemplate.replace(/<SCHEME>/g, 'ulan:')
+      ulanConfiguration.remoteItemQueryTemplate = gettyRemoteItemQueryTemplate
       let tgnConfiguration: EndpointConfiguration = new EndpointConfiguration('tgn', 'TGN', new NamedNode('http://ldf.fi/corsproxy/vocab.getty.edu/sparql'), [GETTY.AdminPlaceConcept, GETTY.PhysAdminPlaceConcept])
       tgnConfiguration.autocompletionTextMatchQueryTemplate = gettyAutocompletionQueryTemplate.replace(/<SCHEME>/g, 'tgn:')
+      tgnConfiguration.remoteItemQueryTemplate = gettyRemoteItemQueryTemplate
       let viafConfiguration: EndpointConfiguration = new EndpointConfiguration('viaf', 'VIAF', new NamedNode('http://ldf.fi/viaf/sparql'))
       viafConfiguration.autocompletionTextMatchQueryTemplate = viafConfiguration.autocompletionTextMatchQueryTemplate.replace(/# ADDITIONALSELECT/g, `
 UNION {
