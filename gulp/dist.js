@@ -4,13 +4,14 @@ var uglifySaveLicense = require('uglify-save-license');
 var $ = require('gulp-load-plugins')();
 
 gulp.task('dist:partials', function() {
-  return gulp.src(".tmp/partials/**/*.html")
+  return gulp.src(".tmp/components/**/*.html")
     .pipe($.plumber({ errorHandler: $.notify.onError("<%= error.stack %>") }))
     .pipe($.ngHtml2js({
       moduleName: "fibra",
-      prefix: "partials/"
+      prefix: "components/"
     }))
-    .pipe(gulp.dest(".tmp/partials"));
+    .pipe($.concat("partials.js"))
+    .pipe(gulp.dest(".tmp"));
 });
 
 gulp.task('dist:wire:bundle-workerscripts', function() {
@@ -33,7 +34,7 @@ gulp.task('dist:html', ['dist:wire:bundle-workerscripts','dist:partials'], funct
     .pipe($.plumber({ errorHandler: $.notify.onError("<%= error.stack %>") }))
     .pipe($.print(function(path) { return "dist:html(1) " + path; }))
     .pipe($.size({ title: 'dist:html(1)' }))
-    .pipe($.inject(gulp.src(".tmp/partials/**/*.js", {read:false}), {
+    .pipe($.inject(gulp.src(".tmp/partials.js", {read:false}), {
       starttag: "<!-- inject:partials-->",
       endtag: "<!-- endinject-->",
       addRootSlash: false,
@@ -53,7 +54,8 @@ gulp.task('dist:html', ['dist:wire:bundle-workerscripts','dist:partials'], funct
     .pipe($.rev())
     .pipe($.print(function(path) { return "dist:html-js(1) " + path; }))
     .pipe($.size({ title: 'dist:html-js(1)' }))
-    //.pipe($.ngAnnotate()).pipe($.uglify({ preserveComments: uglifySaveLicense }))
+    .pipe($.ngAnnotate())
+    .pipe($.uglify({ preserveComments: uglifySaveLicense }))
     .pipe($.print(function(path) { return "dist:html-js(2) " + path; }))
     .pipe($.size({ title: 'dist:html-js(2)' }))
     .pipe(jsFilter.restore)
@@ -63,7 +65,7 @@ gulp.task('dist:html', ['dist:wire:bundle-workerscripts','dist:partials'], funct
     .pipe($.size({ title: 'dist:html-css(1)' }))
     .pipe($.replace(/url\(".*?\/(\w+\.(eot|svg|ttf|woff|woff2).*?)"\)/g, 'url("$1")'))
     .pipe($.replace(/url\(".*?\/(\w+?\.(png|jpg|jpeg))"\)/g, 'url("$1")'))
-    .pipe($.cleanCss({ processImport: false }))
+    .pipe($.cleanCss())
     .pipe($.print(function(path) { return "dist:html-css(2) " + path; }))
     .pipe($.size({ title: 'dist:html-css(2)' }))
     .pipe(cssFilter.restore)

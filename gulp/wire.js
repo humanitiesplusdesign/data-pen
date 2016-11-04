@@ -3,7 +3,7 @@ var $ = require('gulp-load-plugins')();
 var wiredep = require('wiredep').stream;
 
 gulp.task('wire:styles', function() {
-  return gulp.src("app/styles/*.styl")
+  return gulp.src("app/styles/main.styl")
     .pipe(wiredep({
       directory: "app/bower_components",
       fileTypes: {
@@ -20,11 +20,20 @@ gulp.task('wire:styles', function() {
         }
       }
     }))
+    .pipe($.inject(gulp.src(["app/components/**/*.styl","app/styles/*.styl","!app/styles/main.styl"], {read:false}), {
+          starttag: "// inject:styles",
+          endtag: "// endinject",
+          addRootSlash: false,
+          ignorePath: 'app/',
+          transform: function(filepath) {
+            return '@import \'../'+filepath.replace(/\.styl$/g,'\.css')+'\''
+          }
+        }))
     .pipe(gulp.dest("app/styles"));
 });
 
 gulp.task('wire:workerscripts-to-scripts', function() {
-  return gulp.src("app/scripts/app-configuration-ui.ts")
+  return gulp.src("app/components/app/app-configuration-ui.ts")
     .pipe($.inject(gulp.src("worker.conf"), {
           starttag: "importScripts: [",
           endtag: "]",
@@ -34,7 +43,7 @@ gulp.task('wire:workerscripts-to-scripts', function() {
             return file.contents.toString('utf8').replace(/^/,'\'').replace(/[\n\r]+/g,'\',\n      \'').replace(/,[\n\r]+      '$/,'')
           }
         }))
-    .pipe(gulp.dest("app/scripts"));
+    .pipe(gulp.dest("app/components"));
 });
 
 gulp.task('wire:scripts-to-templates', function() {
@@ -42,7 +51,7 @@ gulp.task('wire:scripts-to-templates', function() {
     .pipe(wiredep({
       directory: "app/bower_components"
     }))
-    .pipe($.inject(gulp.src(["app/scripts/**/*.ts","!app/scripts/app-configuration-ui.ts","!app/scripts/app-configuration-worker.ts"], {read:false}), {
+    .pipe($.inject(gulp.src(["app/components/**/*.ts","!app/components/app/app-configuration-ui.ts","!app/components/app/app-configuration-worker.ts"], {read:false}), {
           starttag: "// inject:scripts",
           endtag: "// endinject",
           addRootSlash: false,

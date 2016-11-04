@@ -6,6 +6,6 @@ namespace fibra {
         tree: '<',
         onSelect: '&',
       }
-      public templateUrl: string = 'partials/type-select.html'
+      public templateUrl: string = 'components/type-select/type-select.html'
   }
 }

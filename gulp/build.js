@@ -3,11 +3,13 @@ var nib = require('nib');
 var $ = require('gulp-load-plugins')();
 
 gulp.task('styles', function() {
-  return gulp.src("app/styles/main.styl")
+  return gulp.src("app/**/*.styl")
     .pipe($.plumber({ errorHandler: $.notify.onError("<%= error.stack %>") }))
+    .pipe($.sourcemaps.init())
     .pipe($.stylus({ use: [nib()] }))
+    .pipe($.sourcemaps.write())
     .pipe($.autoprefixer("last 1 version"))
-    .pipe(gulp.dest(".tmp/styles"));
+    .pipe(gulp.dest(".tmp"));
 });
 
 var tsProject = $.typescript.createProject('tsconfig.json',{typescript:require('typescript')});
@@ -48,7 +50,7 @@ gulp.task('clean', function(cb){
 });
 
 gulp.task('lint', function() {
-  return gulp.src('app/scripts/**/*.ts')
+  return gulp.src('app/components/**/*.ts')
     .pipe($.tslint({ formatter: 'verbose' }))
     .pipe($.tslint.report())
 })

@@ -469,7 +469,7 @@ namespace fibra {
       classTreePromise: '<',
       selectedItem: '='
     }
-    public controller: (new (...args: any[]) => angular.IController) = ExploreComponentController
-    public templateUrl: string = 'partials/explore.html'
+    public controller: string = 'ExploreComponentController' // (new (...args: any[]) => angular.IController) = ExploreComponentController
+    public templateUrl: string = 'components/construct-view/explore.html'
   }
 }

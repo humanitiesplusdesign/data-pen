@@ -45,7 +45,7 @@ namespace fibra {
   }
 
   export class ConstructViewComponent implements angular.IComponentOptions {
-      public controller: (new (...args: any[]) => angular.IController) = ConstructViewComponentController
-      public templateUrl: string = 'partials/construct-view.html'
+      public controller: string = 'ConstructViewComponentController' // (new (...args: any[]) => angular.IController) = ConstructViewComponentController
+      public templateUrl: string = 'components/construct-view/construct-view.html'
   }
 }

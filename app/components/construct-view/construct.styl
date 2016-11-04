@@ -1,0 +1,52 @@
+construct-view {
+  .dragLine {
+    stroke: #ff3333
+    stroke-width: 1px
+    stroke-dasharray: 3,3
+  }
+
+  .tooltip {
+    position: absolute
+    z-index: 20
+    visibility: hidden
+    color: black
+    background-color: gray
+    padding: 2px
+    border-radius: 2px
+  }
+
+  .node-container {
+    width: 50px;
+    height: 50px;
+  }
+
+  .node-circle {
+    transition: .2s
+  }
+
+  .node-circle.primary {
+    fill: darken(gray, 50%)
+  }
+
+  .node-circle.secondary {
+    fill: lighten(gray, 50%)
+  }
+
+  .node-circle:hover {
+    r: 11px
+    z-index: 100
+  }
+
+  .selected-circle {
+    fill: green !important
+  }
+
+  .not-selected {
+
+  }
+
+  .node-circle:hover {
+    fill: red
+    cursor: pointer
+  }
+}

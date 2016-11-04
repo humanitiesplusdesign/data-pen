@@ -28,7 +28,7 @@ namespace fibra {
         onSelect: '&',
         showRemoteProperties: '@'
       }
-      public controller = SparqlItemComponentController
-      public templateUrl: string = 'partials/sparql-item.html'
+      public controller: string = 'SparqlItemComponentController' // (new (...args: any[]) => angular.IController) = SparqlItemComponentController
+      public templateUrl: string = 'components/sparql-item/sparql-item.html'
   }
 }

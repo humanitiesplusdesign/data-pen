@@ -19,6 +19,6 @@ namespace fibra {
         tree: '<',
         onSelect: '&',
       }
-      public templateUrl: string = 'partials/tree.html'
+      public templateUrl: string = 'components/tree/tree.html'
   }
 }

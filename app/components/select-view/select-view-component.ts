@@ -13,7 +13,7 @@ namespace fibra {
   }
 
   export class SelectViewComponent implements angular.IComponentOptions {
-      public controller: (new (...args: any[]) => angular.IController) = SelectViewComponentController
-      public templateUrl: string = 'partials/select-view.html'
+      public controller: string = 'SelectViewComponentController' // (new (...args: any[]) => angular.IController) = SelectViewComponentController
+      public templateUrl: string = 'components/select-view/select-view.html'
   }
 }
