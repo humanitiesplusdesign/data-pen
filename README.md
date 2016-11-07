@@ -10,7 +10,7 @@
 
 ### Setting up the build environment
 
-Run `npm install`. This should also automatically run `bower install`, but if it doesn't, run that yourself.
+Run `npm install` (or `yarn` if you have it). This should also automatically run `bower install`, but if it doesn't, run that yourself.
 
 ### Building
 
