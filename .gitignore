@@ -4,3 +4,4 @@ docs
 .tmp
 app/bower_components
 .publish
+.vscode
