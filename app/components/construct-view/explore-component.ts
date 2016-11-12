@@ -431,8 +431,29 @@ namespace fibra {
       })
     }
 
-    private mergeNodes(oldNodes: Item[], newNodes: Item[]) {
-      // TODO
+    private mergeNodes(oldNodes: Item[], nodes: Item[]) {
+      let newNodes: Item[] = []
+
+      // Check if old nodes are still in the mix
+      for(var i = 0; i < oldNodes.length; i++) {
+        for(var j = 0; j < nodes.length; j++) {
+          if(oldNodes[i].toCanonical() === nodes[j].toCanonical()) {
+            newNodes.push(oldNodes[i])
+          }
+        }
+      }
+
+      // Add the new nodes
+      for(var i=0; i < nodes.length; i++) {
+        let check = false
+        for(var j = 0; j < newNodes.length; j++) {
+          if(newNodes[j].toCanonical() === nodes[i].toCanonical()) check = true
+        }
+        if(!check) {
+          newNodes.push(nodes[i])
+        }
+      }
+
       return newNodes
     }
 
