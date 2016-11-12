@@ -3,12 +3,12 @@
     .col-md-12
       .row.no-gutter
         #type-bar.col-md-12
-          type-select(tree="$ctrl.classTree",on-select="$ctrl.alterSelection(treeNode)")
+          explore-type(types="$ctrl.types", chosen-types="$ctrl.chosenTypes")
         .pull-right
           span(ng-repeat="endpoint in $ctrl.endpoints")
             i.glyphicon.glyphicon-triangle-top(ng-class="endpoint.class")
             | {{endpoint.title}}
       .row.no-gutter
         #middle-column.col-md-12
-          explore(class-tree-promise="$ctrl.classTreePromise", selected-item="$ctrl.selectedItem")
+          explore(chosen-types="$ctrl.chosenTypes", selected-item="$ctrl.selectedItem")
           sparql-autocomplete(limit="5",by="group",on-select="$ctrl.createItem(result)")#searchbar

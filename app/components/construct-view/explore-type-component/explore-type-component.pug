@@ -1,0 +1,20 @@
+div.btn-group(uib-dropdown)
+  button#single-button.btn.btn-primary.btn-xs(type="button" uib-dropdown-toggle ng-disabled="disabled") {{ $ctrl.chosenTypes.primary ? $ctrl.chosenTypes.primary.label : "Primary Nodes" }}&nbsp;
+    span.caret
+  ul.dropdown-menu(uib-dropdown-menu role="menu" aria-labelledby="single-button")
+    li(role="menuitem" ng-repeat="type in $ctrl.types")
+      a(ng-click="$ctrl.primaryClick(type)") {{type.label}} ({{type.instances}})
+
+div.btn-group(uib-dropdown)
+  button#single-button.btn.btn-primary.btn-xs(type="button" uib-dropdown-toggle ng-disabled="disabled") {{ $ctrl.chosenTypes.secondary ? $ctrl.chosenTypes.secondary.label : "Secondary Nodes" }}&nbsp;
+    span.caret
+  ul.dropdown-menu(uib-dropdown-menu role="menu" aria-labelledby="single-button")
+    li(role="menuitem" ng-repeat="type in $ctrl.types")
+      a(ng-click="$ctrl.secondaryClick(type)") {{type.label}} ({{type.instances}})
+
+div.btn-group(uib-dropdown)
+  button#single-button.btn.btn-primary.btn-xs(type="button" uib-dropdown-toggle ng-disabled="disabled") {{ $ctrl.chosenTypes.tertiary ? $ctrl.chosenTypes.tertiary.label : "Tertiary Nodes" }}&nbsp;
+    span.caret
+  ul.dropdown-menu(uib-dropdown-menu role="menu" aria-labelledby="single-button")
+    li(role="menuitem" ng-repeat="type in $ctrl.types")
+      a(ng-click="$ctrl.tertiaryClick(type)") {{type.label}} ({{type.instances}})

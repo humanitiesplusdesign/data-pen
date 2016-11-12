@@ -24,12 +24,11 @@ namespace fibra {
     public itemService: SparqlItemService
     // public items: Item[] = []
     public selectedItem: INode
+    public chosenTypes
     public properties: {}[]
-    public classTreePromise: angular.IPromise<TreeNode[]>
     private svgSel: d3.Selection<SVGSVGElement, {}, null, undefined>
     private links: IExploreItemLink[]
     private forceSim: d3.Simulation<IExploreItem, IExploreItemLink>
-    private orderedTypes: string[] = ['http://www.cidoc-crm.org/cidoc-crm/E21_Person', 'http://www.cidoc-crm.org/cidoc-crm/E53_Place', 'http://www.cidoc-crm.org/cidoc-crm/E74_Group']
     private primaryItems: Item[] = []
     private secondaryItems: Item[] = []
     private tertiaryItems: Item[] = []
@@ -92,18 +91,19 @@ namespace fibra {
     }
 
     public queryAndBuild(): angular.IPromise<string> {
-      return this.classTreePromise.then(ct => this.itemService.getItemsForExplore().then(
+      return this.itemService.getItemsForExplore().then(
         (items: Item[]) => {
-          this.primaryItems = this.filterItemsByType(items, this.orderedTypes[0])
-          this.secondaryItems = this.filterItemsByType(items, this.orderedTypes[1])
-          this.tertiaryItems = this.filterItemsByType(items, this.orderedTypes[2])
+          if(this.chosenTypes.primary) this.primaryItems = this.mergeNodes(this.primaryItems, this.filterItemsByType(items, this.chosenTypes.primary.id))
+          if(this.chosenTypes.secondary) this.secondaryItems = this.mergeNodes(this.secondaryItems, this.filterItemsByType(items, this.chosenTypes.secondary.id))
+          if(this.chosenTypes.tertiary) this.tertiaryItems = this.mergeNodes(this.tertiaryItems, this.filterItemsByType(items, this.chosenTypes.tertiary.id))
           this.properties = []
-          for (let p of this.primaryItems[0].localProperties)
-            this.properties.push({key: p.toCanonical(), value: p.label.value })
+          if(this.primaryItems[0] && this.primaryItems[0].localProperties) {
+            for (let p of this.primaryItems[0].localProperties)
+              this.properties.push({key: p.toCanonical(), value: p.label.value })
+          }
           this.links = this.mergeLinks(this.links)
           return 'ok';
-        })
-      ).then(() => this.updateExplore())
+        }).then(() => this.updateExplore())
     }
 
     private filterItemsByType(items: Item[], type: string): Item[] {
@@ -431,6 +431,11 @@ namespace fibra {
       })
     }
 
+    private mergeNodes(oldNodes: Item[], newNodes: Item[]) {
+      // TODO
+      return newNodes
+    }
+
     private mergeLinks(oldLinks: IExploreItemLink[]): IExploreItemLink[] {
       let newLinks: IExploreItemLink[] = []
       let items = this.primaryItems.concat(this.secondaryItems)
@@ -466,8 +471,8 @@ namespace fibra {
 
   export class ExploreComponent implements angular.IComponentOptions {
     public bindings: {[id: string]: string} = {
-      classTreePromise: '<',
-      selectedItem: '='
+      selectedItem: '=',
+      chosenTypes: '='
     }
     public controller: string = 'ExploreComponentController' // (new (...args: any[]) => angular.IController) = ExploreComponentController
     public templateUrl: string = 'components/construct-view/explore.html'

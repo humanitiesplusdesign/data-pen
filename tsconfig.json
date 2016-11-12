@@ -35,6 +35,7 @@
         "app/components/configure-view/configure-view-component.ts",
         "app/components/construct-view/construct-view-component.ts",
         "app/components/construct-view/explore-component.ts",
+        "app/components/construct-view/explore-type-component/explore-type-component.ts",
         "app/components/rdf/rdf.ts",
         "app/components/rdf/rdfjs.ts",
         "app/components/select-view/select-view-component.ts",
