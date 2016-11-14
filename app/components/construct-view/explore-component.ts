@@ -11,6 +11,7 @@ namespace fibra {
   interface IGridNode extends d3.SimulationNodeDatum {
     gx?: number
     gy?: number
+    selected?: boolean
   }
 
   interface IExploreItem extends Item, IGridNode {
@@ -32,6 +33,7 @@ namespace fibra {
     private primaryItems: Item[] = []
     private secondaryItems: Item[] = []
     private tertiaryItems: Item[] = []
+    private allItems: Item[] = []
     private item_info_tip: d3.Selection<HTMLDivElement, {}, HTMLBodyElement, undefined>
     private radius: number = 8
     private tooltip: d3.Selection<HTMLDivElement, {}, HTMLBodyElement, undefined>
@@ -43,12 +45,27 @@ namespace fibra {
     private chargeForce: d3.ForceCollide<IExploreItem> = d3.forceCollide<IExploreItem>(this.gridOffset/1.5)
     private chargeForce2: d3.ForceCollide<IExploreItem> = d3.forceCollide<IExploreItem>(this.gridOffset/1.5)
 
+    // Sunburst stuff
+    private sbRadius = 200
+    private sbGroup: d3.Selection<d3.BaseType, {}, null, undefined>
+    private lessRadius: number = this.sbRadius * this.sbRadius / 3 - 12 * 12
+    private sbArc = d3.arc<any, d3.HierarchyRectangularNode<any>>()
+        .startAngle((d: d3.HierarchyRectangularNode<any>) => { return d.x0 })
+        .endAngle((d: d3.HierarchyRectangularNode<any>) => { return d.x1 })
+        .innerRadius((d: d3.HierarchyRectangularNode<any>) => { return Math.sqrt(d.y0 - this.lessRadius) })
+        .outerRadius((d: d3.HierarchyRectangularNode<any>) => { return Math.sqrt(d.y1 - this.lessRadius) });
+    private sbPart = d3.partition()
+        .size([2 * Math.PI, this.sbRadius * this.sbRadius])
+
     private drawmode: boolean = false
 
     public $postLink(): void {
       this.svgSel = d3.select(this.$element[0]).select<SVGSVGElement>('svg')
       // Create link g
       this.svgSel.append('g').attr('class', 'links')
+      this.svgSel.append('g')
+        .classed('sunburst-overlay', true)
+      this.sbGroup = this.svgSel.select('g.sunburst-overlay')
 
       this.forceSim = d3.forceSimulation<IExploreItem, IExploreItemLink>()
         .force('charge', this.chargeForce)
@@ -96,6 +113,7 @@ namespace fibra {
           if(this.chosenTypes.primary) this.primaryItems = this.mergeNodes(this.primaryItems, this.filterItemsByType(items, this.chosenTypes.primary.id))
           if(this.chosenTypes.secondary) this.secondaryItems = this.mergeNodes(this.secondaryItems, this.filterItemsByType(items, this.chosenTypes.secondary.id))
           if(this.chosenTypes.tertiary) this.tertiaryItems = this.mergeNodes(this.tertiaryItems, this.filterItemsByType(items, this.chosenTypes.tertiary.id))
+          this.allItems = this.primaryItems.concat(this.secondaryItems).concat(this.tertiaryItems)
           this.properties = []
           if(this.primaryItems[0] && this.primaryItems[0].localProperties) {
             for (let p of this.primaryItems[0].localProperties)
@@ -106,7 +124,7 @@ namespace fibra {
         }).then(() => this.updateExplore())
     }
 
-    private filterItemsByType(items: Item[], type: string): Item[] {
+    private filterItemsByType(items: Item[], type: string): IExploreItem[] {
       return items.filter((it) => {
         let typeProp = it.localProperties.filter((pr) => {
           return pr.value === 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type'
@@ -159,6 +177,7 @@ namespace fibra {
     }
 
     private appendNodes(enterSelection: d3.Selection<d3.BaseType, {}, SVGSVGElement, {}>, className: string) {
+
       return enterSelection.append('g')
           .attr('id', (d, i: number) => 'node-' + i + '-' + className)
           .attr('class', 'node')
@@ -228,23 +247,67 @@ namespace fibra {
             this.tooltip.style('visibility', 'hidden')
           })
           .on('click', (d: IExploreItem, i, group) => {
+            let localSelected = d.selected
+            // Unselect everything
+            this.svgSel.selectAll('.node')
+              .each((n: IExploreItem) => { n.selected = false })
+            // Flip this one
+            d.selected = !localSelected
             this.svgSel.selectAll('.node-circle')
-              .classed('selected-circle', false)
-              .attr('r', this.radius + 'px')
-            d3.select(group[i])
-              .classed('selected-circle', true)
-              .attr('r', this.radius + 3 + 'px')
-            this.tooltip.style('visibility', 'hidden')
+              .classed('selected-circle', (d: IExploreItem) => { return d.selected })
+              .attr('r', (d: IExploreItem) => { return this.radius + (d.selected ? 3 : 0) + 'px' })
+            if(d.selected) {
+              this.svgSel.select('g.sunburst-overlay')
+                .datum(d)
+                .each(this.buildSunburst.bind(this))
+                .style('display', 'block')
+            } else {
+              this.svgSel.select('.sunburst-overlay').style('display', 'none')
+            }
+            // this.tooltip.style('visibility', 'hidden')
             this.highlightLinks(d, i)
-            this.$scope.$apply(() => this.selectItem(d))
-            this.item_info_tip.style('top', (d3.event.pageY - 10) + 'px')
-            .style('left', (d3.event.pageX + 17) + 'px')
-            .style('visibility', 'visible')
-            let cscope: angular.IScope = this.$scope.$new(true)
-            cscope['node'] = d
+            // this.$scope.$apply(() => this.selectItem(d))
+            // this.item_info_tip.style('top', (d3.event.pageY - 10) + 'px')
+            // .style('left', (d3.event.pageX + 17) + 'px')
+            // .style('visibility', 'visible')
+            // let cscope: angular.IScope = this.$scope.$new(true)
+            // cscope['node'] = d
             this.item_info_tip.selectAll('*').remove()
-            this.item_info_tip.node().appendChild(this.$compile('<sparql-item item-id="node"></sparql-item>')(cscope)[0])
+            // this.item_info_tip.node().appendChild(this.$compile('<sparql-item item-id="node"></sparql-item>')(cscope)[0])
           })
+    }
+
+    private buildSunburst(d, i, g) {
+
+      this.sbGroup.attr('transform', (d: IExploreItem) => { return 'translate(' + d.gx + ',' + d.gy + ')' })
+
+      // Group by property type -> property value
+      let hier = d3.hierarchy(d, (node) => {
+        if(node.localProperties) {
+          // Root node
+          return node.localProperties
+        } else {
+          // Property node
+          return node.values
+        }
+      })
+
+      hier.sum((d) => { return d.values === undefined && d.localProperties === undefined ? 1 : 0; });
+
+      let part = this.sbPart(hier)
+
+      let paths = this.sbGroup.selectAll("path")
+        .data(hier.descendants(), (d:d3.HierarchyRectangularNode<any>) => { return d.data })
+      paths.exit().remove()
+      paths.enter()
+        .filter((d) => { return d.depth > 0 })
+          .append("path")
+        // .attr("display", function(d) { return d.depth ? null : "none"; }) // hide inner ring
+        .merge(paths)
+          .attr("d", this.sbArc)
+          .style("stroke", "#fff")
+          // .style("fill", function(d) { return color((d.children ? d : d.parent).name); })
+          .style("fill-rule", "evenodd")      
     }
 
     private snapToGrid(x: number, y: number, primary: boolean = true): number[] {
@@ -276,6 +339,18 @@ namespace fibra {
 
         return 'translate(' + gx + ', ' + gy + ')'
       })
+
+      if(sel.filter((d: IExploreItem) => { return d.selected }).node()) {
+        let sbFunc = this.buildSunburst
+        let svgSel = this.svgSel
+        
+        let tickSunburst = function(this, d, i, g) {
+          svgSel.select('g.sunburst-overlay').datum(d).each(sbFunc.bind(this))
+        }
+ 
+        sel.filter((d: IExploreItem) => { return d.selected })
+          .each(tickSunburst.bind(this))
+      }
     }
 
     private genericTick(primaryNodes: d3.Selection<d3.BaseType, {}, SVGSVGElement, {}>,
@@ -431,7 +506,7 @@ namespace fibra {
       })
     }
 
-    private mergeNodes(oldNodes: Item[], nodes: Item[]) {
+    private mergeNodes(oldNodes: Item[], nodes: Item[]): IExploreItem[] {
       let newNodes: Item[] = []
 
       // Check if old nodes are still in the mix
