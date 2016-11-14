@@ -302,12 +302,21 @@ namespace fibra {
       paths.enter()
         .filter((d) => { return d.depth > 0 })
           .append("path")
+          .on('mouseover', (d: d3.HierarchyNode<IExploreItem>, i: number) => {
+            this.tooltip.style('top', (d3.event.pageY - 10) + 'px')
+              .style('left', (d3.event.pageX + 10) + 'px')
+              .style('visibility', 'visible')
+              .text(d.data.label.value)
+          })
+          .on('mouseout', () => {
+            this.tooltip.style('visibility', 'hidden')
+          })
         // .attr("display", function(d) { return d.depth ? null : "none"; }) // hide inner ring
         .merge(paths)
           .attr("d", this.sbArc)
           .style("stroke", "#fff")
           // .style("fill", function(d) { return color((d.children ? d : d.parent).name); })
-          .style("fill-rule", "evenodd")      
+          .style("fill-rule", "evenodd")    
     }
 
     private snapToGrid(x: number, y: number, primary: boolean = true): number[] {
