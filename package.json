@@ -4,14 +4,15 @@
   "devDependencies": {
     "@types/angular-http-auth": "1.2.31",
     "@types/angular-ui-router": "1.1.34",
-    "browser-sync": "2.17.5",
+    "@types/d3": "4.3.0",
+    "browser-sync": "2.17.6",
     "del": "2.2.2",
     "gulp-autoprefixer": "3.1.1",
     "gulp-batch": "1.0.5",
     "gulp-cache": "0.4.5",
-    "gulp-cached": "1.1.0",
+    "gulp-cached": "1.1.1",
     "gulp-clean-css": "2.0.13",
-    "gulp-concat": "2.6.0",
+    "gulp-concat": "2.6.1",
     "gulp-filter": "4.0.0",
     "gulp-flatten": "0.3.1",
     "gulp-gh-pages": "git://github.com/jiemakel/gulp-gh-pages",
@@ -35,7 +36,7 @@
     "gulp-transform": "1.1.0",
     "gulp-tslint": "6.1.3",
     "gulp-typedoc": "2.0.0",
-    "gulp-typescript": "3.1.2",
+    "gulp-typescript": "3.1.3",
     "gulp-typescript-angular": "git://github.com/jiemakel/gulp-typescript-angular",
     "gulp-uglify": "2.0.0",
     "gulp-useref": "3.1.2",
@@ -47,7 +48,7 @@
     "run-sequence": "1.2.2",
     "tslint": "3.15.1",
     "typedoc": "0.5.1",
-    "typescript": "2.0.7",
+    "typescript": "2.0.9",
     "uglify-save-license": "0.4.1",
     "wiredep": "4.0.0"
   },
@@ -56,8 +57,5 @@
   },
   "scripts": {
     "postinstall": "bower install"
-  },
-  "dependencies": {
-    "@types/d3": "4.2.38"
   }
 }
