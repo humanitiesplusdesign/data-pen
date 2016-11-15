@@ -27,7 +27,8 @@ namespace fibra {
       this.buildSunburst = this.buildSunburst.bind(this)
     }
 
-    public postLink(sel) {
+    public addSunburstGroup(sel) {
+      if(this.sbGroup) this.sbGroup.remove()
       this.sbGroup = sel.append('g')
         .classed('sunburst-overlay', true)
     }

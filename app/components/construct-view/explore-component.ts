@@ -54,7 +54,7 @@ namespace fibra {
       // Create link g
       this.svgSel.append('g').attr('class', 'links')
 
-      this.sunburst.postLink(this.svgSel)
+      this.sunburst.addSunburstGroup(this.svgSel)
 
       this.forceSim = d3.forceSimulation<IExploreItem, IExploreItemLink>()
         .force('charge', this.chargeForce)
@@ -359,6 +359,9 @@ namespace fibra {
         .enter().append<SVGLineElement>('line')
           .attr('id', (d: IExploreItemLink, i: number) => 'link-' + i)
         .merge(linkLines)
+
+      // Add sunburst again so it stays on top
+      this.sunburst.addSunburstGroup(this.svgSel)
 
       this.forceSim.stop()
       let onTick = this.genericTick.bind(this, primaryNodes, secondaryNodes, linkLines, false)
