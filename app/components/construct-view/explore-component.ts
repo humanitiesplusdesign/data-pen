@@ -358,6 +358,15 @@ namespace fibra {
       linkLines= linkLines
         .enter().append<SVGLineElement>('line')
           .attr('id', (d: IExploreItemLink, i: number) => 'link-' + i)
+          .on('mouseover', (d: IExploreItemLink, i: number) => {
+            this.tooltip.style('top', (d3.event.pageY - 10) + 'px')
+              .style('left', (d3.event.pageX + 10) + 'px')
+              .style('visibility', 'visible')
+              .text(d.property.label.value)
+          })
+          .on('mouseout', (d: IExploreItemLink, i: number) => {
+            this.tooltip.style('visibility', 'hidden')
+          })
         .merge(linkLines)
 
       // Add sunburst again so it stays on top
