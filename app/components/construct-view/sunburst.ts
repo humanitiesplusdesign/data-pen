@@ -12,8 +12,15 @@ namespace fibra {
         .size([2 * Math.PI, this.sbRadius * this.sbRadius])
     private sbColor = '#aaa'
     private sbTooltip: d3.Selection<HTMLDivElement, {}, HTMLBodyElement, undefined>
+    private selectedItem: INode
+    private item_info_tip: d3.Selection<HTMLDivElement, {}, HTMLBodyElement, undefined>
+    private sel: d3.Selection<SVGSVGElement, {}, null, undefined>
+    private item_info_tip_displayed: boolean = false
 
-    constructor($element: angular.IAugmentedJQuery) {
+    constructor(private $element: angular.IAugmentedJQuery,
+                private $compile: angular.ICompileService,
+                private $scope: angular.IScope,
+                private sparqlItemService: SparqlItemService) {
       this.sbTooltip = d3.select('body').append<HTMLDivElement>('div')
         .style('position', 'absolute')
         .style('z-index', '20')
@@ -23,14 +30,31 @@ namespace fibra {
         .style('border-radius', '2px')
         .style('visibility', 'hidden')
 
+      this.item_info_tip = d3.select('body').append<HTMLDivElement>('div')
+        .attr('id', 'item_info_tip')
+        .style('position', 'absolute')
+        .style('z-index', '20')
+        .style('background-color', 'white')
+        .style('padding', '3px')
+        .style('visibility', 'hidden')
+
       // Typescript messes with `this` depending on caller. Override.
       this.buildSunburst = this.buildSunburst.bind(this)
     }
 
-    public addSunburstGroup(sel) {
+    public addSunburstGroup(sel: d3.Selection<SVGSVGElement, {}, null, undefined>) {
+      this.sel = sel
       if(this.sbGroup) this.sbGroup.remove()
       this.sbGroup = sel.append('g')
         .classed('sunburst-overlay', true)
+
+      // Handle info overlay
+      this.sel.on('click', () => {
+        if( this.item_info_tip_displayed ) {
+          this.item_info_tip.style('visibility', 'hidden')
+          this.item_info_tip_displayed = false
+        }
+      })
     }
 
     public buildSunburst(d, i, g) {
@@ -66,12 +90,32 @@ namespace fibra {
           .on('mouseout', () => {
             this.sbTooltip.style('visibility', 'hidden')
           })
+          .on('click', (d: d3.HierarchyNode<IExploreItem>, i: number) => {
+            this.sbTooltip.style('visibility', 'hidden')
+            this.item_info_tip.style('top', (d3.event.pageY - 10) + 'px')
+              .style('left', (d3.event.pageX + 17) + 'px')
+              .style('visibility', 'visible')
+            let cscope: angular.IScope = this.$scope.$new(true)
+            // Populate initial values
+            cscope['node'] = d.data
+            // Get full value and re-populate
+            this.sparqlItemService.getItem(d.data).then((item) => {
+              cscope['node'] = item
+              this.item_info_tip_displayed = true
+            })
+            this.item_info_tip.selectAll('*').remove()
+            this.item_info_tip.node().appendChild(this.$compile('<sparql-item item-id="node"></sparql-item>')(cscope)[0])
+          })
         // .attr("display", function(d) { return d.depth ? null : "none"; }) // hide inner ring
         .merge(paths)
           .attr("d", this.sbArc)
           .style("stroke", "#fff")
           .style("fill", this.sbColor)
           .style("fill-rule", "evenodd")    
+    }
+
+    public selectItem(id: INode): void {
+      this.selectedItem = id
     }
   }
 }

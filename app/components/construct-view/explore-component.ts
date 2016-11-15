@@ -23,8 +23,6 @@ namespace fibra {
 
   class ExploreComponentController {
     public itemService: SparqlItemService
-    // public items: Item[] = []
-    public selectedItem: INode
     public chosenTypes
     public properties: {}[]
     private svgSel: d3.Selection<SVGSVGElement, {}, null, undefined>
@@ -34,7 +32,6 @@ namespace fibra {
     private secondaryItems: Item[] = []
     private tertiaryItems: Item[] = []
     private allItems: Item[] = []
-    private item_info_tip: d3.Selection<HTMLDivElement, {}, HTMLBodyElement, undefined>
     private radius: number = 8
     private tooltip: d3.Selection<HTMLDivElement, {}, HTMLBodyElement, undefined>
     private edittip: d3.Selection<HTMLDivElement, {}, HTMLBodyElement, undefined>
@@ -60,14 +57,6 @@ namespace fibra {
         .force('charge', this.chargeForce)
         .force('charge2', this.chargeForce2)
         .force('link', d3.forceLink().distance(40).strength(1).iterations(1).id((d: IExploreItem) => '' + d.index))
-
-      this.item_info_tip = d3.select('body').append<HTMLDivElement>('div')
-        .attr('id', 'item_info_tip')
-        .style('position', 'absolute')
-        .style('z-index', '20')
-        .style('background-color', 'white')
-        .style('padding', '3px')
-        .style('visibility', 'hidden')
 
       this.radius = 8
 
@@ -192,8 +181,8 @@ namespace fibra {
                   d.x = d3.event.x
                   d.y = d3.event.y
                   if (d3.select(group[i]).classed('selected-circle')) {
-                  this.item_info_tip.style('top', (d3.event.y + 30) + 'px')
-                  .style('left', (d3.event.x + 30) + 'px')
+                  // this.item_info_tip.style('top', (d3.event.y + 30) + 'px')
+                  // .style('left', (d3.event.x + 30) + 'px')
                   }
                 } else {
                   this.dragline.attr('x1', d.x!)
@@ -261,7 +250,7 @@ namespace fibra {
             // .style('visibility', 'visible')
             // let cscope: angular.IScope = this.$scope.$new(true)
             // cscope['node'] = d
-            this.item_info_tip.selectAll('*').remove()
+            // this.item_info_tip.selectAll('*').remove()
             // this.item_info_tip.node().appendChild(this.$compile('<sparql-item item-id="node"></sparql-item>')(cscope)[0])
           })
     }
@@ -411,10 +400,6 @@ namespace fibra {
       }
     }
 
-    public selectItem(id: INode): void {
-      this.selectedItem = id
-    }
-
     // BUG: after deleting item, links think nodes are in old locations and stationary, items are not getting rebound to new nodes
     public delete(id: INode): angular.IPromise<string> {
 
@@ -440,7 +425,7 @@ namespace fibra {
                 private fibraService: FibraService,
                 private $q: angular.IQService) {
 
-      this.sunburst = new Sunburst($element)
+      this.sunburst = new Sunburst($element, $compile, $scope, sparqlItemService)
 
       this.fibraService.on('change', () => this.queryAndBuild())
       this.itemService = sparqlItemService
