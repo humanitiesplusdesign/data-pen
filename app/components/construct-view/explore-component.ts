@@ -14,7 +14,7 @@ namespace fibra {
     selected?: boolean
   }
 
-  interface IExploreItem extends Item, IGridNode {
+  export interface IExploreItem extends Item, IGridNode {
   }
 
   interface IExploreItemLink extends d3.SimulationLinkDatum<IExploreItem> {
@@ -45,17 +45,7 @@ namespace fibra {
     private chargeForce: d3.ForceCollide<IExploreItem> = d3.forceCollide<IExploreItem>(this.gridOffset/1.5)
     private chargeForce2: d3.ForceCollide<IExploreItem> = d3.forceCollide<IExploreItem>(this.gridOffset/1.5)
 
-    // Sunburst stuff
-    private sbRadius = 200
-    private sbGroup: d3.Selection<d3.BaseType, {}, null, undefined>
-    private lessRadius: number = this.sbRadius * this.sbRadius / 3 - 12 * 12
-    private sbArc = d3.arc<any, d3.HierarchyRectangularNode<any>>()
-        .startAngle((d: d3.HierarchyRectangularNode<any>) => { return d.x0 })
-        .endAngle((d: d3.HierarchyRectangularNode<any>) => { return d.x1 })
-        .innerRadius((d: d3.HierarchyRectangularNode<any>) => { return Math.sqrt(d.y0 - this.lessRadius) })
-        .outerRadius((d: d3.HierarchyRectangularNode<any>) => { return Math.sqrt(d.y1 - this.lessRadius) });
-    private sbPart = d3.partition()
-        .size([2 * Math.PI, this.sbRadius * this.sbRadius])
+    private sunburst: Sunburst
 
     private drawmode: boolean = false
 
@@ -63,9 +53,8 @@ namespace fibra {
       this.svgSel = d3.select(this.$element[0]).select<SVGSVGElement>('svg')
       // Create link g
       this.svgSel.append('g').attr('class', 'links')
-      this.svgSel.append('g')
-        .classed('sunburst-overlay', true)
-      this.sbGroup = this.svgSel.select('g.sunburst-overlay')
+
+      this.sunburst.postLink(this.svgSel)
 
       this.forceSim = d3.forceSimulation<IExploreItem, IExploreItemLink>()
         .force('charge', this.chargeForce)
@@ -259,7 +248,7 @@ namespace fibra {
             if(d.selected) {
               this.svgSel.select('g.sunburst-overlay')
                 .datum(d)
-                .each(this.buildSunburst.bind(this))
+                .each(this.sunburst.buildSunburst.bind(this))
                 .style('display', 'block')
             } else {
               this.svgSel.select('.sunburst-overlay').style('display', 'none')
@@ -275,48 +264,6 @@ namespace fibra {
             this.item_info_tip.selectAll('*').remove()
             // this.item_info_tip.node().appendChild(this.$compile('<sparql-item item-id="node"></sparql-item>')(cscope)[0])
           })
-    }
-
-    private buildSunburst(d, i, g) {
-
-      this.sbGroup.attr('transform', (d: IExploreItem) => { return 'translate(' + d.gx + ',' + d.gy + ')' })
-
-      // Group by property type -> property value
-      let hier = d3.hierarchy(d, (node) => {
-        if(node.localProperties) {
-          // Root node
-          return node.localProperties
-        } else {
-          // Property node
-          return node.values
-        }
-      })
-
-      hier.sum((d) => { return d.values === undefined && d.localProperties === undefined ? 1 : 0; });
-
-      let part = this.sbPart(hier)
-
-      let paths = this.sbGroup.selectAll("path")
-        .data(hier.descendants(), (d:d3.HierarchyRectangularNode<any>) => { return d.data })
-      paths.exit().remove()
-      paths.enter()
-        .filter((d) => { return d.depth > 0 })
-          .append("path")
-          .on('mouseover', (d: d3.HierarchyNode<IExploreItem>, i: number) => {
-            this.tooltip.style('top', (d3.event.pageY - 10) + 'px')
-              .style('left', (d3.event.pageX + 10) + 'px')
-              .style('visibility', 'visible')
-              .text(d.data.label.value)
-          })
-          .on('mouseout', () => {
-            this.tooltip.style('visibility', 'hidden')
-          })
-        // .attr("display", function(d) { return d.depth ? null : "none"; }) // hide inner ring
-        .merge(paths)
-          .attr("d", this.sbArc)
-          .style("stroke", "#fff")
-          // .style("fill", function(d) { return color((d.children ? d : d.parent).name); })
-          .style("fill-rule", "evenodd")    
     }
 
     private snapToGrid(x: number, y: number, primary: boolean = true): number[] {
@@ -350,7 +297,7 @@ namespace fibra {
       })
 
       if(sel.filter((d: IExploreItem) => { return d.selected }).node()) {
-        let sbFunc = this.buildSunburst
+        let sbFunc = this.sunburst.buildSunburst
         let svgSel = this.svgSel
         
         let tickSunburst = function(this, d, i, g) {
@@ -480,6 +427,8 @@ namespace fibra {
                 private sparqlItemService: SparqlItemService,
                 private fibraService: FibraService,
                 private $q: angular.IQService) {
+
+      this.sunburst = new Sunburst($element)
 
       this.fibraService.on('change', () => this.queryAndBuild())
       this.itemService = sparqlItemService
