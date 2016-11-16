@@ -22,6 +22,8 @@ gulp.task('dist:wire:bundle-workerscripts', function() {
      }))
     .pipe($.useref())
     .pipe($.filter('scripts/worker.js'))
+    .pipe($.ngAnnotate())
+    .pipe($.uglify({ preserveComments: uglifySaveLicense }))
     .pipe($.rev())
     .pipe($.print(function(path) { return "dist:worker-js(1) " + path; }))
     .pipe(gulp.dest("dist"));
