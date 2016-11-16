@@ -25,6 +25,9 @@ namespace fibra {
     public itemService: SparqlItemService
     public chosenTypes
     public properties: {}[]
+    public primaryProperties: String[]
+    public secondaryProperties: String[]
+    public tertiaryProperties: String[]
     private svgSel: d3.Selection<SVGSVGElement, {}, null, undefined>
     private links: IExploreItemLink[]
     private forceSim: d3.Simulation<IExploreItem, IExploreItemLink>
@@ -93,11 +96,17 @@ namespace fibra {
           if(this.chosenTypes.tertiary) this.tertiaryItems = this.mergeNodes(this.tertiaryItems, this.filterItemsByType(items, this.chosenTypes.tertiary.id))
           this.allItems = this.primaryItems.concat(this.secondaryItems).concat(this.tertiaryItems)
           this.properties = []
+
           if(this.primaryItems[0] && this.primaryItems[0].localProperties) {
             for (let p of this.primaryItems[0].localProperties)
               this.properties.push({key: p.toCanonical(), value: p.label.value })
           }
           this.links = this.mergeLinks(this.links)
+
+          this.primaryProperties = []
+          this.secondaryProperties = []
+          this.tertiaryProperties = []
+          this.sortProperties();
           return 'ok';
         }).then(() => this.updateExplore())
     }
@@ -113,6 +122,51 @@ namespace fibra {
           return false;
         }
       })
+    }
+
+    private sortProperties(): void {
+      // fill in each property array with every property possessed by the associated objects
+      for (let i = 0; i < this.primaryItems.length; i++) {
+        for (let p = 0; p < this.primaryItems[i].localProperties.length; p++) {
+          let duplicate = false
+          for (let j = 0; j < this.primaryProperties.length; j++) {
+            if (this.primaryProperties[j] == this.primaryItems[i].localProperties[p].label.value) {
+              duplicate = true
+            }
+          }
+          if (!duplicate) {
+            this.primaryProperties.push(this.primaryItems[i].localProperties[p].label.value)
+          }
+        }
+      }
+
+      for (let i = 0; i < this.secondaryItems.length; i++) {
+        for (let p = 0; p < this.secondaryItems[i].localProperties.length; p++) {
+          let duplicate = false
+          for (let j = 0; j < this.secondaryProperties.length; j++) {
+            if (this.secondaryProperties[j] == this.secondaryItems[i].localProperties[p].label.value) {
+              duplicate = true
+            }
+          }
+          if (!duplicate) {
+            this.secondaryProperties.push(this.secondaryItems[i].localProperties[p].label.value)
+          }
+        }
+      }
+
+      for (let i = 0; i < this.tertiaryItems.length; i++) {
+        for (let p = 0; p < this.tertiaryItems[i].localProperties.length; p++) {
+          let duplicate = false
+          for (let j = 0; j < this.tertiaryProperties.length; j++) {
+            if (this.tertiaryProperties[j] == this.tertiaryItems[i].localProperties[p].label.value) {
+              duplicate = true
+            }
+          }
+          if (!duplicate) {
+            this.tertiaryProperties.push(this.tertiaryItems[i].localProperties[p].label.value)
+          }
+        }
+      }
     }
 
     private updateSizing(): void {
@@ -288,11 +342,11 @@ namespace fibra {
       if(sel.filter((d: IExploreItem) => { return d.selected }).node()) {
         let sbFunc = this.sunburst.buildSunburst
         let svgSel = this.svgSel
-        
+
         let tickSunburst = function(this, d, i, g) {
           svgSel.select('g.sunburst-overlay').datum(d).each(sbFunc.bind(this))
         }
- 
+
         sel.filter((d: IExploreItem) => { return d.selected })
           .each(tickSunburst.bind(this))
       }

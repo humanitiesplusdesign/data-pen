@@ -19,11 +19,11 @@ div#tablecontainer
         th Primary
       tr
         th Label
-        th(ng-repeat="p in $ctrl.properties") {{ p.value }}
+        th(ng-repeat="p in $ctrl.primaryProperties") {{ p}}
         th Actions
       tr(ng-repeat="item in $ctrl.primaryItems")
         td(ng-click="$ctrl.selectItem(item)") {{ item.label.value }}
-        td(ng-repeat="p in $ctrl.properties", ng-click="$ctrl.selectItem(item)")
+        td(ng-repeat="p in $ctrl.primaryProperties", ng-click="$ctrl.selectItem(item)")
             // Find way to line up local properties with $ctrl.properties labels
         td
           a(ng-click="$ctrl.delete(item)") Delete
@@ -34,11 +34,11 @@ div#tablecontainer
         th Secondary
       tr
         th Label
-        th(ng-repeat="p in $ctrl.properties") {{ p.value }}
+        th(ng-repeat="p in $ctrl.secondaryProperties") {{ p}}
         th Actions
       tr(ng-repeat="item in $ctrl.secondaryItems")
         td(ng-click="$ctrl.selectItem(item)") {{ item.label.value }}
-        td(ng-repeat="p in $ctrl.properties", ng-click="$ctrl.selectItem(item)")
+        td(ng-repeat="p in $ctrl.secondaryProperties", ng-click="$ctrl.selectItem(item)")
             // Find way to line up local properties with $ctrl.properties labels
         td
           a(ng-click="$ctrl.delete(item)") Delete
@@ -48,11 +48,11 @@ div#tablecontainer
           th Tertiary
         tr
           th Label
-          th(ng-repeat="p in $ctrl.properties") {{ p.value }}
+          th(ng-repeat="p in $ctrl.tertiaryProperties") {{ p}}
           th Actions
         tr(ng-repeat="item in $ctrl.tertiaryItems")
           td(ng-click="$ctrl.selectItem(item)") {{ item.label.value }}
-          td(ng-repeat="p in $ctrl.properties", ng-click="$ctrl.selectItem(item)")
+          td(ng-repeat="p in $ctrl.tertiaryProperties", ng-click="$ctrl.selectItem(item)")
               // Find way to line up local properties with $ctrl.properties labels
           td
             a(ng-click="$ctrl.delete(item)") Delete
