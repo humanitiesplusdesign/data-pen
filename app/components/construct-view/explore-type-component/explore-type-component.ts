@@ -29,6 +29,6 @@ namespace fibra {
         chosenTypes: '='
       }
       public templateUrl: string = 'components/construct-view/explore-type-component/explore-type-component.html'
-      public controller = ExploreTypeComponentController
+      public controller = 'ExploreTypeComponentController'
   }
 }
