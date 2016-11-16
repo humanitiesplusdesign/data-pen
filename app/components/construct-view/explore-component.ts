@@ -25,15 +25,15 @@ namespace fibra {
     public itemService: SparqlItemService
     public chosenTypes
     public properties: {}[]
-    public primaryProperties: String[]
-    public secondaryProperties: String[]
-    public tertiaryProperties: String[]
     private svgSel: d3.Selection<SVGSVGElement, {}, null, undefined>
     private links: IExploreItemLink[]
     private forceSim: d3.Simulation<IExploreItem, IExploreItemLink>
     private primaryItems: Item[] = []
     private secondaryItems: Item[] = []
     private tertiaryItems: Item[] = []
+    private primaryProperties: String[]
+    private secondaryProperties: String[]
+    private tertiaryProperties: String[]
     private allItems: Item[] = []
     private radius: number = 8
     private tooltip: d3.Selection<HTMLDivElement, {}, HTMLBodyElement, undefined>
