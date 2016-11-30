@@ -11,7 +11,7 @@
     "font-awesome": "4.7.0",
     "ngstorage": "0.3.11",
     "angular-bootstrap": "2.2.0",
-    "d3": "4.3.0"
+    "d3": "4.4.0"
   },
   "overrides": {
     "bootstrap": {
