@@ -13,10 +13,8 @@ div#tablecontainer
     a(ng-click="type='type3'" ng-class="{'active': type=='type3'}") Tertiary
 
 
-  div(ng-switch="type")
-    table.exploretable(ng-switch-when="type1")
-      tr
-        th Primary
+  div.widthcontainer(ng-switch="type")
+    table.exploretable(ng-switch-when="type1" style="table-layout: fixed")
       tr
         th Label
         th(ng-repeat="p in $ctrl.primaryProperties") {{ p}}
@@ -24,14 +22,12 @@ div#tablecontainer
       tr(ng-repeat="item in $ctrl.primaryItems")
         td(ng-click="$ctrl.selectItem(item)") {{ item.label.value }}
         td(ng-repeat="p in $ctrl.primaryProperties", ng-click="$ctrl.selectItem(item)")
-            // Find way to line up local properties with $ctrl.properties labels
+          small(ng-repeat="e in item.localProperties" ng-if="e.label.value == p") {{e.values[0].label.value}}
         td
           a(ng-click="$ctrl.delete(item)") Delete
 
 
     table.exploretable(ng-switch-when="type2")
-      tr
-        th Secondary
       tr
         th Label
         th(ng-repeat="p in $ctrl.secondaryProperties") {{ p}}
@@ -39,13 +35,11 @@ div#tablecontainer
       tr(ng-repeat="item in $ctrl.secondaryItems")
         td(ng-click="$ctrl.selectItem(item)") {{ item.label.value }}
         td(ng-repeat="p in $ctrl.secondaryProperties", ng-click="$ctrl.selectItem(item)")
-            // Find way to line up local properties with $ctrl.properties labels
+          small(ng-repeat="e in item.localProperties" ng-if="e.label.value == p") {{e.values[0].label.value}}
         td
           a(ng-click="$ctrl.delete(item)") Delete
 
       table.exploretable(ng-switch-when="type3")
-        tr
-          th Tertiary
         tr
           th Label
           th(ng-repeat="p in $ctrl.tertiaryProperties") {{ p}}
@@ -53,6 +47,6 @@ div#tablecontainer
         tr(ng-repeat="item in $ctrl.tertiaryItems")
           td(ng-click="$ctrl.selectItem(item)") {{ item.label.value }}
           td(ng-repeat="p in $ctrl.tertiaryProperties", ng-click="$ctrl.selectItem(item)")
-              // Find way to line up local properties with $ctrl.properties labels
+            small(ng-repeat="e in item.localProperties" ng-if="e.label.value == p") {{e.values[0].label.value}}
           td
             a(ng-click="$ctrl.delete(item)") Delete
