@@ -14,17 +14,21 @@ namespace fibra {
     public types: TreeNode[] = []
     public chosenTypes: { [id: string]: TreeNode|null}
 
-    public createItem(item: Result): angular.IPromise<INode> {
-      let prefLabel: PropertyToValues<INode> = new PropertyToValues(SKOS.prefLabel)
-      prefLabel.values.push(item.prefLabel)
-      let type: PropertyToValues<INode> = new PropertyToValues(RDF.type)
-      let typeWithLabel: INodePlusLabel = new SourcedNodePlusLabel(item.additionalInformation['type'][0], item.additionalInformation['typeLabel'][0])
-      type.values.push(typeWithLabel)
-      let prom: angular.IPromise<INode> = this.sparqlItemService.createNewItem(item.ids, [prefLabel, type])
-      prom.then(() => {
-        this.fibraService.dispatch('change')
-      })
-      return prom
+    // public createItem(item: Result): angular.IPromise<INode> {
+    //   let prefLabel: PropertyToValues<INode> = new PropertyToValues(SKOS.prefLabel)
+    //   prefLabel.values.push(item.prefLabel)
+    //   let type: PropertyToValues<INode> = new PropertyToValues(RDF.type)
+    //   let typeWithLabel: INodePlusLabel = new SourcedNodePlusLabel(item.additionalInformation['type'][0], item.additionalInformation['typeLabel'][0])
+    //   type.values.push(typeWithLabel)
+    //   let prom: angular.IPromise<INode> = this.sparqlItemService.createNewItem(item.ids, [prefLabel, type])
+    //   prom.then(() => {
+    //     this.fibraService.dispatch('change')
+    //   })
+    //   return prom
+    // }
+
+    public createItem(item: Result) {
+      return this.fibraService.dispatchAction(this.fibraService.createItem(item.ids[0]))
     }
 
     private traverseClassTree(nodes: TreeNode[], test: Function, onSuccess: Function): void {
@@ -49,9 +53,12 @@ namespace fibra {
       }
       this.endpoints = configurationService.configuration.remoteEndpoints()
       this.classTreePromise = sparqlTreeService.getTree(this.configurationService.configuration.primaryEndpoint.endpoint.value, this.configurationService.configuration.primaryEndpoint.treeQueryTemplate)
-      this.classTreePromise.then(c => { 
+      this.classTreePromise.then(c => {
         this.classTree = c;
-        this.traverseClassTree(c, n => this.types.indexOf(n) === -1 && n.children.length === 0, n => this.types.push(n))
+        this.fibraService.dispatchAction(this.fibraService.clearTypes())
+        this.types = this.fibraService.getState().construct.types
+        let addType = (type: TreeNode) => this.fibraService.dispatchAction(this.fibraService.addType(type))
+        this.traverseClassTree(c, n => this.types.indexOf(n) === -1 && n.children.length === 0, n => addType(n))
       })
       this.fibraService.on('change', () => {
         this.classTreePromise = sparqlTreeService.getTree(this.configurationService.configuration.primaryEndpoint.endpoint.value, SparqlTreeService.getClassTreeQuery)
