@@ -9,7 +9,7 @@ namespace fibra {
     payload: any
   }
 
-  const CREATE_ITEM = "CREATE_ITEM"
+  const CREATE_ITEMS = "CREATE_ITEMS"
   const ADD_TYPE = "ADD_TYPE"
   const CLEAR_TYPES = "CLEAR_TYPES"
   const INITIAL_STATE = {}
@@ -61,8 +61,15 @@ namespace fibra {
     // Action creators
     public createItem(item: INode):Action {
       return {
-        type: CREATE_ITEM,
-        payload: item
+        type: CREATE_ITEMS,
+        payload: [item]
+      }
+    }
+
+    public createItems(items: INode[]): Action {
+      return {
+        type: CREATE_ITEMS,
+        payload: items
       }
     }
 
@@ -84,9 +91,9 @@ namespace fibra {
     private itemReducer(state: State = INITIAL_STATE, action: Action = DEFAULT_ACTION): angular.IPromise<State> {
       switch(action.type) {
 
-      case CREATE_ITEM:
-        let item: Item = action.payload
-        let prom = this.sparqlItemService.createNewItem([item], []).then(() => {
+      case CREATE_ITEMS:
+        let items: Item[] = action.payload
+        let prom = this.sparqlItemService.createNewItem(items, []).then(() => {
           this.dispatch('change')
         }).then(() => {
           return state
