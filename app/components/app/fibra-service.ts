@@ -93,7 +93,26 @@ namespace fibra {
 
       case CREATE_ITEMS:
         let items: Item[] = action.payload
-        let prom = this.sparqlItemService.createNewItem(items, []).then(() => {
+    
+        let proms = items.map((item) => {
+          // let prefLabel: PropertyToValues<INode> = new PropertyToValues(SKOS.prefLabel)
+          // prefLabel.values.push(item.remoteProperties.filter((p) => {
+
+          // }))
+          let type: PropertyToValues<INode> = new PropertyToValues(RDF.type)
+          let typeProp = item.localProperties.filter((pr) => {
+            return pr.value === 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type'
+          })
+          // let typeLabelProp = item.localProperties.filter((pr) => {
+          //   return pr.value === 'http://www.w3.org/1999/02/22-rdf-syntax-ns#typeLabel'
+          // })
+          if(typeProp[0]) {
+            let typeWithLabel: INodePlusLabel = new SourcedNodePlusLabel(typeProp[0])
+            type.values.push(typeWithLabel)
+          }
+          return this.sparqlItemService.createNewItem(items, [type])
+        })
+        let prom = this.q.all(proms).then(() => {
           this.dispatch('change')
         }).then(() => {
           return state
