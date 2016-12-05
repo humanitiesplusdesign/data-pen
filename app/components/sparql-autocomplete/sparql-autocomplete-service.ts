@@ -29,22 +29,20 @@ SELECT ?groupId ?groupLabel ?id ?prefLabel ?matchedLabel ?sameAs ?altLabel { # A
     SELECT ?groupId ?id (SUM(?sc) AS ?score) {
       {
         SELECT ?groupId ?id ?sc {
-          GRAPH <IGRAPH> {
-            BIND(CONCAT(REPLACE(<QUERY>,"([\\\\+\\\\-\\\\&\\\\|\\\\!\\\\(\\\\)\\\\{\\\\}\\\\[\\\\]\\\\^\\\\\\"\\\\~\\\\*\\\\?\\\\:\\\\/\\\\\\\\])","\\\\$1"),"*") AS ?query)
-            (?id ?sc) text:query ?query .
-            ?id a ?groupId .
-            # CONSTRAINTS
-          }
+          BIND(CONCAT(REPLACE(<QUERY>,"([\\\\+\\\\-\\\\&\\\\|\\\\!\\\\(\\\\)\\\\{\\\\}\\\\[\\\\]\\\\^\\\\\\"\\\\~\\\\*\\\\?\\\\:\\\\/\\\\\\\\])","\\\\$1"),"*") AS ?query)
+          (?id ?sc) text:query ?query .
+          ?id a ?groupId .
+          # GROUPID
+          # CONSTRAINTS
         } LIMIT <LIMIT>
       } UNION {
-        GRAPH <IGRAPH> {
-          BIND(CONCAT("\\"",REPLACE(<QUERY>,"([\\\\+\\\\-\\\\&\\\\|\\\\!\\\\(\\\\)\\\\{\\\\}\\\\[\\\\]\\\\^\\\\\\"\\\\~\\\\*\\\\?\\\\:\\\\/\\\\\\\\])","\\\\$1"),"\\"") AS ?query)
-          (?id ?sc) text:query ?query .
-          ?id skos:prefLabel|rdfs:label|skos:altLabel|mads:authoritativeLabel|mads:variantLabel ?matchedLabel
-          FILTER (LCASE(?matchedLabel)=LCASE(<QUERY>))
-          ?id a ?groupId .
-          # CONSTRAINTS
-        }
+        BIND(CONCAT("\\"",REPLACE(<QUERY>,"([\\\\+\\\\-\\\\&\\\\|\\\\!\\\\(\\\\)\\\\{\\\\}\\\\[\\\\]\\\\^\\\\\\"\\\\~\\\\*\\\\?\\\\:\\\\/\\\\\\\\])","\\\\$1"),"\\"") AS ?query)
+        (?id ?sc) text:query ?query .
+        ?id skos:prefLabel|rdfs:label|skos:altLabel|mads:authoritativeLabel|mads:variantLabel ?matchedLabel
+        FILTER (LCASE(?matchedLabel)=LCASE(<QUERY>))
+        ?id a ?groupId .
+        # GROUPID
+        # CONSTRAINTS
       }
     }
     GROUP BY ?groupId ?id
@@ -52,11 +50,10 @@ SELECT ?groupId ?groupLabel ?id ?prefLabel ?matchedLabel ?sameAs ?altLabel { # A
   }
   ?id skos:prefLabel|rdfs:label|skos:altLabel|mads:authoritativeLabel|mads:variantLabel ?matchedLabel
   FILTER (REGEX(LCASE(?matchedLabel),CONCAT("\\\\b",LCASE(<QUERY>))))
-  {
-    GRAPH <SGRAPH> {
-      ?groupId sf:preferredLanguageLiteral (skos:prefLabel mads:authoritativeLabel rdfs:label skos:altLabel mads:variantLabel <PREFLANG> '' ?groupLabel) .
-    }
-  } UNION {
+  { # GROUPLABELSTART
+    ?groupId sf:preferredLanguageLiteral (skos:prefLabel mads:authoritativeLabel rdfs:label skos:altLabel mads:variantLabel <PREFLANG> '' ?groupLabel) . # GROUPLABEL
+  } # GROUPLABELEND
+  UNION {
     ?id sf:preferredLanguageLiteral (skos:prefLabel mads:authoritativeLabel rdfs:label skos:altLabel mads:variantLabel <PREFLANG> '' ?prefLabel) .
   } UNION {
     ?id owl:sameAs ?sameAs .

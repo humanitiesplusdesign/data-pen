@@ -27,6 +27,10 @@ UNION {
   ?id <http://ldf.fi/sdfb/schema#odbnId> ?ifpODBNId .
 }
 `)
+      let lcnamesConfiguration: EndpointConfiguration = new EndpointConfiguration('lcnames', 'LC Names', new NamedNode('http://ldf.fi/lcnames/sparql'))
+      lcnamesConfiguration.autocompletionTextMatchQueryTemplate = lcnamesConfiguration.autocompletionTextMatchQueryTemplate.replace(/# GROUPLABELSTART/g, '').replace(/# GROUPLABELEND/g, '').replace(/.*# GROUPLABEL/g, `
+BIND(SUBSTR(STR(?groupId),32) AS ?groupLabel)
+`)
       let procopeConfiguration: EndpointConfiguration = new EndpointConfiguration('procope', 'Procope', new NamedNode('http://ldf.fi/procope/sparql'), [CIDOC.Person, CIDOC.Place, CIDOC.Group])
       procopeConfiguration.autocompletionTextMatchQueryTemplate = procopeConfiguration.autocompletionTextMatchQueryTemplate.replace(/\{ # ADDITIONALVARIABLES/g, '?ifpWikipediaPage {').replace(/# ADDITIONALSELECT/g, `
 UNION {
@@ -86,6 +90,7 @@ UNION {
   FILTER(STRSTARTS(?rid,"LC|n"))
   BIND(IRI(REPLACE(?rid, "^LC\\\\|n *","http://id.loc.gov/authorities/names/n")) AS ?sameAs)
 }`)
+
       let c: Configuration = new Configuration('fbtee', 'French Book Trade in Enlightenment Europe')
       c.primaryEndpoint = new PrimaryEndpointConfiguration('local', 'Local', new NamedNode('http://ldf.fi/fibra/sparql'), new NamedNode('http://ldf.fi/fibra/sparql'))
       c.primaryEndpoint.localItemQueryTemplate = c.primaryEndpoint.localItemQueryTemplate.replace(/GRAPH <GRAPH>/g, 'GRAPH <http://ldf.fi/fibra/fbtee/>')
@@ -136,7 +141,7 @@ UNION {
       c.primaryEndpoint = new PrimaryEndpointConfiguration('local', 'Local', new NamedNode('http://ldf.fi/fibra/sparql'), new NamedNode('http://ldf.fi/fibra/sparql'))
       c.authorityEndpoints = [
         ulanConfiguration,
-        new EndpointConfiguration('lcnames', 'LC Names', new NamedNode('http://ldf.fi/lcnames/sparql')),
+        lcnamesConfiguration,
         viafConfiguration,
         tgnConfiguration,
         new EndpointConfiguration('geonames', 'GeoNames', new NamedNode('http://ldf.fi/geonames/sparql'))
