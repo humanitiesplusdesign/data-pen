@@ -14,21 +14,22 @@ namespace fibra {
     public types: TreeNode[] = []
     public chosenTypes: { [id: string]: TreeNode|null}
 
-    // public createItem(item: Result): angular.IPromise<INode> {
-    //   let prefLabel: PropertyToValues<INode> = new PropertyToValues(SKOS.prefLabel)
-    //   prefLabel.values.push(item.prefLabel)
-    //   let type: PropertyToValues<INode> = new PropertyToValues(RDF.type)
-    //   let typeWithLabel: INodePlusLabel = new SourcedNodePlusLabel(item.additionalInformation['type'][0], item.additionalInformation['typeLabel'][0])
-    //   type.values.push(typeWithLabel)
-    //   let prom: angular.IPromise<INode> = this.sparqlItemService.createNewItem(item.ids, [prefLabel, type])
-    //   prom.then(() => {
-    //     this.fibraService.dispatch('change')
-    //   })
-    //   return prom
-    // }
-
     public createItem(item: Result) {
-      return this.fibraService.dispatchAction(this.fibraService.createItem(item.ids[0]))
+      // Figure out if there is a Fibra identifier
+      let fibraId = item.ids.filter((id) => {
+        return id.value.indexOf("http://ldf.fi/fibra/") !== -1;
+      })
+
+      if(fibraId[0]) {
+        // Make item visible
+        return this.fibraService.dispatchAction(this.fibraService.displayItem(fibraId[0]))
+      } else {
+        // Create item and then display it
+        // return this.fibraService.dispatchAction(this.fibraService.createItem(item.ids[0]))
+      }
+
+      // Otherwise just display a remote item at random (remove once creation is implemented)
+      return this.fibraService.dispatchAction(this.fibraService.displayItem(item.ids[0]))
     }
 
     private traverseClassTree(nodes: TreeNode[], test: Function, onSuccess: Function): void {

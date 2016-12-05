@@ -89,7 +89,13 @@ namespace fibra {
     }
 
     public queryAndBuild(): angular.IPromise<string> {
-      return this.itemService.getItemsForExplore().then(
+      // this.sparqlItemService.getItemsForExplore().then((its) => {
+      //   console.log(its)
+      // })
+      return this.$q.all(this.fibraService.getState().construct.items.map((it) => {
+        let item: Item = it
+        return this.sparqlItemService.getItem(item)
+      })).then(
         (items: Item[]) => {
           if(this.chosenTypes.primary) this.primaryItems = this.mergeNodes(this.primaryItems, this.filterItemsByType(items, this.chosenTypes.primary.id))
           if(this.chosenTypes.secondary) this.secondaryItems = this.mergeNodes(this.secondaryItems, this.filterItemsByType(items, this.chosenTypes.secondary.id))
@@ -113,7 +119,7 @@ namespace fibra {
 
     private filterItemsByType(items: Item[], type: string): IExploreItem[] {
       return items.filter((it) => {
-        let typeProp = it.localProperties.filter((pr) => {
+        let typeProp = it.localProperties.concat(it.remoteProperties).filter((pr) => {
           return pr.value === 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type'
         })
         if(typeProp[0]) {

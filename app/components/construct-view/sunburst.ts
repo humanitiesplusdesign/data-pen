@@ -64,7 +64,7 @@ namespace fibra {
       let hier = d3.hierarchy(d, (node) => {
         if(node.localProperties) {
           // Root node
-          return node.localProperties
+          return node.localProperties.concat(node.remoteProperties)
         } else {
           // Property node
           return node.values

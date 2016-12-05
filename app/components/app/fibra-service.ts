@@ -2,7 +2,13 @@ namespace fibra {
   'use strict'
   type CallbackFunction = () => angular.IPromise<string>
   type RemovalFunction = () => void
-  type State = any
+  type State = {
+    construct: {
+      types: any[],
+      items: any[],
+      itemIndex: {}
+    }
+  }
   type Store = [State]
   type Action = {
     type: string,
@@ -12,7 +18,15 @@ namespace fibra {
   const CREATE_ITEMS = "CREATE_ITEMS"
   const ADD_TYPE = "ADD_TYPE"
   const CLEAR_TYPES = "CLEAR_TYPES"
-  const INITIAL_STATE = {}
+  const DISPLAY_ITEM = "DISPLAY_ITEM"
+  const HIDE_ITEM = "HIDE_ITEM"
+  const INITIAL_STATE = {
+    construct: {
+      types: [],
+      items: [],
+      itemIndex: {}
+    }
+  }
   const DEFAULT_ACTION: Action = { type: '', payload: null }
 
   export class FibraService {
@@ -45,7 +59,9 @@ namespace fibra {
     private createState() {
       this.state = {
         construct: {
-          types: []
+          types: [],
+          items: [],
+          itemIndex: {}
         }
       }
       if(!this.store) {
@@ -59,6 +75,20 @@ namespace fibra {
     }
 
     // Action creators
+    public displayItem(item: ITerm): Action {
+      return {
+        type: DISPLAY_ITEM,
+        payload: item
+      }
+    }
+
+    public hideItem(item: ITerm): Action {
+      return {
+        type: HIDE_ITEM,
+        payload: item
+      }
+    }
+
     public createItem(item: INode):Action {
       return {
         type: CREATE_ITEMS,
@@ -90,6 +120,23 @@ namespace fibra {
     // Reducers
     private itemReducer(state: State = INITIAL_STATE, action: Action = DEFAULT_ACTION): angular.IPromise<State> {
       switch(action.type) {
+
+      case DISPLAY_ITEM:
+        if(!state.construct.itemIndex[action.payload.value]) {
+          state.construct.items.push(action.payload)
+          state.construct.itemIndex[action.payload.value] = action.payload
+        }
+        this.dispatch('change')
+        return this.q.resolve(state)
+
+      case HIDE_ITEM:
+        let it = state.construct.itemIndex[action.payload.value]
+        if(it) {
+          state.construct.items.splice(state.construct.items.indexOf(it), 1)
+          delete state.construct.itemIndex[action.payload.value]
+        }
+        this.dispatch('change')
+        return this.q.resolve(state)
 
       case CREATE_ITEMS:
         let items: Item[] = action.payload
@@ -144,6 +191,7 @@ namespace fibra {
 
     // Public API
     public dispatchAction(action: Action): angular.IPromise<State> {
+      console.log(action.type)
       return this.constructReducer(this.state, action)
         .then((state) => this.itemReducer(state, action))
     }
