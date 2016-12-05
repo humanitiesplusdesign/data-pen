@@ -2,6 +2,7 @@ script(type="text/ng-template",id="sparql-item-popover")
   sparql-item(endpoint='$ctrl.endpoint',item-id='value',show-remote-properties='true')
 
 h4 {{$ctrl.item.label.value}}
+a(ng-click="$ctrl.addItem()") +
 
 table.table.table-striped
   tr(ng-repeat="property in $ctrl.item.localProperties")

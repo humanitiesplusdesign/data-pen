@@ -17,7 +17,13 @@ namespace fibra {
           (item: Item) => this.item = item
         )
     }
-    constructor(private sparqlItemService: SparqlItemService) {
+    public addItem = () => {
+      console.log("Adding", this.item)
+      this.fibraService.dispatchAction(this.fibraService.createItem(this.item))
+    }
+
+    constructor(private sparqlItemService: SparqlItemService,
+                private fibraService: FibraService) {
       super()
     }
   }
