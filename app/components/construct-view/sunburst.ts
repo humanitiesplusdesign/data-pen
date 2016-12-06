@@ -10,17 +10,18 @@ namespace fibra {
         .outerRadius((d: d3.HierarchyRectangularNode<any>) => { return Math.sqrt(d.y1 - this.lessRadius) });
     private sbPart = d3.partition()
         .size([2 * Math.PI, this.sbRadius * this.sbRadius])
-    private sbColor = '#aaa'
     private sbTooltip: d3.Selection<HTMLDivElement, {}, HTMLBodyElement, undefined>
     private selectedItem: INode
     private item_info_tip: d3.Selection<HTMLDivElement, {}, HTMLBodyElement, undefined>
     private sel: d3.Selection<SVGSVGElement, {}, null, undefined>
     private item_info_tip_displayed: boolean = false
+    private original_data: fibra.IGridNode
 
     constructor(private $element: angular.IAugmentedJQuery,
                 private $compile: angular.ICompileService,
                 private $scope: angular.IScope,
-                private sparqlItemService: SparqlItemService) {
+                private sparqlItemService: SparqlItemService,
+                private fibraService: fibra.FibraService) {
       this.sbTooltip = d3.select('body').append<HTMLDivElement>('div')
         .style('position', 'absolute')
         .style('z-index', '20')
@@ -58,6 +59,7 @@ namespace fibra {
     }
 
     public buildSunburst(d, i, g) {
+      this.original_data = d
       this.sbGroup.attr('transform', (d: IExploreItem) => { return 'translate(' + d.gx + ',' + d.gy + ')' })
 
       // Group by property type -> property value
@@ -81,37 +83,51 @@ namespace fibra {
       paths.enter()
         .filter((d) => { return d.depth > 0 })
           .append("path")
+          .classed("sunburst-cell", true)
           .on('mouseover', (d: d3.HierarchyNode<IExploreItem>, i: number) => {
             this.sbTooltip.style('top', (d3.event.pageY - 10) + 'px')
               .style('left', (d3.event.pageX + 10) + 'px')
               .style('visibility', 'visible')
-              .text(d.data.label.value)
+              .text(d.depth === 2 ?
+                (d.data.label.value + " (click to add)") :
+                (d.data.label.value + " (click to add all children)"))
           })
           .on('mouseout', () => {
             this.sbTooltip.style('visibility', 'hidden')
           })
           .on('click', (d: d3.HierarchyNode<IExploreItem>, i: number) => {
-            this.sbTooltip.style('visibility', 'hidden')
-            this.item_info_tip.style('top', (d3.event.pageY - 10) + 'px')
-              .style('left', (d3.event.pageX + 17) + 'px')
-              .style('visibility', 'visible')
-            let cscope: angular.IScope = this.$scope.$new(true)
-            // Populate initial values
-            cscope['node'] = d.data
-            // Get full value and re-populate
-            this.sparqlItemService.getItem(d.data).then((item) => {
-              cscope['node'] = item
-              this.item_info_tip_displayed = true
-            })
-            this.item_info_tip.selectAll('*').remove()
-            this.item_info_tip.node().appendChild(this.$compile('<sparql-item item-id="node"></sparql-item>')(cscope)[0])
+            if(d.depth === 2) {
+              // Leaf
+              this.fibraService.dispatchAction(this.fibraService.displayItem(d.data))
+            } else {
+              // Property
+              d.children.forEach((node) => {
+                this.fibraService.dispatchAction(this.fibraService.displayItem(node.data))
+              })
+            }
+            this.original_data.selected = false
+            this.sbGroup.remove()
           })
+          // .on('click', (d: d3.HierarchyNode<IExploreItem>, i: number) => {
+          //   this.sbTooltip.style('visibility', 'hidden')
+          //   this.item_info_tip.style('top', (d3.event.pageY - 10) + 'px')
+          //     .style('left', (d3.event.pageX + 17) + 'px')
+          //     .style('visibility', 'visible')
+          //   let cscope: angular.IScope = this.$scope.$new(true)
+          //   // Populate initial values
+          //   cscope['node'] = d.data
+          //   // Get full value and re-populate
+          //   this.sparqlItemService.getItem(d.data).then((item) => {
+          //     cscope['node'] = item
+          //     this.item_info_tip_displayed = true
+          //   })
+          //   this.item_info_tip.selectAll('*').remove()
+          //   this.item_info_tip.node().appendChild(this.$compile('<sparql-item item-id="node"></sparql-item>')(cscope)[0])
+          // })
         // .attr("display", function(d) { return d.depth ? null : "none"; }) // hide inner ring
         .merge(paths)
           .attr("d", this.sbArc)
           .style("stroke", "#fff")
-          .style("fill", this.sbColor)
-          .style("fill-rule", "evenodd")    
     }
 
     public selectItem(id: INode): void {

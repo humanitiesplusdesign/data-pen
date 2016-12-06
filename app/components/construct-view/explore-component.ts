@@ -8,7 +8,7 @@ namespace fibra {
     layout: { choice: string }
   }
 
-  interface IGridNode extends d3.SimulationNodeDatum {
+  export interface IGridNode extends d3.SimulationNodeDatum {
     gx?: number
     gy?: number
     selected?: boolean
@@ -283,15 +283,14 @@ namespace fibra {
             this.tooltip.style('visibility', 'hidden')
           })
           .on('click', (d: IExploreItem, i, group) => {
+            this.forceSim.stop()
             let localSelected = d.selected
             // Unselect everything
             this.svgSel.selectAll('.node')
               .each((n: IExploreItem) => { n.selected = false })
             // Flip this one
             d.selected = !localSelected
-            this.svgSel.selectAll('.node-circle')
-              .classed('selected-circle', (d: IExploreItem) => { return d.selected })
-              .attr('r', (d: IExploreItem) => { return this.radius + (d.selected ? 3 : 0) + 'px' })
+            this.updateExplore(false)
             if(d.selected) {
               this.svgSel.select('g.sunburst-overlay')
                 .datum(d)
@@ -372,6 +371,10 @@ namespace fibra {
 
       this.tickTransformNodes(lPrimaryNodes, true)
       this.tickTransformNodes(lSecondaryNodes, false)
+
+      this.svgSel.selectAll('.node-circle')
+              .classed('selected-circle', (d: IExploreItem) => { return d.selected })
+              .attr('r', (d: IExploreItem) => { return this.radius + (d.selected ? 3 : 0) + 'px' })
 
       lLinkLines
         .attr('x1', (d: IExploreItemLink) => (<IExploreItem>d.source).gx!)
@@ -483,7 +486,7 @@ namespace fibra {
                 private fibraService: FibraService,
                 private $q: angular.IQService) {
 
-      this.sunburst = new Sunburst($element, $compile, $scope, sparqlItemService)
+      this.sunburst = new Sunburst($element, $compile, $scope, sparqlItemService, fibraService)
 
       this.fibraService.on('change', () => this.queryAndBuild())
       this.itemService = sparqlItemService
