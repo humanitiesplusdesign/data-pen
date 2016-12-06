@@ -101,9 +101,9 @@ namespace fibra {
               this.fibraService.dispatchAction(this.fibraService.displayItem(d.data))
             } else {
               // Property
-              d.children.forEach((node) => {
-                this.fibraService.dispatchAction(this.fibraService.displayItem(node.data))
-              })
+              this.fibraService.dispatchAction(this.fibraService.displayItems(
+                d.children.map((hn) => { return hn.data })
+              ))
             }
             this.original_data.selected = false
             this.sbGroup.remove()

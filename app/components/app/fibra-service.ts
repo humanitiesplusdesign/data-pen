@@ -18,7 +18,7 @@ namespace fibra {
   const CREATE_ITEMS = "CREATE_ITEMS"
   const ADD_TYPE = "ADD_TYPE"
   const CLEAR_TYPES = "CLEAR_TYPES"
-  const DISPLAY_ITEM = "DISPLAY_ITEM"
+  const DISPLAY_ITEMS = "DISPLAY_ITEMS"
   const HIDE_ITEM = "HIDE_ITEM"
   const INITIAL_STATE = {
     construct: {
@@ -77,8 +77,15 @@ namespace fibra {
     // Action creators
     public displayItem(item: ITerm): Action {
       return {
-        type: DISPLAY_ITEM,
-        payload: item
+        type: DISPLAY_ITEMS,
+        payload: [item]
+      }
+    }
+
+    public displayItems(items: ITerm[]): Action {
+      return {
+        type: DISPLAY_ITEMS,
+        payload: items
       }
     }
 
@@ -121,11 +128,13 @@ namespace fibra {
     private itemReducer(state: State = INITIAL_STATE, action: Action = DEFAULT_ACTION): angular.IPromise<State> {
       switch(action.type) {
 
-      case DISPLAY_ITEM:
-        if(!state.construct.itemIndex[action.payload.value]) {
-          state.construct.items.push(action.payload)
-          state.construct.itemIndex[action.payload.value] = action.payload
-        }
+      case DISPLAY_ITEMS:
+        action.payload.forEach((item) => {
+          if(!state.construct.itemIndex[item.value]) {
+            state.construct.items.push(item)
+            state.construct.itemIndex[item.value] = item
+          }
+        })
         this.dispatch('change')
         return this.q.resolve(state)
 

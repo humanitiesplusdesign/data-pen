@@ -11,6 +11,8 @@ namespace fibra {
   export interface IGridNode extends d3.SimulationNodeDatum {
     gx?: number
     gy?: number
+    fx?: number
+    fy?: number
     selected?: boolean
   }
 
@@ -88,6 +90,13 @@ namespace fibra {
       this.queryAndBuild()
     }
 
+    private lockExisting(nodes: IGridNode[]) {
+      nodes.forEach((node) => {
+        node.fx = node.gx
+        node.fy = node.gy
+      })
+    }
+
     public queryAndBuild(): angular.IPromise<string> {
       return this.$q.all(this.fibraService.getState().construct.items.map((it) => {
         let item: Item = it
@@ -95,6 +104,11 @@ namespace fibra {
       })).then(
         (items: Item[]) => {
           console.log("Items in explore", items)
+          // Lock previous items
+          this.lockExisting(this.primaryItems)
+          this.lockExisting(this.secondaryItems)
+          this.lockExisting(this.tertiaryItems)
+
           if(this.chosenTypes.primary) this.primaryItems = this.mergeNodes(this.primaryItems, this.filterItemsByType(items, this.chosenTypes.primary.id))
           if(this.chosenTypes.secondary) this.secondaryItems = this.mergeNodes(this.secondaryItems, this.filterItemsByType(items, this.chosenTypes.secondary.id))
           if(this.chosenTypes.tertiary) this.tertiaryItems = this.mergeNodes(this.tertiaryItems, this.filterItemsByType(items, this.chosenTypes.tertiary.id))
