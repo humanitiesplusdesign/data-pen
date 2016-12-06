@@ -98,7 +98,7 @@ namespace fibra {
     }
 
     public queryAndBuild(): angular.IPromise<string> {
-      return this.$q.all(this.fibraService.getState().construct.items.map((it) => {
+      let prom = this.$q.all(this.fibraService.getState().construct.items.map((it) => {
         let item: Item = it
         return this.sparqlItemService.getItem(item)
       })).then(
@@ -127,6 +127,10 @@ namespace fibra {
           this.sortProperties();
           return 'ok';
         }).then(() => this.updateExplore())
+
+        this.fibraService.dispatchAction(this.fibraService.placeHolderAction(prom))
+
+        return prom
     }
 
     private filterItemsByType(items: Item[], type: string): IExploreItem[] {

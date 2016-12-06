@@ -2,12 +2,13 @@ namespace fibra {
   'use strict'
   type CallbackFunction = () => angular.IPromise<string>
   type RemovalFunction = () => void
-  type State = {
+  export type State = {
     construct: {
       types: any[],
       items: any[],
       itemIndex: {}
-    }
+    },
+    actionsRunning: number
   }
   type Store = [State]
   type Action = {
@@ -15,6 +16,7 @@ namespace fibra {
     payload: any
   }
 
+  const PLACEHOLDER = "PLACEHOLDER"
   const CREATE_ITEMS = "CREATE_ITEMS"
   const ADD_TYPE = "ADD_TYPE"
   const CLEAR_TYPES = "CLEAR_TYPES"
@@ -24,8 +26,9 @@ namespace fibra {
     construct: {
       types: [],
       items: [],
-      itemIndex: {}
-    }
+      itemIndex: {},
+    },
+    actionsRunning: 0
   }
   const DEFAULT_ACTION: Action = { type: '', payload: null }
 
@@ -57,13 +60,7 @@ namespace fibra {
     // State and store
     private state: State
     private createState() {
-      this.state = {
-        construct: {
-          types: [],
-          items: [],
-          itemIndex: {}
-        }
-      }
+      this.state = INITIAL_STATE
       if(!this.store) {
         this.createStore()
       }
@@ -75,6 +72,13 @@ namespace fibra {
     }
 
     // Action creators
+    public placeHolderAction(prom: angular.IPromise<string>): Action {
+      return {
+        type: PLACEHOLDER,
+        payload: prom
+      }
+    }
+
     public displayItem(item: ITerm): Action {
       return {
         type: DISPLAY_ITEMS,
@@ -188,6 +192,11 @@ namespace fibra {
     private constructReducer(state: State = INITIAL_STATE, action: Action = DEFAULT_ACTION): angular.IPromise<State> {
       switch(action.type) {
 
+      case PLACEHOLDER:
+        return action.payload.then(() => {
+          return state
+        })
+
       case ADD_TYPE:
         state.construct.types.push(action.payload)
         return this.q.resolve(state)
@@ -204,8 +213,14 @@ namespace fibra {
     // Public API
     public dispatchAction(action: Action): angular.IPromise<State> {
       console.log(action.type)
+      this.state.actionsRunning = this.state.actionsRunning+1
+      this.dispatch('action')
       return this.constructReducer(this.state, action)
         .then((state) => this.itemReducer(state, action))
+        .then((state) => {
+          this.state.actionsRunning = this.state.actionsRunning-1
+          return state
+        })
     }
 
     public getState(): State {

@@ -13,6 +13,7 @@ namespace fibra {
     public selectedItem: INode
     public types: TreeNode[] = []
     public chosenTypes: { [id: string]: TreeNode|null}
+    public state: fibra.State
 
     public createItem(item: Result) {
       // Figure out if there is a Fibra identifier
@@ -43,7 +44,9 @@ namespace fibra {
     constructor(private configurationService: ConfigurationService,
                 private sparqlTreeService: SparqlTreeService,
                 private sparqlItemService: SparqlItemService,
-                private fibraService: FibraService) {
+                private fibraService: FibraService,
+                private $scope: angular.IRootScopeService,
+                private $q: angular.IQService) {
 
       this.chosenTypes = {
         primary: null,
@@ -66,6 +69,11 @@ namespace fibra {
           return 'ok'
         })
       })
+      this.fibraService.on('action', () => {
+        this.state = fibraService.getState()
+        return this.$q.resolve('ok')
+      })
+      this.state = fibraService.getState()
     }
   }
 
