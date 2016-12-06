@@ -147,18 +147,21 @@ namespace fibra {
 
           // }))
           return this.sparqlItemService.getItem(node).then((item) => {
-            let prefLabelProp = item.localProperties.filter((pr) => {
+            let prefLabelProp = item.localProperties.concat(item.remoteProperties).filter((pr) => {
               return pr.value === 'http://www.w3.org/2004/02/skos/core#prefLabel'
             })
             let type: PropertyToValues<INode> = new PropertyToValues(RDF.type)
-            let typeProp = item.remoteProperties.filter((pr) => {
+            let typeProp = item.localProperties.concat(item.remoteProperties).filter((pr) => {
               return pr.value === 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type'
             })
             if(typeProp[0]) {
               let typeWithLabel: INodePlusLabel = new SourcedNodePlusLabel(typeProp[0])
               type.values.push(typeWithLabel)
             }
-            return this.sparqlItemService.createNewItem(items, [type, prefLabelProp[0]])
+            return this.sparqlItemService.createNewItem([item], [type, prefLabelProp[0]])
+          }).then((node) => {
+            // Display the item
+            return this.dispatchAction(this.displayItem(node))
           })
         })
         let prom = this.q.all(proms).then(() => {

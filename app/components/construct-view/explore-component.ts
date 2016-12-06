@@ -89,14 +89,12 @@ namespace fibra {
     }
 
     public queryAndBuild(): angular.IPromise<string> {
-      // this.sparqlItemService.getItemsForExplore().then((its) => {
-      //   console.log(its)
-      // })
       return this.$q.all(this.fibraService.getState().construct.items.map((it) => {
         let item: Item = it
         return this.sparqlItemService.getItem(item)
       })).then(
         (items: Item[]) => {
+          console.log("Items in explore", items)
           if(this.chosenTypes.primary) this.primaryItems = this.mergeNodes(this.primaryItems, this.filterItemsByType(items, this.chosenTypes.primary.id))
           if(this.chosenTypes.secondary) this.secondaryItems = this.mergeNodes(this.secondaryItems, this.filterItemsByType(items, this.chosenTypes.secondary.id))
           if(this.chosenTypes.tertiary) this.tertiaryItems = this.mergeNodes(this.tertiaryItems, this.filterItemsByType(items, this.chosenTypes.tertiary.id))

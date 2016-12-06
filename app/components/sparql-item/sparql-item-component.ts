@@ -18,8 +18,8 @@ namespace fibra {
         )
     }
     public addItem = () => {
-      console.log("Adding", this.item)
-      this.fibraService.dispatchAction(this.fibraService.createItem(this.item))
+      // May need to handle creation here as well but for now, just display
+      this.fibraService.dispatchAction(this.fibraService.displayItem(this.item))
     }
 
     constructor(private sparqlItemService: SparqlItemService,

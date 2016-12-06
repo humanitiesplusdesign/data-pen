@@ -19,16 +19,14 @@ namespace fibra {
       let fibraId = item.ids.filter((id) => {
         return id.value.indexOf("http://ldf.fi/fibra/") !== -1;
       })
-
-      if(fibraId[0]) {
+      
+      // if(fibraId[0]) {
         // Make item visible
-        return this.fibraService.dispatchAction(this.fibraService.displayItem(fibraId[0]))
-      } else {
+        // return this.fibraService.dispatchAction(this.fibraService.displayItem(fibraId[0]))
+      // } else {
         // Create item and then display it
         // return this.fibraService.dispatchAction(this.fibraService.createItem(item.ids[0]))
-      }
-
-      // Otherwise just display a remote item at random (remove once creation is implemented)
+      // }
       return this.fibraService.dispatchAction(this.fibraService.displayItem(item.ids[0]))
     }
 
