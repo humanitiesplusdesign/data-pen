@@ -23,7 +23,10 @@ SELECT ?subClass ?superClass ?class ?classLabel ?instances {
         GROUP BY ?class
       }
     }
-    ?class sf:preferredLanguageLiteral (skos:prefLabel rdfs:label skos:altLabel 'en' '' ?classLabel) .
+    OPTIONAL {
+      ?class sf:preferredLanguageLiteral (skos:prefLabel rdfs:label skos:altLabel 'en' '' ?classLabelP) .
+    }
+    BIND(COALESCE(?classLabelP,REPLACE(REPLACE(REPLACE(REPLACE(STR(?class),".*/",""),".*#",""),"_"," "),"([A-ZÅÄÖ])"," $1")) AS ?classLabel)
   }
 }
 `

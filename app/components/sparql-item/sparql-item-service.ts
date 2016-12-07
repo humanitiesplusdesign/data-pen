@@ -71,6 +71,32 @@ namespace fibra {
     public static schemaGraph: INode = new NamedNode(SparqlItemService.ns + 'schema#')
     public static instanceGraph: INode = new NamedNode(SparqlItemService.ns + 'main/')
 
+    public static naiveGetLocalItemPropertiesQuery: string = `
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+PREFIX mads: <http://www.loc.gov/mads/rdf/v1#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX owl: <http://www.w3.org/2002/07/owl#>
+SELECT ?itemLabel ?property ?propertyLabel ?object ?objectLabel {
+  GRAPH <GRAPH> {
+    {
+      <ID> skos:prefLabel|mads:authoritativeLabel|rdfs:label ?itemLabel .
+      FILTER(LANG(?itemLabel)='' || LANG(?itemLabel)='<PREFLANG>')
+    } UNION {
+      <ID> ?property ?object .
+      OPTIONAL {
+        ?property skos:prefLabel|rdfs:label ?propertyLabelP .
+        FILTER(LANG(?propertyLabelP)='' || LANG(?propertyLabelP)='<PREFLANG>')
+      }
+      BIND(COALESCE(?propertyLabelP,REPLACE(REPLACE(REPLACE(REPLACE(STR(?property),".*/",""),".*#",""),"_"," "),"([A-ZÅÄÖ])"," $1")) AS ?propertyLabel)
+      OPTIONAL {
+        ?object skos:prefLabel|rdfs:label ?objectLabelP .
+        FILTER(LANG(?objectLabelP)='' || LANG(?objectLabelP)='<PREFLANG>')
+      }
+      BIND (IF(ISIRI(?object),COALESCE(?objectLabelP,REPLACE(REPLACE(REPLACE(REPLACE(STR(?object),".*/",""),".*#",""),"_"," "),"([A-ZÅÄÖ])"," $1")),?object) AS ?objectLabel)
+    }
+  }
+}`
+
     public static getLocalItemPropertiesQuery: string = `
 PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
 PREFIX mads: <http://www.loc.gov/mads/rdf/v1#>
@@ -80,15 +106,15 @@ PREFIX sf: <http://ldf.fi/functions#>
 SELECT ?itemLabel ?property ?propertyLabel ?object ?objectLabel {
   GRAPH <GRAPH> {
     {
-      <ID> sf:preferredLanguageLiteral (skos:prefLabel mads:authoritativeLabel rdfs:label skos:altLabel mads:variantLabel <PREFLANG> '' ?itemLabel) .
+      <ID> sf:preferredLanguageLiteral (skos:prefLabel mads:authoritativeLabel rdfs:label skos:altLabel mads:variantLabel '<PREFLANG>' '' ?itemLabel) .
     } UNION {
       <ID> ?property ?object .
       OPTIONAL {
-        ?property sf:preferredLanguageLiteral (skos:prefLabel mads:authoritativeLabel rdfs:label skos:altLabel mads:variantLabel <PREFLANG> '' ?propertyLabelP)
+        ?property sf:preferredLanguageLiteral (skos:prefLabel mads:authoritativeLabel rdfs:label skos:altLabel mads:variantLabel '<PREFLANG>' '' ?propertyLabelP)
       }
       BIND(COALESCE(?propertyLabelP,REPLACE(REPLACE(REPLACE(REPLACE(STR(?property),".*/",""),".*#",""),"_"," "),"([A-ZÅÄÖ])"," $1")) AS ?propertyLabel)
       OPTIONAL {
-        ?object sf:preferredLanguageLiteral (skos:prefLabel mads:authoritativeLabel rdfs:label skos:altLabel mads:variantLabel <PREFLANG> '' ?objectLabelP) .
+        ?object sf:preferredLanguageLiteral (skos:prefLabel mads:authoritativeLabel rdfs:label skos:altLabel mads:variantLabel '<PREFLANG>' '' ?objectLabelP) .
       }
       BIND (IF(ISIRI(?object),COALESCE(?objectLabelP,REPLACE(REPLACE(REPLACE(REPLACE(STR(?object),".*/",""),".*#",""),"_"," "),"([A-ZÅÄÖ])"," $1")),?object) AS ?objectLabel)
     }
@@ -105,11 +131,11 @@ SELECT ?property ?propertyLabel ?object ?objectLabel {
   ?object ?property ?id .
   ?id ?property ?object .
   OPTIONAL {
-    ?property sf:preferredLanguageLiteral (skos:prefLabel mads:authoritativeLabel rdfs:label skos:altLabel mads:variantLabel <PREFLANG> '' ?propertyLabelP)
+    ?property sf:preferredLanguageLiteral (skos:prefLabel mads:authoritativeLabel rdfs:label skos:altLabel mads:variantLabel '<PREFLANG>' '' ?propertyLabelP)
   }
   BIND(COALESCE(?propertyLabelP,REPLACE(REPLACE(REPLACE(REPLACE(STR(?property),".*/",""),".*#",""),"_"," "),"([A-ZÅÄÖ])"," $1")) AS ?propertyLabel)
   OPTIONAL {
-    ?object sf:preferredLanguageLiteral (skos:prefLabel mads:authoritativeLabel rdfs:label skos:altLabel mads:variantLabel <PREFLANG> '' ?objectLabelP) .
+    ?object sf:preferredLanguageLiteral (skos:prefLabel mads:authoritativeLabel rdfs:label skos:altLabel mads:variantLabel '<PREFLANG>' '' ?objectLabelP) .
   }
   BIND (IF(ISIRI(?object),COALESCE(?objectLabelP,REPLACE(REPLACE(REPLACE(REPLACE(STR(?object),".*/",""),".*#",""),"_"," "),"([A-ZÅÄÖ])"," $1")),?object) AS ?objectLabel)
 }
@@ -124,11 +150,11 @@ SELECT ?property ?propertyLabel ?object ?objectLabel {
   VALUES ?id { <IDS> }
   ?id ?property ?object .
   OPTIONAL {
-    ?property sf:preferredLanguageLiteral (skos:prefLabel mads:authoritativeLabel rdfs:label skos:altLabel mads:variantLabel <PREFLANG> '' ?propertyLabelP)
+    ?property sf:preferredLanguageLiteral (skos:prefLabel mads:authoritativeLabel rdfs:label skos:altLabel mads:variantLabel '<PREFLANG>' '' ?propertyLabelP)
   }
   BIND(COALESCE(?propertyLabelP,REPLACE(REPLACE(REPLACE(REPLACE(STR(?property),".*/",""),".*#",""),"_"," "),"([A-ZÅÄÖ])"," $1")) AS ?propertyLabel)
   OPTIONAL {
-    ?object sf:preferredLanguageLiteral (skos:prefLabel mads:authoritativeLabel rdfs:label skos:altLabel mads:variantLabel <PREFLANG> '' ?objectLabelP) .
+    ?object sf:preferredLanguageLiteral (skos:prefLabel mads:authoritativeLabel rdfs:label skos:altLabel mads:variantLabel '<PREFLANG>' '' ?objectLabelP) .
   }
   BIND (IF(ISIRI(?object),COALESCE(?objectLabelP,REPLACE(REPLACE(REPLACE(REPLACE(STR(?object),".*/",""),".*#",""),"_"," "),"([A-ZÅÄÖ])"," $1")),?object) AS ?objectLabel)
 }
@@ -149,24 +175,24 @@ SELECT ?id ?type ?itemLabel ?property ?propertyLabel ?object ?objectLabel {
     SERVICE ?service {
       ?oid ?property ?object .
       OPTIONAL {
-        ?property sf:preferredLanguageLiteral (skos:prefLabel mads:authoritativeLabel rdfs:label skos:altLabel mads:variantLabel <PREFLANG> '' ?propertyLabelP)
+        ?property sf:preferredLanguageLiteral (skos:prefLabel mads:authoritativeLabel rdfs:label skos:altLabel mads:variantLabel '<PREFLANG>' '' ?propertyLabelP)
       }
       BIND(COALESCE(?propertyLabelP,REPLACE(REPLACE(REPLACE(REPLACE(STR(?property),".*/",""),".*#",""),"_"," "),"([A-ZÅÄÖ])"," $1")) AS ?propertyLabel)
       OPTIONAL {
-        ?object sf:preferredLanguageLiteral (skos:prefLabel mads:authoritativeLabel rdfs:label skos:altLabel mads:variantLabel <PREFLANG> '' ?objectLabelP) .
+        ?object sf:preferredLanguageLiteral (skos:prefLabel mads:authoritativeLabel rdfs:label skos:altLabel mads:variantLabel '<PREFLANG>' '' ?objectLabelP) .
       }
       BIND (IF(ISIRI(?object),COALESCE(?objectLabelP,REPLACE(REPLACE(REPLACE(REPLACE(STR(?object),".*/",""),".*#",""),"_"," "),"([A-ZÅÄÖ])"," $1")),?object) AS ?objectLabel)
     }
   } UNION {
-    ?id sf:preferredLanguageLiteral (skos:prefLabel mads:authoritativeLabel rdfs:label skos:altLabel mads:variantLabel <PREFLANG> '' ?itemLabel) .
+    ?id sf:preferredLanguageLiteral (skos:prefLabel mads:authoritativeLabel rdfs:label skos:altLabel mads:variantLabel '<PREFLANG>' '' ?itemLabel) .
   } UNION {
     ?id ?property ?object .
     OPTIONAL {
-      ?property sf:preferredLanguageLiteral (skos:prefLabel mads:authoritativeLabel rdfs:label skos:altLabel mads:variantLabel <PREFLANG> '' ?propertyLabelP)
+      ?property sf:preferredLanguageLiteral (skos:prefLabel mads:authoritativeLabel rdfs:label skos:altLabel mads:variantLabel '<PREFLANG>' '' ?propertyLabelP)
     }
     BIND(COALESCE(?propertyLabelP,REPLACE(REPLACE(REPLACE(REPLACE(STR(?property),".*/",""),".*#",""),"_"," "),"([A-ZÅÄÖ])"," $1")) AS ?propertyLabel)
     OPTIONAL {
-      ?object sf:preferredLanguageLiteral (skos:prefLabel mads:authoritativeLabel rdfs:label skos:altLabel mads:variantLabel <PREFLANG> '' ?objectLabelP) .
+      ?object sf:preferredLanguageLiteral (skos:prefLabel mads:authoritativeLabel rdfs:label skos:altLabel mads:variantLabel '<PREFLANG>' '' ?objectLabelP) .
     }
     BIND (IF(ISIRI(?object),COALESCE(?objectLabelP,REPLACE(REPLACE(REPLACE(REPLACE(STR(?object),".*/",""),".*#",""),"_"," "),"([A-ZÅÄÖ])"," $1")),?object) AS ?objectLabel)
   }
