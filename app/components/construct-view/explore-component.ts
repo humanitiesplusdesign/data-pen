@@ -483,16 +483,17 @@ namespace fibra {
     public delete(id: INode): angular.IPromise<string> {
 
       // remove any links from the item -
-      for (let i: number = 0; i < this.links.length; i++) {
-        if (this.links[i].source === id || this.links[i].target === id) {
-          this.links.splice(i, 1)
-        }
-      }
+      // for (let i: number = 0; i < this.links.length; i++) {
+      //   if (this.links[i].source === id || this.links[i].target === id) {
+      //     this.links.splice(i, 1)
+      //   }
+      // }
       // might need more to fully clear svg of deleted links
 
-      let prom: angular.IPromise<string> = this.itemService.deleteItem(id)
-      prom.then(() => this.fibraService.dispatch('change'))
-      return prom
+      // let prom: angular.IPromise<string> = this.itemService.deleteItem(id)
+      // prom.then(() => this.fibraService.dispatch('change'))
+      // return prom
+      return this.fibraService.dispatchAction(this.fibraService.hideItem(id)).then(() => { return 'ok' })
     }
 
     constructor(private $element: angular.IAugmentedJQuery,
