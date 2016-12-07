@@ -93,8 +93,6 @@ UNION {
 
       let c: Configuration = new Configuration('fbtee', 'French Book Trade in Enlightenment Europe')
       c.primaryEndpoint = new PrimaryEndpointConfiguration('local', 'Local', new NamedNode('http://ldf.fi/fibra/sparql'), new NamedNode('http://ldf.fi/fibra/sparql'))
-      c.primaryEndpoint.localItemQueryTemplate = c.primaryEndpoint.localItemQueryTemplate.replace(/GRAPH <GRAPH>/g, 'GRAPH <http://ldf.fi/fibra/fbtee/>')
-      c.primaryEndpoint.autocompletionTextMatchQueryTemplate = c.primaryEndpoint.autocompletionTextMatchQueryTemplate.replace(/GRAPH <GRAPH>/g, 'GRAPH <http://ldf.fi/fibra/fbtee/>')
       c.authorityEndpoints = [
         ulanConfiguration,
         viafConfiguration,
@@ -159,6 +157,11 @@ UNION {
       c.instanceGraph = 'http://ldf.fi/fibra/main/'
       c.schemaNS = 'http://ldf.fi/fibra/schema#'
       c.schemaGraph = 'http://ldf.fi/fibra/schema#'
+      this.configurations.push(c)
+      c = new Configuration('local', 'SPARQL endpoint on localhost')
+      c.primaryEndpoint = new PrimaryEndpointConfiguration('local', 'Local', new NamedNode('http://localhost:3030/fibra/sparql'), new NamedNode('http://localhost:3030/fibra/update'))
+      c.primaryEndpoint.autocompletionTextMatchQueryTemplate = SparqlAutocompleteService.naiveMatchQueryTemplate
+      c.primaryEndpoint.localItemQueryTemplate = SparqlItemService.naiveGetLocalItemPropertiesQuery
       this.configurations.push(c)
     }
   }

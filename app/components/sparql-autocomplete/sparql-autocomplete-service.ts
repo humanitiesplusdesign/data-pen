@@ -15,6 +15,45 @@ namespace fibra {
 
   export class SparqlAutocompleteService {
 
+    public static naiveMatchQueryTemplate: string = `
+  PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+  PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+  PREFIX mads: <http://www.loc.gov/mads/rdf/v1#>
+  PREFIX owl: <http://www.w3.org/2002/07/owl#>
+  PREFIX dcterms: <http://purl.org/dc/terms/>
+  SELECT ?groupId ?groupLabel ?id ?prefLabel ?matchedLabel ?sameAs ?altLabel { # ADDITIONALVARIABLES
+    GRAPH <GRAPH> {
+      {
+        SELECT ?groupId ?id {
+          {
+            ?id skos:prefLabel|rdfs:label|skos:altLabel|mads:authoritativeLabel|mads:variantLabel <QUERY> .
+          } UNION {
+            ?id skos:prefLabel|rdfs:label|skos:altLabel|mads:authoritativeLabel|mads:variantLabel <QUERY>@<PREFLANG> .
+          }
+          ?id a ?groupId .
+        }
+        GROUP BY ?groupId ?id
+        HAVING(BOUND(?id))
+        LIMIT <LIMIT>
+      }
+      ?id skos:prefLabel|rdfs:label|skos:altLabel|mads:authoritativeLabel|mads:variantLabel ?matchedLabel .
+      FILTER (REGEX(LCASE(?matchedLabel),CONCAT("\\\\b",LCASE(<QUERY>))))
+      OPTIONAL {
+        ?groupId skos:prefLabel|rdfs:label|skos:altLabel|mads:authoritativeLabel|mads:variantLabel ?groupLabelP .
+      }
+      BIND(COALESCE(?groupLabelP,REPLACE(REPLACE(REPLACE(REPLACE(STR(?groupId),".*/",""),".*#",""),"_"," "),"([A-ZÅÄÖ])"," $1")) AS ?groupLabel)
+      {
+        ?id  rdfs:label|skos:prefLabel|mads:authoritativeLabel ?prefLabel .
+      } UNION {
+        ?id owl:sameAs ?sameAs .
+      } UNION {
+        ?id skos:altLabel|mads:variantLabel ?altLabel .
+      }
+      # ADDITIONALSELECT
+    }
+  }
+  `
+
     public static defaultMatchQueryTemplate: string = `
 PREFIX text: <http://jena.apache.org/text#>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
@@ -25,42 +64,44 @@ PREFIX sf: <http://ldf.fi/functions#>
 PREFIX fibra: <http://ldf.fi/fibra/schema#>
 PREFIX dcterms: <http://purl.org/dc/terms/>
 SELECT ?groupId ?groupLabel ?id ?prefLabel ?matchedLabel ?sameAs ?altLabel { # ADDITIONALVARIABLES
-  {
-    SELECT ?groupId ?id (SUM(?sc) AS ?score) {
-      {
-        SELECT ?groupId ?id ?sc {
-          BIND(CONCAT(REPLACE(<QUERY>,"([\\\\+\\\\-\\\\&\\\\|\\\\!\\\\(\\\\)\\\\{\\\\}\\\\[\\\\]\\\\^\\\\\\"\\\\~\\\\*\\\\?\\\\:\\\\/\\\\\\\\])","\\\\$1"),"*") AS ?query)
+  GRAPH <GRAPH> {
+    {
+      SELECT ?groupId ?id (SUM(?sc) AS ?score) {
+        {
+          SELECT ?groupId ?id ?sc {
+            BIND(CONCAT(REPLACE(<QUERY>,"([\\\\+\\\\-\\\\&\\\\|\\\\!\\\\(\\\\)\\\\{\\\\}\\\\[\\\\]\\\\^\\\\\\"\\\\~\\\\*\\\\?\\\\:\\\\/\\\\\\\\])","\\\\$1"),"*") AS ?query)
+            (?id ?sc) text:query ?query .
+            ?id a ?groupId .
+            # GROUPID
+            # CONSTRAINTS
+          } LIMIT <LIMIT>
+        } UNION {
+          BIND(CONCAT("\\"",REPLACE(<QUERY>,"([\\\\+\\\\-\\\\&\\\\|\\\\!\\\\(\\\\)\\\\{\\\\}\\\\[\\\\]\\\\^\\\\\\"\\\\~\\\\*\\\\?\\\\:\\\\/\\\\\\\\])","\\\\$1"),"\\"") AS ?query)
           (?id ?sc) text:query ?query .
+          ?id skos:prefLabel|rdfs:label|skos:altLabel|mads:authoritativeLabel|mads:variantLabel ?matchedLabel
+          FILTER (LCASE(?matchedLabel)=LCASE(<QUERY>))
           ?id a ?groupId .
           # GROUPID
           # CONSTRAINTS
-        } LIMIT <LIMIT>
-      } UNION {
-        BIND(CONCAT("\\"",REPLACE(<QUERY>,"([\\\\+\\\\-\\\\&\\\\|\\\\!\\\\(\\\\)\\\\{\\\\}\\\\[\\\\]\\\\^\\\\\\"\\\\~\\\\*\\\\?\\\\:\\\\/\\\\\\\\])","\\\\$1"),"\\"") AS ?query)
-        (?id ?sc) text:query ?query .
-        ?id skos:prefLabel|rdfs:label|skos:altLabel|mads:authoritativeLabel|mads:variantLabel ?matchedLabel
-        FILTER (LCASE(?matchedLabel)=LCASE(<QUERY>))
-        ?id a ?groupId .
-        # GROUPID
-        # CONSTRAINTS
+        }
       }
+      GROUP BY ?groupId ?id
+      HAVING(BOUND(?id))
     }
-    GROUP BY ?groupId ?id
-    HAVING(BOUND(?id))
+    ?id skos:prefLabel|rdfs:label|skos:altLabel|mads:authoritativeLabel|mads:variantLabel ?matchedLabel
+    FILTER (REGEX(LCASE(?matchedLabel),CONCAT("\\\\b",LCASE(<QUERY>))))
+    { # GROUPLABELSTART
+      ?groupId sf:preferredLanguageLiteral (skos:prefLabel mads:authoritativeLabel rdfs:label skos:altLabel mads:variantLabel '<PREFLANG>' '' ?groupLabel) . # GROUPLABEL
+    } # GROUPLABELEND
+    UNION {
+      ?id sf:preferredLanguageLiteral (skos:prefLabel mads:authoritativeLabel rdfs:label skos:altLabel mads:variantLabel '<PREFLANG>' '' ?prefLabel) .
+    } UNION {
+      ?id owl:sameAs ?sameAs .
+    } UNION {
+      ?id skos:altLabel|mads:variantLabel ?altLabel .
+    }
+    # ADDITIONALSELECT
   }
-  ?id skos:prefLabel|rdfs:label|skos:altLabel|mads:authoritativeLabel|mads:variantLabel ?matchedLabel
-  FILTER (REGEX(LCASE(?matchedLabel),CONCAT("\\\\b",LCASE(<QUERY>))))
-  { # GROUPLABELSTART
-    ?groupId sf:preferredLanguageLiteral (skos:prefLabel mads:authoritativeLabel rdfs:label skos:altLabel mads:variantLabel <PREFLANG> '' ?groupLabel) . # GROUPLABEL
-  } # GROUPLABELEND
-  UNION {
-    ?id sf:preferredLanguageLiteral (skos:prefLabel mads:authoritativeLabel rdfs:label skos:altLabel mads:variantLabel <PREFLANG> '' ?prefLabel) .
-  } UNION {
-    ?id owl:sameAs ?sameAs .
-  } UNION {
-    ?id skos:altLabel|mads:variantLabel ?altLabel .
-  }
-  # ADDITIONALSELECT
 }
 `
 

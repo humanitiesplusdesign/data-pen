@@ -2,7 +2,7 @@ namespace fibra {
   'use strict'
 
     export class Configuration {
-      public preferredLanguage: string = '"en"'
+      public preferredLanguage: string = 'en'
       public primaryEndpoint: PrimaryEndpointConfiguration
       public authorityEndpoints: EndpointConfiguration[] = []
       public archiveEndpoints: EndpointConfiguration[] = []
