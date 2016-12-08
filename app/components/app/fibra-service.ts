@@ -6,7 +6,8 @@ namespace fibra {
     construct: {
       types: any[],
       items: any[],
-      itemIndex: {}
+      itemIndex: {},
+      localItems: IGridNode[]
     },
     actionsRunning: number
   }
@@ -16,17 +17,19 @@ namespace fibra {
     payload: any
   }
 
-  const PLACEHOLDER = "PLACEHOLDER"
-  const CREATE_ITEMS = "CREATE_ITEMS"
-  const ADD_TYPE = "ADD_TYPE"
-  const CLEAR_TYPES = "CLEAR_TYPES"
-  const DISPLAY_ITEMS = "DISPLAY_ITEMS"
-  const HIDE_ITEM = "HIDE_ITEM"
-  const INITIAL_STATE = {
+  const PLACEHOLDER: string = 'PLACEHOLDER'
+  const CREATE_ITEMS: string = 'CREATE_ITEMS'
+  const ADD_TYPE: string = 'ADD_TYPE'
+  const CLEAR_TYPES: string = 'CLEAR_TYPES'
+  const DISPLAY_ITEMS: string = 'DISPLAY_ITEMS'
+  const HIDE_ITEM: string = 'HIDE_ITEM'
+  const CREATE_LOCAL_ITEM: string = 'CREATE_LOCAL_ITEM'
+  const INITIAL_STATE: State = {
     construct: {
       types: [],
       items: [],
       itemIndex: {},
+      localItems: []
     },
     actionsRunning: 0
   }
@@ -76,6 +79,13 @@ namespace fibra {
       return {
         type: PLACEHOLDER,
         payload: prom
+      }
+    }
+
+    public createLocalItem(item: ITerm): Action {
+      return {
+        type: CREATE_LOCAL_ITEM,
+        payload: item
       }
     }
 
@@ -149,6 +159,11 @@ namespace fibra {
           delete state.construct.itemIndex[action.payload.value]
         }
         this.dispatch('change')
+        return this.q.resolve(state)
+
+      case CREATE_LOCAL_ITEM:
+        let item: IGridNode = action.payload
+        state.construct.localItems.push(item)
         return this.q.resolve(state)
 
       case CREATE_ITEMS:
