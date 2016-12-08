@@ -67,10 +67,6 @@ namespace fibra {
 
   export class SparqlItemService {
 
-    public static ns: string = 'http://ldf.fi/fibra/'
-    public static schemaGraph: INode = new NamedNode(SparqlItemService.ns + 'schema#')
-    public static instanceGraph: INode = new NamedNode(SparqlItemService.ns + 'main/')
-
     public static naiveGetLocalItemPropertiesQuery: string = `
 PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
 PREFIX mads: <http://www.loc.gov/mads/rdf/v1#>
@@ -208,6 +204,25 @@ WHERE {
 
   export class SparqlItemWorkerService {
 
+    private static processItemResult(properties: PropertyToValues<INodePlusLabel>[], propertyMap: EMap<PropertyToValues<INodePlusLabel>>, propertyValueMap: EMap<EMap<ISourcedNodePlusLabel>>, sameAses: INode[], endpoint: EndpointConfiguration, b: {[varId: string]: s.ISparqlBinding}): void {
+      if (b['property']) {
+        let n: ISourcedNodePlusLabel = propertyValueMap.goc(b['property'].value).goc(b['object'].value, () => {
+          let propertyToValues: PropertyToValues<INodePlusLabel> = propertyMap.goc(b['property'].value, () => {
+            let ret: PropertyToValues<INodePlusLabel> = new PropertyToValues<INodePlusLabel>(DataFactory.instance.nodeFromBinding(b['property']))
+            if (b['propertyLabel']) ret.label = DataFactory.instance.nodeFromBinding(b['propertyLabel'])
+            properties.push(ret)
+            return ret
+          })
+          let oNode: ISourcedNodePlusLabel = new SourcedNodePlusLabel(DataFactory.instance.nodeFromBinding(b['object']))
+          propertyToValues.values.push(oNode)
+          if (OWL.sameAs.equals(propertyToValues)) sameAses.push(oNode)
+          return oNode
+        })
+        n.sourceEndpoints.push(endpoint)
+        if (b['objectLabel'] && !n.label) n.label = DataFactory.instance.nodeFromBinding(b['objectLabel'])
+      }
+    }
+
     constructor(private sparqlService: s.SparqlService, private $q: angular.IQService, private sparqlUpdateWorkerService: SparqlUpdateWorkerService, private configurationWorkerService: ConfigurationWorkerService) {}
 
     public getItems(ids: INode[], queryRemote: boolean = false, canceller?: angular.IPromise<any>): angular.IPromise<Item[]> {
@@ -224,7 +239,7 @@ WHERE {
           for (let b of response.data!.results.bindings) {
             let item: Item = items.goc(b['id'].value)
             if (b['itemLabel']) item.label = DataFactory.instance.nodeFromBinding(b['itemLabel'])
-            this.processItemResult(item.localProperties, idPropertyMap.goc(b['id'].value), idPropertyValueMap.goc(b['id'].value), idSameAses.goc(item), this.configurationWorkerService.configuration.primaryEndpoint, b)
+            SparqlItemWorkerService.processItemResult(item.localProperties, idPropertyMap.goc(b['id'].value), idPropertyValueMap.goc(b['id'].value), idSameAses.goc(item), this.configurationWorkerService.configuration.primaryEndpoint, b)
           }
           if (queryRemote) {
             ret.notify({ endpointType: 'primary', endpoint: this.configurationWorkerService.configuration.primaryEndpoint.endpoint.value, items: items.values()})
@@ -241,7 +256,7 @@ WHERE {
                 (response2: angular.IHttpPromiseCallbackArg<s.ISparqlBindingResult<{[id: string]: s.ISparqlBinding}>>) => {
                   for (let b of response2.data!.results.bindings) {
                     let item: Item = items.goc(b['id'].value)
-                    this.processItemResult(item.remoteProperties, idPropertyMap.goc(b['id'].value), idPropertyValueMap.goc(b['id'].value), idSameAses.goc(item), endpoint, b)
+                    SparqlItemWorkerService.processItemResult(item.remoteProperties, idPropertyMap.goc(b['id'].value), idPropertyValueMap.goc(b['id'].value), idSameAses.goc(item), endpoint, b)
                   }
                   ret.notify({ endpointType: 'remote', endpoint: endpoint.endpoint.value, items: items.values()})
                 },
@@ -277,43 +292,23 @@ WHERE {
 
     public createNewItem(equivalentNodes: INode[] = [], properties: PropertyToValues<INode>[] = []): angular.IPromise<INode> {
       let deferred: angular.IDeferred<INode> = this.$q.defer()
-      let subject: INode = new NamedNode(SparqlItemService.ns + SparqlItemService.UUID())
+      let subject: INode = new NamedNode(this.configurationWorkerService.configuration.instanceNS + SparqlItemService.UUID())
       deferred.notify(subject)
-      let schemaTriplesToAdd: Triple[] = []
-      let instanceTriplesToAdd: Triple[] = []
-      equivalentNodes.forEach(node => instanceTriplesToAdd.push(new Triple(subject, OWL.sameAs, node)))
+      let triplesToAdd: ITriple[] = []
+      equivalentNodes.forEach(node => triplesToAdd.push(new Triple(subject, OWL.sameAs, node)))
       properties.forEach(property => {
-        if (property.label) schemaTriplesToAdd.push(new Triple(property, SKOS.prefLabel, property.label))
+        if (property.label) triplesToAdd.push(new Triple(property, SKOS.prefLabel, property.label))
         property.values.forEach(value => {
-          instanceTriplesToAdd.push(new Triple(subject, property, value))
-          if ((<NodePlusLabel>value).label) instanceTriplesToAdd.push(new Triple(value, SKOS.prefLabel, (<NodePlusLabel>value).label))
+          triplesToAdd.push(new Triple(subject, property, value))
+          if ((<NodePlusLabel>value).label) triplesToAdd.push(new Triple(value, SKOS.prefLabel, (<NodePlusLabel>value).label))
         })
       })
-      this.sparqlUpdateWorkerService.updateGraphs(this.configurationWorkerService.configuration.primaryEndpoint.updateEndpoint.value, [new Graph(SparqlItemService.schemaGraph, schemaTriplesToAdd), new Graph(SparqlItemService.instanceGraph, instanceTriplesToAdd)]).then(
+      this.sparqlUpdateWorkerService.updateGraphs(this.configurationWorkerService.configuration.primaryEndpoint.updateEndpoint.value, [new Graph(this.configurationWorkerService.configuration.graph, triplesToAdd)]).then(
         () => deferred.resolve(subject),
         deferred.reject,
         deferred.notify
       )
       return deferred.promise
-    }
-
-    private processItemResult(properties: PropertyToValues<INodePlusLabel>[], propertyMap: EMap<PropertyToValues<INodePlusLabel>>, propertyValueMap: EMap<EMap<ISourcedNodePlusLabel>>, sameAses: INode[], endpoint: EndpointConfiguration, b: {[varId: string]: s.ISparqlBinding}): void {
-      if (b['property']) {
-        let n: ISourcedNodePlusLabel = propertyValueMap.goc(b['property'].value).goc(b['object'].value, () => {
-          let propertyToValues: PropertyToValues<INodePlusLabel> = propertyMap.goc(b['property'].value, () => {
-            let ret: PropertyToValues<INodePlusLabel> = new PropertyToValues<INodePlusLabel>(DataFactory.instance.nodeFromBinding(b['property']))
-            if (b['propertyLabel']) ret.label = DataFactory.instance.nodeFromBinding(b['propertyLabel'])
-            properties.push(ret)
-            return ret
-          })
-          let oNode: ISourcedNodePlusLabel = new SourcedNodePlusLabel(DataFactory.instance.nodeFromBinding(b['object']))
-          propertyToValues.values.push(oNode)
-          if (OWL.sameAs.equals(propertyToValues)) sameAses.push(oNode)
-          return oNode
-        })
-        n.sourceEndpoints.push(endpoint)
-        if (b['objectLabel'] && !n.label) n.label = DataFactory.instance.nodeFromBinding(b['objectLabel'])
-      }
     }
 
   }
