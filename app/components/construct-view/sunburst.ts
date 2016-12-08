@@ -106,6 +106,7 @@ namespace fibra {
               ))
             }
             this.original_data.selected = false
+            this.sbTooltip.style('visibility', 'hidden')
             this.sbGroup.remove()
           })
           // .on('click', (d: d3.HierarchyNode<IExploreItem>, i: number) => {
