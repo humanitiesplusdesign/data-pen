@@ -258,9 +258,9 @@ WHERE {
                     let item: Item = items.goc(b['id'].value)
                     SparqlItemWorkerService.processItemResult(item.remoteProperties, idPropertyMap.goc(b['id'].value), idPropertyValueMap.goc(b['id'].value), idSameAses.goc(item), endpoint, b)
                   }
-                  ret.notify({ endpointType: 'remote', endpoint: endpoint.endpoint.value, items: items.values()})
+                  ret.notify({ endpointType: 'remote', endpoint: endpoint, items: items.values()})
                 },
-                () => { console.log('remote backend errored, no biggie')}
+                (error) => ret.notify({ endpointType: 'remote', endpoint: endpoint, error: WorkerWorkerService.stripFunctions(error) })
               )
             })).then(() => ret.resolve(items.values()))
           } else ret.resolve(items.values())
