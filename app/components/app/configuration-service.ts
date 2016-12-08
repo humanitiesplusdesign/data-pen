@@ -8,9 +8,8 @@ namespace fibra {
       public archiveEndpoints: EndpointConfiguration[] = []
       public globalDataModelConfiguration: DataModelConfiguration = new DataModelConfiguration()
       public instanceNS: string
-      public instanceGraph: string
+      public graph: INode
       public schemaNS: string
-      public schemaGraph: string
       public deleteItemQuery: string = SparqlItemService.deleteItemQuery
       public prefixes: string = ''
       constructor(public id: string, public name: string) {}

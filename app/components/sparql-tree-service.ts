@@ -26,6 +26,7 @@ SELECT ?subClass ?superClass ?class ?classLabel ?instances {
     OPTIONAL {
       ?class sf:preferredLanguageLiteral (skos:prefLabel rdfs:label skos:altLabel 'en' '' ?classLabelP) .
     }
+    FILTER(ISIRI(?class))
     BIND(COALESCE(?classLabelP,REPLACE(REPLACE(REPLACE(REPLACE(STR(?class),".*/",""),".*#",""),"_"," "),"([A-ZÅÄÖ])"," $1")) AS ?classLabel)
   }
 }

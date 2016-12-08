@@ -98,24 +98,20 @@ namespace fibra {
     }
 
     public queryAndBuild(): angular.IPromise<string> {
-      let prom = this.$q.all(this.fibraService.getState().construct.items.map((it) => {
-        let item: Item = it
-        return this.sparqlItemService.getItem(item)
-      })).then(
-        (items: Item[]) => {
+      let prom = this.sparqlItemService.getItems(this.fibraService.getState().construct.items, false).then((items: Item[]) => {
           console.log("Items in explore", items)
           // Lock previous items
           this.lockExisting(this.primaryItems)
           this.lockExisting(this.secondaryItems)
           this.lockExisting(this.tertiaryItems)
 
-          if(this.chosenTypes.primary) this.primaryItems = this.mergeNodes(this.primaryItems, this.filterItemsByType(items, this.chosenTypes.primary.id))
-          if(this.chosenTypes.secondary) this.secondaryItems = this.mergeNodes(this.secondaryItems, this.filterItemsByType(items, this.chosenTypes.secondary.id))
-          if(this.chosenTypes.tertiary) this.tertiaryItems = this.mergeNodes(this.tertiaryItems, this.filterItemsByType(items, this.chosenTypes.tertiary.id))
+          if (this.chosenTypes.primary) this.primaryItems = this.mergeNodes(this.primaryItems, this.filterItemsByType(items, this.chosenTypes.primary.id))
+          if (this.chosenTypes.secondary) this.secondaryItems = this.mergeNodes(this.secondaryItems, this.filterItemsByType(items, this.chosenTypes.secondary.id))
+          if (this.chosenTypes.tertiary) this.tertiaryItems = this.mergeNodes(this.tertiaryItems, this.filterItemsByType(items, this.chosenTypes.tertiary.id))
           this.allItems = this.primaryItems.concat(this.secondaryItems).concat(this.tertiaryItems)
           this.properties = []
 
-          if(this.primaryItems[0] && this.primaryItems[0].localProperties) {
+          if (this.primaryItems[0] && this.primaryItems[0].localProperties) {
             for (let p of this.primaryItems[0].localProperties)
               this.properties.push({key: p.toCanonical(), value: p.label.value })
           }

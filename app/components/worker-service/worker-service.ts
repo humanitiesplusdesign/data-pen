@@ -86,12 +86,13 @@ namespace fibra {
           } else {
             let deferred: angular.IDeferred<any> = this.deferreds[e.data.id]
             if (deferred) {
-              delete this.deferreds[e.data.id]
-              if (eventId === 'success')
+              if (eventId === 'success') {
+                delete this.deferreds[e.data.id]
                 deferred.resolve(this.restorePrototypes(e.data.data))
-              else if (eventId === 'failure')
+              } else if (eventId === 'failure') {
+                delete this.deferreds[e.data.id]
                 deferred.reject(this.restorePrototypes(e.data.data))
-              else
+              } else
                 deferred.notify(this.restorePrototypes(e.data.data))
             }
           }
@@ -227,7 +228,6 @@ namespace fibra {
             self.postMessage({event: 'failure', id: message.id, data: WorkerService.savePrototypes(WorkerWorkerService.stripFunctions(error))})
           },
           (update) => {
-            delete this.cancellers[message.id!]
             self.postMessage({event: 'update', id: message.id, data: WorkerService.savePrototypes(update)});
         })
       }

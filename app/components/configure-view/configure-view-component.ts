@@ -72,8 +72,8 @@ SELECT ?groupId ?groupLabel ?id ?prefLabel ?matchedLabel ?sameAs ?altLabel {
       let gettyRemoteItemQueryTemplate: string = `PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX gvp: <http://vocab.getty.edu/ontology#>
 SELECT ?property ?propertyLabel ?object ?objectLabel {
-  VALUES ?id { <IDS> }
-  ?id ?property ?object .
+  VALUES (?id ?oid) { <IDPAIRS> }
+  ?oid ?property ?object .
   ?property rdfs:label ?propertyLabel .
   ?object gvp:prefLabelGVP [xl:literalForm ?objectLabel] .
 }`
@@ -154,9 +154,7 @@ UNION {
       ]
       c.archiveEndpoints.forEach((e, i) => e.class =  'source' + (c.authorityEndpoints.length + i))
       c.instanceNS = 'http://ldf.fi/fibra/'
-      c.instanceGraph = 'http://ldf.fi/fibra/main/'
       c.schemaNS = 'http://ldf.fi/fibra/schema#'
-      c.schemaGraph = 'http://ldf.fi/fibra/schema#'
       this.configurations.push(c)
       c = new Configuration('local', 'SPARQL endpoint on localhost')
       c.primaryEndpoint = new PrimaryEndpointConfiguration('local', 'Local', new NamedNode('http://localhost:3030/fibra/sparql'), new NamedNode('http://localhost:3030/fibra/update'))

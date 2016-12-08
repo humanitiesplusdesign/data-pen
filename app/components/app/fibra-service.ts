@@ -33,7 +33,7 @@ namespace fibra {
   const DEFAULT_ACTION: Action = { type: '', payload: null }
 
   export class FibraService {
-    
+
     // Event model - Based on d3.event
     private q: angular.IQService
     private callbacks: {} = {}
@@ -153,7 +153,7 @@ namespace fibra {
 
       case CREATE_ITEMS:
         let items: Item[] = action.payload
-    
+
         let proms = items.map((node) => {
           // let prefLabel: PropertyToValues<INode> = new PropertyToValues(SKOS.prefLabel)
           // prefLabel.values.push(item.remoteProperties.filter((p) => {
@@ -212,8 +212,8 @@ namespace fibra {
 
     // Public API
     public dispatchAction(action: Action): angular.IPromise<State> {
-      console.log(action.type)
       this.state.actionsRunning = this.state.actionsRunning+1
+      console.log(action.type, this.state.actionsRunning)
       this.dispatch('action')
       return this.constructReducer(this.state, action)
         .then((state) => this.itemReducer(state, action))
