@@ -60,6 +60,7 @@ namespace fibra {
         .style('fill', this.svgBackgroundColor)
         .on('click', () => {
           console.log(d3.event)
+          this.fibraService.dispatchAction(this.fibraService.createItem())
         })
 
       // Create link g

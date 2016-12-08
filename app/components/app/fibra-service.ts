@@ -110,7 +110,7 @@ namespace fibra {
       }
     }
 
-    public createItem(item: INode):Action {
+    public createItem(item?: INode):Action {
       return {
         type: CREATE_ITEMS,
         payload: [item]
@@ -169,35 +169,44 @@ namespace fibra {
       case CREATE_ITEMS:
         let items: Item[] = action.payload
 
-        let proms = items.map((node) => {
-          // let prefLabel: PropertyToValues<INode> = new PropertyToValues(SKOS.prefLabel)
-          // prefLabel.values.push(item.remoteProperties.filter((p) => {
+        if(items[0]) {
+          let proms = items.map((node) => {
+            // let prefLabel: PropertyToValues<INode> = new PropertyToValues(SKOS.prefLabel)
+            // prefLabel.values.push(item.remoteProperties.filter((p) => {
 
-          // }))
-          return this.sparqlItemService.getItem(node).then((item) => {
-            let prefLabelProp = item.localProperties.concat(item.remoteProperties).filter((pr) => {
-              return pr.value === 'http://www.w3.org/2004/02/skos/core#prefLabel'
-            })
-            let type: PropertyToValues<INode> = new PropertyToValues(RDF.type)
-            let typeProp = item.localProperties.concat(item.remoteProperties).filter((pr) => {
-              return pr.value === 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type'
-            })
-            if(typeProp[0]) {
-              let typeWithLabel: INodePlusLabel = new SourcedNodePlusLabel(typeProp[0])
-              type.values.push(typeWithLabel)
-            }
-            return this.sparqlItemService.createNewItem([item], [type, prefLabelProp[0]])
-          }).then((node) => {
-            // Display the item
-            return this.dispatchAction(this.displayItem(node))
+            // }))
+            return this.sparqlItemService.createNewItem([node])
+
+            // return this.sparqlItemService.getItem(node).then((item) => {
+            //   let prefLabelProp = item.localProperties.concat(item.remoteProperties).filter((pr) => {
+            //     return pr.value === 'http://www.w3.org/2004/02/skos/core#prefLabel'
+            //   })
+            //   let type: PropertyToValues<INode> = new PropertyToValues(RDF.type)
+            //   let typeProp = item.localProperties.concat(item.remoteProperties).filter((pr) => {
+            //     return pr.value === 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type'
+            //   })
+            //   if(typeProp[0]) {
+            //     let typeWithLabel: INodePlusLabel = new SourcedNodePlusLabel(typeProp[0])
+            //     type.values.push(typeWithLabel)
+            //   }
+            //   return this.sparqlItemService.createNewItem([item], [type, prefLabelProp[0]])
+            // }).then((node) => {
+            //   // Display the item
+            //   return this.dispatchAction(this.displayItem(node))
+            // })
           })
-        })
-        let prom = this.q.all(proms).then(() => {
-          this.dispatch('change')
-        }).then(() => {
-          return state
-        })
-        return prom
+          return this.q.all(proms).then((node) => {
+            console.log(node)
+            this.dispatch('change')
+          }).then(() => {
+            return state
+          })
+        } else {
+          return this.sparqlItemService.createNewItem().then((node) => {
+            console.log(node)
+            return this.state
+          })
+        }
 
       default:
         return this.q.resolve(state)
