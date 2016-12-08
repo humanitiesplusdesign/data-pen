@@ -54,8 +54,6 @@ namespace fibra {
 
     public $postLink(): void {
       this.svgSel = d3.select(this.$element[0]).select<SVGSVGElement>('svg')
-      // Create link g
-      this.svgSel.append('g').attr('class', 'links')
 
       this.svgSel.append('rect')
         .classed('background', true)
@@ -63,6 +61,9 @@ namespace fibra {
         .on('click', () => {
           console.log(d3.event)
         })
+
+      // Create link g
+      this.svgSel.append('g').attr('class', 'links')
 
       this.sunburst.addSunburstGroup(this.svgSel)
 
