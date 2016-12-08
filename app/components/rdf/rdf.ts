@@ -200,6 +200,14 @@ namespace fibra {
     public static GroupConcept: INamedNode = new NamedNode(GETTY.ns + 'GroupConcept')
   }
 
+  export class MADS {
+    public static ns: string = 'http://www.loc.gov/mads/rdf/v1#'
+    public static CorporateName: INamedNode = new NamedNode(MADS.ns + 'CorporateName')
+    public static PersonalName: INamedNode = new NamedNode(MADS.ns + 'PersonalName')
+    public static NameTitle: INamedNode = new NamedNode(MADS.ns + 'NameTitle')
+    public static Geographic: INamedNode = new NamedNode(MADS.ns + 'Geographic')
+  }
+
   export class ENodeMap<V> {
     constructor(private create: (key?: INode) => V = () => { return <V>{}}, private map: EMap<V> = new EMap<V>()) {}
     public goc(key: INode, create?: (key?: INode) => V): V {
