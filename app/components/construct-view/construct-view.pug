@@ -6,9 +6,6 @@
           explore-type(types="$ctrl.types", chosen-types="$ctrl.chosenTypes")
         .pull-right
           span.glyphicon.glyphicon-refresh.fa-spin(ng-show="$ctrl.state.actionsRunning > 0")
-          span(ng-repeat="endpoint in $ctrl.endpoints")
-            i.glyphicon.glyphicon-triangle-top(ng-class="endpoint.class")
-            | {{endpoint.title}}
       .row.no-gutter
         #middle-column.col-md-12
           explore(chosen-types="$ctrl.chosenTypes", selected-item="$ctrl.selectedItem")

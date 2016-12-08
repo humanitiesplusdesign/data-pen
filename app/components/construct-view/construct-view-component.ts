@@ -7,7 +7,6 @@ namespace fibra {
 
   export class ConstructViewComponentController {
 
-    public endpoints: EndpointConfiguration[]
     public classTree: TreeNode[]
     public classTreePromise: angular.IPromise<TreeNode[]>
     public selectedItem: INode
@@ -20,7 +19,7 @@ namespace fibra {
       let fibraId = item.ids.filter((id) => {
         return id.value.indexOf("http://ldf.fi/fibra/") !== -1;
       })
-      
+
       // if(fibraId[0]) {
         // Make item visible
         // return this.fibraService.dispatchAction(this.fibraService.displayItem(fibraId[0]))
@@ -53,7 +52,6 @@ namespace fibra {
         secondary: null,
         tertiary: null
       }
-      this.endpoints = configurationService.configuration.remoteEndpoints()
       this.classTreePromise = sparqlTreeService.getTree(this.configurationService.configuration.primaryEndpoint.endpoint.value, this.configurationService.configuration.primaryEndpoint.treeQueryTemplate)
       this.classTreePromise.then(c => {
         this.classTree = c;
