@@ -527,28 +527,28 @@ namespace fibra {
       this.$scope.$watch('layout.choice', this.updateExplore.bind(this, false))
 
       // add shift to enable draw mode - this can easily be changed to require shift to be held
-      this.$window.addEventListener('keydown', (event) => {
-          if (document.activeElement instanceof HTMLBodyElement) {
-            if (event.keyCode === 16 ) {
-              this.drawmode = this.drawmode ? false : true
-              this.svgSel.style('background-color', this.drawmode ? '#d9d9d9' : '#F2F2F2')
-              if (this.drawmode) {
-              this.svgSel.append('text')
-                  .attr('id', 'drawmodetext')
-                  .html('Draw Mode engaged; to link two nodes, drag from one to the other')
-                  .style('stroke', 'red')
-                  .attr('y', 100)
-              } else {
-                d3.select('#drawmodetext').remove()
-                d3.selectAll('.dragLine').remove()
-              }
-            } else if (event.keyCode === 49) {
-              console.log(this.links)
-            } else if (event.keyCode === 50) {
-              // console.log(this.items)
-            }
-          }
-      })
+      // this.$window.addEventListener('keydown', (event) => {
+      //     if (document.activeElement instanceof HTMLBodyElement) {
+      //       if (event.keyCode === 16 ) {
+      //         this.drawmode = this.drawmode ? false : true
+      //         this.svgSel.style('background-color', this.drawmode ? '#d9d9d9' : '#F2F2F2')
+      //         if (this.drawmode) {
+      //         this.svgSel.append('text')
+      //             .attr('id', 'drawmodetext')
+      //             .html('Draw Mode engaged; to link two nodes, drag from one to the other')
+      //             .style('stroke', 'red')
+      //             .attr('y', 100)
+      //         } else {
+      //           d3.select('#drawmodetext').remove()
+      //           d3.selectAll('.dragLine').remove()
+      //         }
+      //       } else if (event.keyCode === 49) {
+      //         console.log(this.links)
+      //       } else if (event.keyCode === 50) {
+      //         // console.log(this.items)
+      //       }
+      //     }
+      // })
     }
 
     private mergeNodes(oldNodes: Item[], nodes: Item[]): IExploreItem[] {
