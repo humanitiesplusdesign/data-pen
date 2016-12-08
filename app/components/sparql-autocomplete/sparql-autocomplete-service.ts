@@ -239,7 +239,7 @@ SELECT ?groupId ?groupLabel ?id ?prefLabel ?matchedLabel ?sameAs ?altLabel { # A
       queryTemplate = queryTemplate.replace(/# CONSTRAINTS/g, this.configurationWorkerService.configuration.primaryEndpoint.dataModelConfiguration.typeConstraints)
       queryTemplate = queryTemplate.replace(/<PREFLANG>/g, this.configurationWorkerService.configuration.preferredLanguage)
       let pd: ProcessingData = new ProcessingData()
-      this.sparqlService.query(this.configurationWorkerService.configuration.primaryEndpoint.endpoint.value, queryTemplate, {timeout: canceller}).then(
+      let primaryProcessed: angular.IPromise<void> = this.sparqlService.query(this.configurationWorkerService.configuration.primaryEndpoint.endpoint.value, queryTemplate, {timeout: canceller}).then(
         (response) => {
           SparqlAutocompleteWorkerService.processBindings(pd, this.configurationWorkerService.configuration.primaryEndpoint, response.data)
           results.localMatchingResults = SparqlAutocompleteWorkerService.buildResults(pd, new EMap<ResultGroup>())
@@ -258,10 +258,12 @@ SELECT ?groupId ?groupLabel ?id ?prefLabel ?matchedLabel ?sameAs ?altLabel { # A
           return this.sparqlService.query(endpointConfiguration.endpoint.value, queryTemplate, {timeout: canceller}).then(
           (response) => {
             if (response.data.results.bindings.length !== 0) {
-              SparqlAutocompleteWorkerService.processBindings(pd, endpointConfiguration, response.data)
-              SparqlAutocompleteWorkerService.unifyResults(pd)
-              results.remoteResults = results.remoteResults.concat(SparqlAutocompleteWorkerService.buildResults(pd, remoteGroupIdToGroup))
-              d.notify({endpointType: 'remote', endpoint: endpointConfiguration, results: results})
+              primaryProcessed.then(() => {
+                SparqlAutocompleteWorkerService.processBindings(pd, endpointConfiguration, response.data)
+                SparqlAutocompleteWorkerService.unifyResults(pd)
+                results.remoteResults = results.remoteResults.concat(SparqlAutocompleteWorkerService.buildResults(pd, remoteGroupIdToGroup))
+                d.notify({endpointType: 'remote', endpoint: endpointConfiguration, results: results})
+              })
             }
           },
           (error) => d.notify({endpointType: 'remote', endpoint: endpointConfiguration, error: WorkerWorkerService.stripFunctions(error)})
