@@ -170,6 +170,7 @@ namespace fibra {
   export class OWL {
     public static ns: string = 'http://www.w3.org/2002/07/owl#'
     public static sameAs: INamedNode = new NamedNode(OWL.ns + 'sameAs')
+    public static Thing: INamedNode = new NamedNode(OWL.ns + 'Thing')
   }
 
   export class RDF {
