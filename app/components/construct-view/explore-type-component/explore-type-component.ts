@@ -7,6 +7,7 @@ namespace fibra {
     private fibraService: FibraService
 
     public constructor(fibraService: FibraService) {
+      console.log(this.chosenTypes)
       this.fibraService = fibraService
     }
     public primaryClick(type: TreeNode) {
