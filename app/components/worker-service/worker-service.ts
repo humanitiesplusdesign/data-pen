@@ -43,7 +43,18 @@ namespace fibra {
       }
     }
 
+    public static stripPrototypes(args: any): void {
+      if (!args || !args.__className || typeof args !== 'object') return
+      delete args.__className
+      if (args instanceof Array) args.forEach(arg => WorkerService.stripPrototypes(arg))
+      else {
+        for (let key in args) if (args.hasOwnProperty(key))
+          WorkerService.stripPrototypes(args[key])
+      }
+    }
+
     public static savePrototypes(args: any): any {
+      WorkerService.stripPrototypes(args)
       this.savePrototypesInternal(args)
       return args
     }
@@ -146,7 +157,7 @@ namespace fibra {
       return deferred.promise
     }
 
-    private restorePrototypes(args: any): any {
+    public restorePrototypes(args: any): any {
       this.restorePrototypesInternal(args)
       WorkerService.stripMarks(args)
       return args
@@ -221,15 +232,15 @@ namespace fibra {
         promise.then(
           (success) => {
             delete this.cancellers[message.id!]
-            self.postMessage({event: 'success', id: message.id, data: WorkerService.savePrototypes(success)});
+            self.postMessage({event: 'success', id: message.id, data: WorkerService.savePrototypes(success)})
           },
           (error) => {
             delete this.cancellers[message.id!]
             self.postMessage({event: 'failure', id: message.id, data: WorkerService.savePrototypes(WorkerWorkerService.stripFunctions(error))})
           },
-          (update) => {
-            self.postMessage({event: 'update', id: message.id, data: WorkerService.savePrototypes(update)});
-        })
+          (update) =>
+            self.postMessage({event: 'update', id: message.id, data: WorkerService.savePrototypes(update)})
+        )
       }
     }
 

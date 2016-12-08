@@ -64,6 +64,7 @@ namespace fibra {
   export class ConfigurationService {
     public configuration: Configuration
     public setConfiguration(configuration: Configuration): void {
+      WorkerService.savePrototypes(configuration)
       this.$localStorage['configuration'] = configuration
       this.configuration = configuration
       this.workerService.callAll('configurationWorkerService', 'setConfiguration', [configuration])
@@ -71,7 +72,7 @@ namespace fibra {
     constructor(private workerService: WorkerService, private $localStorage: any) {
       this.configuration = $localStorage['configuration']
       if (this.configuration) {
-        this.configuration['__proto__'] = Configuration.prototype
+        workerService.restorePrototypes(this.configuration)
         this.workerService.callAll('configurationWorkerService', 'setConfiguration', [this.configuration])
       }
     }
