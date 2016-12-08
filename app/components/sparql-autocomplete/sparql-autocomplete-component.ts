@@ -6,25 +6,38 @@ namespace fibra {
     public onSelect: (selection: Result) => void
     public error: boolean = false
     public query: string
-    private results: ResultGroup[]
+    public queryRemote?: string
+    private hide: boolean = false
+    private results: AutocompletionResults
     private canceller: angular.IDeferred<any>
-    public clearResults: () => void = () => {
-      this.results = []
+    public onSelectInternal(selection: Result): void {
+      this.onSelect(selection)
+      this.hide = true
+    }
+    public clear(): void {
+      this.results = null
       this.query = ''
     }
-    public onChange: (query: string) => void = (query: string) => {
+    public onChange(query: string): void {
       this.canceller.resolve()
       this.canceller = this.$q.defer()
       this.queryRunning = true
       this.error = false
-      this.sparqlAutocompleteService.autocomplete(query, this.limit, this.canceller.promise).then(
-        (resultsByGroup: ResultGroup[]) => {
-          this.results = resultsByGroup
+      this.sparqlAutocompleteService.autocomplete(query, this.limit, this.queryRemote !== undefined, '', this.canceller.promise).then(
+        (results: AutocompletionResults) => {
+          this.results = results
           this.queryRunning = false
         },
         () => {
           this.queryRunning = false
           this.error = true
+        },
+        (update: {error?: any, results?: AutocompletionResults}) => {
+          if (update.error) this.error = true
+          else {
+            this.error = false
+            this.results = update.results
+          }
         }
       )
     }
@@ -38,6 +51,7 @@ namespace fibra {
         constraints: '<',
         limit: '@',
         onSelect: '&',
+        queryRemote: '@'
       }
       public controller: string = 'SparqlAutocompleteComponentController' // (new (...args: any[]) => angular.IController) = SparqlAutocompleteComponentController
       public templateUrl: string = 'components/sparql-autocomplete/sparql-autocomplete.html'

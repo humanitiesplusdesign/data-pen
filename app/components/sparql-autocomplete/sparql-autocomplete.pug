@@ -1,13 +1,13 @@
 script(type="text/ng-template",id="sparql-autocomplete-item-popover")
   sparql-item(item-id='result.ids[0]',show-remote-properties='true')
-.form-group.has-feedback
-  input.form-control(ng-model="$ctrl.query",ng-model-options='{ debounce: 500 }',ng-change="$ctrl.onChange($ctrl.query)")
+.has-feedback
+  input.form-control(ng-model="$ctrl.query",ng-model-options='{ debounce: 500 }',ng-change="$ctrl.onChange($ctrl.query)",ng-focus="$ctrl.hide = false")
   span.glyphicon.glyphicon-refresh.fa-spin.form-control-feedback(ng-show="$ctrl.queryRunning")
   span.danger.glyphicon.glyphicon-alert.form-control-feedback(ng-show="$ctrl.error")
-  span.glyphicon.glyphicon-remove.form-control-feedback(ng-show="$ctrl.results", ng-click="$ctrl.clearResults()", style="pointer-events: auto;")
-div(ng-repeat="result in $ctrl.results track by $index")
-  h4 {{result.configuration.title || result.label }}
-  ul: li(ng-repeat="result in result.results track by $index",ng-click="$ctrl.onSelect({result:result})") {{result.matchedLabel.value}}
+  span.glyphicon.glyphicon-remove.form-control-feedback(ng-show="$ctrl.results", ng-click="$ctrl.clear()", style="pointer-events: auto;")
+div(ng-if="!$ctrl.hide"): div(ng-repeat="resultGroup in $ctrl.results.localMatchingResults track by $index")
+  h4 {{ resultGroup.label }}
+  ul: li(ng-repeat="result in resultGroup.results track by $index",ng-click="$ctrl.onSelectInternal({result:result})") {{result.matchedLabel.value}}
     span(ng-if="result.matchedLabel.value !== result.prefLabel.value") -&gt; {{result.prefLabel.value}}
     span(ng-if="result.additionalInformation['altLabel']") &nbsp;(
       span(ng-repeat="altLabel in result.additionalInformation['altLabel'] | limitTo:5") {{$last ? altLabel.value : altLabel.value+', '}}
@@ -16,3 +16,17 @@ div(ng-repeat="result in $ctrl.results track by $index")
     | &nbsp;[
     span(ng-repeat="datasource in result.datasources track by $index") {{$last ? datasource.id : datasource.id+', '}}
     | ]
+
+div(ng-if="!$ctrl.hide && $ctrl.results.remoteResults && $ctrl.results.remoteResults.length != 0")
+  h3 Further results
+  div(ng-repeat="resultGroup in $ctrl.results.remoteResults track by $index")
+    h4 {{ resultGroup.label }}
+    ul: li(ng-repeat="result in resultGroup.results track by $index",ng-click="$ctrl.onSelectInternal({result:result})") {{result.matchedLabel.value}}
+      span(ng-if="result.matchedLabel.value !== result.prefLabel.value") -&gt; {{result.prefLabel.value}}
+      span(ng-if="result.additionalInformation['altLabel']") &nbsp;(
+        span(ng-repeat="altLabel in result.additionalInformation['altLabel'] | limitTo:5") {{$last ? altLabel.value : altLabel.value+', '}}
+        span(ng-if="result.additionalInformation['altLabel'].length>5") , &hellip;
+        | )
+      | &nbsp;[
+      span(ng-repeat="datasource in result.datasources track by $index") {{$last ? datasource.id : datasource.id+', '}}
+      | ]

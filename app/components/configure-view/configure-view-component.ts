@@ -27,10 +27,7 @@ UNION {
   ?id <http://ldf.fi/sdfb/schema#odbnId> ?ifpODBNId .
 }
 `)
-      let lcnamesConfiguration: EndpointConfiguration = new EndpointConfiguration('lcnames', 'LC Names', new NamedNode('http://ldf.fi/lcnames/sparql'))
-      lcnamesConfiguration.autocompletionTextMatchQueryTemplate = lcnamesConfiguration.autocompletionTextMatchQueryTemplate.replace(/# GROUPLABELSTART/g, '').replace(/# GROUPLABELEND/g, '').replace(/.*# GROUPLABEL/g, `
-BIND(SUBSTR(STR(?groupId),32) AS ?groupLabel)
-`)
+      let lcnamesConfiguration: EndpointConfiguration = new EndpointConfiguration('lcnames', 'LC Names', new NamedNode('http://ldf.fi/lcnames/sparql'), [MADS.CorporateName, MADS.PersonalName, MADS.Geographic])
       let procopeConfiguration: EndpointConfiguration = new EndpointConfiguration('procope', 'Procope', new NamedNode('http://ldf.fi/procope/sparql'), [CIDOC.Person, CIDOC.Place, CIDOC.Group])
       procopeConfiguration.autocompletionTextMatchQueryTemplate = procopeConfiguration.autocompletionTextMatchQueryTemplate.replace(/\{ # ADDITIONALVARIABLES/g, '?ifpWikipediaPage {').replace(/# ADDITIONALSELECT/g, `
 UNION {
@@ -93,6 +90,7 @@ UNION {
 
       let c: Configuration = new Configuration('fbtee', 'French Book Trade in Enlightenment Europe')
       c.primaryEndpoint = new PrimaryEndpointConfiguration('local', 'Local', new NamedNode('http://ldf.fi/fibra/sparql'), new NamedNode('http://ldf.fi/fibra/sparql'))
+      c.primaryEndpoint.autocompletionTextMatchQueryTemplate = c.primaryEndpoint.autocompletionTextMatchQueryTemplate.replace(/# STARTGRAPH/g, 'GRAPH <GRAPH> {').replace(/# ENDGRAPH/g, '}')
       c.authorityEndpoints = [
         ulanConfiguration,
         viafConfiguration,
@@ -107,6 +105,7 @@ UNION {
       this.configurations.push(c)
       c = new Configuration('aw', 'Ancient World')
       c.primaryEndpoint = new PrimaryEndpointConfiguration('local', 'Local', new NamedNode('http://ldf.fi/fibra/sparql'), new NamedNode('http://ldf.fi/fibra/sparql'))
+      c.primaryEndpoint.autocompletionTextMatchQueryTemplate = c.primaryEndpoint.autocompletionTextMatchQueryTemplate.replace(/# STARTGRAPH/g, 'GRAPH <GRAPH> {').replace(/# ENDGRAPH/g, '}')
       c.authorityEndpoints = [
         // pleiades
         // latin DBpedia?
@@ -123,6 +122,7 @@ UNION {
       this.configurations.push(c)
       c = new Configuration('procope', 'Procope')
       c.primaryEndpoint = new PrimaryEndpointConfiguration('local', 'Local', new NamedNode('http://ldf.fi/fibra/sparql'), new NamedNode('http://ldf.fi/fibra/sparql'))
+      c.primaryEndpoint.autocompletionTextMatchQueryTemplate = c.primaryEndpoint.autocompletionTextMatchQueryTemplate.replace(/# STARTGRAPH/g, 'GRAPH <GRAPH> {').replace(/# ENDGRAPH/g, '}')
       c.authorityEndpoints = [
         ulanConfiguration,
         viafConfiguration,
@@ -137,6 +137,7 @@ UNION {
       this.configurations.push(c)
       c = new Configuration('all', 'All Datasources')
       c.primaryEndpoint = new PrimaryEndpointConfiguration('local', 'Local', new NamedNode('http://ldf.fi/fibra/sparql'), new NamedNode('http://ldf.fi/fibra/sparql'))
+      c.primaryEndpoint.autocompletionTextMatchQueryTemplate = c.primaryEndpoint.autocompletionTextMatchQueryTemplate.replace(/# STARTGRAPH/g, 'GRAPH <GRAPH> {').replace(/# ENDGRAPH/g, '}')
       c.authorityEndpoints = [
         ulanConfiguration,
         lcnamesConfiguration,

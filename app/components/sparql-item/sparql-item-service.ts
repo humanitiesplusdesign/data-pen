@@ -254,11 +254,13 @@ WHERE {
               queryTemplate2 = queryTemplate2.replace(/<PREFLANG>/g, this.configurationWorkerService.configuration.preferredLanguage)
               return this.sparqlService.query(endpoint.endpoint.value, queryTemplate2, {timeout: canceller}).then(
                 (response2: angular.IHttpPromiseCallbackArg<s.ISparqlBindingResult<{[id: string]: s.ISparqlBinding}>>) => {
-                  for (let b of response2.data!.results.bindings) {
-                    let item: Item = items.goc(b['id'].value)
-                    SparqlItemWorkerService.processItemResult(item.remoteProperties, idPropertyMap.goc(b['id'].value), idPropertyValueMap.goc(b['id'].value), idSameAses.goc(item), endpoint, b)
+                  if (response2.data!.results.bindings.length !== 0) {
+                    for (let b of response2.data!.results.bindings) {
+                      let item: Item = items.goc(b['id'].value)
+                      SparqlItemWorkerService.processItemResult(item.remoteProperties, idPropertyMap.goc(b['id'].value), idPropertyValueMap.goc(b['id'].value), idSameAses.goc(item), endpoint, b)
+                    }
+                    ret.notify({ endpointType: 'remote', endpoint: endpoint, items: items.values()})
                   }
-                  ret.notify({ endpointType: 'remote', endpoint: endpoint, items: items.values()})
                 },
                 (error) => ret.notify({ endpointType: 'remote', endpoint: endpoint, error: WorkerWorkerService.stripFunctions(error) })
               )
