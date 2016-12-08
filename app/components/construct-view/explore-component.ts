@@ -46,6 +46,7 @@ namespace fibra {
     private gridOffset: number = 50 // Should be even
     private chargeForce: d3.ForceCollide<IExploreItem> = d3.forceCollide<IExploreItem>(this.gridOffset/1.5)
     private chargeForce2: d3.ForceCollide<IExploreItem> = d3.forceCollide<IExploreItem>(this.gridOffset/1.5)
+    private svgBackgroundColor: string = '#EEE'
 
     private sunburst: Sunburst
 
@@ -53,6 +54,14 @@ namespace fibra {
 
     public $postLink(): void {
       this.svgSel = d3.select(this.$element[0]).select<SVGSVGElement>('svg')
+
+      this.svgSel.append('rect')
+        .classed('background', true)
+        .style('fill', this.svgBackgroundColor)
+        .on('click', () => {
+          console.log(d3.event)
+        })
+
       // Create link g
       this.svgSel.append('g').attr('class', 'links')
 
@@ -214,6 +223,10 @@ namespace fibra {
       this.svgSel.style('width', viewport_width + 'px')
         .style('height', viewport_height - 36 + 'px')
         // .style('top', 25 + 'px')
+
+      this.svgSel.select('rect.background')
+        .style('width', viewport_width + 'px')
+        .style('height', viewport_height - 36 + 'px')
 
       let svg_width: number = +this.svgSel.style('width').replace('px', '')
       let svg_height: number = +this.svgSel.style('height').replace('px', '')
