@@ -5,7 +5,7 @@ namespace fibra {
   }
 
   interface IExploreScope extends angular.IScope {
-    layout: { choice: string }
+    layout: { choice: string, links: string }
   }
 
   export interface IGridNode extends d3.SimulationNodeDatum {
@@ -59,7 +59,6 @@ namespace fibra {
         .classed('background', true)
         .style('fill', this.svgBackgroundColor)
         .on('click', () => {
-          console.log(d3.event)
           this.fibraService.dispatchAction(this.fibraService.createItem())
         })
 
@@ -71,7 +70,7 @@ namespace fibra {
       this.forceSim = d3.forceSimulation<IExploreItem, IExploreItemLink>()
         .force('charge', this.chargeForce)
         .force('charge2', this.chargeForce2)
-        .force('link', d3.forceLink().distance(40).strength(1).iterations(1).id((d: IExploreItem) => '' + d.index))
+        .force('link', d3.forceLink().id((d: IExploreItem) => '' + d.index))
 
       this.radius = 8
 
@@ -433,7 +432,7 @@ namespace fibra {
 
       linkLines.exit().remove()
 
-      linkLines= linkLines
+      linkLines = linkLines
         .enter().append<SVGLineElement>('line')
           .attr('id', (d: IExploreItemLink, i: number) => 'link-' + i)
           .on('mouseover', (d: IExploreItemLink, i: number) => {
@@ -446,6 +445,7 @@ namespace fibra {
             this.tooltip.style('visibility', 'hidden')
           })
         .merge(linkLines)
+          .style('visibility', this.$scope.layout.links === 'show' ? 'visible' : 'hidden')
 
       // Add sunburst again so it stays on top
       this.sunburst.addSunburstGroup(this.svgSel)
@@ -521,10 +521,12 @@ namespace fibra {
       this.itemService = sparqlItemService
       this.links = []
       this.$scope.layout = {
-        'choice': 'force'
+        'choice': 'force',
+        'links': 'hide'
       }
 
       this.$scope.$watch('layout.choice', this.updateExplore.bind(this, false))
+      this.$scope.$watch('layout.links', this.updateExplore.bind(this, false))
 
       // add shift to enable draw mode - this can easily be changed to require shift to be held
       // this.$window.addEventListener('keydown', (event) => {

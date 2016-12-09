@@ -1,11 +1,16 @@
 div#explorecontainer
-  div#layout-choice
-    label Force
-      input(type="radio" ng-model="layout.choice" value="force")
-    label Force Grid
-      input(type="radio" ng-model="layout.choice" value="forcegrid")
   svg#explore
 
+div#layout-choice
+  label Force
+    input(type="radio" ng-model="layout.choice" value="force")
+  label Force Grid
+    input(type="radio" ng-model="layout.choice" value="forcegrid")
+div#link-options
+  label Show
+    input(type="radio" ng-model="layout.links" value="show")
+  label Hide
+    input(type="radio" ng-model="layout.links" value="hide")
 div#tablecontainer
   div#tabcontainer
     a(ng-click="type='type1'" ng-class="{'active': type=='type1'}") Primary
