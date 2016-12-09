@@ -15,18 +15,16 @@ namespace fibra {
     public state: fibra.State
 
     public createItem(item: Result) {
-      // Figure out if there is a Fibra identifier
-      let fibraId = item.ids.filter((id) => {
-        return id.value.indexOf("http://ldf.fi/fibra/") !== -1;
-      })
+      // Is there a type on this item? If so, and it is not already in chosenTypes,
+      // add it.
+      let itemTypeKey: string = item.additionalInformation['type'][0] ? item.additionalInformation['type'][0].value : ""
+      let itemType: TreeNode = this.types.filter((t) => { return t.id === itemTypeKey })[0]
+      if (!this.chosenTypes['primary'] && itemType) {
+        this.chosenTypes['primary'] = itemType
+      } else if (!this.chosenTypes['secondary'] && itemType) {
+        this.chosenTypes['secondary'] = itemType
+      }
 
-      // if(fibraId[0]) {
-        // Make item visible
-        // return this.fibraService.dispatchAction(this.fibraService.displayItem(fibraId[0]))
-      // } else {
-        // Create item and then display it
-        // return this.fibraService.dispatchAction(this.fibraService.createItem(item.ids[0]))
-      // }
       return this.fibraService.dispatchAction(this.fibraService.displayItem(item.ids[0]))
     }
 
