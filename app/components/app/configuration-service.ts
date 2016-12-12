@@ -23,6 +23,10 @@ namespace fibra {
       }
     }
 
+    export class Citation {
+      constructor(public name: string, public url: string = null, public rightsholder: string = null, public rightsholderurl: string = null) {}
+    }
+
     export class EndpointConfiguration {
       public class: string = ''
       public autocompletionTextMatchQueryTemplate: string = SparqlAutocompleteService.defaultMatchQueryTemplate
@@ -30,14 +34,14 @@ namespace fibra {
       public localItemQueryTemplate: string = SparqlItemService.getLocalItemPropertiesQuery
       public remoteItemQueryTemplate: string = SparqlItemService.getRemoteItemPropertiesQuery
       public dataModelConfiguration: DataModelConfiguration = new DataModelConfiguration()
-      constructor(public id: string, public title: string, public endpoint: INode, selectedTypes: INode[] = []) {
+      constructor(public id: string, public name: string, public citation: Citation, public endpoint: INode, selectedTypes: INode[] = []) {
         this.dataModelConfiguration.setSelectedTypes(selectedTypes)
       }
     }
 
     export class PrimaryEndpointConfiguration extends EndpointConfiguration {
-      constructor(id: string, title: string, endpoint: INode, public updateEndpoint: INode = endpoint) {
-        super(id, title, endpoint)
+      constructor(id: string, name: string, citation: Citation, endpoint: INode, public updateEndpoint: INode = endpoint) {
+        super(id, name, citation, endpoint)
       }
     }
 
