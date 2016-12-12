@@ -55,7 +55,8 @@ namespace fibra {
     public label: string
 
     public constructor(
-      private fibraService: fibra.FibraService
+      private fibraService: fibra.FibraService,
+      private sparqlItemService: SparqlItemService
     ) { }
 
     public $postLink(): void {
@@ -74,7 +75,8 @@ namespace fibra {
       console.log(typeNode)
       typeProp.values.push(typeNode)
 
-      this.fibraService.dispatchAction(this.fibraService.itemProperty(this.node, typeProp))
+      this.fibraService.dispatchAction(this.fibraService.itemProperty(this.node, [typeProp]))
+      // this.sparqlItemService.alterItem(this.node, [typeProp])
     }
   }
 }

@@ -111,7 +111,7 @@ namespace fibra {
       }
     }
 
-    public itemProperty(item: INode, propertiesToAdd: PropertyToValues<INode>, propertiesToRemove?: PropertyToValues<INode>) {
+    public itemProperty(item: INode, propertiesToAdd: PropertyToValues<INode>[], propertiesToRemove?: PropertyToValues<INode>[]) {
       return {
         type: ITEM_PROPERTIES,
         payload: {
