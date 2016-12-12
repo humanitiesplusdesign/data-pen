@@ -14,6 +14,7 @@ namespace fibra {
     fx?: number
     fy?: number
     selected?: boolean
+    baseSelection?: d3.Selection<SVGSVGElement, {}, null, undefined>
   }
 
   export interface IExploreItem extends Item, IGridNode {
@@ -26,6 +27,7 @@ namespace fibra {
   class ExploreComponentController {
     public itemService: SparqlItemService
     public chosenTypes
+    public types
     public properties: {}[]
     private svgSel: d3.Selection<SVGSVGElement, {}, null, undefined>
     private links: IExploreItemLink[]
@@ -33,6 +35,7 @@ namespace fibra {
     private primaryItems: Item[] = []
     private secondaryItems: Item[] = []
     private tertiaryItems: Item[] = []
+    private untypedItems: Item[] = []
     private primaryProperties: String[]
     private secondaryProperties: String[]
     private tertiaryProperties: String[]
@@ -47,8 +50,11 @@ namespace fibra {
     private chargeForce: d3.ForceCollide<IExploreItem> = d3.forceCollide<IExploreItem>(this.gridOffset/1.5)
     private chargeForce2: d3.ForceCollide<IExploreItem> = d3.forceCollide<IExploreItem>(this.gridOffset/1.5)
     private svgBackgroundColor: string = '#EEE'
+    private lastClickX: number = 0
+    private lastClickY: number = 0
 
     private sunburst: Sunburst
+    private propertyPopover: PropertyPopover
 
     private drawmode: boolean = false
 
@@ -59,6 +65,8 @@ namespace fibra {
         .classed('background', true)
         .style('fill', this.svgBackgroundColor)
         .on('click', () => {
+          this.lastClickX = d3.event.offsetX
+          this.lastClickY = d3.event.offsetY
           this.fibraService.dispatchAction(this.fibraService.createItem())
         })
 
@@ -114,6 +122,7 @@ namespace fibra {
           this.lockExisting(this.secondaryItems)
           this.lockExisting(this.tertiaryItems)
 
+          this.untypedItems = this.mergeNodes(this.untypedItems, this.filterItemsByType(items, OWL.Thing.value))
           if (this.chosenTypes.primary) this.primaryItems = this.mergeNodes(this.primaryItems, this.filterItemsByType(items, this.chosenTypes.primary.id))
           if (this.chosenTypes.secondary) this.secondaryItems = this.mergeNodes(this.secondaryItems, this.filterItemsByType(items, this.chosenTypes.secondary.id))
           if (this.chosenTypes.tertiary) this.tertiaryItems = this.mergeNodes(this.tertiaryItems, this.filterItemsByType(items, this.chosenTypes.tertiary.id))
@@ -384,20 +393,24 @@ namespace fibra {
 
     private genericTick(primaryNodes: d3.Selection<d3.BaseType, {}, SVGSVGElement, {}>,
                         secondaryNodes: d3.Selection<d3.BaseType, {}, SVGSVGElement, {}>,
+                        untypedNodes: d3.Selection<d3.BaseType, {}, SVGSVGElement, {}>,
                         linkLines: d3.Selection<SVGLineElement, IExploreItemLink, SVGGElement, {}>,
                         transition: boolean = false) {
 
       let lPrimaryNodes: d3.Selection<d3.BaseType, {}, SVGSVGElement, {}>|d3.Transition<d3.BaseType, {}, SVGSVGElement, {}> = primaryNodes
       let lSecondaryNodes: d3.Selection<d3.BaseType, {}, SVGSVGElement, {}>|d3.Transition<d3.BaseType, {}, SVGSVGElement, {}> = secondaryNodes
+      let lUntypedNodes: d3.Selection<d3.BaseType, {}, SVGSVGElement, {}>|d3.Transition<d3.BaseType, {}, SVGSVGElement, {}> = untypedNodes
       let lLinkLines: d3.Selection<SVGLineElement, IExploreItemLink, SVGGElement, {}>|d3.Transition<SVGLineElement, IExploreItemLink, SVGGElement, {}> = linkLines
       if(transition) {
         lPrimaryNodes = lPrimaryNodes.transition()
         lSecondaryNodes = lSecondaryNodes.transition()
+        lUntypedNodes = lUntypedNodes.transition()
         lLinkLines = lLinkLines.transition()
       }
 
       this.tickTransformNodes(lPrimaryNodes, true)
       this.tickTransformNodes(lSecondaryNodes, false)
+      this.tickTransformNodes(lUntypedNodes, false)
 
       this.svgSel.selectAll('.node-circle')
               .classed('selected-circle', (d: IExploreItem) => { return d.selected })
@@ -412,6 +425,9 @@ namespace fibra {
 
     private updateExplore(runSim: boolean = true, transition: boolean = false): angular.IPromise<string> {
 
+      let untypedNodes: d3.Selection<d3.BaseType, {}, SVGSVGElement, {}> = this.svgSel
+          .selectAll<SVGElement, IExploreItem>('circle.untyped')
+        .data(this.untypedItems, (d: Item) => d.value)
       let primaryNodes: d3.Selection<d3.BaseType, {}, SVGSVGElement, {}> = this.svgSel
           .selectAll<SVGElement, IExploreItem>('circle.primary')
         .data(this.primaryItems, (d: Item) => d.value)
@@ -421,9 +437,21 @@ namespace fibra {
 
       primaryNodes.exit().remove()
       secondaryNodes.exit().remove()
+      untypedNodes.exit().remove()
+
+      // Untyped nodes should come in one at a time based on a user's click event. For these
+      // we also want append the user interface for setting type and label.
+      untypedNodes.enter().each((datum: IExploreItem, i, g) => {
+        datum.fx = this.lastClickX
+        datum.fy = this.lastClickY
+        datum.gx = this.lastClickX
+        datum.gy = this.lastClickY
+        datum.baseSelection = this.svgSel
+      }).each(this.propertyPopover.addPopover.bind(this, this.$scope, this.types))
 
       primaryNodes = primaryNodes.merge(this.appendNodes(primaryNodes.enter(), 'primary'))
       secondaryNodes = secondaryNodes.merge(this.appendNodes(secondaryNodes.enter(), 'secondary'))
+      untypedNodes = untypedNodes.merge(this.appendNodes(untypedNodes.enter(), 'untyped'))
 
       let linkLines: d3.Selection<SVGLineElement, IExploreItemLink, SVGGElement, {}> = this.svgSel
           .select<SVGGElement>('g.links')
@@ -451,8 +479,8 @@ namespace fibra {
       this.sunburst.addSunburstGroup(this.svgSel)
 
       this.forceSim.stop()
-      let onTick = this.genericTick.bind(this, primaryNodes, secondaryNodes, linkLines, false)
-      this.forceSim.nodes(this.primaryItems.concat(this.secondaryItems))
+      let onTick = this.genericTick.bind(this, primaryNodes, secondaryNodes, untypedNodes, linkLines, false)
+      this.forceSim.nodes(this.primaryItems.concat(this.secondaryItems).concat(this.untypedItems))
         .on('tick', onTick)
       this.forceSim
         .force<d3.ForceLink<IExploreItem, IExploreItemLink>>('link').links(this.links)
@@ -472,7 +500,7 @@ namespace fibra {
       if(runSim) {
         this.forceSim.alpha(1).restart()
       } else {
-        this.genericTick(primaryNodes, secondaryNodes, linkLines, transition)
+        this.genericTick(primaryNodes, secondaryNodes, untypedNodes, linkLines, transition)
       }
 
       return this.$q.resolve('ok')
@@ -516,6 +544,7 @@ namespace fibra {
                 private $q: angular.IQService) {
 
       this.sunburst = new Sunburst($element, $compile, $scope, sparqlItemService, fibraService)
+      this.propertyPopover = new PropertyPopover($element, $scope, fibraService, $compile)
 
       this.fibraService.on('change', () => this.queryAndBuild())
       this.itemService = sparqlItemService
@@ -615,7 +644,8 @@ namespace fibra {
   export class ExploreComponent implements angular.IComponentOptions {
     public bindings: {[id: string]: string} = {
       selectedItem: '=',
-      chosenTypes: '='
+      chosenTypes: '=',
+      types: '='
     }
     public controller: string = 'ExploreComponentController' // (new (...args: any[]) => angular.IController) = ExploreComponentController
     public templateUrl: string = 'components/construct-view/explore.html'

@@ -8,5 +8,5 @@
           span.glyphicon.glyphicon-refresh.fa-spin(ng-show="$ctrl.state.actionsRunning > 0")
       .row.no-gutter
         #middle-column.col-md-12
-          explore(chosen-types="$ctrl.chosenTypes", selected-item="$ctrl.selectedItem")
+          explore(types="$ctrl.types" chosen-types="$ctrl.chosenTypes", selected-item="$ctrl.selectedItem")
           sparql-autocomplete(limit="5",by="group",query-remote,on-select="$ctrl.createItem(result)")#searchbar

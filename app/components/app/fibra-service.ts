@@ -24,6 +24,7 @@ namespace fibra {
   const DISPLAY_ITEMS: string = 'DISPLAY_ITEMS'
   const HIDE_ITEM: string = 'HIDE_ITEM'
   const CREATE_LOCAL_ITEM: string = 'CREATE_LOCAL_ITEM'
+  const ITEM_PROPERTIES: string = 'ITEM_PROPERTIES'
   const INITIAL_STATE: State = {
     construct: {
       types: [],
@@ -107,6 +108,17 @@ namespace fibra {
       return {
         type: HIDE_ITEM,
         payload: item
+      }
+    }
+
+    public itemProperty(item: INode, propertiesToAdd: PropertyToValues<INode>, propertiesToRemove?: PropertyToValues<INode>) {
+      return {
+        type: ITEM_PROPERTIES,
+        payload: {
+          item: item,
+          propertiesToAdd: propertiesToAdd,
+          propertiesToRemove: propertiesToRemove
+        }
       }
     }
 
@@ -202,11 +214,21 @@ namespace fibra {
             return state
           })
         } else {
-          return this.sparqlItemService.createNewItem().then((node) => {
-            console.log(node)
+          let type: PropertyToValues<INode> = new PropertyToValues(RDF.type)
+          type.values.push(OWL.Thing)
+          let prefLabel: PropertyToValues<INode> = new PropertyToValues(SKOS.prefLabel)
+          prefLabel.values.push(DataFactory.instance.literal(''))
+          return this.sparqlItemService.createNewItem([], [type, prefLabel]).then((node) => {
+            this.dispatchAction(this.displayItem(node))
             return this.state
           })
         }
+      case ITEM_PROPERTIES:
+        this.sparqlItemService.alterItem(action.payload.item, action.payload.propertiesToAdd).then((str) => {
+          console.log(str)
+          console.log('updated')
+          return this.state
+        })
 
       default:
         return this.q.resolve(state)

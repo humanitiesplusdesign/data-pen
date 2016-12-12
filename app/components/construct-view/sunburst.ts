@@ -1,4 +1,5 @@
 namespace fibra {
+  'use strict'
   export class Sunburst {
     private sbRadius = 200
     private sbGroup: d3.Selection<d3.BaseType, {}, null, undefined>
