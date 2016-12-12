@@ -208,6 +208,11 @@ namespace fibra {
     public static Geographic: INamedNode = new NamedNode(MADS.ns + 'Geographic')
   }
 
+  export class GEOVOCAB {
+    public static ns: string = 'http://geovocab.org/spatial#'
+    public static Feature: INamedNode = new NamedNode(GEOVOCAB.ns + 'Feature')
+  }
+
   export class ENodeMap<V> {
     constructor(private create: (key?: INode) => V = () => { return <V>{}}, private map: EMap<V> = new EMap<V>()) {}
     public goc(key: INode, create?: (key?: INode) => V): V {

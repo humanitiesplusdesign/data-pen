@@ -75,24 +75,31 @@ SELECT ?groupId ?groupLabel ?id ?prefLabel ?matchedLabel ?sameAs ?altLabel { # A
       SELECT ?groupId ?id (SUM(?sc) AS ?score) {
         {
           SELECT ?groupId ?id ?sc {
+            BIND(CONCAT("\\"",REPLACE(<QUERY>,"([\\\\+\\\\-\\\\&\\\\|\\\\!\\\\(\\\\)\\\\{\\\\}\\\\[\\\\]\\\\^\\\\\\"\\\\~\\\\*\\\\?\\\\:\\\\/\\\\\\\\])","\\\\$1"),"\\"") AS ?query)
+            (?id ?sc) text:query ?query .
+            ?id skos:prefLabel|rdfs:label|skos:altLabel|mads:authoritativeLabel|mads:variantLabel ?matchedLabel
+            FILTER (LCASE(?matchedLabel)=LCASE(<QUERY>))
+            ?id a ?groupId .
+            # GROUPID
+            # CONSTRAINTS
+          }
+          GROUP BY ?groupId ?id ?sc
+          LIMIT <LIMIT>
+        } UNION {
+          SELECT ?groupId ?id ?sc {
             BIND(CONCAT(REPLACE(<QUERY>,"([\\\\+\\\\-\\\\&\\\\|\\\\!\\\\(\\\\)\\\\{\\\\}\\\\[\\\\]\\\\^\\\\\\"\\\\~\\\\*\\\\?\\\\:\\\\/\\\\\\\\])","\\\\$1"),"*") AS ?query)
             (?id ?sc) text:query ?query .
             ?id a ?groupId .
             # GROUPID
             # CONSTRAINTS
-          } LIMIT <LIMIT>
-        } UNION {
-          BIND(CONCAT("\\"",REPLACE(<QUERY>,"([\\\\+\\\\-\\\\&\\\\|\\\\!\\\\(\\\\)\\\\{\\\\}\\\\[\\\\]\\\\^\\\\\\"\\\\~\\\\*\\\\?\\\\:\\\\/\\\\\\\\])","\\\\$1"),"\\"") AS ?query)
-          (?id ?sc) text:query ?query .
-          ?id skos:prefLabel|rdfs:label|skos:altLabel|mads:authoritativeLabel|mads:variantLabel ?matchedLabel
-          FILTER (LCASE(?matchedLabel)=LCASE(<QUERY>))
-          ?id a ?groupId .
-          # GROUPID
-          # CONSTRAINTS
+          }
+          GROUP BY ?groupId ?id ?sc
+          LIMIT <LIMIT>
         }
       }
       GROUP BY ?groupId ?id
       HAVING(BOUND(?id))
+      LIMIT <LIMIT>
     }
     ?id skos:prefLabel|rdfs:label|skos:altLabel|mads:authoritativeLabel|mads:variantLabel ?matchedLabel
     FILTER (REGEX(LCASE(?matchedLabel),CONCAT("\\\\b",LCASE(<QUERY>))))

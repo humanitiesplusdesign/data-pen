@@ -1,8 +1,27 @@
+script(type="text/ng-template",id="treenode.html")
+  | {{node.label}}
+  span(ng-if="node.instances>0") &nbsp;({{node.instances | number}})
+  ul
+    li(ng-repeat="node in node.children track by $index",ng-include="'treenode.html'")
 .container
   h3 Select configuration
   ul: li(ng-repeat="configuration in $ctrl.configurations")
     h4: a(ng-click="$ctrl.setConfiguration(configuration)") {{configuration.name}}
     h5 Configured Authorities:
-    ul.list-inline: li(ng-repeat="endpoint in configuration.authorityEndpoints") {{endpoint.title}}
+    ul: li(ng-repeat="endpoint in configuration.authorityEndpoints")
+      a(ng-if="endpoint.citation.url",ng-href="{{endpoint.citation.url}}") {{endpoint.citation.name}}
+      span(ng-if="!endpoint.citation.url") {{endpoint.citation.name}}
+      span(ng-if="endpoint.citation.rightsholder") &nbsp;(
+        a(ng-if="endpoint.citation.rightsholderurl",ng-href="{{endpoint.citation.rightsholderurl}}") {{endpoint.citation.rightsholder}}
+        span(ng-if="!endpoint.citation.rightsholderurl") {{endpoint.citation.rightsholder}}
+        | )
+      ul: li(ng-repeat="node in $ctrl.statistics[endpoint.id]",ng-include="'treenode.html'")
     h5 Configured Archives:
-    ul.list-inline: li(ng-repeat="endpoint in configuration.archiveEndpoints") {{endpoint.title}}
+    ul: li(ng-repeat="endpoint in configuration.archiveEndpoints")
+      a(ng-if="endpoint.citation.url",ng-href="{{endpoint.citation.url}}") {{endpoint.citation.name}}
+      span(ng-if="!endpoint.citation.url") {{endpoint.citation.name}}
+      span(ng-if="endpoint.citation.rightsholder") &nbsp;(
+        a(ng-if="endpoint.citation.rightsholderurl",ng-href="{{endpoint.citation.rightsholderurl}}") {{endpoint.citation.rightsholder}}
+        span(ng-if="!endpoint.citation.rightsholderurl") {{endpoint.citation.rightsholder}}
+        | )
+      ul: li(ng-repeat="node in $ctrl.statistics[endpoint.id] track by $index",ng-include="'treenode.html'")

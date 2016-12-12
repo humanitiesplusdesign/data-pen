@@ -4,23 +4,27 @@ namespace fibra {
   import s = fi.seco.sparql
 
   export class SparqlTreeService {
+
     public static getClassTreeQuery: string = `
 PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX sf: <http://ldf.fi/functions#>
 SELECT ?subClass ?superClass ?class ?classLabel ?instances {
-  GRAPH <GRAPH> {
+  # STARTGRAPH
     {
-      ?subClass rdfs:subClassOf ?class .
+      ?groupId rdfs:subClassOf ?class .
       FILTER EXISTS {
-        ?p a ?subClass .
+        ?id a ?groupId .
+        # CONSTRAINTS
       }
+      BIND (?groupId AS ?subClass)
     } UNION {
       {
-        SELECT ?class (COUNT(DISTINCT ?p) AS ?instances) {
-          ?p a ?class .
+        SELECT (?groupId AS ?class) (COUNT(?id) AS ?instances) {
+          ?id a ?groupId .
+          # CONSTRAINTS
         }
-        GROUP BY ?class
+        GROUP BY ?groupId
       }
     }
     OPTIONAL {
@@ -28,7 +32,7 @@ SELECT ?subClass ?superClass ?class ?classLabel ?instances {
     }
     FILTER(ISIRI(?class))
     BIND(COALESCE(?classLabelP,REPLACE(REPLACE(REPLACE(REPLACE(STR(?class),".*/",""),".*#",""),"_"," "),"([A-ZÅÄÖ])"," $1")) AS ?classLabel)
-  }
+  # ENDGRAPH
 }
 `
     constructor(private workerService: WorkerService) {}
