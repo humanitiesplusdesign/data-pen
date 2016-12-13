@@ -22,14 +22,26 @@ construct-view {
 
   .node-circle {
     transition: .2s
+    fill: none
+    stroke: grey
   }
 
   .node-circle.primary {
-    fill: darken(gray, 50%)
+    stroke: darken(gray, 50%)
   }
 
   .node-circle.secondary {
+    stroke: lighten(gray, 50%)
+  }
+
+  .node-circle.labeled {
     fill: lighten(gray, 50%)
+  }
+
+  .node-circle.untyped {
+    fill: none
+    stroke: grey
+    stroke-dasharray: 0.9
   }
 
   .node-circle:hover {

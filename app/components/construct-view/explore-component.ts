@@ -260,7 +260,6 @@ namespace fibra {
           .classed('node-circle', true)
           .classed(className, true)
           .attr('id', (d, i: number) => 'node-circle-' + i + '-' + className)
-          .style('stroke', 'black')
           .attr('r', this.radius + 'px')
           .call(d3.drag()
               .on('start', (d: IExploreItem, i: number) => {
@@ -418,6 +417,8 @@ namespace fibra {
       this.svgSel.selectAll('.node-circle')
               .classed('selected-circle', (d: IExploreItem) => { return d.selected })
               .attr('r', (d: IExploreItem) => { return this.radius + (d.selected ? 3 : 0) + 'px' })
+      this.svgSel.selectAll('.node-circle')
+        .classed('labeled', (d: IExploreItem) => { return d.label.value ? true : false; })
 
       lLinkLines
         .attr('x1', (d: IExploreItemLink) => (<IExploreItem>d.source).gx!)
