@@ -242,7 +242,7 @@ WHERE {
             SparqlItemWorkerService.processItemResult(item.localProperties, idPropertyMap.goc(b['id'].value), idPropertyValueMap.goc(b['id'].value), idSameAses.goc(item), this.configurationWorkerService.configuration.primaryEndpoint, b)
           }
           if (queryRemote) {
-            ret.notify({ endpointType: 'primary', endpoint: this.configurationWorkerService.configuration.primaryEndpoint.endpoint.value, items: items.values()})
+            ret.notify({ endpointType: 'primary', endpoint: this.configurationWorkerService.configuration.primaryEndpoint.id, items: items.values()})
             let itemIdQuery: string = ''
             for (let item of items.values()) {
               itemIdQuery += '(' + item.toCanonical() + item.toCanonical() + ')'
@@ -259,10 +259,10 @@ WHERE {
                       let item: Item = items.goc(b['id'].value)
                       SparqlItemWorkerService.processItemResult(item.remoteProperties, idPropertyMap.goc(b['id'].value), idPropertyValueMap.goc(b['id'].value), idSameAses.goc(item), endpoint, b)
                     }
-                    ret.notify({ endpointType: 'remote', endpoint: endpoint, items: items.values()})
+                    ret.notify({ endpointType: 'remote', endpoint: endpoint.id, items: items.values()})
                   }
                 },
-                (error) => ret.notify({ endpointType: 'remote', endpoint: endpoint, error: WorkerWorkerService.stripFunctions(error) })
+                (error) => ret.notify({ endpointType: 'remote', endpoint: endpoint.id, error: WorkerWorkerService.stripFunctions(error) })
               )
             })).then(() => ret.resolve(items.values()))
           } else ret.resolve(items.values())

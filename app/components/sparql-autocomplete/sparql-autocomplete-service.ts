@@ -251,7 +251,7 @@ SELECT ?groupId ?groupLabel ?id ?prefLabel ?matchedLabel ?sameAs ?altLabel { # A
           SparqlAutocompleteWorkerService.processBindings(pd, this.configurationWorkerService.configuration.primaryEndpoint, response.data)
           results.localMatchingResults = SparqlAutocompleteWorkerService.buildResults(pd, new EMap<ResultGroup>())
           if (!queryRemote) d.resolve(results)
-          else d.notify({endpointType: 'primary', endpoint: this.configurationWorkerService.configuration.primaryEndpoint, results: results})
+          else d.notify({endpointType: 'primary', endpoint: this.configurationWorkerService.configuration.primaryEndpoint.id, results: results})
         }
       )
       if (queryRemote) {
@@ -269,11 +269,11 @@ SELECT ?groupId ?groupLabel ?id ?prefLabel ?matchedLabel ?sameAs ?altLabel { # A
                 SparqlAutocompleteWorkerService.processBindings(pd, endpointConfiguration, response.data)
                 SparqlAutocompleteWorkerService.unifyResults(pd)
                 results.remoteResults = results.remoteResults.concat(SparqlAutocompleteWorkerService.buildResults(pd, remoteGroupIdToGroup))
-                d.notify({endpointType: 'remote', endpoint: endpointConfiguration, results: results})
+                d.notify({endpointType: 'remote', endpoint: endpointConfiguration.id, results: results})
               })
             }
           },
-          (error) => d.notify({endpointType: 'remote', endpoint: endpointConfiguration, error: WorkerWorkerService.stripFunctions(error)})
+          (error) => d.notify({endpointType: 'remote', endpoint: endpointConfiguration.id, error: WorkerWorkerService.stripFunctions(error)})
         )})).then(() => d.resolve(results))
       }
       return d.promise
