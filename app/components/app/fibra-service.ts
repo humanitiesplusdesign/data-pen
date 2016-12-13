@@ -224,9 +224,7 @@ namespace fibra {
           })
         }
       case ITEM_PROPERTIES:
-        this.sparqlItemService.alterItem(action.payload.item, action.payload.propertiesToAdd).then((str) => {
-          console.log(str)
-          console.log('updated')
+        this.sparqlItemService.alterItem(action.payload.item, action.payload.propertiesToAdd, action.payload.propertiesToRemove).then((str) => {
           return this.state
         })
 

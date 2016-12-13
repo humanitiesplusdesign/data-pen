@@ -14,7 +14,6 @@ namespace fibra {
     fx?: number
     fy?: number
     selected?: boolean
-    baseSelection?: d3.Selection<SVGSVGElement, {}, null, undefined>
   }
 
   export interface IExploreItem extends Item, IGridNode {
@@ -107,16 +106,13 @@ namespace fibra {
       this.queryAndBuild()
     }
 
-    private lockExisting(nodes: IGridNode[]) {
-      nodes.forEach((node) => {
-        node.fx = node.gx
-        node.fy = node.gy
-      })
-    }
-
     public queryAndBuild(): angular.IPromise<string> {
-      let prom = this.sparqlItemService.getItems(this.fibraService.getState().construct.items, false).then((items: Item[]) => {
-          console.log("Items in explore", items)
+      let prom: angular.IPromise<string> = this.sparqlItemService.getItems(this.fibraService.getState().construct.items, false).then((items: Item[]) => {
+          console.log('Items in explore', items)
+
+          // If we are showing property popovers, hide 'em.
+          this.propertyPopover.hidePopover()
+
           // Lock previous items
           this.lockExisting(this.primaryItems)
           this.lockExisting(this.secondaryItems)
@@ -145,6 +141,13 @@ namespace fibra {
         this.fibraService.dispatchAction(this.fibraService.placeHolderAction(prom))
 
         return prom
+    }
+
+    private lockExisting(nodes: IGridNode[]) {
+      nodes.forEach((node) => {
+        node.fx = node.gx
+        node.fy = node.gy
+      })
     }
 
     private filterItemsByType(items: Item[], type: string): IExploreItem[] {
@@ -446,8 +449,7 @@ namespace fibra {
         datum.fy = this.lastClickY
         datum.gx = this.lastClickX
         datum.gy = this.lastClickY
-        datum.baseSelection = this.svgSel
-      }).each(this.propertyPopover.addPopover.bind(this, this.$scope, this.types))
+      }).each(this.propertyPopover.addPopover.bind(this, this.$scope, this.types, this.svgSel))
 
       primaryNodes = primaryNodes.merge(this.appendNodes(primaryNodes.enter(), 'primary'))
       secondaryNodes = secondaryNodes.merge(this.appendNodes(secondaryNodes.enter(), 'secondary'))

@@ -18,17 +18,13 @@ namespace fibra {
         .style('padding', '3px')
         .style('border-radius', '2px')
         .classed('property-popover', true)
-      
-
     }
 
-    public addPopover(this, $scope, types, d, i, g): void {
+    public addPopover(this, $scope, types, baseSVG, d, i, g): void {
       let enterNode: any = this
       let propertyPopover: d3.Selection<HTMLDivElement, {}, HTMLBodyElement, undefined> = 
-        d3.select(d.baseSelection.node().parentElement.parentElement).select<HTMLDivElement>('div.property-popover')
-      
+        d3.select(baseSVG.node().parentElement.parentElement).select<HTMLDivElement>('div.property-popover')
       propertyPopover.select('property-popover').remove()
-      
       propertyPopover
         .style('left', (d.fx - 3) + 'px')
         .style('top', (d.fy + 12) + 'px')
@@ -36,6 +32,17 @@ namespace fibra {
       cscope['node'] = d
       cscope['types'] = types
       propertyPopover.node().appendChild(this.$compile('<property-popover node="node" types="types"></property-popover>')(cscope)[0])
+      propertyPopover.style('visibility', 'visible')
+    }
+
+    public hidePopover(): void {
+      this.propertyPopover.style('visibility', 'hidden')
+    }
+
+    public closePopover(): void {
+      console.log('Clicked')
+      this.hidePopover()
+      this.fibraService.dispatch('change')
     }
   }
 
@@ -68,15 +75,26 @@ namespace fibra {
       this.chosenType = this.types.filter((t:TreeNode) => { return t.id === nodeType})[0]
     }
 
-    private typeClick(type: TreeNode) {
+    private typeChange(type: TreeNode) {
       this.chosenType = type
+      let oldTypes: PropertyToValues<INode> = this.node.localProperties.filter((p) => { return p.value === RDF.type.value })[0]
       let typeProp: PropertyToValues<INode> = new PropertyToValues(RDF.type)
       let typeNode: INamedNode = new NamedNode(type.id)
-      console.log(typeNode)
       typeProp.values.push(typeNode)
 
-      this.fibraService.dispatchAction(this.fibraService.itemProperty(this.node, [typeProp]))
-      // this.sparqlItemService.alterItem(this.node, [typeProp])
+      console.log(oldTypes)
+
+      this.fibraService.dispatchAction(this.fibraService.itemProperty(this.node, [typeProp], [oldTypes]))
     }
+
+    private labelChange() {
+      let oldLabels: PropertyToValues<INode> = this.node.localProperties.filter((p) => { return p.value === SKOS.prefLabel.value })[0]
+      let prefLabel: PropertyToValues<INode> = new PropertyToValues(SKOS.prefLabel)
+      prefLabel.values.push(DataFactory.instance.literal(this.label))
+
+      console.log(oldLabels)
+
+      this.fibraService.dispatchAction(this.fibraService.itemProperty(this.node, [prefLabel], [oldLabels]))
+    } 
   }
 }

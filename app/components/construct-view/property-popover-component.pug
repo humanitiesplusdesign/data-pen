@@ -6,7 +6,9 @@ div
           span.caret
         ul.dropdown-menu(uib-dropdown-menu role="menu" aria-labelledby="single-button")
           li(role="menuitem" ng-repeat="type in $ctrl.types")
-            a(ng-click="$ctrl.typeClick(type)") {{type.label}} ({{type.instances}})
+            a(ng-click="$ctrl.typeChange(type)") {{type.label}} ({{type.instances}})
+    span.pull-right
+      i.glyphicon.glyphicon-remove(ng-click="$ctrl.closePopover()")
   div.form-group
     lable.control-label(for="labelField") Label
-      input.form-control(type="text" ng-model="$ctrl.label")
+      input.form-control(type="text" ng-model="$ctrl.label" ng-blur="$ctrl.labelChange()")
