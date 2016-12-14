@@ -12,6 +12,7 @@ namespace fibra {
     public selectedItem: INode
     public types: TreeNode[] = []
     public chosenTypes: { [id: string]: TreeNode|null}
+    private limitFilter: string = ''
     public state: fibra.State
 
     public createItem(item: Result) {
@@ -42,7 +43,7 @@ namespace fibra {
                 private sparqlTreeService: SparqlTreeService,
                 private sparqlItemService: SparqlItemService,
                 private fibraService: FibraService,
-                private $scope: angular.IRootScopeService,
+                private $scope: angular.IScope,
                 private $q: angular.IQService) {
 
       this.chosenTypes = {
@@ -50,6 +51,12 @@ namespace fibra {
         secondary: null,
         tertiary: null
       }
+      fibraService.on('change', () => {
+        this.limitFilter = ''
+        for (let level in this.chosenTypes) if (this.chosenTypes[level]) this.limitFilter += '<' + this.chosenTypes[level].id + '>' + ','
+        if (this.limitFilter.length !== 0) this.limitFilter = 'FILTER (?groupId IN (' + this.limitFilter.substring(0, this.limitFilter.length - 1) + '))'
+        return this.$q.resolve('ok')
+      })
       this.classTreePromise = sparqlTreeService.getTree(this.configurationService.configuration.primaryEndpoint.endpoint.value, this.configurationService.configuration.primaryEndpoint.treeQueryTemplate)
       this.classTreePromise.then(c => {
         this.classTree = c;

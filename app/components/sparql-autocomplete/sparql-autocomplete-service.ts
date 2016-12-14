@@ -243,7 +243,7 @@ SELECT ?groupId ?groupLabel ?id ?prefLabel ?matchedLabel ?sameAs ?altLabel { # A
       let queryTemplate: string = this.configurationWorkerService.configuration.primaryEndpoint.autocompletionTextMatchQueryTemplate
       queryTemplate = queryTemplate.replace(/<QUERY>/g, s.SparqlService.stringToSPARQLString(query))
       queryTemplate = queryTemplate.replace(/<LIMIT>/g, '' + limit)
-      queryTemplate = queryTemplate.replace(/# CONSTRAINTS/g, this.configurationWorkerService.configuration.primaryEndpoint.dataModelConfiguration.typeConstraints)
+      queryTemplate = queryTemplate.replace(/# CONSTRAINTS/g, limits + this.configurationWorkerService.configuration.primaryEndpoint.dataModelConfiguration.typeConstraints)
       queryTemplate = queryTemplate.replace(/<PREFLANG>/g, this.configurationWorkerService.configuration.preferredLanguage)
       let pd: ProcessingData = new ProcessingData()
       let primaryProcessed: angular.IPromise<void> = this.sparqlService.query(this.configurationWorkerService.configuration.primaryEndpoint.endpoint.value, queryTemplate, {timeout: canceller}).then(

@@ -2,6 +2,7 @@ namespace fibra {
   'use strict'
   class SparqlAutocompleteComponentController {
     public limit: string
+    public constraints: string
     public queryRunning: boolean
     public onSelect: (selection: Result) => void
     public queryRemote?: string
@@ -26,7 +27,7 @@ namespace fibra {
       this.canceller = this.$q.defer()
       this.queryRunning = true
       this.error = false
-      this.sparqlAutocompleteService.autocomplete(query, this.currentLimit + 1, this.queryRemote !== undefined, '', this.canceller.promise).then(
+      this.sparqlAutocompleteService.autocomplete(query, this.currentLimit + 1, this.queryRemote !== undefined, this.constraints, this.canceller.promise).then(
         (results: AutocompletionResults) => {
           this.queryRunning = false
         },
