@@ -101,7 +101,9 @@ SELECT ?id ?itemLabel ?property ?propertyLabel ?object ?objectLabel {
   GRAPH <GRAPH> {
     VALUES ?id { <IDS> }
     ?id sf:preferredLanguageLiteral (skos:prefLabel mads:authoritativeLabel rdfs:label skos:altLabel mads:variantLabel '<PREFLANG>' '' ?itemLabel) .
-    ?id ?property ?object .
+    { ?id ?property ?object . }
+    UNION
+    { ?object ?property ?id . }
     OPTIONAL {
       ?property sf:preferredLanguageLiteral (skos:prefLabel mads:authoritativeLabel rdfs:label skos:altLabel mads:variantLabel '<PREFLANG>' '' ?propertyLabelP)
     }
