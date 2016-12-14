@@ -25,8 +25,6 @@ namespace fibra {
 
   class ExploreComponentController {
     public itemService: SparqlItemService
-    public chosenTypes
-    public types
     public properties: {}[]
     private svgSel: d3.Selection<SVGSVGElement, {}, null, undefined>
     private links: IExploreItemLink[]
@@ -35,6 +33,7 @@ namespace fibra {
     private secondaryItems: Item[] = []
     private tertiaryItems: Item[] = []
     private untypedItems: Item[] = []
+    private removedUntypedItems: IExploreItem[] = []
     private primaryProperties: String[]
     private secondaryProperties: String[]
     private tertiaryProperties: String[]
@@ -118,11 +117,16 @@ namespace fibra {
           this.lockExisting(this.secondaryItems)
           this.lockExisting(this.tertiaryItems)
 
+          let displayTypes: TreeNode[] = this.fibraService.getState().construct.displayTypes
+
+          let currentUntyped: IExploreItem[] = this.filterItemsByType(items, OWL.Thing.value)
+          this.removedUntypedItems = this.untypedItems.filter((it) => currentUntyped.indexOf(it) === -1)
+
           this.untypedItems = this.mergeNodes(this.untypedItems, this.filterItemsByType(items, OWL.Thing.value))
-          if (this.chosenTypes.primary) this.primaryItems = this.mergeNodes(this.primaryItems, this.filterItemsByType(items, this.chosenTypes.primary.id))
-          if (this.chosenTypes.secondary) this.secondaryItems = this.mergeNodes(this.secondaryItems, this.filterItemsByType(items, this.chosenTypes.secondary.id))
-          if (this.chosenTypes.tertiary) this.tertiaryItems = this.mergeNodes(this.tertiaryItems, this.filterItemsByType(items, this.chosenTypes.tertiary.id))
-          this.allItems = this.primaryItems.concat(this.secondaryItems).concat(this.tertiaryItems)
+          if (displayTypes[0]) this.primaryItems = this.mergeNodes(this.primaryItems, this.filterItemsByType(items, displayTypes[0].id))
+          if (displayTypes[1]) this.secondaryItems = this.mergeNodes(this.secondaryItems, this.filterItemsByType(items, displayTypes[1].id))
+          if (displayTypes[2]) this.tertiaryItems = this.mergeNodes(this.tertiaryItems, this.filterItemsByType(items, displayTypes[2].id))
+          this.allItems = this.primaryItems.concat(this.secondaryItems).concat(this.tertiaryItems).concat(this.untypedItems)
           this.properties = []
 
           if (this.primaryItems[0] && this.primaryItems[0].localProperties) {
@@ -450,7 +454,20 @@ namespace fibra {
         datum.fy = this.lastClickY
         datum.gx = this.lastClickX
         datum.gy = this.lastClickY
-      }).each(this.propertyPopover.addPopover.bind(this, this.$scope, this.types, this.svgSel))
+      }).each(this.propertyPopover.addPopover.bind(this, this.$scope, this.fibraService.getState().construct.types, this.svgSel))
+
+      // If a node went from being untyped to being primary or secondary, bring along its position
+      let applyOldPosition = (datum: IExploreItem) => {
+        let oldNode: IExploreItem = this.removedUntypedItems.filter((it) => { return it.value === datum.value })[0]
+        if (oldNode) {
+          datum.fx = oldNode.fx
+          datum.fy = oldNode.fy
+          datum.gx = oldNode.gx
+          datum.gy = oldNode.gy
+        }
+      }
+      primaryNodes.enter().each(applyOldPosition)
+      secondaryNodes.enter().each(applyOldPosition)
 
       primaryNodes = primaryNodes.merge(this.appendNodes(primaryNodes.enter(), 'primary'))
       secondaryNodes = secondaryNodes.merge(this.appendNodes(secondaryNodes.enter(), 'secondary'))
@@ -647,8 +664,6 @@ namespace fibra {
   export class ExploreComponent implements angular.IComponentOptions {
     public bindings: {[id: string]: string} = {
       selectedItem: '=',
-      chosenTypes: '=',
-      types: '='
     }
     public controller: string = 'ExploreComponentController' // (new (...args: any[]) => angular.IController) = ExploreComponentController
     public templateUrl: string = 'components/construct-view/explore.html'

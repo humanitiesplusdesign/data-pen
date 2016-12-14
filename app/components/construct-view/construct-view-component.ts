@@ -11,7 +11,6 @@ namespace fibra {
     public classTreePromise: angular.IPromise<TreeNode[]>
     public selectedItem: INode
     public types: TreeNode[] = []
-    public chosenTypes: { [id: string]: TreeNode|null}
     private limitFilter: string = ''
     public state: fibra.State
 
@@ -20,23 +19,16 @@ namespace fibra {
       // add it.
       let itemTypeKey: string = item.additionalInformation['type'][0] ? item.additionalInformation['type'][0].value : ""
       let itemType: TreeNode = this.types.filter((t) => { return t.id === itemTypeKey })[0]
-      if (!this.chosenTypes['primary'] && itemType) {
-        this.chosenTypes['primary'] = itemType
-      } else if (!this.chosenTypes['secondary'] && itemType) {
-        this.chosenTypes['secondary'] = itemType
+      let chosenTypes: TreeNode[] = this.fibraService.getState().construct.displayTypes
+      if (!chosenTypes[0] && itemType) {
+        this.fibraService.dispatchAction(this.fibraService.setOrderedTypes([itemType]))
+      } else if (!chosenTypes[1] && itemType) {
+        let newTypes: TreeNode[] = chosenTypes.concat([])
+        newTypes.push(itemType)
+        this.fibraService.dispatchAction(this.fibraService.setOrderedTypes(newTypes))
       }
 
       return this.fibraService.dispatchAction(this.fibraService.displayItem(item.ids[0]))
-    }
-
-    private traverseClassTree(nodes: TreeNode[], test: Function, onSuccess: Function): void {
-      let traverse = (node: TreeNode) => {
-        if(test(node)) {
-          onSuccess(node)
-          node.children.forEach(traverse)
-        }
-      }
-      nodes.forEach(traverse)
     }
 
     constructor(private configurationService: ConfigurationService,
@@ -46,14 +38,10 @@ namespace fibra {
                 private $scope: angular.IScope,
                 private $q: angular.IQService) {
 
-      this.chosenTypes = {
-        primary: null,
-        secondary: null,
-        tertiary: null
-      }
       fibraService.on('change', () => {
+        let chosenTypes = fibraService.getState().construct.displayTypes
         this.limitFilter = ''
-        for (let level in this.chosenTypes) if (this.chosenTypes[level]) this.limitFilter += '<' + this.chosenTypes[level].id + '>' + ','
+        chosenTypes.forEach((t) => { if (t) this.limitFilter += '<' + t.id + '>' + ',' })
         if (this.limitFilter.length !== 0) this.limitFilter = 'FILTER (?groupId IN (' + this.limitFilter.substring(0, this.limitFilter.length - 1) + '))'
         return this.$q.resolve('ok')
       })
@@ -77,6 +65,16 @@ namespace fibra {
         return this.$q.resolve('ok')
       })
       this.state = fibraService.getState()
+    }
+
+    private traverseClassTree(nodes: TreeNode[], test: Function, onSuccess: Function): void {
+      let traverse = (node: TreeNode) => {
+        if(test(node)) {
+          onSuccess(node)
+          node.children.forEach(traverse)
+        }
+      }
+      nodes.forEach(traverse)
     }
   }
 

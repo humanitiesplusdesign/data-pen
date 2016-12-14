@@ -5,6 +5,7 @@ namespace fibra {
   export type State = {
     construct: {
       types: any[],
+      displayTypes: TreeNode[],
       items: any[],
       itemIndex: {},
       localItems: IGridNode[]
@@ -25,9 +26,11 @@ namespace fibra {
   const HIDE_ITEM: string = 'HIDE_ITEM'
   const CREATE_LOCAL_ITEM: string = 'CREATE_LOCAL_ITEM'
   const ITEM_PROPERTIES: string = 'ITEM_PROPERTIES'
+  const SET_ORDERED_TYPES: string = 'SET_ORDERED_TYPES'
   const INITIAL_STATE: State = {
     construct: {
       types: [],
+      displayTypes: [],
       items: [],
       itemIndex: {},
       localItems: []
@@ -150,6 +153,13 @@ namespace fibra {
       }
     }
 
+    public setOrderedTypes(types: TreeNode[]): Action {
+      return {
+        type: SET_ORDERED_TYPES,
+        payload: types
+      }
+    }
+
     // Reducers
     private itemReducer(state: State = INITIAL_STATE, action: Action = DEFAULT_ACTION): angular.IPromise<State> {
       switch(action.type) {
@@ -247,6 +257,10 @@ namespace fibra {
 
       case CLEAR_TYPES:
         state.construct.types = []
+        return this.q.resolve(state)
+
+      case SET_ORDERED_TYPES:
+        state.construct.displayTypes = action.payload
         return this.q.resolve(state)
 
       default:

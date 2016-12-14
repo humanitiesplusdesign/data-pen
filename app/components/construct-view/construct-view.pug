@@ -3,10 +3,10 @@
     .col-md-12
       .row.no-gutter
         #type-bar.col-md-12
-          explore-type(types="$ctrl.types", chosen-types="$ctrl.chosenTypes")
+          explore-type
         .pull-right
           span.glyphicon.glyphicon-refresh.fa-spin(ng-show="$ctrl.state.actionsRunning > 0")
       .row.no-gutter
         #middle-column.col-md-12
-          explore(types="$ctrl.types" chosen-types="$ctrl.chosenTypes", selected-item="$ctrl.selectedItem")
+          explore(selected-item="$ctrl.selectedItem")
           sparql-autocomplete(limit="5",constraints="$ctrl.limitFilter",query-remote,on-select="$ctrl.createItem(result)")#searchbar

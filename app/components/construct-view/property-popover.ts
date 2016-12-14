@@ -77,19 +77,23 @@ namespace fibra {
       let typeNode: INamedNode = new NamedNode(type.id)
       typeProp.values.push(typeNode)
 
-      console.log(oldTypes)
-
       this.fibraService.dispatchAction(this.fibraService.itemProperty(this.node, [typeProp], [oldTypes]))
+
+      // Update the type displayed in the construct interface if appropriate (duplicative)
+      let chosenTypes: TreeNode[] = this.fibraService.getState().construct.displayTypes
+      if (!chosenTypes[0] && type) {
+        this.fibraService.dispatchAction(this.fibraService.setOrderedTypes([type]))
+      } else if (!chosenTypes[1] && type) {
+        let newTypes: TreeNode[] = chosenTypes.concat([])
+        newTypes.push(type)
+        this.fibraService.dispatchAction(this.fibraService.setOrderedTypes(newTypes))
+      }
     }
 
     private labelChange() {
       let oldLabels: PropertyToValues<INode> = this.node.localProperties.filter((p) => { return p.value === SKOS.prefLabel.value })[0]
       let prefLabel: PropertyToValues<INode> = new PropertyToValues(SKOS.prefLabel)
       prefLabel.values.push(DataFactory.instance.literal(this.label))
-
-      console.log(oldLabels)
-      console.log(this.close)
-      this.close()
 
       this.fibraService.dispatchAction(this.fibraService.itemProperty(this.node, [prefLabel], [oldLabels]))
     }

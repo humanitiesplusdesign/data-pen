@@ -2,32 +2,35 @@ namespace fibra {
   'use strict'
 
   export class ExploreTypeComponentController {
-    public types
-    public chosenTypes
-    private fibraService: FibraService
+    private types: () => TreeNode[]
+    private displayTypes: () => TreeNode[]
 
-    public constructor(fibraService: FibraService) {
+    public constructor(private fibraService: FibraService) {
       this.fibraService = fibraService
+      this.types = () => this.fibraService.getState().construct.types
+      this.displayTypes = () => this.fibraService.getState().construct.displayTypes
     }
     public primaryClick(type: TreeNode) {
-      this.chosenTypes.primary = type
+      let newTypes: TreeNode[] = this.displayTypes().concat([])
+      newTypes[0] = type
+      this.fibraService.dispatchAction(this.fibraService.setOrderedTypes(newTypes))
       this.fibraService.dispatch('change')
     }
     public secondaryClick(type: TreeNode) {
-      this.chosenTypes.secondary = type
+      let newTypes: TreeNode[] = this.displayTypes().concat([])
+      newTypes[1] = type
+      this.fibraService.dispatchAction(this.fibraService.setOrderedTypes(newTypes))
       this.fibraService.dispatch('change')
     }
     public tertiaryClick(type: TreeNode) {
-      this.chosenTypes.tertiary = type
+      let newTypes: TreeNode[] = this.displayTypes().concat([])
+      newTypes[2] = type
+      this.fibraService.dispatchAction(this.fibraService.setOrderedTypes(newTypes))
       this.fibraService.dispatch('change')
     }
   }
 
   export class ExploreTypeComponent implements angular.IComponentOptions {
-      public bindings: {[id: string]: string} = {
-        types: '=',
-        chosenTypes: '='
-      }
       public templateUrl: string = 'components/construct-view/explore-type-component/explore-type-component.html'
       public controller = 'ExploreTypeComponentController'
   }
