@@ -20,7 +20,7 @@ SELECT ?subClass ?superClass ?class ?classLabel ?instances {
       BIND(?groupId AS ?subClass)
     } UNION {
       {
-        SELECT ?groupId (COUNT(?id) AS ?instances) {
+        SELECT ?groupId (COUNT(*) AS ?instances) {
           ?id a ?groupId .
         }
         GROUP BY ?groupId
