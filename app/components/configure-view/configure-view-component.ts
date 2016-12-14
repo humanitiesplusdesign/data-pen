@@ -238,6 +238,7 @@ SELECT (crm:E53_Place as ?class) ("Place"@en as ?classLabel) (COUNT(*) AS ?insta
       this.configurations.push(c)
       c = new Configuration('local', 'SPARQL endpoint on localhost')
       c.primaryEndpoint = new PrimaryEndpointConfiguration('local', 'Local', new Citation('Local'), new NamedNode('http://localhost:3030/fibra/sparql'), new NamedNode('http://localhost:3030/fibra/update'))
+      c.primaryEndpoint.treeQueryTemplate = c.primaryEndpoint.treeQueryTemplate.replace(/# STARTGRAPH/g, 'GRAPH <GRAPH> {').replace(/# ENDGRAPH/g, '}')
       c.primaryEndpoint.autocompletionTextMatchQueryTemplate = SparqlAutocompleteService.naiveMatchQueryTemplate
       c.primaryEndpoint.localItemQueryTemplate = SparqlItemService.naiveGetLocalItemPropertiesQuery
       this.configurations.push(c)

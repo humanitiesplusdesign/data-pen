@@ -72,24 +72,22 @@ PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
 PREFIX mads: <http://www.loc.gov/mads/rdf/v1#>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX owl: <http://www.w3.org/2002/07/owl#>
-SELECT ?itemLabel ?property ?propertyLabel ?object ?objectLabel {
+SELECT ?id ?itemLabel ?property ?propertyLabel ?object ?objectLabel {
   GRAPH <GRAPH> {
-    {
-      <ID> skos:prefLabel|mads:authoritativeLabel|rdfs:label ?itemLabel .
-      FILTER(LANG(?itemLabel)='' || LANG(?itemLabel)='<PREFLANG>')
-    } UNION {
-      <ID> ?property ?object .
-      OPTIONAL {
-        ?property skos:prefLabel|rdfs:label ?propertyLabelP .
-        FILTER(LANG(?propertyLabelP)='' || LANG(?propertyLabelP)='<PREFLANG>')
-      }
-      BIND(COALESCE(?propertyLabelP,REPLACE(REPLACE(REPLACE(REPLACE(STR(?property),".*/",""),".*#",""),"_"," "),"([A-ZÅÄÖ])"," $1")) AS ?propertyLabel)
-      OPTIONAL {
-        ?object skos:prefLabel|rdfs:label ?objectLabelP .
-        FILTER(LANG(?objectLabelP)='' || LANG(?objectLabelP)='<PREFLANG>')
-      }
-      BIND (IF(ISIRI(?object),COALESCE(?objectLabelP,REPLACE(REPLACE(REPLACE(REPLACE(STR(?object),".*/",""),".*#",""),"_"," "),"([A-ZÅÄÖ])"," $1")),?object) AS ?objectLabel)
+    VALUES ?id { <IDS> }
+    ?id skos:prefLabel|mads:authoritativeLabel|rdfs:label ?itemLabel .
+    FILTER(LANG(?itemLabel)='' || LANG(?itemLabel)='<PREFLANG>')
+    ?id ?property ?object .
+    OPTIONAL {
+      ?property skos:prefLabel|rdfs:label ?propertyLabelP .
+      FILTER(LANG(?propertyLabelP)='' || LANG(?propertyLabelP)='<PREFLANG>')
     }
+    BIND(COALESCE(?propertyLabelP,REPLACE(REPLACE(REPLACE(REPLACE(STR(?property),".*/",""),".*#",""),"_"," "),"([A-ZÅÄÖ])"," $1")) AS ?propertyLabel)
+    OPTIONAL {
+      ?object skos:prefLabel|rdfs:label ?objectLabelP .
+      FILTER(LANG(?objectLabelP)='' || LANG(?objectLabelP)='<PREFLANG>')
+    }
+    BIND (IF(ISIRI(?object),COALESCE(?objectLabelP,REPLACE(REPLACE(REPLACE(REPLACE(STR(?object),".*/",""),".*#",""),"_"," "),"([A-ZÅÄÖ])"," $1")),?object) AS ?objectLabel)
   }
 }`
 
