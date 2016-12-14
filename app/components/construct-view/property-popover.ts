@@ -11,12 +11,6 @@ namespace fibra {
         private $compile: angular.ICompileService) {
 
       this.propertyPopover = d3.select($element[0]).append<HTMLDivElement>('div')
-        .style('position', 'absolute')
-        .style('z-index', '20')
-        .style('background-color', 'gray')
-        .style('color', 'white')
-        .style('padding', '3px')
-        .style('border-radius', '2px')
         .classed('property-popover', true)
     }
 
@@ -31,25 +25,24 @@ namespace fibra {
       let cscope: angular.IScope = $scope.$new(true)
       cscope['node'] = d
       cscope['types'] = types
-      propertyPopover.node().appendChild(this.$compile('<property-popover node="node" types="types"></property-popover>')(cscope)[0])
+      cscope['close'] = () => {
+        propertyPopover.style('visibility', 'hidden')
+      }
+      console.log(cscope['close'])
+      propertyPopover.node().appendChild(this.$compile('<property-popover node="node" types="types" close="close"></property-popover>')(cscope)[0])
       propertyPopover.style('visibility', 'visible')
     }
 
     public hidePopover(): void {
       this.propertyPopover.style('visibility', 'hidden')
     }
-
-    public closePopover(): void {
-      console.log('Clicked')
-      this.hidePopover()
-      this.fibraService.dispatch('change')
-    }
   }
 
   export class PropertyPopoverComponent implements angular.IComponentOptions {
     public bindings: {[id: string]: string} = {
       types: '=',
-      node: '='
+      node: '=',
+      close: '='
     }
     public templateUrl: string = 'components/construct-view/property-popover-component.html'
     public controller = 'PropertyPopoverComponentController'
@@ -58,8 +51,10 @@ namespace fibra {
   export class PropertyPopoverComponentController {
     public types
     public node: Item
+    public close: () => void
     public chosenType: TreeNode
     public label: string
+    public thingType: string = OWL.Thing.value
 
     public constructor(
       private fibraService: fibra.FibraService,
@@ -93,8 +88,15 @@ namespace fibra {
       prefLabel.values.push(DataFactory.instance.literal(this.label))
 
       console.log(oldLabels)
+      console.log(this.close)
+      this.close()
 
       this.fibraService.dispatchAction(this.fibraService.itemProperty(this.node, [prefLabel], [oldLabels]))
-    } 
+    }
+
+    private closePopover() {
+      this.close()
+      this.fibraService.dispatch('change')
+    }
   }
 }

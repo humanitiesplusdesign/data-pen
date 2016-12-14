@@ -2,13 +2,12 @@ div
   div.form-group
     label.control-label(for="typeSelect") Type
       div.btn-group(uib-dropdown)
-        button#single-button.btn.btn-primary.btn-xs(type="button" uib-dropdown-toggle ng-disabled="disabled") {{ $ctrl.chosenType.label }}&nbsp;
-          span.caret
+        button#single-button.btn.btn-primary.btn-sm(type="button" uib-dropdown-toggle ng-disabled="disabled") {{ $ctrl.chosenType.label }}&nbsp;
         ul.dropdown-menu(uib-dropdown-menu role="menu" aria-labelledby="single-button")
           li(role="menuitem" ng-repeat="type in $ctrl.types")
             a(ng-click="$ctrl.typeChange(type)") {{type.label}} ({{type.instances}})
-    span.pull-right
-      i.glyphicon.glyphicon-remove(ng-click="$ctrl.closePopover()")
-  div.form-group
-    lable.control-label(for="labelField") Label
-      input.form-control(type="text" ng-model="$ctrl.label" ng-blur="$ctrl.labelChange()")
+  div.form-group(ng-show="$ctrl.chosenType.id !== $ctrl.thingType")
+    label.control-label(for="labelField") Label
+      input.form-control.label-input.pull-right(type="text" ng-model="$ctrl.label" ng-blur="$ctrl.labelChange()")
+  div.form-group(ng-show="$ctrl.label!==''")
+    a.btn.btn-sm(ng-click="$ctrl.closePopover()") Save and close
