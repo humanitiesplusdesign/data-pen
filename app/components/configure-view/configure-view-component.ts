@@ -79,13 +79,29 @@ SELECT ?property ?propertyLabel ?object ?objectLabel {
   ?property rdfs:label ?propertyLabel .
   ?object gvp:prefLabelGVP [xl:literalForm ?objectLabel] .
 }`
+      let gettyTreeQueryTemplate: string = `PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+SELECT (?groupId AS ?class) ?classLabel ?instances {
+  {
+    SELECT ?groupId (COUNT(*) AS ?instances) {
+      ?id a ?groupId .
+      # CONSTRAINTS
+    }
+    GROUP BY ?groupId
+  }
+  ?groupId rdfs:label ?classLabel .
+}
+`
       let ulanConfiguration: EndpointConfiguration = new EndpointConfiguration('ulan', 'ULAN', new Citation('Getty Union List of Artist Names', 'http://www.getty.edu/research/tools/vocabularies/ulan/index.html', 'The Getty Research Institute', 'http://www.getty.edu/research/'), new NamedNode('http://ldf.fi/corsproxy/vocab.getty.edu/sparql'), [GETTY.PersonConcept, GETTY.GroupConcept])
       ulanConfiguration.autocompletionTextMatchQueryTemplate = gettyAutocompletionQueryTemplate.replace(/<SCHEME>/g, 'ulan:')
       ulanConfiguration.remoteItemQueryTemplate = gettyRemoteItemQueryTemplate
+      ulanConfiguration.treeQueryTemplate = gettyTreeQueryTemplate
+      this.calculateStatistics(ulanConfiguration)
       let tgnConfiguration: EndpointConfiguration = new EndpointConfiguration('tgn', 'TGN', new Citation('Getty Thesaurus of Geographic Names', 'http://www.getty.edu/research/tools/vocabularies/tgn/index.html', 'The Getty Research Institute', 'http://www.getty.edu/research/'), new NamedNode('http://ldf.fi/corsproxy/vocab.getty.edu/sparql'), [GETTY.AdminPlaceConcept, GETTY.PhysAdminPlaceConcept])
       tgnConfiguration.autocompletionTextMatchQueryTemplate = gettyAutocompletionQueryTemplate.replace(/<SCHEME>/g, 'tgn:')
       tgnConfiguration.remoteItemQueryTemplate = gettyRemoteItemQueryTemplate
-      let viafConfiguration: EndpointConfiguration = new EndpointConfiguration('viaf', 'VIAF', new Citation('Virtual International Authority File', 'http://viaf.org/viaf/data/', 'OCLC Research', 'http://www.oclc.org/research.html'), new NamedNode('http://ldf.fi/viaf/sparql'))
+      tgnConfiguration.treeQueryTemplate = gettyTreeQueryTemplate
+      this.calculateStatistics(tgnConfiguration)
+      let viafConfiguration: EndpointConfiguration = new EndpointConfiguration('viaf', 'VIAF', new Citation('Virtual International Authority File', 'http://viaf.org/viaf/data/', 'OCLC Research', 'http://www.oclc.org/research.html'), new NamedNode('http://ldf.fi/viaf/sparql'), [ CIDOC.Person, CIDOC.Group, CIDOC.Place])
       this.calculateStatistics(viafConfiguration)
       viafConfiguration.autocompletionTextMatchQueryTemplate = viafConfiguration.autocompletionTextMatchQueryTemplate.replace(/# ADDITIONALSELECT/g, `
 UNION {
@@ -99,6 +115,48 @@ UNION {
       c.primaryEndpoint.autocompletionTextMatchQueryTemplate = c.primaryEndpoint.autocompletionTextMatchQueryTemplate.replace(/# STARTGRAPH/g, 'GRAPH <GRAPH> {').replace(/# ENDGRAPH/g, '}')
       c.primaryEndpoint.treeQueryTemplate = c.primaryEndpoint.treeQueryTemplate.replace(/# STARTGRAPH/g, 'GRAPH <GRAPH> {').replace(/# ENDGRAPH/g, '}')
       let geonamesConfiguration: EndpointConfiguration = new EndpointConfiguration('geonames', 'GeoNames', new Citation('GeoNames', 'http://www.geonames.org/about.html'), new NamedNode('http://ldf.fi/geonames/sparql'))
+      geonamesConfiguration.autocompletionTextMatchQueryTemplate = `PREFIX text: <http://jena.apache.org/text#>
+PREFIX go: <http://www.geonames.org/ontology#>
+PREFIX owl: <http://www.w3.org/2002/07/owl#>
+PREFIX sf: <http://ldf.fi/functions#>
+PREFIX crm: <http://www.cidoc-crm.org/cidoc-crm/>
+SELECT (crm:E53_Place AS ?groupId) ("Place"@en AS ?groupLabel) ?id ?prefLabel ?matchedLabel ?altLabel {
+  {
+    SELECT ?id (SUM(?sc) AS ?score) {
+      {
+        SELECT ?id ?sc {
+          BIND(CONCAT("\\"",REPLACE(<QUERY>,"([\\\\+\\\\-\\\\&\\\\|\\\\!\\\\(\\\\)\\\\{\\\\}\\\\[\\\\]\\\\^\\\\\\"\\\\~\\\\*\\\\?\\\\:\\\\/\\\\\\\\])","\\\\$1"),"\\"") AS ?query)
+          (?id ?sc) text:query ?query .
+          ?id go:name|go:alternateName ?matchedLabel
+          FILTER (LCASE(?matchedLabel)=LCASE(<QUERY>))
+        }
+        LIMIT <LIMIT>
+      } UNION {
+        SELECT ?id ?sc {
+          BIND(CONCAT(REPLACE(<QUERY>,"([\\\\+\\\\-\\\\&\\\\|\\\\!\\\\(\\\\)\\\\{\\\\}\\\\[\\\\]\\\\^\\\\\\"\\\\~\\\\*\\\\?\\\\:\\\\/\\\\\\\\])","\\\\$1"),"*") AS ?query)
+          (?id ?sc) text:query ?query .
+        }
+        LIMIT <LIMIT>
+      }
+    }
+    GROUP BY ?id
+    HAVING(BOUND(?id))
+    LIMIT <LIMIT>
+  }
+  ?id go:nanme|go:alternateName ?matchedLabel
+  FILTER (REGEX(LCASE(?matchedLabel),CONCAT("\\\\b",LCASE(<QUERY>))))
+  {
+    ?id sf:preferredLanguageLiteral (go:name go:alternateName '' ?prefLabel) .
+  } UNION {
+    ?id go:alternateName ?altLabel .
+  }
+}
+`
+      geonamesConfiguration.treeQueryTemplate = `PREFIX go: <http://www.geonames.org/ontology#>
+PREFIX crm: <http://www.cidoc-crm.org/cidoc-crm/>
+SELECT (crm:E53_Place as ?class) ("Place"@en as ?classLabel) (COUNT(*) AS ?instances) {
+  ?s go:name ?o .
+}`
       this.calculateStatistics(geonamesConfiguration)
       c.authorityEndpoints = [
         ulanConfiguration,
@@ -122,7 +180,6 @@ UNION {
       // this.calculateStatistics(ladbpediaConfiguration)
       let pleiadesConfiguration: EndpointConfiguration = new EndpointConfiguration('pleiades', 'Pleiades', new Citation('The Pleiades Gazetteer', 'https://pleiades.stoa.org/home', 'The Pleiades Community', 'https://pleiades.stoa.org/credits'), new NamedNode('http://ldf.fi/ancore/sparql'), [GEOVOCAB.Feature])
       this.calculateStatistics(pleiadesConfiguration)
-      // this.calculateStatistics(pleiadesConfiguration)
       c.authorityEndpoints = [
         pleiadesConfiguration,
         ladbpediaConfiguration,
@@ -162,7 +219,8 @@ UNION {
         lcnamesConfiguration,
         viafConfiguration,
         tgnConfiguration,
-        geonamesConfiguration
+        geonamesConfiguration,
+        pleiadesConfiguration
       ]
       c.authorityEndpoints.forEach((e, i) => e.class =  'source' + i)
       let schoenbergConfiguration: EndpointConfiguration =  new EndpointConfiguration('schoenberg', 'Schoenberg', new Citation('The Schoenberg Database of Manuscripts', 'http://dla.library.upenn.edu/dla/schoenberg/ancillary.html?id=collections/schoenberg/about', 'SDBM Project', 'https://sdbm.library.upenn.edu/pages/About##staff'), new NamedNode('http://ldf.fi/schoenberg/sparql'), [CIDOC.Person, CIDOC.Place, CIDOC.Group])

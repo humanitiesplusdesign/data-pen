@@ -17,15 +17,16 @@ SELECT ?subClass ?superClass ?class ?classLabel ?instances {
         ?id a ?groupId .
         # CONSTRAINTS
       }
-      BIND (?groupId AS ?subClass)
+      BIND(?groupId AS ?subClass)
     } UNION {
       {
-        SELECT (?groupId AS ?class) (COUNT(?id) AS ?instances) {
+        SELECT ?groupId (COUNT(?id) AS ?instances) {
           ?id a ?groupId .
-          # CONSTRAINTS
         }
         GROUP BY ?groupId
       }
+      # CONSTRAINTS
+      BIND (?groupId AS ?class)
     }
     OPTIONAL {
       ?class sf:preferredLanguageLiteral (skos:prefLabel rdfs:label skos:altLabel 'en' '' ?classLabelP) .
