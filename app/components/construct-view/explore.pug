@@ -12,46 +12,4 @@ div#link-options
   label Hide
     input(type="radio" ng-model="layout.links" value="hide")
 div#tablecontainer
-  div#tabcontainer
-    a(ng-click="type='type1'" ng-class="{'active': type=='type1'}") Primary
-    a(ng-click="type='type2'" ng-class="{'active': type=='type2'}") Secondary
-    a(ng-click="type='type3'" ng-class="{'active': type=='type3'}") Tertiary
-
-
-  div.widthcontainer(ng-switch="type")
-    table.exploretable(ng-switch-when="type1" style="table-layout: fixed")
-      tr
-        th Label
-        th(ng-repeat="p in $ctrl.primaryProperties") {{ p}}
-        th Actions
-      tr(ng-repeat="item in $ctrl.primaryItems")
-        td(ng-click="$ctrl.selectItem(item)") {{ item.label.value }}
-        td(ng-repeat="p in $ctrl.primaryProperties", ng-click="$ctrl.selectItem(item)")
-          small(ng-repeat="e in item.localProperties" ng-if="e.label.value == p") {{e.values[0].label.value}}
-        td
-          a(ng-click="$ctrl.delete(item)") Delete
-
-
-    table.exploretable(ng-switch-when="type2")
-      tr
-        th Label
-        th(ng-repeat="p in $ctrl.secondaryProperties") {{ p}}
-        th Actions
-      tr(ng-repeat="item in $ctrl.secondaryItems")
-        td(ng-click="$ctrl.selectItem(item)") {{ item.label.value }}
-        td(ng-repeat="p in $ctrl.secondaryProperties", ng-click="$ctrl.selectItem(item)")
-          small(ng-repeat="e in item.localProperties" ng-if="e.label.value == p") {{e.values[0].label.value}}
-        td
-          a(ng-click="$ctrl.delete(item)") Delete
-
-      table.exploretable(ng-switch-when="type3")
-        tr
-          th Label
-          th(ng-repeat="p in $ctrl.tertiaryProperties") {{ p}}
-          th Actions
-        tr(ng-repeat="item in $ctrl.tertiaryItems")
-          td(ng-click="$ctrl.selectItem(item)") {{ item.label.value }}
-          td(ng-repeat="p in $ctrl.tertiaryProperties", ng-click="$ctrl.selectItem(item)")
-            small(ng-repeat="e in item.localProperties" ng-if="e.label.value == p") {{e.values[0].label.value}}
-          td
-            a(ng-click="$ctrl.delete(item)") Delete
+  explore-table(primary-items="$ctrl.primaryItems" secondary-items="$ctrl.secondaryItems")
