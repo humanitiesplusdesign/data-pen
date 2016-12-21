@@ -83,7 +83,7 @@ namespace fibra {
       let chosenTypes: TreeNode[] = this.fibraService.getState().construct.displayTypes
       if (!chosenTypes[0] && type) {
         this.fibraService.dispatchAction(this.fibraService.setOrderedTypes([type]))
-      } else if (!chosenTypes[1] && type) {
+      } else if (!chosenTypes[1] && type && (chosenTypes[0] !== type)) {
         let newTypes: TreeNode[] = chosenTypes.concat([])
         newTypes.push(type)
         this.fibraService.dispatchAction(this.fibraService.setOrderedTypes(newTypes))
