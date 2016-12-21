@@ -14,15 +14,12 @@ namespace fibra {
     }
 
     public $onChanges(chngsObj: any): void {
-      console.log(chngsObj)
       this.primaryProperties = []
       this.secondaryProperties = []
       this.sortProperties();
     }
 
     private delete(id: INode): angular.IPromise<string> {
-      console.log(id)
-      console.log(this.fibraService.getState().construct.items)
       return this.fibraService.dispatchAction(this.fibraService.hideItem(id)).then(() => { return 'ok' })
     }
 
