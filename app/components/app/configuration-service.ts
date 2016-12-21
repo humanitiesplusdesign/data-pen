@@ -7,9 +7,9 @@ namespace fibra {
       public authorityEndpoints: EndpointConfiguration[] = []
       public archiveEndpoints: EndpointConfiguration[] = []
       public globalDataModelConfiguration: DataModelConfiguration = new DataModelConfiguration()
-      public instanceNS: string
+      public instanceNS: string = 'http://ldf.fi/fibra/'
       public graph: INode
-      public schemaNS: string
+      public schemaNS: string = 'http://ldf.fi/fibra/schema#'
       public deleteItemQuery: string = SparqlItemService.deleteItemQuery
       public prefixes: string = ''
       constructor(public id: string, public name: string) {}

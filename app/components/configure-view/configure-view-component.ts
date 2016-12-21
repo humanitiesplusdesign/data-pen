@@ -233,8 +233,6 @@ SELECT (crm:E53_Place as ?class) ("Place"@en as ?classLabel) (COUNT(*) AS ?insta
         schoenbergConfiguration
       ]
       c.archiveEndpoints.forEach((e, i) => e.class =  'source' + (c.authorityEndpoints.length + i))
-      c.instanceNS = 'http://ldf.fi/fibra/'
-      c.schemaNS = 'http://ldf.fi/fibra/schema#'
       this.configurations.push(c)
       c = new Configuration('local', 'SPARQL endpoint on localhost')
       c.primaryEndpoint = new PrimaryEndpointConfiguration('local', 'Local', new Citation('Local'), new NamedNode('http://localhost:3030/fibra/sparql'), new NamedNode('http://localhost:3030/fibra/update'))
