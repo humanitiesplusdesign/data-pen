@@ -1,6 +1,6 @@
 div#tabcontainer
-  a(ng-click="type='type1'" ng-class="{'active': type=='type1'}") Primary
-  a(ng-click="type='type2'" ng-class="{'active': type=='type2'}") Secondary
+  a(ng-click="type='type1'" ng-class="{'active': type=='type1'}") {{ $ctrl.fibraService.getState().construct.displayTypes[0] ? $ctrl.fibraService.getState().construct.displayTypes[0].label : "Primary" }}
+  a(ng-click="type='type2'" ng-class="{'active': type=='type2'}") {{ $ctrl.fibraService.getState().construct.displayTypes[1] ? $ctrl.fibraService.getState().construct.displayTypes[1].label : "Secondary" }}
 
 
 div.widthcontainer(ng-switch="type")
