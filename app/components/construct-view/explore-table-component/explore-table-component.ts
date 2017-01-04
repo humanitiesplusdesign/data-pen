@@ -35,14 +35,24 @@ namespace fibra {
             newProp.values.push(snpl)
           })
         return newProp
-      })
+      }).filter((prop) => { return prop.values.length > 0 })
       this.originalPropertiesMap[item.value] = origProps
     }
 
     private saveItem(item: Item): void {
       // Currently this just replaces all properties on the item. We should really only update
       // properties that have changed.
-      this.fibraService.dispatchAction(this.fibraService.itemProperty(item, item.localProperties, this.originalPropertiesMap[item.value]))
+      let newProps: PropertyToValues<INode>[] = item.localProperties.map((prop) => {
+        let newProp = new PropertyToValues(prop)
+        prop.values
+          .filter((vl) => { return vl.termType === 'Literal' })
+          .forEach((vl: SourcedNodePlusLabel) => {
+            let literalNode = DataFactory.instance.literal(vl.value)
+            newProp.values.push(literalNode)
+          })
+        return newProp
+      }).filter((prop) => { return prop.values.length > 0 })
+      this.fibraService.dispatchAction(this.fibraService.itemProperty(item, newProps, this.originalPropertiesMap[item.value]))
         .then(() => {
           this.fibraService.dispatch('change')
           this.editItem = null
