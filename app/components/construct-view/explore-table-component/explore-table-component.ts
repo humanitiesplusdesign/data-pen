@@ -7,6 +7,8 @@ namespace fibra {
     private tertiaryProperties: String[]
     private primaryItems: Item[] = []
     private secondaryItems: Item[] = []
+    private originalPropertiesMap: { [id: string] : PropertyToValues<INode>[] } = { }
+    private editItem: Item
 
     public constructor( private fibraService: FibraService,
                         private sparqlItemService: SparqlItemService) {
@@ -17,6 +19,34 @@ namespace fibra {
       this.primaryProperties = []
       this.secondaryProperties = []
       this.sortProperties();
+    }
+
+    private selectItem(item: Item): void {
+      this.editItem = item
+
+      let origProps: PropertyToValues<INode>[] = item.localProperties.map((prop) => {
+        let newProp = new PropertyToValues(prop)
+        prop.values
+          // Only handle literal values
+          .filter((vl) => { return vl.termType === 'Literal' })
+          .forEach((vl: SourcedNodePlusLabel) => {
+            let literalNode = DataFactory.instance.literal(vl.value)
+            let snpl = new SourcedNodePlusLabel(literalNode, vl.label, vl.sourceEndpoints)
+            newProp.values.push(snpl)
+          })
+        return newProp
+      })
+      this.originalPropertiesMap[item.value] = origProps
+    }
+
+    private saveItem(item: Item): void {
+      // Currently this just replaces all properties on the item. We should really only update
+      // properties that have changed.
+      this.fibraService.dispatchAction(this.fibraService.itemProperty(item, item.localProperties, this.originalPropertiesMap[item.value]))
+        .then(() => {
+          this.fibraService.dispatch('change')
+          this.editItem = null
+        })
     }
 
     private delete(id: INode): angular.IPromise<string> {
