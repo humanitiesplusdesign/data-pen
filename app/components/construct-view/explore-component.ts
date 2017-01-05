@@ -541,6 +541,10 @@ namespace fibra {
         for(var j = 0; j < nodes.length; j++) {
           if(oldNodes[i].toCanonical() === nodes[j].toCanonical()) {
             newNodes.push(oldNodes[i])
+
+            // We need to grab new node information like labels and props in case it's changed
+            oldNodes[i].label = nodes[j].label
+            oldNodes[i].localProperties = nodes[j].localProperties
           }
         }
       }
