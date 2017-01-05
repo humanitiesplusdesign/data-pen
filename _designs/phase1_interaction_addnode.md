@@ -1,6 +1,6 @@
 ---
 layout: page
-title: Interaction: Add a Node
+title: "Interaction: Add a Node"
 collection: designs
 updated: 2016-09-07
 

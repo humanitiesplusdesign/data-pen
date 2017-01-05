@@ -1,0 +1,57 @@
+    <div class="content container dark">
+      <div class="row">
+      <h2>Projects</h2>
+      <p><strong>Note:</strong> Each project listed below has its own project page where you can find all the research products including data, interactive visualizations, and publications.</p>
+      
+      {% for item in site.data.[page.collection].projects %}
+        <article>
+          <!--<img class="img-circle greydout" src="{{site.baseurl}}/img/{{page.collection}}_icon.png" alt="Map of travels">-->
+          <div class="title">
+            <h3><small>{{ item.type | capitalize }}</small><br />
+              {% if item.page %}
+              <a href="{{site.baseurl}}/{{item.collection}}/{{item.page}}" alt="Link to publication">
+              {% elsif item.purl %}
+              <a href="{{item.purl}}" target="_blank" alt="Link to Stanford Digital Repository">
+              {% else %}
+              <a href="{{item.publisher-url}}" target="_blank" alt="External link to publication">
+              {% endif %}
+                 {{ item.title }}</a>
+            </h3> 
+          <p>
+            Authored by {% assign authorCount = item.author | size %}
+            {% if authorCount == 0 %}
+            {% elsif authorCount == 1 %}
+                {{ item.author | first }}
+            {% else %}
+                {% for author in item.author %}
+                    {% if forloop.first %}
+                        {{ author }}
+                    {% elsif forloop.last %}
+                        and {{ author }}
+                    {% else %}
+                        , {{ author }}
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
+             {% if item.date %}
+             , {{ item.date }}
+             {% endif %}
+            <br />
+            {{ item.abstract }}
+            </p>
+            <p>
+            {% if item.publisher %} 
+            Published by <a href="{{item.publisher-url}}">{{ item.publisher }}</a>
+            {% endif %}
+
+          </p>
+            <ul>
+          </div>
+        </article>
+        <div style="clear:both"></div>
+        {% endfor %}
+        
+      </div>
+    </div>
+
+

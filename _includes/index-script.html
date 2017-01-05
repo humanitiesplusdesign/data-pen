@@ -1,0 +1,17 @@
+<!--
+    Project Index 
+    -->
+
+            <script>
+            var ibutton = document.getElementById('index-button'); // Assumes element with id='button'
+
+            ibutton.onclick = function() {
+                var div = document.getElementById('projectindex');
+                if (div.style.width !== '100%') {
+                    div.style.width = '100%';
+                }
+                else {
+                    div.style.width = '0';
+                }
+            };
+           </script>

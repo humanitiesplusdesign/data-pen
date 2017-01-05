@@ -1,0 +1,5 @@
+<section class="columned">
+{% for record in site.data.fibra_consultants %}
+{{record.firstname}} {{record.lastname}} <small>{{record.affiliation | upcase }}</small><br />
+{% endfor %}
+</section>

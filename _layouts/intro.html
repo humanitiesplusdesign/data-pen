@@ -1,0 +1,119 @@
+---
+layout: default
+---
+
+<header>
+  <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#collapse">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <span class="navbar-brand"><h1><a href="http://republicofletters.stanford.edu">Mapping the Republic of Letters</a><span class="subhead">{{ page.project-title }}</span></h1></span>
+      </div><!-- navbar-header -->
+      <div class="collapse navbar-collapse" id="collapse">
+        <ul class="nav navbar-nav navbar-right">
+          <li><a href="#featured"></a></li>
+          <li><a href="#introduction">Introduction</a></li>
+          {% if page.group %}
+            <li><a href="#projects">Projects</a></li>
+          {% else %}
+            <li><a href="#catalog">Project Index</a></li>
+          {% endif %}
+          <li><a href="#umbrella">About</a></li>
+        </ul>        
+      </div><!-- collapse navbar-collapse -->
+    </div><!-- container -->
+  </nav>
+
+{% if page.group %}
+  {% include carousel.html %}
+{% else %}
+  {% include mastheadimg.html %}
+{% endif %}
+
+</header>
+
+<div class="main">
+  <div class="page" id="introduction">
+    <div class="content container">
+      <h2>{{ page.title }}</h2>
+      <h3>
+        {% for author in page.author %}
+        {% assign authorCount = page.author | size %}
+                    {% if authorCount == 0 %}
+                    {% elsif authorCount == 1 %}
+                        {{ page.author | first }}
+                    {% else %}
+                        {% for author in page.author %}
+                            {% if forloop.first %}
+                                {{ author }}
+                            {% elsif forloop.last %}
+                                and {{ author }}
+                            {% else %}
+                                , {{ author }}
+                            {% endif %}
+                        {% endfor %}
+                    {% endif %}
+          {% endfor %}
+      </h3>      
+      <div class="row columnflow">
+
+              {{ content }}
+
+        
+      </div><!-- row -->
+    </div><!-- content container -->
+  </div><!-- introduction page -->
+  {% if page.group %}
+    <div class="page" id="projects">
+      {% include projects.html %}
+    </div>
+  {% else %}
+    <div class="page" id="catalog">
+      {% include catalog.html %}
+    </div>
+  {% endif %}
+
+  
+
+
+
+  <div class="page" id="umbrella">
+	  <h2>Mapping the Republic of Letters Project</h2>
+	  <div class="content container">
+		  <div class="row">
+			  <p><em>Mapping the Republic of Letters</em> has been an exciting collaboration for us, as well as an ongoing experiment in how to conduct collaborative, interactive historical research in a digital age. To learn more about that project, visit <a href="http://republicofletters.stanford.edu">republicofletters.stanford.edu</a>.</p>
+        <br />
+
+      </div><!-- row -->   
+    </div><!-- content container -->
+    <div id="fullwidth"></div>
+  </div><!-- Project page -->
+
+</div><!-- main -->
+
+<footer>
+  <div class="content container">
+    <div class="row">
+      <div class="col-sm-4">
+        <div id="grant"><img width="180px" src ="{{site.baseurl}}/img/neh_logo_rev.png" /></div>
+        <p></p>    
+      </div><!-- col-sm-4 -->
+      <div class="col-sm-4">
+        <div id="acknowledge">Mapping the Republic of Letters has received funding from the National Endowment for the Humanities and the Stanford Presidential Fund for Innovation in the Humanities.</div>  
+      </div><!-- col-sm-4 -->
+  <div class="col-sm-4">
+        <div id="grant"><a href="http://stanford.edu"><img class="pull-right" width="100px" src ="{{site.baseurl}}/img/SUSig_White.png" /></a></div>   
+      </div><!-- col-sm-4 -->
+    </div><!-- row -->
+  </div><!-- content container -->
+</footer>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js"></script>
+<script src="{{site.baseurl}}/public/js/coverpage.js"></script>
+

@@ -1,0 +1,60 @@
+
+{% for collection in site.collections | where:"type","project" %}
+{% assign project = collection.label %}
+
+{% for c in site.[project] %}
+{% if c.title == page.title %}
+  {% assign thisPost = c %}
+  {% if forloop.index == 1 %}
+    {% assign prevflag = 0 %}
+    {% assign nextflag = 1 %}
+  {% elsif forloop.index == forloop.length %}
+    {% assign prevflag = 1 %}
+    {% assign nextflag = 0 %}
+  {% else %}
+    {% assign prevflag = 1 %}
+    {% assign nextflag = 1 %}
+  {% endif %}  
+{% endif %}
+{% endfor %}
+
+{% for c in site.[project] %}
+  {% if c.title == page.title %}
+    {% assign prevflag = 0 %}
+  {% endif %}
+  {% if prevflag == 1 %}
+    {% assign prevPost = c %}
+    {% assign page.previous = c %}
+  {% endif %}
+{% endfor %}
+
+{% if nextflag == 1 %}
+  {% for c in site.[project] %}
+    {% if foundPost == 1 %}
+      {% assign getNext = 1 %}
+    {% endif %}
+    {% if c.title == page.title %}
+      {% assign foundPost = 1 %}        
+    {% endif %}
+    {% if getNext == 1%}
+      {% assign nextPost = c %}
+      {% assign page.next = c %}
+      {% assign foundPost = 0 %}
+      {% assign getNext = 0 %}
+    {% endif %}
+  {% endfor %}
+{% endif %}
+
+{% endfor %}
+
+  <div id="project-nav" class="clearfix nav-slide">
+      <ul class="pagination">
+          {% if prevPost.url %}
+          <li><a class="button prev" href="{{site.baseurl}}{{prevPost.url}}">Previous {{prevPost.type}}</a></li>
+          {% endif %} 
+          &nbsp;&nbsp;&nbsp;&nbsp;
+          {% if nextPost.url %} 
+          <li><a class="button next" href="{{site.baseurl}}{{nextPost.url}}">Next {{nextPost.type}}</a></li>
+          {% endif %} 
+      </ul>
+  </div>

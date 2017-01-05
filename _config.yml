@@ -1,12 +1,17 @@
 # Built with Jekyll 3.2.0
 
 # Setup
-title:               Fibra Project
+title:               'Fibra Project'
 tagline:             'A graphical expression of interpretation.'
-description:         'Fibra is a data modeling tool with the ability to connect to rich data stores. With Fibra, when you add a record to your local data set, you can pull all the related data you want from open, digitized, and strongly linked sources around the world. Through the graphical interface you can add your own categorizations to the records you create and publish them.'
+description:         'Personal modeling tool for node rich data.'
 url:                 'fibra'
-baseurl:             'http://hdlab.stanford.edu/fibra'
+#baseurl:             'http://hdlab.stanford.edu/fibra'
 urlimg: 	'http://hdlab.stanford.edu/fibra/assets/'
+keywords:    "digital humanities, linked data, Stanford University, Humanities+Design"
+source_link: "https://github.com/humanitiesplusdesign/fibra/"
+favicon:     "img/favicon.ico"
+touch_icon:  "img/apple-touch-icon.png"
+google_analytics_key: UA-89834843-1
 
 gems:
   - jekyll-redirect-from
@@ -26,6 +31,8 @@ collections:
     output: true
   designs:
     output: true
+  splash:
+    output: false
 
 # Markdown specs
 markdown: kramdown
@@ -39,10 +46,24 @@ kramdown:
   smart_quotes:   lsquo,rsquo,ldquo,rdquo
   enable_coderay: false
 
-# Custom vars
-version:             0.0.5
 
 # Exclusions from the final site
 exclude: [optional, vendor]
+
+
+### template colors, used site-wide via css ###
+colors:
+  black:     '#111111'
+  white:     '#fff'
+  blue:      'rgb(58,171,210)'
+  sanfrancisco:  '#8f8f8f'
+  portland:      '#292929'
+  green:     '#9bcf2f'
+  purple:    '#c869bf'
+  orange:    '#FF8F19'
+  turquoise: '#0fbfcf'
+  red:       'rgb(198, 58,70)'
+  blueprint:   '#489df9'
+
 
 

@@ -1,0 +1,13 @@
+  <div class="carousel" data-ride="carousel" id="featured">
+    <div class="carousel-inner fullheight">
+      <div class="item gradient">
+        {% if page.mastheadimg %}
+        {% for img in page.mastheadimg %}
+        <img src="{{img}}" alt="{{ page.collection | titlecase}}">
+        {% endfor %}
+        {% else %}
+        <img src="{{site.baseurl}}/img/{{ page.collection }}.jpg" alt="{{ page.collection | titlecase }}">
+        {% endif %}
+      </div>
+    </div><!-- carousel-inner -->
+  </div><!-- featured carousel -->

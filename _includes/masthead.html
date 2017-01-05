@@ -1,0 +1,19 @@
+  <div class="wrap">
+      <div class="container masthead">
+          <h1>{{ page.title }}<br />
+          <small>{{page.author}}, {{page.publication-date}}</small></h1>
+          <button class="reveal">What's This?</button>
+          <div class="panel">
+            {% if page.layout == "schema" %}
+            <p>The data schema is a description of the author's data model. It is both a guide to understanding the values in a data set and a model that may be applied to other data sets. For example, the data schema John Locke's correspondence network might also be applied to the correspondence of Thomas Hobbes or René Descartes. We consider the data schema an essential research product which, by itself, expresses the design of the research inquiry while also supporting effective data sharing, discovery and analysis.</p>
+            {% elsif page.layout == "visualization" %}
+            <p>The data visualizations below were created using the Palladio application developed at Stanford. The embedded visualizations are Palladio Bricks. Palladio is freely available to use at <a href="http://hd.stanford.edu/palladio"> http://hd.stanford.edu/palladio</a> and the source code is available on GitHub <a href="https://github.com/humanitiesplusdesign/palladio">here</a>.</p>
+             {% elsif page.layout == "sigma-embed" %}
+               <p>The graph visualization embedded in this page is an application developed by the
+            	<a href="http://www.oii.ox.ac.uk" title="Oxford Internet Institute">Oxford Internet Institute</a> and 
+            	<a href="http://jisc.ac.uk" title="JISC">JISC</a>. The underlying graph data was produced using <a href="http://gephi.org">Gephi</a>.</p>
+
+            {% endif %}
+          </div><!-- end panel -->
+      </div>
+  </div>

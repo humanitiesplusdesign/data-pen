@@ -1,0 +1,58 @@
+<div class="content container">
+  <div class="row">
+      <h2>Project Index</h2>
+      <p><strong>Note:</strong> Each item below should be cited separately. Follow the link to each page for citation information. The data are available for download from the Stanford Digital Repository. The data schema and interactive visualizations are viewable at this site. </p>
+      
+      {% assign groups = site.data.[page.collection].catalog | group_by: "type" %}
+      {% for group in groups %}
+      <h3><small>{{ group.name | capitalize }}</small></h3>
+      <article>
+             {% for item in group.items %} 
+                    <h4>
+                      {% if item.page %}
+                      <a href="{{site.baseurl}}/{{page.collection}}/{{item.page}}" alt="Link to publication">{{ item.title }}</a>
+                      {% elsif item.purl %}
+                      <a href="{{item.purl}}" target="_blank" alt="Link to Stanford Digital Repository">{{ item.title }}</a>
+                      <br /><small><em>(This link will take you to the Stanford Digital Repository)</em></small>
+                      {% else %}
+                      <a href="{{item.publisher-url}}" target="_blank" alt="External link to publication">{{ item.title }}</a>
+                      {% endif %}
+                    </h4> 
+                    <p>
+                    {% if item.author %}
+                      Authored by {% assign authorCount = item.author | size %}
+                      {% if authorCount == 0 %}
+                      {% elsif authorCount == 1 %}
+                          {{ item.author | first }}
+                      {% else %}
+                          {% for author in item.author %}
+                              {% if forloop.first %}
+                                  {{ author }}
+                              {% elsif forloop.last %}
+                                  and {{ author }}
+                              {% else %}
+                                  , {{ author }}
+                              {% endif %}
+                          {% endfor %}
+                      {% endif %}
+                       {% if item.date %}
+                         {{ item.date | prepend: ",   " }}
+                       {% endif %}
+                       <br />
+                    {% endif %}
+
+                    {% if item.abstract %}
+                      {{ item.abstract }}
+                    {% endif %}
+                    {% if item.publisher %} 
+                    Published by <a href="{{item.publisher-url}}">{{ item.publisher }}</a>
+                    {% endif %}
+                    </p>
+              {% endfor %}
+      </article>
+       <div style="clear:both"></div>
+      {% endfor %}
+  </div>
+</div>
+
+

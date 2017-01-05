@@ -1,0 +1,13 @@
+
+
+<section>
+{% for file in page.files %}
+
+<a href="{{ site.baseurl }}/{{ page.collection }}{{ file | prepend: '/tabular-data/' | append: '.tsv'}}">{{ file  | append: '.tsv'}}</a>
+  
+{% endfor %}
+</section>
+
+
+
+

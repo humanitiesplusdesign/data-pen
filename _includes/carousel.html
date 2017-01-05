@@ -1,0 +1,22 @@
+  <div class="carousel fade" data-ride="carousel" id="featured">
+
+    <ol class="carousel-indicators">
+    </ol>
+
+    <div class="carousel-inner fullheight">
+    
+    {% for url in page.mastheadimg %}
+      <div class="item gradient"><img src="{{ url }}"></div>
+    {% endfor %}
+    {% for img in page.siteimg %}
+      <div class="item gradient"><img src="{{site.baseurl}}/img/{{ img }}"></div>
+    {% endfor %}
+    </div><!-- carousel-inner -->
+
+    <a class="left carousel-control" href="#featured" role="button" data-slide="prev">
+      <span class="glyphicon glyphicon-chevron-left"></span>
+    </a>
+    <a class="right carousel-control" href="#featured" role="button" data-slide="next">
+      <span class="glyphicon glyphicon-chevron-right"></span>
+    </a>
+  </div><!-- featured carousel -->

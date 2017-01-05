@@ -1,0 +1,50 @@
+<div id="projectindex" class="overlay">
+    <div class="content">
+
+          
+          <h2>Project Index</h2>
+          {% assign groups = site.data.[page.collection].catalog | group_by: "type" %}
+          {% for group in groups %}
+              <div class="title">
+                <h3><small>{{ group.name | capitalize }}</small></h3>
+              </div>
+              <article>
+                  {% for item in group.items %}
+
+                    {% if item.type == "article" %}
+                  <h4>
+                    <a href="{{item.publisher-url}}" target="_blank" alt="External link to publication">{{ item.title }}</a>
+                  </h4>
+                         {% if item.publisher %}
+                        <p>
+                           <a href="{{item.publisher-url}}">Go to {{ item.publisher }}</a>
+                        </p>
+                        {% endif %}
+                        
+                   {% elsif item.page %}
+                   
+                   <h4>
+                    <a href="{{site.baseurl}}/{{page.collection}}/{{item.page}}" alt="Link to page on this site">{{ item.title }}</a>
+                  </h4> 
+
+                  {% else %}
+                      {% if item.type == "data" %}
+                      <h4>
+                        <a href="{{ item.purl }}">{{ item.title }}</a>
+                      </h4>
+                      <p>
+                       Download and citation details at Stanford Digitial Repository
+                      </p>
+                      {% endif %}
+                  {% endif %}
+                {% endfor %}
+            </article>
+            <div style="clear:both"></div>
+            {% endfor %}
+          
+          
+          
+          
+    </div>
+</div>
+
