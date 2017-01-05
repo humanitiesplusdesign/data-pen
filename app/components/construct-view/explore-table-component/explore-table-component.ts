@@ -1,12 +1,25 @@
 namespace fibra {
   'use strict'
 
+  type TableInfo = {
+    properties: String[],
+    items: Item[]
+  }
+
   export class ExploreTableComponentController {
-    private primaryProperties: String[]
-    private secondaryProperties: String[]
-    private tertiaryProperties: String[]
+    // bindings
     private primaryItems: Item[] = []
     private secondaryItems: Item[] = []
+
+    private tableTypes: string[] = ['primary', 'secondary']
+    private primary: TableInfo = {
+      properties: [],
+      items: []
+    }
+    private secondary: TableInfo = {
+      properties: [],
+      items: [] 
+    }
     private originalPropertiesMap: { [id: string] : PropertyToValues<INode>[] } = { }
     private editItem: Item
 
@@ -16,8 +29,10 @@ namespace fibra {
     }
 
     public $onChanges(chngsObj: any): void {
-      this.primaryProperties = []
-      this.secondaryProperties = []
+      this.primary.properties = []
+      this.secondary.properties = []
+      this.primary.items = this.primaryItems
+      this.secondary.items = this.secondaryItems
       this.sortProperties();
     }
 
@@ -65,33 +80,21 @@ namespace fibra {
 
     private sortProperties(): void {
       // fill in each property array with every property possessed by the associated objects
-      for (let i = 0; i < this.primaryItems.length; i++) {
-        for (let p = 0; p < this.primaryItems[i].localProperties.length; p++) {
-          let duplicate = false
-          for (let j = 0; j < this.primaryProperties.length; j++) {
-            if (this.primaryProperties[j] == this.primaryItems[i].localProperties[p].label.value) {
-              duplicate = true
+      ['primary', 'secondary'].forEach((key) => {
+        for (let i = 0; i < this[key].items.length; i++) {
+          for (let p = 0; p < this[key].items[i].localProperties.length; p++) {
+            let duplicate = false
+            for (let j = 0; j < this[key].properties.length; j++) {
+              if (this[key].properties[j] == this[key].items[i].localProperties[p].label.value) {
+                duplicate = true
+              }
+            }
+            if (!duplicate) {
+              this[key].properties.push(this[key].items[i].localProperties[p].label.value)
             }
           }
-          if (!duplicate) {
-            this.primaryProperties.push(this.primaryItems[i].localProperties[p].label.value)
-          }
         }
-      }
-
-      for (let i = 0; i < this.secondaryItems.length; i++) {
-        for (let p = 0; p < this.secondaryItems[i].localProperties.length; p++) {
-          let duplicate = false
-          for (let j = 0; j < this.secondaryProperties.length; j++) {
-            if (this.secondaryProperties[j] == this.secondaryItems[i].localProperties[p].label.value) {
-              duplicate = true
-            }
-          }
-          if (!duplicate) {
-            this.secondaryProperties.push(this.secondaryItems[i].localProperties[p].label.value)
-          }
-        }
-      }
+      })
     }
   }
 
