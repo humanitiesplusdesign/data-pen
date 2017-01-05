@@ -7,7 +7,7 @@ fa-icon:
 
 # About the Project
 
-The Humanities + Design research lab at Stanford has developed [Palladio](http://hdlab.stanford.edu/palladio), [Breve](http://hdlab.stanford.edu/palladio), and a number of other prototype visualizations to help scholars explore and manipulate multidimensional historical data. Palladio was our answer to the need to look at information in familiar ways; to investigate it closely and carefully in maps, timelines, graphs and tables. We call the process "thinking through data." 
+The Humanities + Design research lab at Stanford has developed [Palladio](http://hdlab.stanford.edu/palladio), [Breve](http://hdlab.stanford.edu/palladio), and a number of other prototype visualizations to help scholars explore and manipulate multidimensional historical data. Palladio fulfilled a need to look at data in familiar ways; to investigate it closely and carefully in the form of maps, timelines, graphs and tables. The responsive, interlinked, and interactive visualizations encourage a reflective reading or what we call thinking through data.
 
 In the humanities, the material we work with and the questions we ask of it are, for the most part, not well suited to predictive modeling. The computing practices that help us navigate and parse data at machine scale like data mining, pattern recognition, and machine learning, are not adept at handling the small scale, idiosyncratic nature of historical data. So while we depend upon machine scale computing to help us wade through the sea of data and discover what is relevant, we also need human scale tools that support critical inquiry into the data themselves.
 
