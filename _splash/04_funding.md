@@ -9,7 +9,7 @@ style: left
 # {{page.title}}
 The Fibra Project became real thanks to an ACLS [Digital Extension grant](https://www.acls.org/programs/digitalextension/). 
 
-We are also very fortunate for our affiliation with [CESTA](http://cesta.stanford.edu), the hub of all of our activities. The researchers and staff there are crucial to the success of the project. We also rely heavily on our partnership with the Stanford University Libraries for technical expertise and sharing ideas for how to create the research tools that make the most of the digital library.
+We are also very fortunate for our affiliation with [CESTA](http://cesta.stanford.edu), the hub of all of our activities. The researchers and staff there are crucial to the success of the project. We also rely heavily on our partnership with the Stanford University Libraries for technical expertise and sharing ideas in how to create the research tools that make the most of the digital library.
 
 
 <span class=" logos columned">

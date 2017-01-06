@@ -7,7 +7,7 @@ fa-icon:
 
 # Join Fibra-Stanford
 
-The Fibra project began in late 2016 and will be completed by December 2017. It is a project of the [Humanities+Design](http://hdlab.stanford.edu) research lab at the [Center for Spatial Analysis](http://cesta.stanford.edu). The core collaborative team includes the [Stanford University Libraries](http://library.stanford.edu/), the [Semantic Computing Research Group](https://seco.cs.aalto.fi/) at the University of Aalto, and [Coredatra](http://coredatra.com/). But the collaboration extends to an exceptional community of researchers, librarians, and designers whom we depend upon to learn, toghther exactly what it is we should be building.
+The Fibra project began in late 2016 and will be completed by December 2017. It is a project of the [Humanities+Design](http://hdlab.stanford.edu) research lab at the [Center for Spatial Analysis](http://cesta.stanford.edu). The core collaborative team includes the [Stanford University Libraries](http://library.stanford.edu/), the [Semantic Computing Research Group](https://seco.cs.aalto.fi/) at the University of Aalto, and [Coredatra](http://coredatra.com/). But the collaboration extends to an exceptional community of researchers, librarians, and designers whom we depend upon to learn what it is we should be building.
 
 Please join us:
 
