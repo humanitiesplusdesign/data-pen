@@ -19,14 +19,14 @@
 
     <nav><ul>
       {% for node in site.splash %}
-        {% capture id %}{{ node.title | remove:' ' | downcase }}{% endcapture %}
+        {% capture id %}{{ node.title | remove:'-' | remove:' ' | downcase }}{% endcapture %}
         <li class="p-{{id}}"><a href="#{{id}}">{{node.title}}</a></li>
       {% endfor %}
     </ul></nav>
 
 
     {% for page in site.splash %}
-      {% capture id %}{{ page.title | remove:'-' | downcase }}{% endcapture %}
+      {% capture id %}{{ page.title | remove:'-' | remove:' ' | downcase }}{% endcapture %}
       <div id="{{id}}" class="section p-{{id}}">
         {% if page.icon %}
         <div class="subtlecircle sectiondivider imaged">
