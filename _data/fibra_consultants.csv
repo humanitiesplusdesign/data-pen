@@ -1,31 +1,30 @@
-firstname,lastname,affiliation
-Ruth  Ahnert,Queen Mary, University of London
-Sebastian,Ahnert,University of Cambridge
-Arno  Bosse Oxford University
-Simon,Burrows,University of Western Sydney
-Giovanna,Ceserani,Stanford University
-Paolo,Ciuccarelli,Politecnico di Milano
-Javier, de la Rosa, Stanford Libraries
-Marten,Düring,University of Luxembourg
-Paula,Findlen,Stanford University
-Mauricio,Giraldo,New York Public Library
-Jo,Guldi,Brown University
-Howard,Hotson,Oxford University
-Eero,Hyvonen,Aalto University
-Matthew,Jones,Columbia
-Christoph,Kudella,University College Cork
-Miranda Lewis Oxford University
-Matthew,Lincoln,Getty Research Institute
-Jacqueline,Lorber Kasunic,University of Technology Sydney
-Sarah ,Ogilvie,Stanford University
-Irène,Passeron,CNRS, Paris
-Miriam,Posner,UCLA
-Rob,Sanderson,‎J. Paul Getty Trust
-Philip,Schreur,Stanford University Libraries
-Daniel,Shore,Georgetown University
-Sarah,Sussman,Stanford University Libraries
-Kate,Sweetapple,University of Technology Sydney
-Thomas,Wallnig,University of Vienna
-Chris,Warren,Carnegie Mellon
-Scott,Weingart,Carnegie Mellon
-Caroline,Winterer,Stanford University
+firstname,lastname,affiliation,email
+Ruth,Ahnert,Queen Mary University of London,r.r.ahnert@qmul.ac.uk
+Sebastian,Ahnert,University of Cambridge,sea31@cam.ac.uk
+Arno,Bosse,Oxford University,arno.bosse@history.ox.ac.uk
+Simon,Burrows,University of Western Sydney,S.Burrows@westernsydney.edu.au
+Giovanna,Ceserani,Stanford University,ceserani@stanford.edu
+Paolo,Ciuccarelli,Politecnico di Milano,paolo.ciuccarelli@gmail.com
+Marten,Düring,University of Luxembourg,marten.during@uni.lu
+Paula,Findlen,Stanford University,pfindlen@stanford.edu
+Mauricio,Giraldo,New York Public Library,mauriciogiraldo@nypl.org
+Jo,Guldi,Brown University,Ellen_Guldi@brown.edu
+Howard,Hotson,Oxford University,howard.hotson@st-annes.ox.ac.uk
+Eero,Hyvonen,Aalto University,eero.hyvonen@aalto.fi
+Matthew,Jones,Columbia,mj340@columbia.edu
+Christoph,Kudella,University College Cork,christoph.kudella@googlemail.com
+Miranda,Lewis,Oxford University,miranda.lewis@history.ox.ac.uk
+Matthew,Lincoln,Getty Research Institute,matthew.d.lincoln@gmail.com
+Jacqueline,Lorber Kasunic,University of Technology Sydney,Jacquie.Kasunic@uts.edu.au
+Sarah,Ogilvie,Stanford University,sogilivie@stanford.edu
+Irène,Passeron,CNRS Paris,irene.passeron@imj-prg.fr
+Miriam,Posner,UCLA,miriam.posner@gmail.com
+Rob,Sanderson,‎J. Paul Getty Trust,RSanderson@getty.edu
+Philip,Schreur,Stanford University Libraries,pschreur@stanford.edu
+Daniel,Shore,Georgetown University,Daniel.Shore@georgetown.edu
+Sarah,Sussman,Stanford University Libraries,ssussman@stanford.edu
+Kate,Sweetapple,University of Technology Sydney,Kate.Sweetapple@uts.edu.au
+Thomas,Wallnig,University of Vienna,thomas.wallnig@univie.ac.at
+Chris,Warren,Carnegie Mellon,cnwarren@cmu.edu
+Scott,Weingart,Carnegie Mellon,scottbot@cmu.edu
+Caroline,Winterer,Stanford University,cwinterer@stanford.edu
