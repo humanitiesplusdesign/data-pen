@@ -13,7 +13,11 @@ namespace fibra {
 
   let m: angular.IModule = angular.module('fibra', [ 'http-auth-interceptor', 'ngStorage', 'ui.router',  'ui.bootstrap', 'ui.bootstrap.tpls' ])
   m.config(($stateProvider: angular.ui.IStateProvider, $urlRouterProvider: angular.ui.IUrlRouterProvider) => {
-    $urlRouterProvider.otherwise('/configure')
+    $urlRouterProvider.otherwise('/landing')
+    $stateProvider.state('landing', {
+      url: '/landing',
+      templateUrl: 'components/app/landing.html'
+    })
     $stateProvider.state('configure', {
       url: '/configure',
       template: '<configure-view></configure-view>'
