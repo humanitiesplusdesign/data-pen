@@ -161,7 +161,8 @@ SELECT ?groupId ?groupLabel ?id ?prefLabel ?matchedLabel ?sameAs ?altLabel { # A
           pd.idToIdSet.get(id).add(binding['sameAs'].value)
           pd.idToIdSet.goc(binding['sameAs'].value).add(id)
         }
-        for (let v of result.head.vars) if (v.indexOf('ifp') === 0 && binding[v]) pd.ifpVarPlusValueToIdSet.goc(v.substring(3)).goc(binding[v].value).add(id)
+        // FIXME: demo hack
+        for (let v of result.head.vars) if ((v.indexOf('ifp') === 0 || v === 'prefLabel') && binding[v]) pd.ifpVarPlusValueToIdSet.goc(v.substring(3)).goc(binding[v].value).add(id)
       })
     }
 

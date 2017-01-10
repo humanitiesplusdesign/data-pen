@@ -77,7 +77,7 @@ namespace fibra {
     }
     constructor(private workerService: WorkerService, private $localStorage: any) {
       let emloConfiguration: EndpointConfiguration = new EndpointConfiguration('emlo', 'EMLO', new Citation('Early Modern Letters Online', 'http://emlo.bodleian.ox.ac.uk/blog/?page_id=907', 'Cultures of Knowledge', 'http://www.culturesofknowledge.org/'), new NamedNode('http://ldf.fi/emlo/sparql'), [CIDOC.Person, CIDOC.Place, CIDOC.Group])
-      emloConfiguration.autocompletionTextMatchQueryTemplate = emloConfiguration.autocompletionTextMatchQueryTemplate.replace(/\{ # ADDITIONALVARIABLES/g, '?ifpWikipediaPage ?ifpODBNId {').replace(/# ADDITIONALSELECT/g, `
+      emloConfiguration.autocompletionTextMatchQueryTemplate = emloConfiguration.autocompletionTextMatchQueryTemplate.replace(/{ # ADDITIONALVARIABLES/g, '?ifpWikipediaPage ?ifpODBNId {').replace(/# ADDITIONALSELECT/g, `
       UNION {
       {
       ?id <http://emlo.bodleian.ox.ac.uk/schema#cofk_union_relationship_type-is_related_to> ?ref .
@@ -89,9 +89,10 @@ namespace fibra {
       BIND(REPLACE(STR(?ref),'http://www.oxforddnb.com/view/article/([^?]*).*','$1') AS ?ifpODBNId)
       }
       }`)
+      console.log(emloConfiguration.autocompletionTextMatchQueryTemplate)
       this.presetAuthorities.push(emloConfiguration)
       let sdfbConfiguration: EndpointConfiguration = new EndpointConfiguration('sdfb', 'SDFB', new Citation('Six Degrees of Francis Bacon: Reassembling the Early Modern Social Network', 'http://www.sixdegreesoffrancisbacon.com/about', 'SDFB Team', 'http://www.sixdegreesoffrancisbacon.com/team'), new NamedNode('http://ldf.fi/sdfb/sparql'), [CIDOC.Person, CIDOC.Place, CIDOC.Group])
-      sdfbConfiguration.autocompletionTextMatchQueryTemplate = sdfbConfiguration.autocompletionTextMatchQueryTemplate.replace(/\{ # ADDITIONALVARIABLES/g, '?ifpODBNId {').replace(/# ADDITIONALSELECT/g, `
+      sdfbConfiguration.autocompletionTextMatchQueryTemplate = sdfbConfiguration.autocompletionTextMatchQueryTemplate.replace(/{ # ADDITIONALVARIABLES/g, '?ifpODBNId {').replace(/# ADDITIONALSELECT/g, `
       UNION {
       ?id <http://ldf.fi/sdfb/schema#odbnId> ?ifpODBNId .
       }
@@ -100,7 +101,7 @@ namespace fibra {
       let lcnamesConfiguration: EndpointConfiguration = new EndpointConfiguration('lcnames', 'LC Names', new Citation('Library of Congress Name Authority', 'http://id.loc.gov/authorities/names.html', 'Library of Congress', 'https://www.loc.gov/'), new NamedNode('http://ldf.fi/lcnames/sparql'), [MADS.CorporateName, MADS.PersonalName, MADS.Geographic])
       this.presetAuthorities.push(lcnamesConfiguration)
       let procopeConfiguration: EndpointConfiguration = new EndpointConfiguration('procope', 'Procope', new Citation('Procope', '', 'Dan Edelstein et al.', 'https://dlcl.stanford.edu/people/dan-edelstein'), new NamedNode('http://ldf.fi/procope/sparql'), [CIDOC.Person, CIDOC.Place, CIDOC.Group])
-      procopeConfiguration.autocompletionTextMatchQueryTemplate = procopeConfiguration.autocompletionTextMatchQueryTemplate.replace(/\{ # ADDITIONALVARIABLES/g, '?ifpWikipediaPage {').replace(/# ADDITIONALSELECT/g, `
+      procopeConfiguration.autocompletionTextMatchQueryTemplate = procopeConfiguration.autocompletionTextMatchQueryTemplate.replace(/{ # ADDITIONALVARIABLES/g, '?ifpWikipediaPage {').replace(/# ADDITIONALSELECT/g, `
       UNION {
       ?id <http://ldf.fi/procope-schema#wikipediaUrl> ?ref .
       BIND(IRI(?ref) AS ?ifpWikipediaPage)
@@ -238,7 +239,8 @@ namespace fibra {
       c.authorityEndpoints.forEach((e, i) => e.class =  'source' + i)
       c.archiveEndpoints = [
         emloConfiguration,
-        sdfbConfiguration
+        sdfbConfiguration,
+        procopeConfiguration
       ]
       c.archiveEndpoints.forEach((e, i) => e.class =  'source' + (c.authorityEndpoints.length + i))
       this.presets.push(c)
