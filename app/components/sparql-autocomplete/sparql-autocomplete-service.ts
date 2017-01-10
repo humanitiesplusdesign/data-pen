@@ -169,7 +169,8 @@ SELECT ?groupId ?groupLabel ?id ?prefLabel ?matchedLabel ?sameAs ?altLabel { # A
     private static buildResults(pd: ProcessingData, groupIdToGroup: EMap<ResultGroup>): ResultGroup[] {
       let res: ResultGroup[] = []
       pd.idToIdSet.each((idSet: StringSet, id: string) => {
-        if (!pd.seen.has(id)) {
+        let seen: boolean = pd.seen.has(id) || idSet.values().some(id2 => pd.seen.has(id2))
+        if (!seen) {
           pd.seen.adds(idSet)
           let result: Result = new Result(idSet.values().map(oid => DataFactory.instance.namedNode(oid)), pd.idToDatasourceSet.get(id).values(), pd.idToMatchedLabelSet.get(id).values()[0], pd.idToPrefLabelSet.get(id).values()[0])
           if (pd.idToAltLabelSet.has(id)) result.additionalInformation['altLabel'] = pd.idToAltLabelSet.get(id).values()
@@ -200,6 +201,7 @@ SELECT ?groupId ?groupLabel ?id ?prefLabel ?matchedLabel ?sameAs ?altLabel { # A
         let oidSet: StringSet = pd.idToIdSet.get(oid)
         if (idSet !== oidSet) {
           pd.idToIdSet.set(oid, idSet)
+
           idSet.adds(oidSet)
           let datasourceSet: IdentitySet<EndpointConfiguration> = pd.idToDatasourceSet.get(id)
           let oDatasourceSet: IdentitySet<EndpointConfiguration> = pd.idToDatasourceSet.get(oid)

@@ -89,7 +89,6 @@ namespace fibra {
       BIND(REPLACE(STR(?ref),'http://www.oxforddnb.com/view/article/([^?]*).*','$1') AS ?ifpODBNId)
       }
       }`)
-      console.log(emloConfiguration.autocompletionTextMatchQueryTemplate)
       this.presetAuthorities.push(emloConfiguration)
       let sdfbConfiguration: EndpointConfiguration = new EndpointConfiguration('sdfb', 'SDFB', new Citation('Six Degrees of Francis Bacon: Reassembling the Early Modern Social Network', 'http://www.sixdegreesoffrancisbacon.com/about', 'SDFB Team', 'http://www.sixdegreesoffrancisbacon.com/team'), new NamedNode('http://ldf.fi/sdfb/sparql'), [CIDOC.Person, CIDOC.Place, CIDOC.Group])
       sdfbConfiguration.autocompletionTextMatchQueryTemplate = sdfbConfiguration.autocompletionTextMatchQueryTemplate.replace(/{ # ADDITIONALVARIABLES/g, '?ifpODBNId {').replace(/# ADDITIONALSELECT/g, `
