@@ -1,18 +1,10 @@
 .container
-  h2 Select data
+  h2 Constrain configuration
 
   ul
-    li
-      a(ng-click="$ctrl.setData('set1')") The Ancient World (Pleiades &amp; Pelagios)
-      ul
-        li 1,188 Place
-        li 22,564 Thing
-    li
-      a(ng-click="$ctrl.setData('set2')") People two degrees removed from John Locke from SDFB and associated places from EMLO
-      ul
-        li 1,227 Person
-        li 204 Place
-    li
-      a(ng-click="$ctrl.setData('set3')") People two degrees removed from John Locke from SDFB
-      ul
-        li 1,215 Person
+    li: a(ng-click="$ctrl.setData('set2')") Unconstrained <br />
+      img(src="http://hdlab.stanford.edu/img/breve_rect.png",height="200")
+    li 1700-1800 Europe (n people, n+5 places) <br />
+      img(src="http://hdlab.stanford.edu/img/breve_rect.png",height="200")
+    li 1700-1800 France (y people, y-10 places) <br />
+      img(src="http://hdlab.stanford.edu/img/breve_rect.png",height="200")

@@ -1,0 +1,23 @@
+.container
+  h1 Fibra
+  h2 New project
+  ol
+    li: a(ui-sref="configure") Configure
+    li Select
+    li Construct
+  h2 Existing projects
+  ul
+    li
+      a(ng-click="$ctrl.setProject('set2')") People two degrees removed from John Locke from SDFB and associated places from EMLO
+      ul
+        li 1,227 Person
+        li 204 Place
+    li
+      a(ng-click="$ctrl.setProject('set3')") People two degrees removed from John Locke from SDFB
+      ul
+        li 1,215 Person
+    li
+      a(ng-click="$ctrl.setProject('set1')") The Ancient World (Pleiades &amp; Pelagios)
+      ul
+        li 1,188 Place
+        li 22,564 Thing
