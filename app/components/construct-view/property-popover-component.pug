@@ -9,5 +9,6 @@ div
   div.form-group(ng-show="$ctrl.chosenType.id !== $ctrl.thingType")
     label.control-label(for="labelField") Label
       input.form-control.label-input.pull-right(type="text" ng-model="$ctrl.label" ng-blur="$ctrl.labelChange()")
-  div.form-group(ng-show="$ctrl.label!==''")
-    a.btn.btn-sm(ng-click="$ctrl.closePopover()") Save and close
+  div.form-group
+    a.btn.btn-sm(ng-click="$ctrl.deleteAndClose()") Cancel
+    a.btn.btn-sm(ng-click="$ctrl.closePopover()" ng-show="$ctrl.label!==''") Save and close

@@ -98,6 +98,14 @@ namespace fibra {
       this.fibraService.dispatchAction(this.fibraService.itemProperty(this.node, [prefLabel], [oldLabels]))
     }
 
+    private deleteAndClose() {
+      this.fibraService.dispatchAction(this.fibraService.deleteItem(this.node))
+        .then(() => {
+          this.fibraService.dispatch('change')
+          this.close()
+        })
+    }
+
     private closePopover() {
       this.close()
       this.fibraService.dispatch('change')
