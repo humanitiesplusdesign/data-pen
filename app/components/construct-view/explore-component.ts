@@ -371,6 +371,9 @@ namespace fibra {
               .attr('r', (d: IExploreItem) => { return this.radius + (d.selected ? 3 : 0) + 'px' })
       this.svgSel.selectAll('.node-circle')
         .classed('labeled', (d: IExploreItem) => { return d.label.value ? true : false; })
+        // We should only count 'sameAs' relations as verified if they are against the configuration,
+        // but this doesn't make that distinction.
+        .classed('verified', (d: IExploreItem) => { return d.localProperties.filter((p) => { return p.value === 'http://www.w3.org/2002/07/owl#sameAs' }).length > 0; })
 
       lLinkLines
         .attr('x1', (d: IExploreItemLink) => (<IExploreItem>d.source).gx!)

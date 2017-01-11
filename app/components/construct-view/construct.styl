@@ -26,16 +26,20 @@ construct-view {
     stroke: grey
   }
 
-  .node-circle.primary {
+  .node-circle {
     stroke: darken(gray, 50%)
   }
 
   .node-circle.secondary {
-    stroke: lighten(gray, 50%)
+    opacity: 30%
   }
 
   .node-circle.labeled {
     fill: lighten(gray, 50%)
+  }
+
+  .node-circle.verified {
+    fill: darken(gray, 50%)
   }
 
   .node-circle.untyped {
