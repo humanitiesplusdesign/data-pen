@@ -74,8 +74,12 @@ namespace fibra {
         })
     }
 
-    private delete(id: INode): angular.IPromise<string> {
+    private hide(id: INode): angular.IPromise<string> {
       return this.fibraService.dispatchAction(this.fibraService.hideItem(id)).then(() => { return 'ok' })
+    }
+
+    private delete(id: INode): angular.IPromise<State> {
+      return this.fibraService.dispatchAction(this.fibraService.deleteItem(id))
     }
 
     private sortProperties(): void {

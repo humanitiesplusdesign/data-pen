@@ -18,5 +18,6 @@ uib-tabset
           td(ng-repeat="p in $ctrl[t].properties", ng-click="$ctrl.selectItem(item)" ng-if="item !== $ctrl.editItem")
             small(ng-repeat="e in item.localProperties" ng-if="e.label.value == p") {{e.values[0].label.value}}
           td
-            a(ng-click="$ctrl.delete(item)") Hide
+            a(ng-click="$ctrl.hide(item)") Hide
+            a(ng-click="$ctrl.delete(item)") &nbsp;Delete
             a(ng-click="$ctrl.saveItem($ctrl.editItem)" ng-if="item === $ctrl.editItem") &nbsp;Save

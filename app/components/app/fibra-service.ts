@@ -20,6 +20,7 @@ namespace fibra {
 
   const PLACEHOLDER: string = 'PLACEHOLDER'
   const CREATE_ITEMS: string = 'CREATE_ITEMS'
+  const DELETE_ITEMS: string = 'DELETE_ITEMS'
   const ADD_TYPE: string = 'ADD_TYPE'
   const CLEAR_TYPES: string = 'CLEAR_TYPES'
   const DISPLAY_ITEMS: string = 'DISPLAY_ITEMS'
@@ -139,6 +140,13 @@ namespace fibra {
       }
     }
 
+    public deleteItem(item: INode): Action {
+      return {
+        type: DELETE_ITEMS,
+        payload: [item]
+      }
+    }
+
     public addType(type: TreeNode):Action {
       return {
         type: ADD_TYPE,
@@ -233,6 +241,15 @@ namespace fibra {
             return this.state
           })
         }
+
+      case DELETE_ITEMS:
+        return this.q.all(action.payload.map((item: INode) => {
+          return this.sparqlItemService.deleteItem(item)
+        })).then(() => {
+          this.dispatch('change')
+          return this.state
+        })
+
       case ITEM_PROPERTIES:
         return this.sparqlItemService.alterItem(action.payload.item, action.payload.propertiesToAdd, action.payload.propertiesToRemove).then((str) => {
           return this.state
