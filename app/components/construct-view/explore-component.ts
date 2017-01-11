@@ -208,6 +208,7 @@ namespace fibra {
       return enterSelection.append('g')
           .attr('id', (d, i: number) => 'node-' + i + '-' + className)
           .attr('class', 'node')
+          .classed(className, true)
         .append('circle')
           .classed('node-circle', true)
           .classed(className, true)
