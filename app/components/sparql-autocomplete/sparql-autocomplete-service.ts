@@ -258,6 +258,7 @@ SELECT ?groupId ?groupLabel ?id ?prefLabel ?matchedLabel ?sameAs ?altLabel { # A
         }
       )
       if (queryRemote) {
+        // FIXME: It is currently possible that we miss equivalencies because equivalent data from one source doesn't fit the limit while it does for another. Add further query to make sure all equivalencies are fetched (either in autocompletion or latest in import)
         let remoteGroupIdToGroup: EMap<ResultGroup> = new EMap<ResultGroup>()
         this.$q.all(this.configurationWorkerService.configuration.remoteEndpoints().map(endpointConfiguration => {
           queryTemplate = endpointConfiguration.autocompletionTextMatchQueryTemplate

@@ -135,7 +135,7 @@ namespace fibra {
       {
       ?id gvp:prefLabelGVP [xl:literalForm ?prefLabel] .
       } UNION {
-      ?id skos:exactMatch ?sameAs .
+      ?id skos:exactMatch|skos:closeMatch ?sameAs .
       }
       }`
       let gettyRemoteItemQueryTemplate: string = `PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
