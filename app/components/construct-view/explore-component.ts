@@ -51,6 +51,8 @@ namespace fibra {
     private sunburst: Sunburst
     private propertyPopover: PropertyPopover
 
+    private verifyItem: Item = null
+
     private drawmode: boolean = false
 
     public $postLink(): void {
@@ -501,7 +503,10 @@ namespace fibra {
       this.sunburst = new Sunburst($element, $compile, $scope, sparqlItemService, fibraService)
       this.propertyPopover = new PropertyPopover($element, $scope, fibraService, $compile)
 
-      this.fibraService.on('change', () => this.queryAndBuild())
+      this.fibraService.on('change', () => {
+        this.verifyItem = this.fibraService.getState().construct.verifyItem
+        return this.queryAndBuild()
+      })
       this.itemService = sparqlItemService
       this.links = []
       this.$scope.layout = {

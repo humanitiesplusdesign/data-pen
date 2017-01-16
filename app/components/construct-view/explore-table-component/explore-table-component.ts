@@ -100,6 +100,10 @@ namespace fibra {
         }
       })
     }
+
+    private verify(node: Item) {
+      this.fibraService.dispatchAction(this.fibraService.verifyItem(node))
+    }
   }
 
   export class ExploreTableComponent implements angular.IComponentOptions {

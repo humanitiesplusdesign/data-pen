@@ -8,7 +8,8 @@ namespace fibra {
       displayTypes: TreeNode[],
       items: any[],
       itemIndex: {},
-      localItems: IGridNode[]
+      localItems: IGridNode[],
+      verifyItem: Item
     },
     actionsRunning: number
   }
@@ -21,6 +22,7 @@ namespace fibra {
   const PLACEHOLDER: string = 'PLACEHOLDER'
   const CREATE_ITEMS: string = 'CREATE_ITEMS'
   const DELETE_ITEMS: string = 'DELETE_ITEMS'
+  const VERIFY_ITEM: string = 'VERIFY_ITEM'
   const ADD_TYPE: string = 'ADD_TYPE'
   const CLEAR_TYPES: string = 'CLEAR_TYPES'
   const DISPLAY_ITEMS: string = 'DISPLAY_ITEMS'
@@ -34,7 +36,8 @@ namespace fibra {
       displayTypes: [],
       items: [],
       itemIndex: {},
-      localItems: []
+      localItems: [],
+      verifyItem: null
     },
     actionsRunning: 0
   }
@@ -147,6 +150,13 @@ namespace fibra {
       }
     }
 
+    public verifyItem(item: INode): Action {
+      return {
+        type: VERIFY_ITEM,
+        payload: item
+      }
+    }
+
     public addType(type: TreeNode):Action {
       return {
         type: ADD_TYPE,
@@ -249,6 +259,11 @@ namespace fibra {
           this.dispatch('change')
           return this.state
         })
+
+      case VERIFY_ITEM:
+        this.state.construct.verifyItem = action.payload
+        this.dispatch('change')
+        return this.q.resolve(this.state)
 
       case ITEM_PROPERTIES:
         return this.sparqlItemService.alterItem(action.payload.item, action.payload.propertiesToAdd, action.payload.propertiesToRemove).then((str) => {

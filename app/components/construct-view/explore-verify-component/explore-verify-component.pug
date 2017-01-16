@@ -1,0 +1,7 @@
+.verify-container
+  .verify-header Verify
+    .verify-cancel(ng-click="$ctrl.clear()") X
+  .verify-content
+    .verify-result-group(ng-repeat="grp in $ctrl.matchingResults")
+      .verify-result-group-header {{grp.label}}
+      .verify-result(ng-repeat="rslt in grp.results" ng-click="$ctrl.verify(rslt)") {{ rslt.prefLabel.value }}
