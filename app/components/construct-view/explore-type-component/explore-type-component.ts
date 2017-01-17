@@ -7,7 +7,7 @@ namespace fibra {
 
     public constructor(private fibraService: FibraService) {
       this.fibraService = fibraService
-      this.types = () => this.fibraService.getState().construct.types
+      this.types = () => this.fibraService.getState().construct.types.concat(this.fibraService.getState().construct.userTypes)
       this.displayTypes = () => this.fibraService.getState().construct.displayTypes
     }
     public primaryClick(type: TreeNode) {

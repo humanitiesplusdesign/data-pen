@@ -1,11 +1,21 @@
 div
   div.form-group
     label.control-label(for="typeSelect") Type
-      div.btn-group(uib-dropdown)
-        button#single-button.btn.btn-primary.btn-sm(type="button" uib-dropdown-toggle ng-disabled="disabled") {{ $ctrl.chosenType.label }}&nbsp;
-        ul.dropdown-menu(uib-dropdown-menu role="menu" aria-labelledby="single-button")
-          li(role="menuitem" ng-repeat="type in $ctrl.types")
-            a(ng-click="$ctrl.typeChange(type)") {{type.label}} ({{type.instances}})
+      //- div.btn-group(uib-dropdown)
+      //-   button#single-button.btn.btn-primary.btn-sm(type="button" uib-dropdown-toggle ng-disabled="disabled") {{ $ctrl.chosenType.label }}&nbsp;
+      //-   ul.dropdown-menu(uib-dropdown-menu role="menu" aria-labelledby="single-button")
+      //-     li(role="menuitem" ng-repeat="type in $ctrl.types")
+      //-       a(ng-click="$ctrl.typeChange(type)") {{type.label}} ({{type.instances}})
+
+
+      button.btn.btn-sm.pull-right(type="button" ng-show="$ctrl.showTypeCreate" ng-click="$ctrl.typeCreate($ctrl.typeQueryGS())") Create Type
+      input.form-control.label-input.pull-right( 
+        type="text"
+        ng-model="$ctrl.typeQueryGS"
+        ng-model-options="{ getterSetter: true }"
+        uib-typeahead="type.label for type in $ctrl.getTypes() | filter:$viewValue | limitTo:8"
+        ng-change="$ctrl.typeEvaluate($ctrl.typeQueryGS())"
+        typeahead-on-select="$ctrl.typeChange($item, $model, $label, $event)")
   div.form-group(ng-show="$ctrl.chosenType.id !== $ctrl.thingType")
     label.control-label(for="labelField") Label
       input.form-control.label-input.pull-right(type="text" ng-model="$ctrl.label" ng-blur="$ctrl.labelChange()")

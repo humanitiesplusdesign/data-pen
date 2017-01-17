@@ -48,6 +48,10 @@ namespace fibra {
     public controller = 'PropertyPopoverComponentController'
   }
 
+  interface IPropertyPopoverScope extends angular.IScope {
+    selected?: (sel: string) => string
+  }
+
   export class PropertyPopoverComponentController {
     public types
     public node: Item
@@ -55,11 +59,25 @@ namespace fibra {
     public chosenType: TreeNode
     public label: string
     public thingType: string = OWL.Thing.value
+    public showTypeCreate: boolean = false
+
+    private typeQuery: string = ''
+    private getTypes: () => TreeNode[]
+    private typeQueryGS: (query: string) => string = (query: string) => {
+      if(query !== undefined) {
+        this.typeQuery = query
+      }
+      return this.typeQuery
+    }
 
     public constructor(
       private fibraService: fibra.FibraService,
-      private sparqlItemService: SparqlItemService
-    ) { }
+      private sparqlItemService: SparqlItemService,
+      private $scope: IPropertyPopoverScope,
+      private $q: angular.IQService
+    ) {
+      this.getTypes = () => this.fibraService.getState().construct.types.concat(this.fibraService.getState().construct.userTypes)
+    }
 
     public $postLink(): void {
       this.label = this.node.label.value
@@ -68,26 +86,51 @@ namespace fibra {
         return p.value === 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type'
       })[0].values[0].value
       this.chosenType = this.types.filter((t:TreeNode) => { return t.id === nodeType})[0]
+      if (this.chosenType) this.typeQuery = this.chosenType.label
+    }
+
+    private typeCreate(label) {
+      if (label && !this.types.filter((t:TreeNode) => { return t.label === label})[0]) {
+        // We have a string and no matching type is in scope.
+        this.fibraService.dispatchAction(this.fibraService.createType(label)).then((state) => {
+          // Type should now show up in the list. Assign the type that was picked
+          let typePicked: TreeNode = state.construct.userTypes.filter((t) => t.label === label)[0]
+          if (typePicked) return this.typeChange(typePicked)
+          else return this.$q.resolve(state)
+        })
+      }
+    }
+
+    private typeEvaluate(label) {
+      console.log(label, this.getTypes())
+      if(label && !this.getTypes().filter((t: TreeNode) => { return t.label === label})[0]) {
+        this.showTypeCreate = true
+      } else {
+        // Does match an existing type, or is empty
+        this.showTypeCreate = false
+      }
     }
 
     private typeChange(type: TreeNode) {
+
       this.chosenType = type
       let oldTypes: PropertyToValues<INode> = this.node.localProperties.filter((p) => { return p.value === RDF.type.value })[0]
       let typeProp: PropertyToValues<INode> = new PropertyToValues(RDF.type)
       let typeNode: INamedNode = new NamedNode(type.id)
       typeProp.values.push(typeNode)
+      this.showTypeCreate = false
 
-      this.fibraService.dispatchAction(this.fibraService.itemProperty(this.node, [typeProp], [oldTypes]))
-
-      // Update the type displayed in the construct interface if appropriate (duplicative)
-      let chosenTypes: TreeNode[] = this.fibraService.getState().construct.displayTypes
-      if (!chosenTypes[0] && type) {
-        this.fibraService.dispatchAction(this.fibraService.setOrderedTypes([type]))
-      } else if (!chosenTypes[1] && type && (chosenTypes[0] !== type)) {
-        let newTypes: TreeNode[] = chosenTypes.concat([])
-        newTypes.push(type)
-        this.fibraService.dispatchAction(this.fibraService.setOrderedTypes(newTypes))
-      }
+      return this.fibraService.dispatchAction(this.fibraService.itemProperty(this.node, [typeProp], [oldTypes])).then((state) => {
+        // Update the type displayed in the construct interface if appropriate (duplicative)
+        let chosenTypes: TreeNode[] = this.fibraService.getState().construct.displayTypes
+        if (!chosenTypes[0] && type) {
+          return this.fibraService.dispatchAction(this.fibraService.setOrderedTypes([type]))
+        } else if (!chosenTypes[1] && type && (chosenTypes[0] !== type)) {
+          let newTypes: TreeNode[] = chosenTypes.concat([])
+          newTypes.push(type)
+          return this.fibraService.dispatchAction(this.fibraService.setOrderedTypes(newTypes))
+        }
+      })
     }
 
     private labelChange() {

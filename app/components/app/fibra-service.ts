@@ -4,7 +4,8 @@ namespace fibra {
   type RemovalFunction = () => void
   export type State = {
     construct: {
-      types: any[],
+      types: TreeNode[],
+      userTypes: TreeNode[],
       displayTypes: TreeNode[],
       items: any[],
       itemIndex: {},
@@ -20,6 +21,7 @@ namespace fibra {
   }
 
   const PLACEHOLDER: string = 'PLACEHOLDER'
+  const CREATE_TYPE: string = 'CREATE_TYPE'
   const CREATE_ITEMS: string = 'CREATE_ITEMS'
   const DELETE_ITEMS: string = 'DELETE_ITEMS'
   const VERIFY_ITEM: string = 'VERIFY_ITEM'
@@ -33,6 +35,7 @@ namespace fibra {
   const INITIAL_STATE: State = {
     construct: {
       types: [],
+      userTypes: [],
       displayTypes: [],
       items: [],
       itemIndex: {},
@@ -178,6 +181,13 @@ namespace fibra {
       }
     }
 
+    public createType(label: string): Action {
+      return {
+        type: CREATE_TYPE,
+        payload: label
+      }
+    }
+
     // Reducers
     private itemReducer(state: State = INITIAL_STATE, action: Action = DEFAULT_ACTION): angular.IPromise<State> {
       switch(action.type) {
@@ -285,6 +295,13 @@ namespace fibra {
 
       case ADD_TYPE:
         state.construct.types.push(action.payload)
+        // Check if this matches any user-defined types and remove them if so
+        let dupType = state.construct.userTypes.filter((tn) => {
+          return tn.id === action.payload.id
+        })[0]
+        if(dupType) {
+          state.construct.userTypes.splice(state.construct.userTypes.indexOf(dupType), 1)
+        }
         return this.q.resolve(state)
 
       case CLEAR_TYPES:
@@ -294,6 +311,16 @@ namespace fibra {
       case SET_ORDERED_TYPES:
         state.construct.displayTypes = action.payload
         return this.q.resolve(state)
+
+      case CREATE_TYPE:
+        let prefLabel: PropertyToValues<INode> = new PropertyToValues(SKOS.prefLabel)
+        prefLabel.values.push(DataFactory.instance.literal(action.payload))
+        return this.sparqlItemService.createNewItem([], [prefLabel]).then((node) => {
+          console.log(node)
+          let tn: TreeNode = new TreeNode(node.value, action.payload)
+          this.state.construct.userTypes.push(tn)
+          return this.state
+        })
 
       default:
         return this.q.resolve(state)
