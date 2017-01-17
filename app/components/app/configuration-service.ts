@@ -307,6 +307,29 @@ namespace fibra {
       c.primaryEndpoint.autocompletionTextMatchQueryTemplate = SparqlAutocompleteService.naiveMatchQueryTemplate
       c.primaryEndpoint.localItemQueryTemplate = SparqlItemService.naiveGetLocalItemPropertiesQuery
       this.presets.push(c)
+      c = new Configuration('local', 'SPARQL endpoint on localhost (with all authorities & archives)')
+      c.primaryEndpoint = new PrimaryEndpointConfiguration('local', 'Local', new Citation('Local'), new NamedNode('http://localhost:3030/fibra/sparql'), new NamedNode('http://localhost:3030/fibra/update'))
+      c.primaryEndpoint.treeQueryTemplate = c.primaryEndpoint.treeQueryTemplate.replace(/# STARTGRAPH/g, 'GRAPH <GRAPH> {').replace(/# ENDGRAPH/g, '}')
+      c.primaryEndpoint.autocompletionTextMatchQueryTemplate = SparqlAutocompleteService.naiveMatchQueryTemplate
+      c.primaryEndpoint.localItemQueryTemplate = SparqlItemService.naiveGetLocalItemPropertiesQuery
+      c.authorityEndpoints = [
+        ulanConfiguration,
+        lcnamesConfiguration,
+        viafConfiguration,
+        tgnConfiguration,
+        geonamesConfiguration,
+        pleiadesConfiguration
+      ]
+      c.authorityEndpoints.forEach((e, i) => e.class =  'source' + i)
+      c.archiveEndpoints = [
+        sdfbConfiguration,
+        emloConfiguration,
+        procopeConfiguration,
+        fbteeConfiguration,
+        schoenbergConfiguration
+      ]
+      c.archiveEndpoints.forEach((e, i) => e.class =  'source' + (c.authorityEndpoints.length + i))
+      this.presets.push(c)
       this.configuration = $localStorage['configuration']
       if (this.configuration) {
         workerService.restorePrototypes(this.configuration)
