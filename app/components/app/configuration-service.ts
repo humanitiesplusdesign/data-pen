@@ -303,12 +303,76 @@ namespace fibra {
       this.presets.push(c)
       c = new Configuration('local', 'SPARQL endpoint on localhost')
       c.primaryEndpoint = new PrimaryEndpointConfiguration('local', 'Local', new Citation('Local'), new NamedNode('http://localhost:3030/fibra/sparql'), new NamedNode('http://localhost:3030/fibra/update'))
+      c.primaryEndpoint.treeQueryTemplate = `
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX sf: <http://ldf.fi/functions#>
+SELECT ?subClass ?superClass ?class ?classLabel ?instances {
+    # STARTGRAPH
+    {
+      ?groupId rdfs:subClassOf ?class .
+      FILTER EXISTS {
+        ?id a ?groupId .
+        # CONSTRAINTS
+      }
+      BIND(?groupId AS ?subClass)
+    } UNION {
+      {
+        SELECT ?groupId	(COUNT(*) AS ?instances) {
+          ?id a ?groupId .
+        }
+        GROUP BY ?groupId
+      }
+      # CONSTRAINTS
+      BIND (?groupId AS ?class)
+    }
+    OPTIONAL {
+      ?class skos:prefLabel|rdfs:label|skos:altLabel ?classLabelP .
+      FILTER(LANG(?classLabelP)='' || LANG(?classLabelP)='<PREFLANG>')
+    }
+    FILTER(ISIRI(?class))
+    BIND(COALESCE(?classLabelP,REPLACE(REPLACE(REPLACE(REPLACE(STR(?class),".*/",""),".*#",""),"_"," "),"([A-ZÅÄÖ])"," $1")) AS ?classLabel)
+  # ENDGRAPH
+}
+`
       c.primaryEndpoint.treeQueryTemplate = c.primaryEndpoint.treeQueryTemplate.replace(/# STARTGRAPH/g, 'GRAPH <GRAPH> {').replace(/# ENDGRAPH/g, '}')
       c.primaryEndpoint.autocompletionTextMatchQueryTemplate = SparqlAutocompleteService.naiveMatchQueryTemplate
       c.primaryEndpoint.localItemQueryTemplate = SparqlItemService.naiveGetLocalItemPropertiesQuery
       this.presets.push(c)
       c = new Configuration('local', 'SPARQL endpoint on localhost (with all authorities & archives)')
       c.primaryEndpoint = new PrimaryEndpointConfiguration('local', 'Local', new Citation('Local'), new NamedNode('http://localhost:3030/fibra/sparql'), new NamedNode('http://localhost:3030/fibra/update'))
+      c.primaryEndpoint.treeQueryTemplate = `
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX sf: <http://ldf.fi/functions#>
+SELECT ?subClass ?superClass ?class ?classLabel ?instances {
+    # STARTGRAPH
+    {
+      ?groupId rdfs:subClassOf ?class .
+      FILTER EXISTS {
+        ?id a ?groupId .
+        # CONSTRAINTS
+      }
+      BIND(?groupId AS ?subClass)
+    } UNION {
+      {
+        SELECT ?groupId	(COUNT(*) AS ?instances) {
+          ?id a ?groupId .
+        }
+        GROUP BY ?groupId
+      }
+      # CONSTRAINTS
+      BIND (?groupId AS ?class)
+    }
+    OPTIONAL {
+      ?class skos:prefLabel|rdfs:label|skos:altLabel ?classLabelP .
+      FILTER(LANG(?classLabelP)='' || LANG(?classLabelP)='<PREFLANG>')
+    }
+    FILTER(ISIRI(?class))
+    BIND(COALESCE(?classLabelP,REPLACE(REPLACE(REPLACE(REPLACE(STR(?class),".*/",""),".*#",""),"_"," "),"([A-ZÅÄÖ])"," $1")) AS ?classLabel)
+  # ENDGRAPH
+}
+`
       c.primaryEndpoint.treeQueryTemplate = c.primaryEndpoint.treeQueryTemplate.replace(/# STARTGRAPH/g, 'GRAPH <GRAPH> {').replace(/# ENDGRAPH/g, '}')
       c.primaryEndpoint.autocompletionTextMatchQueryTemplate = SparqlAutocompleteService.naiveMatchQueryTemplate
       c.primaryEndpoint.localItemQueryTemplate = SparqlItemService.naiveGetLocalItemPropertiesQuery

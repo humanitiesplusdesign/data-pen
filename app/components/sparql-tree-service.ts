@@ -9,7 +9,7 @@ namespace fibra {
 PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX sf: <http://ldf.fi/functions#>
-SELECT ?subClass ?superClass ?class ?classLabel ?prefLabel ?instances {
+SELECT ?subClass ?superClass ?class ?classLabel ?instances {
   # STARTGRAPH
     {
       ?groupId rdfs:subClassOf ?class .
@@ -20,15 +20,13 @@ SELECT ?subClass ?superClass ?class ?classLabel ?prefLabel ?instances {
       BIND(?groupId AS ?subClass)
     } UNION {
       {
-        SELECT ?groupId (COUNT(*) AS ?instances) ?label {
+        SELECT ?groupId (COUNT(*) AS ?instances) {
           ?id a ?groupId .
-          ?groupId skos:prefLabel ?label .
         }
-        GROUP BY ?groupId ?label
+        GROUP BY ?groupId
       }
       # CONSTRAINTS
       BIND (?groupId AS ?class)
-      BIND (?label AS ?prefLabel)
     }
     OPTIONAL {
       ?class sf:preferredLanguageLiteral (skos:prefLabel rdfs:label skos:altLabel 'en' '' ?classLabelP) .
@@ -55,8 +53,6 @@ SELECT ?subClass ?superClass ?class ?classLabel ?prefLabel ?instances {
           response.data!.results.bindings.forEach(binding => {
             if (binding['classLabel'])
               classes[binding['class'].value] = new TreeNode(binding['class'].value, binding['classLabel'].value)
-            if (binding['prefLabel']) // Override if there is a prefLabel maintained
-              classes[binding['class'].value] = new TreeNode(binding['class'].value, binding['prefLabel'].value)
             if (binding['instances'])
               classes[binding['class'].value].instances = parseInt(binding['instances'].value, 10)
             if (binding['subClass']) {
