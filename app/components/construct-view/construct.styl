@@ -162,7 +162,15 @@ construct-view {
     }
   }
 
+  #verifycontainer.ng-hide {
+    transition: 0.15s linear all;
+    opacity: 0;
+    display: initial
+  }
+
   #verifycontainer {
+    transition: 0.15s linear all;
+    opacity: 1;
     width: 35%
     height: 100%
     background-color: darken(gray, 30%)
@@ -170,6 +178,10 @@ construct-view {
     position: fixed
     top: 0px
     right: 0px
+
+    .verify-cancel {
+      margin-left: 0.5em
+    }
 
     .verify-header {
       background-color: #cf5d5d
@@ -195,6 +207,15 @@ construct-view {
       font-size: 1.5em
       font-weight: bold
       margin-bottom: 0.5em
+    }
+
+    .verify-result {
+      list-style-type: none
+      padding: 0.25em
+
+      button {
+        margin-right: 0.5em 
+      }
     }
   }
 }
