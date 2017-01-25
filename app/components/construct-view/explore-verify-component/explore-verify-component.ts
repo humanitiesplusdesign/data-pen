@@ -50,6 +50,7 @@ namespace fibra {
     private updateResults(results: AutocompletionResults) {
       let typeLabels: string[] = this.relevantTypes.map((t) => { return t.label.value })
       this.matchingResults = results.remoteResults.filter((r) => typeLabels.indexOf(r.label) !== -1)
+      console.log(this.matchingResults)
     }
 
     private verify(result: Result) {
