@@ -66,7 +66,6 @@ namespace fibra {
     }
 
     public build(items: PaletteItem[]) {
-      console.log(items)
       let circles = this.svgSel
         .selectAll('circle.item')
           .data(items)

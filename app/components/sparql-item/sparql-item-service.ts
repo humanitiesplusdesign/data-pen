@@ -231,11 +231,9 @@ WHERE {
 
     public getItems(ids: INode[], queryRemote: boolean = false, canceller?: angular.IPromise<any>, unrestricted: boolean = false): angular.IPromise<Item[]> {
       let queryTemplate: string = this.configurationWorkerService.configuration.primaryEndpoint.localItemQueryTemplate
-      console.log(queryTemplate)
       if (unrestricted) queryTemplate = queryTemplate.replace(/VALUES \?id { <IDS> }/g, '')
       queryTemplate = queryTemplate.replace(/<IDS>/g, ids.map(id => id.toCanonical()).join(''))
       queryTemplate = queryTemplate.replace(/<PREFLANG>/g, this.configurationWorkerService.configuration.preferredLanguage)
-      console.log(queryTemplate)
       let items: EMap<Item> = new EMap<Item>((id) => new Item(DataFactory.instance.namedNode(id)))
       let ret: angular.IDeferred<Item[]> = this.$q.defer()
       this.sparqlService.query(this.configurationWorkerService.configuration.primaryEndpoint.endpoint.value, queryTemplate, {timeout: canceller}).then(
