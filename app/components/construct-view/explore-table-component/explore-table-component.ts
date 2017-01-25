@@ -104,6 +104,22 @@ namespace fibra {
     private verify(node: Item) {
       this.fibraService.dispatchAction(this.fibraService.verifyItem(node))
     }
+
+    // start of csv download capability
+    private downloadcsv() {
+      let table = this.primary.items;
+      let csv= "data:text/csv;charset=utf-8,";
+
+      for (let i = 0; i < table.length; i++) {
+          for (let j = 0; j < table[i].localProperties.length; j++) {
+            csv += table[i].localProperties[j].values[0].value + ",";
+          }
+          csv += "\n";
+      }
+
+      let encUri = encodeURI(csv);
+      window.open(encUri);
+    }
   }
 
   export class ExploreTableComponent implements angular.IComponentOptions {

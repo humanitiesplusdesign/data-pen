@@ -1,6 +1,7 @@
 uib-tabset
   uib-tab(ng-repeat="t in $ctrl.tableTypes" index="$index" heading="{{$ctrl.fibraService.getState().construct.displayTypes[$index] ? $ctrl.fibraService.getState().construct.displayTypes[$index].label : t }}")
     div.widthcontainer
+      a(ng-click="$ctrl.downloadcsv()") Download
       table.exploretable.table.table-striped(style="table-layout: fixed")
         tr
           th Label

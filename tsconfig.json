@@ -37,6 +37,7 @@
         "app/components/construct-view/explore-component.ts",
         "app/components/construct-view/explore-table-component/explore-table-component.ts",
         "app/components/construct-view/explore-type-component/explore-type-component.ts",
+        "app/components/construct-view/explore-verify-component/explore-verify-component.ts",
         "app/components/construct-view/property-popover.ts",
         "app/components/construct-view/sunburst.ts",
         "app/components/projects-view/projects-view-component.ts",
