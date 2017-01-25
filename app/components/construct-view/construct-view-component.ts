@@ -13,6 +13,7 @@ namespace fibra {
     public types: TreeNode[] = []
     private limitFilter: string = ''
     public state: fibra.State
+    public paletteDisplay: boolean = false
 
     public createItem(item: Result) {
       // Is there a type on this item? If so, and it is not already in chosenTypes,

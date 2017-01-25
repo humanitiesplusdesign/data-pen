@@ -168,6 +168,43 @@ construct-view {
     }
   }
 
+  #palette-container.ng-hide {
+    transition: 0.15s linear all;
+    width: 0%;
+    display: initial
+  }
+
+  #palette-container {
+    transition: 0.15s linear all;
+    opacity: 1;
+    width: 15%
+    height: 100%
+    background-color: darken(gray, 30%)
+    position: fixed
+    top: 0px
+    left: 0px
+    z-index: 3
+  }
+
+  #palette-tab {
+    transition: 0.15s linear all;
+    position: fixed
+    top: 40%
+    left: 15%
+    z-index: 3
+    height: 10%
+    width: 20px
+    border-top-right-radius: 5px
+    border-bottom-right-radius: 5px
+    background-color: darken(gray, 30%)
+  }
+
+  #palette-tab.closed {
+    transition: 0.15s linear all;
+    display: initial
+    left: 0px
+  }
+
   #verifycontainer.ng-hide {
     transition: 0.15s linear all;
     opacity: 0;
