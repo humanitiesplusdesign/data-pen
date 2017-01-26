@@ -1,15 +1,17 @@
 namespace fibra {
   'use strict'
 
-  interface PaletteItem extends Item {
+  interface IPaletteItem extends Item {
     typeValue: string
+    typeLabel: string
   }
 
   export class PaletteComponentController {
 
     private svgSel: d3.Selection<SVGSVGElement, {}, null, undefined>
-    private items: PaletteItem[]
-    private itemPromise: angular.IPromise<PaletteItem[]>
+    private tooltip: d3.Selection<HTMLDivElement, {}, HTMLBodyElement, undefined>
+    private items: IPaletteItem[]
+    private itemPromise: angular.IPromise<IPaletteItem[]>
     private paletteWidth: number
     private paletteHeight: number
     private typeColorScale: d3.ScaleOrdinal<string, string> = d3.scaleOrdinal(d3.schemeCategory20c)
@@ -24,8 +26,8 @@ namespace fibra {
       this.query()
     }
 
-    public query(): angular.IPromise<PaletteItem[]> {
-      return this.itemPromise = this.sparqlItemService.getAllItems().then((items: PaletteItem[]) => {
+    public query(): angular.IPromise<IPaletteItem[]> {
+      return this.itemPromise = this.sparqlItemService.getAllItems().then((items: IPaletteItem[]) => {
         return this.items = this.mergeItems(this.items, items)
       })
     }
@@ -36,6 +38,15 @@ namespace fibra {
       this.svgSel
         .style('height', '100%')
         .style('width', '100%')
+
+      this.tooltip = d3.select('body').append<HTMLDivElement>('div')
+        .style('position', 'absolute')
+        .style('z-index', '20')
+        .style('background-color', 'gray')
+        .style('color', 'white')
+        .style('padding', '3px')
+        .style('border-radius', '2px')
+        .style('visibility', 'hidden')
 
       let onChangeFunction = () => {
         return this.query().then(this.build.bind(this)).then(() => { return 'Done' })
@@ -48,7 +59,7 @@ namespace fibra {
       })
     }
 
-    public addItem(item: PaletteItem) {
+    public addItem(item: IPaletteItem) {
       let itemTypeKey: string = item.typeValue
       let itemType: TreeNode = this.fibraService.getState().construct.types.filter((t) => { return t.id === itemTypeKey })[0]
       let chosenTypes: TreeNode[] = this.fibraService.getState().construct.displayTypes
@@ -65,11 +76,11 @@ namespace fibra {
       })
     }
 
-    public build(items: PaletteItem[]) {
+    public build(items: IPaletteItem[]) {
       this.updateSizing()
       let circles = this.svgSel
         .selectAll('circle.item')
-          .data(items, (d: PaletteItem) => d.value )
+          .data(items, (d: IPaletteItem) => d.value )
 
       let padding = items.length > 300 ? items.length > 2000 ? 1 : 2 : 4
       let rawRadius = (Math.sqrt(this.paletteWidth * this.paletteHeight / items.length) - padding) / 2
@@ -85,8 +96,17 @@ namespace fibra {
           .classed('item', true)
           .attr('r', radius)
           .on('click', this.addItem.bind(this))
+          .on('mouseover', (d: IPaletteItem, i: number) => {
+            this.tooltip.style('top', (d3.event.pageY - 10) + 'px')
+              .style('left', (d3.event.pageX + 10) + 'px')
+              .style('visibility', 'visible')
+              .text(d.label.value + ' (' + d.typeLabel + ')')
+          })
+          .on('mouseout', (d: IExploreItem, i: number) => {
+            this.tooltip.style('visibility', 'hidden')
+          })
         .merge(circles).transition()
-          .attr('fill', (d: PaletteItem) => this.typeColorScale(d.typeValue))
+          .attr('fill', (d: IPaletteItem) => this.typeColorScale(d.typeValue))
           .attr('transform', (d, i) => { return 'translate(' + ((i % xDots) + 1) * xOffset + ',' + (Math.floor(i / xDots) + 1) * yOffset + ')'})
     }
 
@@ -95,16 +115,18 @@ namespace fibra {
       this.paletteHeight = Math.round(window.innerHeight)
     }
 
-    private mergeItems(oldItems, newItems: PaletteItem[]) {
+    private mergeItems(oldItems, newItems: IPaletteItem[]) {
       newItems.forEach((item) => {
         let typeProp = item.localProperties.filter((p) => p.value === RDF.type.value)[0]
         if(typeProp && typeProp.values[0]) {
           item.typeValue = typeProp.values[0].value
+          item.typeLabel = typeProp.values[0].label.value
         } else {
           item.typeValue = ''
+          item.typeLabel = 'No type defined'
         }
       })
-      newItems.sort((a: PaletteItem, b: PaletteItem) => a.typeValue === b.typeValue ? 0 : a.typeValue > b.typeValue ? 1 : -1)
+      newItems.sort((a: IPaletteItem, b: IPaletteItem) => a.typeValue === b.typeValue ? 0 : a.typeValue > b.typeValue ? 1 : -1)
       return newItems
     }
   }
