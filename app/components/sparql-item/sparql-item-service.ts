@@ -190,7 +190,7 @@ WHERE {
     }
 
     public getAllItems(queryRemote: boolean = false, canceller?: angular.IPromise<any>): angular.IPromise<Item[]> {
-      return this.workerService.call('sparqlItemWorkerService', 'getItems', [[], queryRemote], canceller)
+      return this.workerService.call('sparqlItemWorkerService', 'getItems', [false, queryRemote], canceller)
     }
 
     public createNewItem(equivalentNodes: INode[] = [], properties: IPropertyToValues<INode>[] = []): angular.IPromise<INode> {
@@ -229,10 +229,11 @@ WHERE {
 
     constructor(private sparqlService: s.SparqlService, private $q: angular.IQService, private sparqlUpdateWorkerService: SparqlUpdateWorkerService, private configurationWorkerService: ConfigurationWorkerService) {}
 
-    public getItems(ids: INode[], queryRemote: boolean = false, canceller?: angular.IPromise<any>): angular.IPromise<Item[]> {
+    public getItems(ids: INode[] | boolean, queryRemote: boolean = false, canceller?: angular.IPromise<any>): angular.IPromise<Item[]> {
       let queryTemplate: string = this.configurationWorkerService.configuration.primaryEndpoint.localItemQueryTemplate
-      if (ids.length === 0) queryTemplate = queryTemplate.replace(/VALUES \?id { <IDS> }/g, '')
-      queryTemplate = queryTemplate.replace(/<IDS>/g, ids.map(id => id.toCanonical()).join(''))
+      if (!ids) queryTemplate = queryTemplate.replace(/VALUES \?id { <IDS> }/g, '')
+      let nodeIds: INode[] = ids ? <INode[]> ids : []
+      queryTemplate = queryTemplate.replace(/<IDS>/g, nodeIds.map(id => id.toCanonical()).join(''))
       queryTemplate = queryTemplate.replace(/<PREFLANG>/g, this.configurationWorkerService.configuration.preferredLanguage)
       let items: EMap<Item> = new EMap<Item>((id) => new Item(DataFactory.instance.namedNode(id)))
       let ret: angular.IDeferred<Item[]> = this.$q.defer()
