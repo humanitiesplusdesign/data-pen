@@ -2,7 +2,7 @@ namespace fibra {
   'use strict'
 
   interface PaletteItem extends Item {
-
+    typeValue: string
   }
 
   export class PaletteComponentController {
@@ -12,6 +12,7 @@ namespace fibra {
     private itemPromise: angular.IPromise<PaletteItem[]>
     private paletteWidth: number
     private paletteHeight: number
+    private typeColorScale: d3.ScaleOrdinal<string, string> = d3.scaleOrdinal(d3.schemeCategory20c)
 
     public constructor( private fibraService: FibraService,
                         private configurationService: ConfigurationService,
@@ -24,7 +25,7 @@ namespace fibra {
     }
 
     public query(): angular.IPromise<PaletteItem[]> {
-      return this.itemPromise = this.sparqlItemService.getAllItems().then((items) => {
+      return this.itemPromise = this.sparqlItemService.getAllItems().then((items: PaletteItem[]) => {
         return this.items = this.mergeItems(this.items, items)
       })
     }
@@ -48,7 +49,7 @@ namespace fibra {
     }
 
     public addItem(item: PaletteItem) {
-      let itemTypeKey: string = item.localProperties.filter((p) => p.value === RDF.type.value)[0].values[0].value
+      let itemTypeKey: string = item.typeValue
       let itemType: TreeNode = this.fibraService.getState().construct.types.filter((t) => { return t.id === itemTypeKey })[0]
       let chosenTypes: TreeNode[] = this.fibraService.getState().construct.displayTypes
       if (!chosenTypes[0] && itemType) {
@@ -68,13 +69,13 @@ namespace fibra {
       this.updateSizing()
       let circles = this.svgSel
         .selectAll('circle.item')
-          .data(items)
+          .data(items, (d: PaletteItem) => d.value )
 
       let padding = items.length > 300 ? items.length > 2000 ? 1 : 2 : 4
       let rawRadius = (Math.sqrt(this.paletteWidth * this.paletteHeight / items.length) - padding) / 2
       let radius = rawRadius > 8 ? 8 : rawRadius
-      let xOffset = radius * 2 + padding
-      let yOffset = radius * 2 + padding
+      let xOffset = radius * 2 + padding / 2
+      let yOffset = radius * 2 + padding / 2
       let xDots = Math.floor((this.paletteWidth) / xOffset) - 1
 
       circles.exit().remove()
@@ -84,7 +85,8 @@ namespace fibra {
           .classed('item', true)
           .attr('r', radius)
           .on('click', this.addItem.bind(this))
-        .merge(circles)
+        .merge(circles).transition()
+          .attr('fill', (d: PaletteItem) => this.typeColorScale(d.typeValue))
           .attr('transform', (d, i) => { return 'translate(' + ((i % xDots) + 1) * xOffset + ',' + (Math.floor(i / xDots) + 1) * yOffset + ')'})
     }
 
@@ -93,7 +95,16 @@ namespace fibra {
       this.paletteHeight = Math.round(window.innerHeight)
     }
 
-    private mergeItems(oldItems, newItems) {
+    private mergeItems(oldItems, newItems: PaletteItem[]) {
+      newItems.forEach((item) => {
+        let typeProp = item.localProperties.filter((p) => p.value === RDF.type.value)[0]
+        if(typeProp && typeProp.values[0]) {
+          item.typeValue = typeProp.values[0].value
+        } else {
+          item.typeValue = ''
+        }
+      })
+      newItems.sort((a: PaletteItem, b: PaletteItem) => a.typeValue === b.typeValue ? 0 : a.typeValue > b.typeValue ? 1 : -1)
       return newItems
     }
   }
