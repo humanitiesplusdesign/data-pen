@@ -42,7 +42,6 @@ namespace fibra {
 
       this.fibraService.on('change', onChangeFunction)
 
-      this.updateSizing()
       this.itemPromise.then((items) => {
         this.build.bind(this)(items)
       })
@@ -66,12 +65,16 @@ namespace fibra {
     }
 
     public build(items: PaletteItem[]) {
+      this.updateSizing()
       let circles = this.svgSel
         .selectAll('circle.item')
           .data(items)
 
-      let xOffset = 14
-      let yOffset = 14
+      let padding = items.length > 300 ? items.length > 2000 ? 1 : 2 : 4
+      let rawRadius = (Math.sqrt(this.paletteWidth * this.paletteHeight / items.length) - padding) / 2
+      let radius = rawRadius > 8 ? 8 : rawRadius
+      let xOffset = radius * 2 + padding
+      let yOffset = radius * 2 + padding
       let xDots = Math.floor((this.paletteWidth) / xOffset) - 1
 
       circles.exit().remove()
@@ -79,15 +82,15 @@ namespace fibra {
       circles.enter()
         .append('circle')
           .classed('item', true)
-          .attr('r', 5)
+          .attr('r', radius)
           .on('click', this.addItem.bind(this))
         .merge(circles)
           .attr('transform', (d, i) => { return 'translate(' + ((i % xDots) + 1) * xOffset + ',' + (Math.floor(i / xDots) + 1) * yOffset + ')'})
     }
 
     private updateSizing(): void {
-      this.paletteWidth = this.svgSel.node().clientWidth
-      this.paletteHeight = this.svgSel.node().clientHeight
+      this.paletteWidth = Math.round(window.innerWidth * 0.15) // this.svgSel.node().clientWidth
+      this.paletteHeight = Math.round(window.innerHeight)
     }
 
     private mergeItems(oldItems, newItems) {
