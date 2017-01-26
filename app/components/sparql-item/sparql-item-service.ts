@@ -100,10 +100,10 @@ PREFIX sf: <http://ldf.fi/functions#>
 SELECT ?id ?itemLabel ?property ?propertyLabel ?object ?objectLabel {
   GRAPH <GRAPH> {
     VALUES ?id { <IDS> }
-    ?id sf:preferredLanguageLiteral (skos:prefLabel mads:authoritativeLabel rdfs:label skos:altLabel mads:variantLabel '<PREFLANG>' '' ?itemLabel) .
     { ?id ?property ?object . }
     UNION
     { ?object ?property ?id . }
+    ?id sf:preferredLanguageLiteral (skos:prefLabel mads:authoritativeLabel rdfs:label skos:altLabel mads:variantLabel '<PREFLANG>' '' ?itemLabel) .
     OPTIONAL {
       ?property sf:preferredLanguageLiteral (skos:prefLabel mads:authoritativeLabel rdfs:label skos:altLabel mads:variantLabel '<PREFLANG>' '' ?propertyLabelP)
     }
@@ -190,7 +190,7 @@ WHERE {
     }
 
     public getAllItems(queryRemote: boolean = false, canceller?: angular.IPromise<any>): angular.IPromise<Item[]> {
-      return this.workerService.call('sparqlItemWorkerService', 'getItems', [[], queryRemote, canceller, true])
+      return this.workerService.call('sparqlItemWorkerService', 'getItems', [[], queryRemote], canceller)
     }
 
     public createNewItem(equivalentNodes: INode[] = [], properties: IPropertyToValues<INode>[] = []): angular.IPromise<INode> {
@@ -229,9 +229,9 @@ WHERE {
 
     constructor(private sparqlService: s.SparqlService, private $q: angular.IQService, private sparqlUpdateWorkerService: SparqlUpdateWorkerService, private configurationWorkerService: ConfigurationWorkerService) {}
 
-    public getItems(ids: INode[], queryRemote: boolean = false, canceller?: angular.IPromise<any>, unrestricted: boolean = false): angular.IPromise<Item[]> {
+    public getItems(ids: INode[], queryRemote: boolean = false, canceller?: angular.IPromise<any>): angular.IPromise<Item[]> {
       let queryTemplate: string = this.configurationWorkerService.configuration.primaryEndpoint.localItemQueryTemplate
-      if (unrestricted) queryTemplate = queryTemplate.replace(/VALUES \?id { <IDS> }/g, '')
+      if (ids.length === 0) queryTemplate = queryTemplate.replace(/VALUES \?id { <IDS> }/g, '')
       queryTemplate = queryTemplate.replace(/<IDS>/g, ids.map(id => id.toCanonical()).join(''))
       queryTemplate = queryTemplate.replace(/<PREFLANG>/g, this.configurationWorkerService.configuration.preferredLanguage)
       let items: EMap<Item> = new EMap<Item>((id) => new Item(DataFactory.instance.namedNode(id)))
