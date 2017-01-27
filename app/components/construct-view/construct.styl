@@ -9,6 +9,9 @@ construct-view {
     position: fixed
     z-index: 1
     width: 100%
+    background-color: initial
+    height: 22px
+    min-height: initial
   }
 
   .tooltip {
@@ -70,6 +73,22 @@ construct-view {
   .node-circle:hover {
     fill: red
     cursor: pointer
+  }
+
+  #type-bar {
+    padding-left: 0px;
+  }
+
+  #type-bar li {
+    display: inline-block
+  }
+
+  #menu-icons {
+    margin-left: 1em
+
+    .btn-group {
+      margin-left: 0.5em
+    }
   }
 
   #searchbar {
