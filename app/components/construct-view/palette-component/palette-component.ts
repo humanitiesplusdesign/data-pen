@@ -105,9 +105,11 @@ namespace fibra {
           .on('mouseout', (d: IExploreItem, i: number) => {
             this.tooltip.style('visibility', 'hidden')
           })
-        .merge(circles).transition()
-          .attr('fill', (d: IPaletteItem) => this.typeColorScale(d.typeValue))
-          .attr('transform', (d, i) => { return 'translate(' + ((i % xDots) + 1) * xOffset + ',' + (Math.floor(i / xDots) + 1) * yOffset + ')'})
+        .merge(circles)
+            .classed('displayed', (d: IPaletteItem) => this.fibraService.getState().construct.itemIndex[d.value] ? true : false)
+          .transition()
+            .attr('fill', (d: IPaletteItem) => this.typeColorScale(d.typeValue))
+            .attr('transform', (d, i) => { return 'translate(' + ((i % xDots) + 1) * xOffset + ',' + (Math.floor(i / xDots) + 1) * yOffset + ')'})
     }
 
     private updateSizing(): void {
