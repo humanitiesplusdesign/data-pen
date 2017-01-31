@@ -13,7 +13,7 @@ nav#menu-bar.navbar.navbar-default.navbar-static-top
     span.btn-group
       button.btn.btn-xs.disabled
         span.glyphicon.glyphicon-upload(aria-hidden="true")
-      button.btn.btn-xs.disabled
+      button.btn.btn-xs(ng-click="$ctrl.downloadRDF()")
         span.glyphicon.glyphicon-download(aria-hidden="true")
   .pull-right
     span.glyphicon.glyphicon-refresh.fa-spin(ng-show="$ctrl.state.actionsRunning > 0")

@@ -32,6 +32,29 @@ namespace fibra {
       return this.fibraService.dispatchAction(this.fibraService.displayItem(item.ids[0]))
     }
 
+    public downloadRDF() {
+      let currentConfig = this.configurationService.configuration.graph.value
+      let downloadlink = "http://ldf.fi/fibra/sparql?graph=" + currentConfig // + "&force-accept=application/rdf+xml"
+      let request = new XMLHttpRequest()
+      request.open("GET", downloadlink, true)
+      request.onload = function (e) {
+          if (request.readyState === 4) {
+            if (request.status === 200) {
+              let data = request.responseText
+              let download = document.createElement("a")
+              download.href = "data:application/rdf+xml;charset=utf-8," + data
+              download.download = "fibra.rdf"
+              document.body.appendChild(download)
+              download.click()
+              document.body.removeChild(download)
+            } else {
+              console.error(request.statusText);
+            }
+          }
+        }
+        request.send(null);
+    }
+
     constructor(private configurationService: ConfigurationService,
                 private sparqlTreeService: SparqlTreeService,
                 private sparqlItemService: SparqlItemService,
