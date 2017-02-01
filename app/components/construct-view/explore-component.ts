@@ -24,6 +24,10 @@ namespace fibra {
   }
 
   class ExploreComponentController {
+    // bindings
+    public linkMode: boolean
+
+
     public itemService: SparqlItemService
     public properties: {}[]
     private svgSel: d3.Selection<SVGSVGElement, {}, null, undefined>
@@ -53,7 +57,11 @@ namespace fibra {
 
     private verifyItem: Item = null
 
-    private drawmode: boolean = false
+    public $onChanges(chngsObj: any): void {
+      if(this.svgSel) {
+        this.updateExplore(false, false)
+      }
+    }
 
     public $postLink(): void {
       this.svgSel = d3.select(this.$element[0]).select<SVGSVGElement>('svg')
@@ -133,6 +141,7 @@ namespace fibra {
               this.properties.push({key: p.toCanonical(), value: p.label.value })
           }
           this.links = this.mergeLinks(this.links)
+          console.log(this.links)
 
           return 'ok';
         }).then(() => this.updateExplore())
@@ -212,7 +221,7 @@ namespace fibra {
           .attr('r', this.radius + 'px')
           .call(d3.drag()
               .on('start', (d: IExploreItem, i: number) => {
-                if (!this.drawmode) {
+                if (!this.linkMode) {
                   d.fx = d.x
                   d.fy = d.y
                 } else {
@@ -221,7 +230,7 @@ namespace fibra {
                 }
                })
               .on('drag', (d: IExploreItem, i: number, group) => {
-                if (!this.drawmode) {
+                if (!this.linkMode) {
                   d3.select(group[i]).classed('fixed', true)
                   d.x = d3.event.x
                   d.y = d3.event.y
@@ -238,7 +247,7 @@ namespace fibra {
                 this.updateExplore(false, false)
                })
               .on('end',  (d: IExploreItem, i: number, group) => {
-                if (!this.drawmode) {
+                if (!this.linkMode) {
                   if (!d3.select(group[i]).classed('fixed')) {
                     d.fx = undefined
                     d.fy = undefined
@@ -247,17 +256,28 @@ namespace fibra {
                   let lineX: number = +this.dragline.attr('x2')
                   let lineY: number = +this.dragline.attr('y2')
 
+                  let nodeDrop: boolean = false
+
                   d3.selectAll('.node')
                     .each((f: IExploreItem, j) => {
                       if (Math.abs(lineX - f.x) < this.radius && Math.abs(lineY - f.y) < this.radius) {
-                        this.links.push({'source': d, 'target': f, 'property': undefined})
-                        this.updateExplore(false)
+                        nodeDrop = true
+                        let linkedProp: PropertyToValues<INode> = new PropertyToValues(FibraInternal.linked)
+                        linkedProp.values.push(DataFactory.instance.nodeFromNode(d))
+                        this.fibraService.dispatchAction(this.fibraService.itemProperty(f, [linkedProp], []))
+                          .then((state) => {
+                            this.dragline.remove()
+                            this.queryAndBuild()
+                            return state
+                          })
                       }
                     })
-                  this.dragline.remove()
-                }
 
-               }))
+                  if (!nodeDrop) {
+                    this.dragline.remove()
+                  }
+                }
+              }))
           .on('mouseover', (d: IExploreItem, i: number) => {
             this.highlightLinks(d, i)
             this.tooltip.style('top', (d3.event.pageY - 10) + 'px')
@@ -286,16 +306,7 @@ namespace fibra {
             } else {
               this.svgSel.select('.sunburst-overlay').style('display', 'none')
             }
-            // this.tooltip.style('visibility', 'hidden')
             this.highlightLinks(d, i)
-            // this.$scope.$apply(() => this.selectItem(d))
-            // this.item_info_tip.style('top', (d3.event.pageY - 10) + 'px')
-            // .style('left', (d3.event.pageX + 17) + 'px')
-            // .style('visibility', 'visible')
-            // let cscope: angular.IScope = this.$scope.$new(true)
-            // cscope['node'] = d
-            // this.item_info_tip.selectAll('*').remove()
-            // this.item_info_tip.node().appendChild(this.$compile('<sparql-item item-id="node"></sparql-item>')(cscope)[0])
           })
     }
 
@@ -366,6 +377,7 @@ namespace fibra {
       this.svgSel.selectAll('.node-circle')
               .classed('selected-circle', (d: IExploreItem) => { return d.selected })
               .attr('r', (d: IExploreItem) => { return this.radius + (d.selected ? 3 : 0) + 'px' })
+              .style('cursor', this.linkMode ? 'crosshair' : 'initial')
       this.svgSel.selectAll('.node-circle')
         .classed('labeled', (d: IExploreItem) => { return d.label.value ? true : false; })
         // We should only count 'sameAs' relations as verified if they are against the configuration,
@@ -510,30 +522,6 @@ namespace fibra {
 
       this.$scope.$watch('layout.choice', this.updateExplore.bind(this, false))
       this.$scope.$watch('layout.links', this.updateExplore.bind(this, false))
-
-      // add shift to enable draw mode - this can easily be changed to require shift to be held
-      // this.$window.addEventListener('keydown', (event) => {
-      //     if (document.activeElement instanceof HTMLBodyElement) {
-      //       if (event.keyCode === 16 ) {
-      //         this.drawmode = this.drawmode ? false : true
-      //         this.svgSel.style('background-color', this.drawmode ? '#d9d9d9' : '#F2F2F2')
-      //         if (this.drawmode) {
-      //         this.svgSel.append('text')
-      //             .attr('id', 'drawmodetext')
-      //             .html('Draw Mode engaged; to link two nodes, drag from one to the other')
-      //             .style('stroke', 'red')
-      //             .attr('y', 100)
-      //         } else {
-      //           d3.select('#drawmodetext').remove()
-      //           d3.selectAll('.dragLine').remove()
-      //         }
-      //       } else if (event.keyCode === 49) {
-      //         console.log(this.links)
-      //       } else if (event.keyCode === 50) {
-      //         // console.log(this.items)
-      //       }
-      //     }
-      // })
     }
 
     private mergeNodes(oldNodes: Item[], nodes: Item[]): IExploreItem[] {
@@ -601,7 +589,7 @@ namespace fibra {
 
   export class ExploreComponent implements angular.IComponentOptions {
     public bindings: {[id: string]: string} = {
-      selectedItem: '=',
+      linkMode: '<',
     }
     public controller: string = 'ExploreComponentController' // (new (...args: any[]) => angular.IController) = ExploreComponentController
     public templateUrl: string = 'components/construct-view/explore.html'

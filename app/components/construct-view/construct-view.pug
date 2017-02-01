@@ -3,7 +3,7 @@ nav#menu-bar.navbar.navbar-default.navbar-static-top
     explore-type
   #menu-icons.pull-left
     span.btn-group
-      button.btn.btn-xs.disabled
+      button.btn.btn-xs(ng-init="linkMode = false", ng-click="linkMode = !linkMode")
         span.glyphicon.glyphicon-link(aria-hidden="true")
     span.btn-group
       button.btn.btn-xs.disabled
@@ -21,7 +21,7 @@ nav#menu-bar.navbar.navbar-default.navbar-static-top
   .row.main.no-gutter
     .col-md-12
       #middle-column.col-md-12
-        explore(selected-item="$ctrl.selectedItem")
+        explore(link-mode="linkMode")
         //- sparql-autocomplete(limit="5",constraints="$ctrl.limitFilter",query-remote,on-select="$ctrl.createItem(result)")#searchbar
 #palette-container(ng-show="$ctrl.paletteDisplay")
   palette
