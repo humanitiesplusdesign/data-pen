@@ -168,18 +168,12 @@ namespace fibra {
       // fix how links sit on top of nodes
       let viewport_width: number = window.innerWidth
       let viewport_height: number = window.innerHeight
-      let searchbarwidth: number = +d3.select('#searchbar').style('width').replace('px', '')
       this.exploreWidth = viewport_width
       this.exploreHeight = viewport_height - 36
 
       d3.select(this.$element[0]).select('#explorecontainer')
         .style('width', this.exploreWidth + 'px')
         .style('height', this.exploreHeight + 'px')
-
-      d3.select(this.$element[0].parentElement).select('#searchbar')
-        .style('top', viewport_height * 6 / 7 + 'px')
-        .style('left', viewport_width / 2 - searchbarwidth / 2 + 'px')
-        .style('display', 'block')
 
       // move table down so top is at bottom of viewport
       d3.select(this.$element[0]).select('#exploretable')

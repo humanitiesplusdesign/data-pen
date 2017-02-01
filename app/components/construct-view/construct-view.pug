@@ -22,7 +22,7 @@ nav#menu-bar.navbar.navbar-default.navbar-static-top
     .col-md-12
       #middle-column.col-md-12
         explore(selected-item="$ctrl.selectedItem")
-        sparql-autocomplete(limit="5",constraints="$ctrl.limitFilter",query-remote,on-select="$ctrl.createItem(result)")#searchbar
+        //- sparql-autocomplete(limit="5",constraints="$ctrl.limitFilter",query-remote,on-select="$ctrl.createItem(result)")#searchbar
 #palette-container(ng-show="$ctrl.paletteDisplay")
   palette
 #palette-tab(ng-class="{closed: !$ctrl.paletteDisplay }" ng-click="$ctrl.paletteDisplay = !$ctrl.paletteDisplay")
