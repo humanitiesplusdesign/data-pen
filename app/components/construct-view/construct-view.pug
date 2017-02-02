@@ -3,7 +3,7 @@ nav#menu-bar.navbar.navbar-default.navbar-static-top
     explore-type
   #menu-icons.pull-left
     span.btn-group
-      button.btn.btn-xs(ng-init="linkMode = false", ng-click="linkMode = !linkMode")
+      button.btn.btn-xs(ng-init="linkMode = false", ng-click="linkMode = !linkMode" ng-class="{'btn-primary': linkMode}")
         span.glyphicon.glyphicon-link(aria-hidden="true")
     span.btn-group
       button.btn.btn-xs.disabled
