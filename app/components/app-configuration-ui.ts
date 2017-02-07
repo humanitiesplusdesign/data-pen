@@ -55,8 +55,7 @@ namespace fibra {
     })
     $stateProvider.state('login', {
       url: '/login',
-      template: '<button ng-click="login()">Login with Github</button>',
-      controller: LoginController,
+      template: '<login></login>',
       params: {
         redirect_hash: {
           type: 'string',
@@ -66,13 +65,8 @@ namespace fibra {
     })
     $stateProvider.state('callback', {
       url: '/callback',
-      controller: CallbackController,
+      template: '<callback></callback>',
       params: {
-        state: {
-          type: 'string',
-          array: false,
-          value: ''
-        },
         code: {
           type: 'string',
           array: false,
