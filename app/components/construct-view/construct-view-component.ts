@@ -43,7 +43,7 @@ namespace fibra {
               let data = request.responseText
               let download = document.createElement("a")
               download.href = "data:application/rdf+xml;charset=utf-8," + data
-              download.download = "fibra.rdf"
+              download.download = "fibra.ttl"
               document.body.appendChild(download)
               download.click()
               document.body.removeChild(download)
