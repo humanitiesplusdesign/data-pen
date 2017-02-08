@@ -32,7 +32,7 @@ namespace fibra {
 
       // If no requestTime, redirect to localhost
       if(!$localStorage.requestTime) {
-        $window.location.href = 'http://localhost:3000/#/' + $window.location.href.split('?')[1]
+        $window.location.href = 'http://localhost:3000/#/?' + $window.location.href.split('?')[1]
       } else {
         $.getJSON('https://fibra-auth-gateway.herokuapp.com/authenticate/' + search['code'], (result) => {
           $scope.$apply((s) => {
@@ -42,12 +42,12 @@ namespace fibra {
                 let userObj = user.filter((ue) => { return ue.primary && ue.verified })[0]
                 if(userObj && userObj.email) {
                   $localStorage.login_provider = 'Github'
-                  $sessionStorage.user_email = userObj.email
-                  $sessionStorage.access_token = result.token
+                  $localStorage.user_email = userObj.email
+                  $localStorage.access_token = result.token
                   $localStorage.requestTime = null
 
-                    // Funny redirect to get rid of stray search parameters
-                  $window.location.href = $window.location.href.split('?')[0] +
+                  // Funny redirect to get rid of stray search parameters
+                  $window.location.href = $window.location.origin + $window.location.pathname +
                     '#/' + search['state']
                 } else {
                   alert('Authentication failed')

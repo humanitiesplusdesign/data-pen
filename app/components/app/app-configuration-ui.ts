@@ -17,7 +17,7 @@ namespace fibra {
             $uiRouterProvider: any) => {
     $urlServiceProvider.rules.otherwise((match, url, router) => {
       // Manually parse the search because it is not visible to Angular.
-      let search: {} = {}
+      let search: {} = url.search
       window.location.search.replace('?', '').split('&').forEach((pair: string) => {
         let pa = pair.split('=')
         search[pa[0]] = pa[1]
@@ -148,6 +148,6 @@ namespace fibra {
 
     // Register the "requires auth" hook with the TransitionsService
     // Turn this off for the moment - go to #/login to login.
-    // $transitions.onBefore(requiresAuthCriteria, redirectToLogin, {priority: 10});
+    $transitions.onBefore(requiresAuthCriteria, redirectToLogin, {priority: 10});
   })
 }

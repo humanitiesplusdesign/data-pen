@@ -6,7 +6,6 @@ namespace fibra {
   }
 
   export class ConstructViewComponentController {
-
     public classTree: TreeNode[]
     public classTreePromise: angular.IPromise<TreeNode[]>
     public selectedItem: INode
@@ -14,6 +13,14 @@ namespace fibra {
     private limitFilter: string = ''
     public state: fibra.State
     public paletteDisplay: boolean = false
+
+    public loginState(): string {
+      if(this.$localStorage.user_email) {
+        return this.$localStorage.user_email + ' (via ' + this.$localStorage.login_provider + ')'
+      } else {
+        return 'Not logged in'
+      }
+    }
 
     public createItem(item: Result) {
       // Is there a type on this item? If so, and it is not already in chosenTypes,
@@ -58,6 +65,9 @@ namespace fibra {
     constructor(private configurationService: ConfigurationService,
                 private sparqlTreeService: SparqlTreeService,
                 private sparqlItemService: SparqlItemService,
+                private socialAuthService: SocialAuthService,
+                private $localStorage: any,
+                private $sessionStorage: any,
                 private fibraService: FibraService,
                 private $scope: angular.IScope,
                 private $q: angular.IQService) {
