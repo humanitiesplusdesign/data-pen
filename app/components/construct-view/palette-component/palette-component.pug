@@ -1,1 +1,3 @@
-svg.palette
+.inner-palette-container
+  svg.palette
+  input.palette-filter(type="text" placeholder="filter by label" ng-model="$ctrl.labelFilter" ng-change="$ctrl.update()")

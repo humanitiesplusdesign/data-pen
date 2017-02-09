@@ -9,12 +9,15 @@ namespace fibra {
   export class PaletteComponentController {
 
     private svgSel: d3.Selection<SVGSVGElement, {}, null, undefined>
+    private circles: d3.Selection<d3.BaseType, IPaletteItem, SVGSVGElement, {}>
     private tooltip: d3.Selection<HTMLDivElement, {}, HTMLBodyElement, undefined>
     private items: IPaletteItem[]
     private itemPromise: angular.IPromise<IPaletteItem[]>
     private paletteWidth: number
     private paletteHeight: number
+    private paletteSearchHeight: number = 40
     private typeColorScale: d3.ScaleOrdinal<string, string> = d3.scaleOrdinal(d3.schemeCategory20c)
+    private labelFilter: string = ''
 
     public constructor( private fibraService: FibraService,
                         private configurationService: ConfigurationService,
@@ -77,9 +80,8 @@ namespace fibra {
     }
 
     public build(items: IPaletteItem[]) {
-      console.log(items)
       this.updateSizing()
-      let circles = this.svgSel
+      this.circles = this.svgSel
         .selectAll('circle.item')
           .data(items, (d: IPaletteItem) => d.value )
 
@@ -90,9 +92,9 @@ namespace fibra {
       let yOffset = radius * 2 + padding / 2
       let xDots = Math.floor((this.paletteWidth) / xOffset) - 1
 
-      circles.exit().remove()
+      this.circles.exit().remove()
 
-      circles.enter()
+      this.circles = this.circles.enter()
         .append('circle')
           .classed('item', true)
           .attr('r', radius)
@@ -106,16 +108,26 @@ namespace fibra {
           .on('mouseout', (d: IExploreItem, i: number) => {
             this.tooltip.style('visibility', 'hidden')
           })
-        .merge(circles)
-            .classed('displayed', (d: IPaletteItem) => this.fibraService.getState().construct.itemIndex[d.value] ? true : false)
-          .transition()
-            .attr('fill', (d: IPaletteItem) => this.typeColorScale(d.typeValue))
-            .attr('transform', (d, i) => { return 'translate(' + ((i % xDots) + 1) * xOffset + ',' + (Math.floor(i / xDots) + 1) * yOffset + ')'})
+        .merge(this.circles)
+          .call(this.update.bind(this))
+
+      this.circles
+        .transition()
+          .attr('fill', (d: IPaletteItem) => this.typeColorScale(d.typeValue))
+          .attr('transform', (d, i) => { return 'translate(' + ((i % xDots) + 1) * xOffset + ',' + (Math.floor(i / xDots) + 1) * yOffset + ')'})
+    }
+
+    public update(circles: d3.Selection<d3.BaseType, IPaletteItem, SVGSVGElement, {}>) {
+      let c: d3.Selection<d3.BaseType, IPaletteItem, SVGSVGElement, {}> = circles ? circles : this.circles
+
+      c .classed('displayed', (d: IPaletteItem) => this.fibraService.getState().construct.itemIndex[d.value] ? true : false)
+        .classed('filtered', (d: IPaletteItem) => this.labelFilter && !(d.label.value.indexOf(this.labelFilter) !== -1))
     }
 
     private updateSizing(): void {
       this.paletteWidth = Math.round(window.innerWidth * 0.15) // this.svgSel.node().clientWidth
-      this.paletteHeight = Math.round(window.innerHeight)
+      this.paletteHeight = Math.round(window.innerHeight) - this.paletteSearchHeight
+      this.svgSel.style('height', this.paletteHeight + 'px')
     }
 
     private mergeItems(oldItems, newItems: IPaletteItem[]) {

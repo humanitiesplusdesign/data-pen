@@ -192,6 +192,19 @@ construct-view {
     }
   }
 
+  .inner-palette-container {
+    height: 100%
+    text-align: center
+
+    .palette-filter {
+      padding: 3px
+      font-size: 12px
+      border: 0px
+      border-radius: 0px
+      font-weight: normal
+    }
+  }
+
   #palette-container.ng-hide {
     transition: 0.15s linear all;
     width: 0%;
@@ -232,6 +245,9 @@ construct-view {
   .palette {
     circle.item.displayed {
       opacity: 0.3
+    }
+    circle.item.filtered {
+      opacity: 0.1
     }
   }
 
