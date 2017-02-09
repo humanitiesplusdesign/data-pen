@@ -121,7 +121,7 @@ namespace fibra {
       let c: d3.Selection<d3.BaseType, IPaletteItem, SVGSVGElement, {}> = circles ? circles : this.circles
 
       c .classed('displayed', (d: IPaletteItem) => this.fibraService.getState().construct.itemIndex[d.value] ? true : false)
-        .classed('filtered', (d: IPaletteItem) => this.labelFilter && !(d.label.value.indexOf(this.labelFilter) !== -1))
+        .classed('filtered', (d: IPaletteItem) => this.labelFilter && !(d.label.value.toUpperCase().indexOf(this.labelFilter.toUpperCase()) !== -1))
     }
 
     private updateSizing(): void {
