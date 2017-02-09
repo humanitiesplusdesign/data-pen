@@ -77,6 +77,7 @@ namespace fibra {
     }
 
     public build(items: IPaletteItem[]) {
+      console.log(items)
       this.updateSizing()
       let circles = this.svgSel
         .selectAll('circle.item')
@@ -129,7 +130,7 @@ namespace fibra {
         }
       })
       newItems.sort((a: IPaletteItem, b: IPaletteItem) => a.typeValue === b.typeValue ? 0 : a.typeValue > b.typeValue ? 1 : -1)
-      return newItems
+      return newItems.filter((item: IPaletteItem) => item.typeValue !== '')
     }
   }
 
