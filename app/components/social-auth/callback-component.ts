@@ -3,7 +3,7 @@ namespace fibra {
 
   export class CallbackComponent implements angular.IComponentOptions {
       public controller: string = 'CallbackController' // (new (...args: any[]) => angular.IController) = SelectViewComponentController
-      public template: string = ''
+      public template: string = '<div>Please wait...</div>'
   }
 
   export class CallbackController implements angular.IComponentController {
