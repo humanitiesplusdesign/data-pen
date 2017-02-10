@@ -7,9 +7,10 @@ namespace fibra {
     private queryRunning: boolean
     private error: boolean
     private limitFilter: string = ''
+    private queryString: string = ''
     private canceller: angular.IDeferred<any>
     private matchingResults: ResultGroup[]
-    private relevantTypes: INodePlusLabel[]
+    private relevantTypes: INodePlusLabel[] = []
 
     public constructor( private fibraService: FibraService,
                         private $q: angular.IQService,
@@ -19,38 +20,44 @@ namespace fibra {
     }
 
     public $onChanges(chngsObj: any): void {
+      if(this.node) {
+        this.queryString = this.node.label.value
+        if (this.node) {
+          this.runQuery()
+        }
+      }
+    }
+
+    private runQuery(): void {
+      this.canceller.resolve()
+      this.updateResults(new AutocompletionResults())
       this.queryRunning = true
       this.error = false
       this.limitFilter = ''
-      this.canceller.resolve()
       this.canceller = this.$q.defer()
-      if (this.node) {
-        this.limitFilter = ''
-        let nodeTypes: PropertyToValues<INodePlusLabel> = this.node.localProperties.filter((p) => p.value === 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type')[0]
-        this.relevantTypes = nodeTypes ? nodeTypes.values : []
-        this.relevantTypes.forEach((t) => { if (t) this.limitFilter += '<' + t.value + '>' + ',' })
-        if (this.limitFilter.length !== 0) this.limitFilter = 'FILTER (?groupId IN (' + this.limitFilter.substring(0, this.limitFilter.length - 1) + '))'
-        this.sparqlAutocompleteService.autocomplete(this.node.label.value, 6, true, this.limitFilter, this.canceller.promise).then(
-          (results: AutocompletionResults) => {
-            this.queryRunning = false
-            this.updateResults(results)
-          },
-          () => {
-            this.queryRunning = false
-            this.error = true
-          },
-          (update: {error?: any, results?: AutocompletionResults}) => {
-            if (update.error) this.error = true
-            else this.updateResults(update.results)
-          }
-        )
-      }
+      let nodeTypes: PropertyToValues<INodePlusLabel> = this.node.localProperties.filter((p) => p.value === 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type')[0]
+      this.relevantTypes = nodeTypes ? nodeTypes.values : []
+      this.relevantTypes.forEach((t) => { if (t) this.limitFilter += '<' + t.value + '>' + ',' })
+      if (this.limitFilter.length !== 0) this.limitFilter = 'FILTER (?groupId IN (' + this.limitFilter.substring(0, this.limitFilter.length - 1) + '))'
+      this.sparqlAutocompleteService.autocomplete(this.queryString, 6, true, this.limitFilter, this.canceller.promise).then(
+        (results: AutocompletionResults) => {
+          this.queryRunning = false
+          this.updateResults(results)
+        },
+        () => {
+          this.queryRunning = false
+          this.error = true
+        },
+        (update: {error?: any, results?: AutocompletionResults}) => {
+          if (update.error) this.error = true
+          else this.updateResults(update.results)
+        }
+      )
     }
 
     private updateResults(results: AutocompletionResults) {
       let typeLabels: string[] = this.relevantTypes.map((t) => { return t.label.value })
       this.matchingResults = results.remoteResults.filter((r) => typeLabels.indexOf(r.label) !== -1)
-      console.log(this.matchingResults)
     }
 
     private verify(result: Result) {

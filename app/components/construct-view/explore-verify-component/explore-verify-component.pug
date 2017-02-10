@@ -1,6 +1,10 @@
 .verify-container
   .verify-header Verify
     .verify-cancel.pull-left(ng-click="$ctrl.clear()") X
+    span.glyphicon.glyphicon-refresh.fa-spin.form-control-feedback(ng-show="$ctrl.queryRunning")
+  .verify-input
+    input(type="text" placeholder="search term" ng-model="$ctrl.queryString")
+    button.btn.btn-sm.btn-primary(ng-click="$ctrl.runQuery()") Search
   .verify-content
     ul.verify-result-group(ng-repeat="grp in $ctrl.matchingResults")
       .verify-result-group-header {{grp.label}}
