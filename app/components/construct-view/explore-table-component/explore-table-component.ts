@@ -54,6 +54,10 @@ namespace fibra {
       this.originalPropertiesMap[item.value] = origProps
     }
 
+    private itemVerified(item: Item): boolean {
+      return !!(item.localProperties.filter((p) =>  p.value === OWL.sameAs.value)[0])
+    }
+
     private saveItem(item: Item): void {
       // Currently this just replaces all properties on the item. We should really only update
       // properties that have changed.
