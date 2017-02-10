@@ -141,7 +141,8 @@ namespace fibra {
           item.typeLabel = 'No type defined'
         }
       })
-      newItems.sort((a: IPaletteItem, b: IPaletteItem) => a.typeValue === b.typeValue ? 0 : a.typeValue > b.typeValue ? 1 : -1)
+      // Sort by type and then by label
+      newItems.sort((a: IPaletteItem, b: IPaletteItem) => a.typeValue === b.typeValue ? (a.label.value === b.label.value ? 0 : a.label.value > b.label.value ? 1 : -1) : a.typeValue > b.typeValue ? 1 : -1)
       return newItems.filter((item: IPaletteItem) => item.typeValue !== '')
     }
   }
