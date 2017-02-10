@@ -20,7 +20,7 @@ namespace fibra {
     }
 
     public $onChanges(chngsObj: any): void {
-      if(this.node) {
+      if (this.node) {
         this.queryString = this.node.label.value
         if (this.node) {
           this.runQuery()
@@ -58,6 +58,11 @@ namespace fibra {
     private updateResults(results: AutocompletionResults) {
       let typeLabels: string[] = this.relevantTypes.map((t) => { return t.label.value })
       this.matchingResults = results.remoteResults.filter((r) => typeLabels.indexOf(r.label) !== -1)
+      console.log(this.matchingResults)
+    }
+
+    private sourcesFromResult(result: Result): string {
+      return ' (Sources: ' + result.datasources.map((ds) => ds.name).join(', ') + ')'
     }
 
     private verify(result: Result) {

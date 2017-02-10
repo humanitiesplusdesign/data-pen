@@ -11,3 +11,4 @@
       .verify-result(ng-repeat="rslt in grp.results" ng-click="$ctrl.verify(rslt)")
         button.btn.btn-sm(ng-click="$ctrl.verify(rslt)") Verify
         span {{ rslt.prefLabel.value }}
+        span {{ $ctrl.sourcesFromResult(rslt) }}
