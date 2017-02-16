@@ -24,7 +24,6 @@
         "app/bower_components/**/typings"
     ],
     "files": [
-        "app/components/app-configuration-ui.ts",
         "app/components/app/app-configuration-common.ts",
         "app/components/app/app-configuration-ui.ts",
         "app/components/app/app-configuration-worker.ts",
@@ -255,6 +254,7 @@
         "node_modules/@types/lodash/max/index.d.ts",
         "node_modules/@types/lodash/maxBy/index.d.ts",
         "node_modules/@types/lodash/mean/index.d.ts",
+        "node_modules/@types/lodash/meanBy/index.d.ts",
         "node_modules/@types/lodash/memoize/index.d.ts",
         "node_modules/@types/lodash/merge/index.d.ts",
         "node_modules/@types/lodash/mergeWith/index.d.ts",

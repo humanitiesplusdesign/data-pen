@@ -83,7 +83,7 @@ namespace fibra {
     appName: 'fibra',
     workerThreads: 8,
     importScripts: [
-      'bower_components/angular/angular.min.js',
+      'bower_components/angular/angular.js',
       'bower_components/angular-http-auth/src/http-auth-interceptor.js',
       'bower_components/angular-sparql-service/dist/sparql-service.js',
       'components/app/app-configuration-worker.js',

@@ -18,7 +18,7 @@ gulp.task('dist:wire:bundle-workerscripts', function() {
   return gulp.src("worker.conf")
     .pipe($.plumber({ errorHandler: $.notify.onError("<%= error.stack %>") }))
     .pipe($.transform(function(contents) {
-      return contents.toString('utf8').replace(/\n/g,'"></script>\n<script src="').replace(/^/,'<!-- build:js({.tmp,app}) scripts/worker.js-->\n<script src="').replace(/<script src="$/,'<!-- endbuild-->\n')
+      return contents.toString('utf8').replace(/\n/g,'"></script>\n<script src="').replace(/^/,'<!-- build:js({.tmp,app}) scripts/worker.js-->\n<script src="').replace(/<script src="$/,'<!-- endbuild-->\n');
      }))
     .pipe($.useref())
     .pipe($.filter('scripts/worker.js'))

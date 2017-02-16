@@ -15,10 +15,11 @@ namespace fibra {
         readyState: 'complete',
         cookie: '',
         querySelector: function () {},
+        addEventListener: function() {},
         createElement: function() {
           return {
             pathname: '',
-            setAttribute: function() {}
+            setAttribute: function(key, value) {}
           };
         },
       };
