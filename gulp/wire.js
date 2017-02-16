@@ -26,7 +26,7 @@ gulp.task('wire:styles', function() {
           addRootSlash: false,
           ignorePath: 'app/',
           transform: function(filepath) {
-            return '@import \'../'+filepath.replace(/\.styl$/g,'\.css')+'\''
+            return '@import \'../'+filepath.replace(/\.styl$/g,'\.css')+'\'';
           }
         }))
     .pipe(gulp.dest("app/styles"));
@@ -40,10 +40,10 @@ gulp.task('wire:workerscripts-to-scripts', function() {
           addRootSlash: false,
           ignorePath: 'app/',
           transform: function(filepath, file) {
-            return file.contents.toString('utf8').replace(/^/,'\'').replace(/[\n\r]+/g,'\',\n      \'').replace(/,[\n\r]+      '$/,'')
+            return file.contents.toString('utf8').replace(/^/,'\'').replace(/[\n\r]+/g,'\',\n      \'').replace(/,[\n\r]+      '$/,'');
           }
         }))
-    .pipe(gulp.dest("app/components"));
+    .pipe(gulp.dest("app/components/app"));
 });
 
 gulp.task('wire:scripts-to-templates', function() {
@@ -57,10 +57,10 @@ gulp.task('wire:scripts-to-templates', function() {
           addRootSlash: false,
           ignorePath: 'app/',
           transform: function(filepath) {
-            return 'script(src="'+filepath.replace(/\.ts$/g,'\.js')+'")'
+            return 'script(src="'+filepath.replace(/\.ts$/g,'\.js')+'")';
           }
         }))
     .pipe(gulp.dest("app"));
 });
 
-gulp.task('wire', ['wire:styles', 'wire:workerscripts-to-scripts', 'wire:scripts-to-templates'])
+gulp.task('wire', ['wire:styles', 'wire:workerscripts-to-scripts', 'wire:scripts-to-templates']);
