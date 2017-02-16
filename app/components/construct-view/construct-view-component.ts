@@ -14,14 +14,6 @@ namespace fibra {
     public state: fibra.State
     public paletteDisplay: boolean = false
 
-    public loginState(): string {
-      if(this.$localStorage.user_email) {
-        return this.$localStorage.user_email + ' (via ' + this.$localStorage.login_provider + ')'
-      } else {
-        return 'Not logged in'
-      }
-    }
-
     public createItem(item: Result) {
       // Is there a type on this item? If so, and it is not already in chosenTypes,
       // add it.

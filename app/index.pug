@@ -15,6 +15,9 @@ html(lang="en",ng-app="fibra",ng-hint)
 
     title Fibra
   body
+    .pull-right
+      span(ng-bind="socialAuthService.loginState()")
+      a(ng-if="socialAuthService.isLoggedIn()" ng-click="socialAuthService.logout()") &nbsp;Log out
     .modal(ng-class="authInfo.authOpen ? 'modal-open fade in' : ''",ng-style="authInfo.authOpen ? {display:'block'} : {}"): .modal-dialog(ng-show="authInfo.authOpen"): form.modal-content
       .modal-header: h4.modal-title Authentication required
       .modal-body
@@ -55,7 +58,6 @@ html(lang="en",ng-app="fibra",ng-hint)
     // build:js(.tmp) scripts/main.js
     script(src="components/app/app-configuration-ui.js")
     // inject:scripts
-    script(src="components/app-configuration-ui.js")
     script(src="components/collection-utils.js")
     script(src="components/sparql-tree-service.js")
     script(src="components/sparql-update-service.js")
@@ -82,8 +84,8 @@ html(lang="en",ng-app="fibra",ng-hint)
     script(src="components/tree/tree-component.js")
     script(src="components/type-select/type-select-component.js")
     script(src="components/worker-service/worker-service.js")
-    script(src="components/construct-view/explore-type-component/explore-type-component.js")
     script(src="components/construct-view/explore-table-component/explore-table-component.js")
+    script(src="components/construct-view/explore-type-component/explore-type-component.js")
     script(src="components/construct-view/explore-verify-component/explore-verify-component.js")
     script(src="components/construct-view/palette-component/palette-component.js")
     // endinject

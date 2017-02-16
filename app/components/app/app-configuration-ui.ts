@@ -9,6 +9,7 @@ namespace fibra {
       username: string | undefined
       password: string | undefined
     }
+    socialAuthService: SocialAuthService
   }
 
   let m: angular.IModule = angular.module('fibra', [ 'http-auth-interceptor', 'ngStorage', 'ui.router', 'ui.bootstrap', 'ui.bootstrap.tpls', 'ngAnimate' ])
@@ -85,17 +86,17 @@ namespace fibra {
       'bower_components/angular/angular.min.js',
       'bower_components/angular-http-auth/src/http-auth-interceptor.js',
       'bower_components/angular-sparql-service/dist/sparql-service.js',
-      'scripts/app-configuration-worker.js',
-      'scripts/app-configuration-common.js',
-      'scripts/worker-service.js',
-      'scripts/configuration-service.js',
-      'scripts/collection-utils.js',
-      'scripts/rdf.js',
-      'scripts/sparql-item-service.js',
-      'scripts/sparql-autocomplete-service.js',
-      'scripts/sparql-tree-service.js',
-      'scripts/sparql-update-service.js',
-      'scripts/tree-component.js'
+      'components/app/app-configuration-worker.js',
+      'components/app/app-configuration-common.js',
+      'components/worker-service/worker-service.js',
+      'components/app/configuration-service.js',
+      'components/collection-utils.js',
+      'components/rdf/rdf.js',
+      'components/sparql-item/sparql-item-service.js',
+      'components/sparql-autocomplete/sparql-autocomplete-service.js',
+      'components/sparql-tree-service.js',
+      'components/sparql-update-service.js',
+      'components/tree/tree-component.js'
       ]
   })
   m.run(( $rootScope: IAuthenticationRootScopeService,
@@ -130,7 +131,6 @@ namespace fibra {
     }
     $rootScope.$on('event:auth-loginRequired', () => $rootScope.authInfo.authOpen = true)
 
-
     // Social logon
     let requiresAuthCriteria = {
       to: (state) => state.data && state.data.requiresAuth
@@ -145,6 +145,8 @@ namespace fibra {
         return transition.router.stateService.target('login', { redirect_hash: window.location.hash })
       }
     };
+
+    $rootScope.socialAuthService = socialAuthService
 
     // Register the "requires auth" hook with the TransitionsService
     // Turn this off for the moment - go to #/login to login.
