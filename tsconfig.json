@@ -20,8 +20,8 @@
         "node_modules/@types/**/*.d.ts"
     ],
     "exclude": [
-        "app/bower_components/**/node_modules",
-        "app/bower_components/**/typings"
+        "app/bower_components/*/node_modules/**/*.ts",
+        "app/bower_components/*/typings/**/*.ts"
     ],
     "files": [
         "app/components/app/app-configuration-common.ts",
@@ -30,7 +30,6 @@
         "app/components/app/configuration-service.ts",
         "app/components/app/fibra-service.ts",
         "app/components/app/social-auth-service.ts",
-        "app/components/app/sparql-service.ts",
         "app/components/author-view/author-view-component.ts",
         "app/components/collection-utils.ts",
         "app/components/configure-view/configure-view-component.ts",
