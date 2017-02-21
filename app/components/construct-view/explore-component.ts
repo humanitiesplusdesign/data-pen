@@ -181,20 +181,13 @@ namespace fibra {
       this.exploreHeight = viewport_height - 36
 
       d3.select(this.$element[0]).select('#explorecontainer')
-        .style('width', this.exploreWidth + 'px')
         .style('height', this.exploreHeight + 'px')
 
       // move table down so top is at bottom of viewport
       d3.select(this.$element[0]).select('#exploretable')
-        .style('width', viewport_width + 'px')
         .style('height', viewport_height - 50 + 'px')
 
       this.svgSel.style('width', viewport_width + 'px')
-        .style('height', viewport_height - 36 + 'px')
-        // .style('top', 25 + 'px')
-
-      this.svgSel.select('rect.background')
-        .style('width', viewport_width + 'px')
         .style('height', viewport_height - 36 + 'px')
 
       let svg_width: number = +this.svgSel.style('width').replace('px', '')
