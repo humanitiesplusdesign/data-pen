@@ -5,7 +5,7 @@ uib-tabset
       table.exploretable.table.table-striped(style="table-layout: fixed")
         tr
           th Label
-          th(ng-repeat="p in $ctrl[t].properties") {{ p }}
+          th(ng-repeat="p in $ctrl[t].properties" ng-click="$ctrl.removeFromProperties(p)") {{ p }}
           th Actions
         tr(ng-repeat="item in $ctrl[t].items")
           td(ng-click="$ctrl.selectItem(item)") {{ item.label.value }}
@@ -24,3 +24,5 @@ uib-tabset
             a(ng-click="$ctrl.verify(item)" ng-if="!$ctrl.itemVerified(item)") &nbsp;Verify
             a(ng-click="$ctrl.delete(item)") &nbsp;Delete
             a(ng-click="$ctrl.saveItem($ctrl.editItem)" ng-if="item === $ctrl.editItem") &nbsp;Save
+      div Hidden Properties (click to show)
+        p(ng-repeat="x in $ctrl.removedProperties" ng-click="$ctrl.addFromRemovedProperties(x)") {{ x }}

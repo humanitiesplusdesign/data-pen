@@ -18,8 +18,11 @@ namespace fibra {
     }
     private secondary: TableInfo = {
       properties: [],
-      items: [] 
+      items: []
     }
+
+    private removedProperties: String[] = []
+
     private originalPropertiesMap: { [id: string] : PropertyToValues<INode>[] } = { }
     private editItem: Item
 
@@ -92,6 +95,11 @@ namespace fibra {
         for (let i = 0; i < this[key].items.length; i++) {
           for (let p = 0; p < this[key].items[i].localProperties.length; p++) {
             let duplicate = false
+
+            for (let j = 0; j < this.removedProperties.length; j++) { //if user has already hidden/removed this property, don't show it again
+              if (this.removedProperties[j] == this[key].items[i].localProperties[p].label.value) duplicate = true
+            }
+
             for (let j = 0; j < this[key].properties.length; j++) {
               if (this[key].properties[j] == this[key].items[i].localProperties[p].label.value) {
                 duplicate = true
@@ -103,6 +111,29 @@ namespace fibra {
           }
         }
       })
+    }
+
+    private removeFromProperties(property) {
+        ['primary', 'secondary'].forEach((key) => {
+            for (let i = 0; i < this[key].properties.length; i++) {
+              if (this[key].properties[i] == property) {
+                  this[key].properties.splice(i, 1)
+                }
+            }
+        })
+        this.addToRemovedProperties(property);
+    }
+
+    private addToRemovedProperties(property) {
+        this.removedProperties.push(property);
+    }
+
+    private addFromRemovedProperties(property) {
+      for (let i = 0; i < this.removedProperties.length; i++) { //remove from removedproperties
+        if (this.removedProperties[i] == property) this.removedProperties.splice(i, 1);
+      }
+
+      this.fibraService.dispatch('change')
     }
 
     private verify(node: Item) {
