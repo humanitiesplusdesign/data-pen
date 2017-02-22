@@ -165,12 +165,13 @@ namespace fibra {
   // DRAFT
   export class FibraInternal {
     public static ns: string = 'http://hdlab.stanford.edu/fibra/ontology#'
-    public static linked: INamedNode = new NamedNode(FibraInternal.ns + 'linked')
+    public static linked: INamedNode = new NamedNode(FibraInternal.ns + 'linked') // Deprecated
   }
 
   export class SKOS {
     public static ns: string = 'http://www.w3.org/2004/02/skos/core#'
     public static prefLabel: INamedNode = new NamedNode(SKOS.ns + 'prefLabel')
+    public static related: INamedNode = new NamedNode(SKOS.ns + 'related')
   }
 
   export class OWL {

@@ -255,7 +255,7 @@ namespace fibra {
                     .each((f: IExploreItem, j) => {
                       if (Math.abs(lineX - f.x) < this.radius && Math.abs(lineY - f.y) < this.radius) {
                         nodeDrop = true
-                        let linkedProp: PropertyToValues<INode> = new PropertyToValues(FibraInternal.linked)
+                        let linkedProp: PropertyToValues<INode> = new PropertyToValues(SKOS.related)
                         linkedProp.values.push(DataFactory.instance.nodeFromNode(d))
                         this.fibraService.dispatchAction(this.fibraService.itemProperty(f, [linkedProp], []))
                           .then((state) => {
