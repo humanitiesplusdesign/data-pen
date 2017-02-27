@@ -32,7 +32,7 @@ namespace fibra {
 
       // If no requestTime, redirect to localhost
       if(!$localStorage.requestTime) {
-        $window.location.href = 'http://localhost:3000/#/?' + $window.location.href.split('?')[1]
+        $window.location.href = 'http://localhost:3000/#!/?' + $window.location.href.split('?')[1]
       } else {
         $.getJSON('https://fibra-auth-gateway.herokuapp.com/authenticate/' + search['code'], (result) => {
           $scope.$apply((s) => {
@@ -48,7 +48,7 @@ namespace fibra {
 
                   // Funny redirect to get rid of stray search parameters
                   $window.location.href = $window.location.origin + $window.location.pathname +
-                    '#/' + search['state']
+                    '#!/' + search['state']
                 } else {
                   alert('Authentication failed')
                 }

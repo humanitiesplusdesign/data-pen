@@ -17,7 +17,6 @@ namespace fibra {
             $urlServiceProvider: any,
             $locationProvider: any,
             $uiRouterProvider: any) => {
-    $locationProvider.hashPrefix('')
     $urlServiceProvider.rules.otherwise((match, url, router) => {
       // Manually parse the search because it is not visible to Angular.
       let search: {} = url.search
