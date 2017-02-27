@@ -79,6 +79,15 @@ namespace fibra {
       })
     }
 
+    public createItem(label: string): void {
+      let node: INode = DataFactory.instance.namedNode(label)
+      this.fibraService.dispatchAction(this.fibraService.createItem(node)).then(() => {
+        this.query().then((items) => {
+          this.build.bind(this)(items)
+        })
+      })
+    }
+
     public build(items: IPaletteItem[]) {
       this.updateSizing()
       this.circles = this.svgSel

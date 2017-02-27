@@ -72,7 +72,7 @@ namespace fibra {
         .on('click', () => {
           this.lastClickX = d3.event.offsetX
           this.lastClickY = d3.event.offsetY
-          this.fibraService.dispatchAction(this.fibraService.createItem())
+          this.fibraService.dispatchAction(this.fibraService.createDisplayItem())
         })
 
       // Create link g
@@ -189,6 +189,10 @@ namespace fibra {
 
       this.svgSel.style('width', viewport_width + 'px')
         .style('height', viewport_height - 36 + 'px')
+
+      this.svgSel.select('rect.background')
+         .style('width', viewport_width + 'px')
+         .style('height', viewport_height - 36 + 'px')
 
       let svg_width: number = +this.svgSel.style('width').replace('px', '')
       let svg_height: number = +this.svgSel.style('height').replace('px', '')
