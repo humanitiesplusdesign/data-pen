@@ -3,11 +3,12 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, width=device-width">
-    <link rel="stylesheet" href="styles/vendor-fce9c4b9d9.css">
-    <link rel="stylesheet" href="styles/main-595488cc00.css">
+    <link rel="stylesheet" href="styles/vendor.css">
+    <link rel="stylesheet" href="styles/main.css">
     <title>Fibra</title>
   </head>
   <body>
+    <div class="pull-right"><span ng-bind="socialAuthService.loginState()"></span><a ng-if="socialAuthService.isLoggedIn()" ng-click="socialAuthService.logout()">&nbsp;Log out</a></div>
     <div class="modal" ng-class="authInfo.authOpen ? 'modal-open fade in' : ''" ng-style="authInfo.authOpen ? {display:'block'} : {}">
       <div class="modal-dialog" ng-show="authInfo.authOpen">
         <form class="modal-content">
@@ -32,8 +33,8 @@
       </div>
     </div>
     <div ui-view></div>
-    <script src="scripts/vendor-7160897b76.js"></script>
-    <script src="scripts/main-f34ed824d1.js"></script>
+    <script src="scripts/vendor-9dde59ed6f.js"></script>
+    <script src="scripts/main-b635ceca3d.js"></script>
     <div class="uib-modal-backdrop fade in" ng-show="authInfo.authOpen"></div>
   </body>
 </html>
