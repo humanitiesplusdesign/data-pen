@@ -67,7 +67,7 @@ gulp.task('dist:html', ['dist:wire:bundle-workerscripts','dist:partials'], funct
     .pipe($.size({ title: 'dist:html-css(1)' }))
     .pipe($.replace(/url\(".*?\/(\w+\.(eot|svg|ttf|woff|woff2).*?)"\)/g, 'url("$1")'))
     .pipe($.replace(/url\(".*?\/(\w+?\.(png|jpg|jpeg))"\)/g, 'url("$1")'))
-    .pipe($.cleanCss())
+    // .pipe($.cleanCss())
     .pipe($.print(function(path) { return "dist:html-css(2) " + path; }))
     .pipe($.size({ title: 'dist:html-css(2)' }))
     .pipe(cssFilter.restore)
