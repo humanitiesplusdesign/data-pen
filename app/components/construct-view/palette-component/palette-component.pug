@@ -1,5 +1,5 @@
 .inner-palette-container
-  svg.palette
+  div.palette
   input.palette-filter(type="text" placeholder="filter by label" ng-model="$ctrl.labelFilter" ng-change="$ctrl.update()")
   span(ng-click="$ctrl.createItem($ctrl.labelFilter)")
     span.glyphicon.glyphicon-plus.inverse-icon

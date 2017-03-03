@@ -6,18 +6,33 @@ namespace fibra {
     typeLabel: string
   }
 
+  type ItemLeaf = {
+    'label': string,
+    'items': IPaletteItem[]
+  }
+  type ItemBranch = {
+    'key': string,
+    'value': ItemLeaf
+  }
+  type ItemTree = d3.Map<ItemLeaf>
+
   export class PaletteComponentController {
 
-    private svgSel: d3.Selection<SVGSVGElement, {}, null, undefined>
+    private divSel: d3.Selection<HTMLDivElement, {}, null, undefined>
     private circles: d3.Selection<d3.BaseType, IPaletteItem, SVGSVGElement, {}>
+    private types: d3.Selection<d3.BaseType, ItemBranch, HTMLDivElement, {}>
     private tooltip: d3.Selection<HTMLDivElement, {}, HTMLBodyElement, undefined>
     private items: IPaletteItem[]
-    private itemPromise: angular.IPromise<IPaletteItem[]>
     private paletteWidth: number
     private paletteHeight: number
     private paletteSearchHeight: number = 40
     private typeColorScale: d3.ScaleOrdinal<string, string> = d3.scaleOrdinal(d3.schemeCategory20c)
     private labelFilter: string = ''
+    private typeItemTreePromise: angular.IPromise<ItemTree>
+    private typeItemTree: ItemTree = d3.map<{
+      'label': string,
+      'items': IPaletteItem[]
+    }>()
 
     public constructor( private fibraService: FibraService,
                         private configurationService: ConfigurationService,
@@ -26,19 +41,23 @@ namespace fibra {
                         private sparqlTreeService: SparqlTreeService,
                         private $q: angular.IQService) {
 
+      this.typeItemTree.set('', {
+        'label': 'No type defined',
+        'items': []
+      })
       this.query()
     }
 
-    public query(): angular.IPromise<IPaletteItem[]> {
-      return this.itemPromise = this.sparqlItemService.getAllItems().then((items: IPaletteItem[]) => {
-        return this.items = this.mergeItems(this.items, items)
+    public query(): angular.IPromise<ItemTree> {
+      return this.typeItemTreePromise = this.sparqlItemService.getAllItems().then((items: IPaletteItem[]) => {
+        return this.mergeItems(this.items, items)
       })
     }
 
     public $postLink(): void {
-      this.svgSel = d3.select(this.$element[0]).select<SVGSVGElement>('svg')
+      this.divSel = d3.select(this.$element[0]).select<HTMLDivElement>('div.palette')
 
-      this.svgSel
+      this.divSel
         .style('height', '100%')
         .style('width', '100%')
 
@@ -57,8 +76,8 @@ namespace fibra {
 
       this.fibraService.on('change', onChangeFunction)
 
-      this.itemPromise.then((items) => {
-        this.build.bind(this)(items)
+      this.typeItemTreePromise.then((itemTree) => {
+        this.build.bind(this)(itemTree)
       })
     }
 
@@ -88,18 +107,47 @@ namespace fibra {
       })
     }
 
-    public build(items: IPaletteItem[]) {
+    public build(itemTree: ItemTree) {
       this.updateSizing()
-      this.circles = this.svgSel
-        .selectAll('circle.item')
-          .data(items, (d: IPaletteItem) => d.value )
+      let itemTreeFiltered = itemTree.entries().filter((d) => d.key !== '')
+      let items: IPaletteItem[] = itemTreeFiltered.reduce(
+        (a: IPaletteItem[], b: ItemBranch) => {
+          return a.concat(b.value.items)
+        },
+        []
+      )
+      let padding: number = items.length > 300 ? items.length > 2000 ? 1 : 2 : 4
+      let paletteHeightLessTypes = this.paletteHeight - (itemTreeFiltered.length * 25)
+      let rawRadius: number = (Math.sqrt(this.paletteWidth * paletteHeightLessTypes / items.length) - padding) / 2
+      let radius: number = rawRadius > 8 ? 8 : rawRadius
+      let xOffset: number = radius * 2 + padding / 2
+      let yOffset: number = radius * 2 + padding / 2
+      let xDots: number = Math.floor((this.paletteWidth) / xOffset) - 1
 
-      let padding = items.length > 300 ? items.length > 2000 ? 1 : 2 : 4
-      let rawRadius = (Math.sqrt(this.paletteWidth * this.paletteHeight / items.length) - padding) / 2
-      let radius = rawRadius > 8 ? 8 : rawRadius
-      let xOffset = radius * 2 + padding / 2
-      let yOffset = radius * 2 + padding / 2
-      let xDots = Math.floor((this.paletteWidth) / xOffset) - 1
+      this.types = this.divSel
+        .selectAll('div.type')
+          .data(itemTreeFiltered, (d: ItemBranch) => d.key )
+      this.types.exit().remove()
+      let typesDivsEnter = this.types.enter()
+        .append('div')
+          .classed('type', true)
+          .text((d) => d.value.label)
+
+      typesDivsEnter
+        .append('svg')
+          .attr('width', '100%')
+
+      this.types = typesDivsEnter
+        .merge(this.types)
+
+      let typeSvgs = this.types.select('svg')
+         .attr('height', (d) => {
+           return (Math.ceil(d.value.items.length / xDots) + 1) * yOffset
+          })
+
+      this.circles = typeSvgs
+        .selectAll('circle.item')
+          .data((d) => d.value.items, (d: IPaletteItem) => d.value )
 
       this.circles.exit().remove()
 
@@ -136,23 +184,40 @@ namespace fibra {
     private updateSizing(): void {
       this.paletteWidth = Math.round(window.innerWidth * 0.15) // this.svgSel.node().clientWidth
       this.paletteHeight = Math.round(window.innerHeight) - this.paletteSearchHeight
-      this.svgSel.style('height', this.paletteHeight + 'px')
+      this.divSel.style('height', this.paletteHeight + 'px')
     }
 
     private mergeItems(oldItems, newItems: IPaletteItem[]) {
+      // Wipe old items (bad, but temporary)
+      this.typeItemTree.values().forEach((v) => {
+        v.items = []
+      })
+
       newItems.forEach((item) => {
-        let typeProp = item.localProperties.filter((p) => p.value === RDF.type.value)[0]
-        if(typeProp && typeProp.values[0]) {
+        let typeProp: IPropertyToValues<INodePlusLabel> = item.localProperties.filter((p) => p.value === RDF.type.value)[0]
+        if (typeProp && typeProp.values[0]) {
           item.typeValue = typeProp.values[0].value
           item.typeLabel = typeProp.values[0].label.value
+
+          // Add type to the type map
+          if (!this.typeItemTree.has(item.typeValue)) {
+            this.typeItemTree.set(item.typeValue, {
+              'label': item.typeLabel,
+              'items': [item]
+            })
+          } else {
+            this.typeItemTree.get(item.typeValue).items.push(item)
+          }
         } else {
           item.typeValue = ''
           item.typeLabel = 'No type defined'
         }
       })
-      // Sort by type and then by label
-      newItems.sort((a: IPaletteItem, b: IPaletteItem) => a.typeValue === b.typeValue ? (a.label.value === b.label.value ? 0 : a.label.value > b.label.value ? 1 : -1) : a.typeValue > b.typeValue ? 1 : -1)
-      return newItems.filter((item: IPaletteItem) => item.typeValue !== '')
+      // Sort by label
+      this.typeItemTree.values().forEach((v) => {
+        v.items.sort((a: IPaletteItem, b: IPaletteItem) => a.label.value === b.label.value ? 0 : a.label.value > b.label.value ? 1 : -1)
+      })
+      return this.typeItemTree
     }
   }
 
