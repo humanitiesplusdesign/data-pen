@@ -11,12 +11,8 @@ nav#menu-bar.navbar.navbar-default.navbar-static-top.palette-relevant(ng-class="
       button.btn.btn-xs.disabled
         span.glyphicon.glyphicon-zoom-out(aria-hidden="true")
     span.btn-group
-      button.btn.btn-xs(ng-click="$ctrl.uploadCSV()")
+      button.btn.btn-xs.disabled
         span.glyphicon.glyphicon-upload(aria-hidden="true")
-      input(type="file"
-            id="dataModelSelector"
-            style="display:none"
-            onchange="angular.element(this).scope().loadCSV(this)")
       button.btn.btn-xs(ng-click="$ctrl.downloadRDF()")
         span.glyphicon.glyphicon-download(aria-hidden="true")
   .pull-right

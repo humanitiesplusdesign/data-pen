@@ -5,10 +5,6 @@ namespace fibra {
     constructor(public endpoint: string, public queryTemplate: string) {}
   }
 
-  interface IConstructScope extends angular.IScope {
-    loadCSV
-  }
-
   export class ConstructViewComponentController {
     public classTree: TreeNode[]
     public classTreePromise: angular.IPromise<TreeNode[]>
@@ -58,25 +54,6 @@ namespace fibra {
         request.send(null);
     }
 
-    public uploadCSV() {
-      $('#dataModelSelector').click();
-    }
-
-    public loadCSV(file) {
-      console.log(file)
-      var reader = new FileReader();
-      reader.onload = () => {
-        this.$scope.$apply((s) => {
-          console.log(reader.result)
-          // Leave as a stub until we can move this over to the palette
-        })
-      };
-      reader.readAsText(file.files[0]);
-      // We need to clear the input so that we pick up future uploads. This is *not*
-      // cross-browser-compatible.
-      file.value = null;
-    }
-
     constructor(private configurationService: ConfigurationService,
                 private sparqlTreeService: SparqlTreeService,
                 private sparqlItemService: SparqlItemService,
@@ -84,10 +61,8 @@ namespace fibra {
                 private $localStorage: any,
                 private $sessionStorage: any,
                 private fibraService: FibraService,
-                private $scope: IConstructScope,
                 private $q: angular.IQService) {
 
-      $scope.loadCSV = this.loadCSV
       fibraService.on('change', () => {
         let chosenTypes = fibraService.getState().construct.displayTypes
         this.limitFilter = ''

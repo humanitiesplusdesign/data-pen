@@ -133,31 +133,43 @@ namespace fibra {
       }
     }
 
-    public createItem(item?: INode):Action {
+    public createItem(item?: INode, typ?: string):Action {
       return {
         type: CREATE_ITEMS,
-        payload: [item]
+        payload: {
+          items: [item],
+          type: typ
+        }
       }
     }
 
-    public createItems(items: INode[]): Action {
+    public createItems(items: INode[], typ?: string): Action {
       return {
         type: CREATE_ITEMS,
-        payload: items
+        payload: {
+          items: items,
+          type: typ
+        }
       }
     }
 
-    public createDisplayItem(item?: INode): Action {
+    public createDisplayItem(item?: INode, typ?: string): Action {
       return {
         type: CREATE_DISPLAY_ITEMS,
-        payload: [item]
+        payload: {
+          items: [item],
+          type: typ
+        }
       }
     }
 
-    public createDisplayItems(items: INode[]): Action {
+    public createDisplayItems(items: INode[], typ?: string): Action {
       return {
         type: CREATE_DISPLAY_ITEMS,
-        payload: items
+        payload: {
+          items: items,
+          type: typ
+        }
       }
     }
 
@@ -295,7 +307,6 @@ namespace fibra {
         let prefLabel: PropertyToValues<INode> = new PropertyToValues(SKOS.prefLabel)
         prefLabel.values.push(DataFactory.instance.literal(action.payload))
         return this.sparqlItemService.createNewItem([], [prefLabel]).then((node) => {
-          console.log(node)
           let tn: TreeNode = new TreeNode(node.value, action.payload)
           this.state.construct.userTypes.push(tn)
           return this.state
@@ -307,13 +318,14 @@ namespace fibra {
     }
 
     private createItemsInternal(action, state): angular.IPromise<INode[]> {
-      let items: Item[] = action.payload
+      let items: Item[] = action.payload.items
+      let typeNode: INamedNode = action.payload.type ? DataFactory.instance.namedNode(action.payload.type) : OWL.Thing
 
       if (items[0]) {
         let proms = items.map((node) => {
           let prefLabel: PropertyToValues<INode> = new PropertyToValues(SKOS.prefLabel)
           let type: PropertyToValues<INode> = new PropertyToValues(RDF.type)
-          type.values.push(OWL.Thing)
+          type.values.push(typeNode)
           if (node.value) {
             prefLabel.values.push(DataFactory.instance.literal(node.value))
             return this.sparqlItemService.createNewItem([], [prefLabel, type])
@@ -342,7 +354,7 @@ namespace fibra {
         return this.q.all(proms)
       } else {
         let type: PropertyToValues<INode> = new PropertyToValues(RDF.type)
-        type.values.push(OWL.Thing)
+        type.values.push(typeNode)
         let prefLabel: PropertyToValues<INode> = new PropertyToValues(SKOS.prefLabel)
         prefLabel.values.push(DataFactory.instance.literal(''))
         return this.sparqlItemService.createNewItem([], [type, prefLabel]).then((node) => {

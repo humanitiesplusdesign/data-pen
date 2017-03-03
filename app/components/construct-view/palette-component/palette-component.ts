@@ -16,6 +16,10 @@ namespace fibra {
   }
   type ItemTree = d3.Map<ItemLeaf>
 
+  interface IPaletteScope extends angular.IScope {
+    loadCSV
+  }
+
   export class PaletteComponentController {
 
     private divSel: d3.Selection<HTMLDivElement, {}, null, undefined>
@@ -33,14 +37,17 @@ namespace fibra {
       'label': string,
       'items': IPaletteItem[]
     }>()
+    private typeForCreation: string
 
     public constructor( private fibraService: FibraService,
                         private configurationService: ConfigurationService,
                         private $element: angular.IAugmentedJQuery,
                         private sparqlItemService: SparqlItemService,
                         private sparqlTreeService: SparqlTreeService,
+                        private $scope: IPaletteScope,
                         private $q: angular.IQService) {
 
+      $scope.loadCSV = this.loadCSV.bind(this)
       this.typeItemTree.set('', {
         'label': 'No type defined',
         'items': []
@@ -107,6 +114,37 @@ namespace fibra {
       })
     }
 
+    public uploadCSV(datum: ItemBranch): void {
+      this.typeForCreation = datum.key
+      $('#dataModelSelector').click();
+    }
+
+    public loadCSV(file): void {
+      // Just uses the first column of the file as labels
+      let reader: FileReader = new FileReader();
+      reader.onload = () => {
+        let parsedCSV = d3.csvParse(reader.result)
+        let labelColumnKey = parsedCSV.columns[0]
+        this.fibraService.dispatchAction(
+          this.fibraService.createItems(
+            parsedCSV.map((row) => {
+              let node: INode = DataFactory.instance.namedNode(row[labelColumnKey])
+              return node
+            }),
+            this.typeForCreation
+          )
+        ).then(() => {
+          this.query().then((items) => {
+            this.build.bind(this)(items)
+          })
+        })
+      };
+      reader.readAsText(file.files[0]);
+      // We need to clear the input so that we pick up future uploads. This is *not*
+      // cross-browser-compatible.
+      file.value = null;
+    }
+
     public build(itemTree: ItemTree) {
       this.updateSizing()
       let itemTreeFiltered = itemTree.entries().filter((d) => d.key !== '')
@@ -131,7 +169,14 @@ namespace fibra {
       let typesDivsEnter = this.types.enter()
         .append('div')
           .classed('type', true)
+          .classed('inverse-icon', true)
           .text((d) => d.value.label)
+
+      typesDivsEnter
+        .append('span')
+          .classed('glyphicon', true)
+          .classed('glyphicon-upload', true)
+          .on('click', this.uploadCSV.bind(this))
 
       typesDivsEnter
         .append('svg')
