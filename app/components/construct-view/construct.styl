@@ -253,6 +253,10 @@ construct-view {
   }
 
   .palette {
+    circle.item {
+      cursor: grab
+    }
+
     circle.item.displayed {
       opacity: 0.3
     }
@@ -265,6 +269,16 @@ construct-view {
         margin-left: 0.25em
       }
     }
+  }
+
+  .palette-node-drag {
+    position: absolute
+    height: 16px
+    width: 16px
+  }
+
+  .palette-node-drag {
+    cursor: grabbing
   }
 
   .inverse-icon {

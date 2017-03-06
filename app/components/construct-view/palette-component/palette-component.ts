@@ -23,6 +23,7 @@ namespace fibra {
   export class PaletteComponentController {
 
     private divSel: d3.Selection<HTMLDivElement, {}, null, undefined>
+    private nodeDrag: d3.Selection<SVGSVGElement, {}, null, undefined>
     private circles: d3.Selection<d3.BaseType, IPaletteItem, SVGSVGElement, {}>
     private types: d3.Selection<d3.BaseType, ItemBranch, HTMLDivElement, {}>
     private tooltip: d3.Selection<HTMLDivElement, {}, HTMLBodyElement, undefined>
@@ -48,6 +49,7 @@ namespace fibra {
                         private $q: angular.IQService) {
 
       $scope.loadCSV = this.loadCSV.bind(this)
+
       this.typeItemTree.set('', {
         'label': 'No type defined',
         'items': []
@@ -63,6 +65,9 @@ namespace fibra {
 
     public $postLink(): void {
       this.divSel = d3.select(this.$element[0]).select<HTMLDivElement>('div.palette')
+      this.nodeDrag = d3.select(this.$element[0]).select<SVGSVGElement>('.palette-node-drag')
+      this.nodeDrag.style('display', 'none')
+      this.nodeDrag.append('circle')
 
       this.divSel
         .style('height', '100%')
@@ -88,7 +93,7 @@ namespace fibra {
       })
     }
 
-    public addItem(item: IPaletteItem) {
+    public addItem(item: IPaletteItem, coordinates?: [number]) {
       let itemTypeKey: string = item.typeValue
       let itemType: TreeNode = this.fibraService.getState().construct.types.filter((t) => { return t.id === itemTypeKey })[0]
       let chosenTypes: TreeNode[] = this.fibraService.getState().construct.displayTypes
@@ -99,7 +104,7 @@ namespace fibra {
         newTypes.push(itemType)
         this.fibraService.dispatchAction(this.fibraService.setOrderedTypes(newTypes))
       }
-      return this.fibraService.dispatchAction(this.fibraService.displayItem(item)).then((state) => {
+      return this.fibraService.dispatchAction(this.fibraService.displayItem(item, coordinates)).then((state) => {
         this.fibraService.dispatch('change')
         return state
       })
@@ -154,6 +159,7 @@ namespace fibra {
         },
         []
       )
+      console.log(this.paletteWidth)
       let padding: number = items.length > 300 ? items.length > 2000 ? 1 : 2 : 4
       let paletteHeightLessTypes = this.paletteHeight - (itemTreeFiltered.length * 25)
       let rawRadius: number = (Math.sqrt(this.paletteWidth * paletteHeightLessTypes / items.length) - padding) / 2
@@ -161,6 +167,11 @@ namespace fibra {
       let xOffset: number = radius * 2 + padding / 2
       let yOffset: number = radius * 2 + padding / 2
       let xDots: number = Math.floor((this.paletteWidth) / xOffset) - 1
+
+      // Bring the node drag SVG and the addItem function local
+      let nodeDrag = this.nodeDrag
+      let addItem = this.addItem.bind(this)
+      let paletteWidth = this.paletteWidth
 
       this.types = this.divSel
         .selectAll('div.type')
@@ -200,7 +211,7 @@ namespace fibra {
         .append('circle')
           .classed('item', true)
           .attr('r', radius)
-          .on('click', this.addItem.bind(this))
+          // .on('click', this.addItem.bind(this))
           .on('mouseover', (d: IPaletteItem, i: number) => {
             this.tooltip.style('top', (d3.event.pageY - 10) + 'px')
               .style('left', (d3.event.pageX + 10) + 'px')
@@ -210,6 +221,47 @@ namespace fibra {
           .on('mouseout', (d: IExploreItem, i: number) => {
             this.tooltip.style('visibility', 'hidden')
           })
+          .call(d3.drag<SVGElement, IPaletteItem, SVGCircleElement>()
+            .on('start', function(d) {
+              let thisCircle: d3.Selection<SVGElement, {}, null, undefined> = d3.select(this)
+              nodeDrag
+                .style('display', 'block')
+              nodeDrag.select('circle')
+                .classed('item', thisCircle.classed('item'))
+                .attr('r', thisCircle.attr('r'))
+                .attr('fill', thisCircle.attr('fill'))
+                .attr('transform', 'translate(8,8)')
+              nodeDrag
+                .style('left', d3.event.sourceEvent.clientX - 8)
+                .style('top', d3.event.sourceEvent.clientY - 8)
+            })
+            .on('drag', function(d) {
+              nodeDrag
+                .style('left', d3.event.sourceEvent.clientX - 8)
+                .style('top', d3.event.sourceEvent.clientY - 8)
+            })
+            .on('end', function(d) {
+              // If the cursor is on the canvas, display
+              let exploreContainer: Element = d3.select<Element, any>('#explorecontainer').node()
+              if (
+                d3.event.sourceEvent.clientX > exploreContainer.getBoundingClientRect().left &&
+                d3.event.sourceEvent.clientX < exploreContainer.getBoundingClientRect().right &&
+                d3.event.sourceEvent.clientY > exploreContainer.getBoundingClientRect().top &&
+                d3.event.sourceEvent.clientY < exploreContainer.getBoundingClientRect().bottom
+              ) {
+                addItem(
+                  d3.select<SVGElement, IPaletteItem>(this).datum(),
+                  [
+                    d3.event.sourceEvent.clientX - exploreContainer.getBoundingClientRect().left,
+                    d3.event.sourceEvent.clientY - exploreContainer.getBoundingClientRect().top
+                  ]
+                ).then(() => {
+                  nodeDrag.style('display', 'none')
+                })
+              } else {
+                nodeDrag.style('display', 'none')
+              }
+            }))
         .merge(this.circles)
           .call(this.update.bind(this))
 

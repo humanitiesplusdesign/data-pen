@@ -414,7 +414,15 @@ namespace fibra {
       }).each(this.propertyPopover.addPopover.bind(this, this.$scope, this.fibraService.getState().construct.types, this.svgSel))
 
       // If a node went from being untyped to being primary or secondary, bring along its position
+      // Also handle position getting set from a drop (pull position from state)
       let applyOldPosition = (datum: IExploreItem) => {
+        // Get position from state if it was set there.
+        datum.fx = this.fibraService.getState().construct.itemIndex[datum.value].x
+        datum.fy = this.fibraService.getState().construct.itemIndex[datum.value].y
+        datum.gx = this.fibraService.getState().construct.itemIndex[datum.value].x
+        datum.gx = this.fibraService.getState().construct.itemIndex[datum.value].y
+
+        // Or if node was already here, get position from old node
         let oldNode: IExploreItem = this.removedUntypedItems.filter((it) => { return it.value === datum.value })[0]
         if (oldNode) {
           datum.fx = oldNode.fx

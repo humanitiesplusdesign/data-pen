@@ -101,17 +101,23 @@ namespace fibra {
       }
     }
 
-    public displayItem(item: ITerm): Action {
+    public displayItem(item: ITerm, coordinates?: [number]): Action {
       return {
         type: DISPLAY_ITEMS,
-        payload: [item]
+        payload: {
+          items: [item],
+          coordinates: [coordinates]
+        }
       }
     }
 
-    public displayItems(items: ITerm[]): Action {
+    public displayItems(items: ITerm[], coordinates?: [number][]): Action {
       return {
         type: DISPLAY_ITEMS,
-        payload: items
+        payload: {
+          items: items,
+          coordinates: coordinates
+        }
       }
     }
 
@@ -220,10 +226,16 @@ namespace fibra {
       switch(action.type) {
 
       case DISPLAY_ITEMS:
-        action.payload.forEach((item) => {
+        action.payload.items.forEach((item, i) => {
           if(!state.construct.itemIndex[item.value]) {
             state.construct.items.push(item)
             state.construct.itemIndex[item.value] = item
+
+            // If coordinates are provided, apply them
+            if(action.payload.coordinates[i][0] && action.payload.coordinates[i][1]) {
+              state.construct.itemIndex[item.value].x = action.payload.coordinates[i][0]
+              state.construct.itemIndex[item.value].y = action.payload.coordinates[i][1]
+            }
           }
         })
         this.dispatch('change')
