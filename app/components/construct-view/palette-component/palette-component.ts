@@ -8,7 +8,8 @@ namespace fibra {
 
   type ItemLeaf = {
     'label': string,
-    'items': IPaletteItem[]
+    'items': IPaletteItem[],
+    'expanded': boolean
   }
   type ItemBranch = {
     'key': string,
@@ -34,10 +35,7 @@ namespace fibra {
     private typeColorScale: d3.ScaleOrdinal<string, string> = d3.scaleOrdinal(d3.schemeCategory20c)
     private labelFilter: string = ''
     private typeItemTreePromise: angular.IPromise<ItemTree>
-    private typeItemTree: ItemTree = d3.map<{
-      'label': string,
-      'items': IPaletteItem[]
-    }>()
+    private typeItemTree: ItemTree = d3.map<ItemLeaf>()
     private typeForCreation: string
 
     public constructor( private fibraService: FibraService,
@@ -51,8 +49,9 @@ namespace fibra {
       $scope.loadCSV = this.loadCSV.bind(this)
 
       this.typeItemTree.set('', {
-        'label': 'No type defined',
-        'items': []
+        label: 'No type defined',
+        items: [],
+        expanded: false
       })
       this.query()
     }
@@ -159,7 +158,6 @@ namespace fibra {
         },
         []
       )
-      console.log(this.paletteWidth)
       let padding: number = items.length > 300 ? items.length > 2000 ? 1 : 2 : 4
       let paletteHeightLessTypes = this.paletteHeight - (itemTreeFiltered.length * 25)
       let rawRadius: number = (Math.sqrt(this.paletteWidth * paletteHeightLessTypes / items.length) - padding) / 2
@@ -190,11 +188,27 @@ namespace fibra {
           .on('click', this.uploadCSV.bind(this))
 
       typesDivsEnter
+        .append('span')
+          .classed('glyphicon', true)
+          .classed('expand-button', true)
+          .on('click', (d) =>  {
+            d.value.expanded = !d.value.expanded
+            this.typeItemTreePromise.then(this.build.bind(this))
+          })
+
+      typesDivsEnter
         .append('svg')
           .attr('width', '100%')
 
       this.types = typesDivsEnter
         .merge(this.types)
+
+      this.types.selectAll('.expand-button')
+        .classed('glyphicon-resize-small', (d: ItemBranch) => d.value.expanded)
+        .classed('glyphicon-resize-full', (d: ItemBranch) => !d.value.expanded)
+
+      this.types.selectAll('svg')
+        .style('display', (d: ItemBranch) => d.value.expanded ? 'block' : 'none')
 
       let typeSvgs = this.types.select('svg')
          .attr('height', (d) => {
@@ -299,8 +313,9 @@ namespace fibra {
           // Add type to the type map
           if (!this.typeItemTree.has(item.typeValue)) {
             this.typeItemTree.set(item.typeValue, {
-              'label': item.typeLabel,
-              'items': [item]
+              label: item.typeLabel,
+              items: [item],
+              expanded: true
             })
           } else {
             this.typeItemTree.get(item.typeValue).items.push(item)
