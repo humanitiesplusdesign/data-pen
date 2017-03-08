@@ -232,7 +232,7 @@ namespace fibra {
             state.construct.itemIndex[item.value] = item
 
             // If coordinates are provided, apply them
-            if(action.payload.coordinates[i][0] && action.payload.coordinates[i][1]) {
+            if(action.payload.coordinates && action.payload.coordinates[i] && action.payload.coordinates[i][0] && action.payload.coordinates[i][1]) {
               state.construct.itemIndex[item.value].x = action.payload.coordinates[i][0]
               state.construct.itemIndex[item.value].y = action.payload.coordinates[i][1]
             }
