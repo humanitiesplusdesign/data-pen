@@ -44,7 +44,8 @@ namespace fibra {
                         private sparqlItemService: SparqlItemService,
                         private sparqlTreeService: SparqlTreeService,
                         private $scope: IPaletteScope,
-                        private $q: angular.IQService) {
+                        private $q: angular.IQService,
+                        private FileSaver: any) {
 
       $scope.loadCSV = this.loadCSV.bind(this)
 
@@ -123,21 +124,93 @@ namespace fibra {
       $('#dataModelSelector').click();
     }
 
+    public downloadCSV(datum: ItemBranch): void {
+      let blob: Blob = new Blob(
+        [ d3.csvFormat(
+          datum.value.items.map((d) => {
+            return {
+              [SKOS.prefLabel.value]: d.localProperties.filter((p) => p.value === SKOS.prefLabel.value)[0].values[0].value,
+              FibraId: d.value
+            }
+          }),
+          [SKOS.prefLabel.value, 'FibraId']
+        ) ],
+        { type: 'application/csv;charset=utf-8' }
+      )
+      let filename: string = datum.value.label + '.csv'
+      this.FileSaver.saveAs(blob, filename)
+    }
+
     public loadCSV(file): void {
+      // Notes: column headers we should handle
+      //  - 'FibraId' - this will be the matching Fibra identifier. In this case we should not createItem
+      //              but rather update an existing item if necessary
+      //  - SKOS.prefLabel.value - Will be the label to use
+      //  - 'Match' - will be the Recon matched value and should go to OWL.sameAs property
+      //  - 'Notes' - will do onto a notes property?
+
+
       // Just uses the first column of the file as labels
       let reader: FileReader = new FileReader();
       reader.onload = () => {
         let parsedCSV = d3.csvParse(reader.result)
+        let newRows: d3.DSVRowString[] = parsedCSV.filter((row) => {
+          return !row['FibraId']  // Not an update
+        })
         let labelColumnKey = parsedCSV.columns[0]
-        this.fibraService.dispatchAction(
-          this.fibraService.createItems(
-            parsedCSV.map((row) => {
-              let node: INode = DataFactory.instance.namedNode(row[labelColumnKey])
-              return node
-            }),
-            this.typeForCreation
-          )
-        ).then(() => {
+        let proms: angular.IPromise<State>[] = [
+          newRows.length > 0 ? this.fibraService.dispatchAction(
+            this.fibraService.createItems(
+              newRows.map((row) => {
+                console.log(row)
+                let node: INode = DataFactory.instance.namedNode(row[labelColumnKey])
+                return node
+              }),
+              this.typeForCreation
+            )
+          ) : this.$q.resolve(this.fibraService.getState()),
+          this.$q.all(parsedCSV.filter((row) => {
+            return !!row['FibraId']
+          }).map((row) => {
+            if(row['Match'] && !row[OWL.sameAs.value]) {
+              row[OWL.sameAs.value] = row['Match']
+              delete row['Match']
+            }
+            let entries = d3.entries(row)
+            let props: PropertyToValues<INode>[] = entries
+              .filter((entry) =>  entry.key !== 'FibraId'
+                                  && entry.value
+                                  && entry.key !== OWL.sameAs.value
+                                  && entry.key !== 'Notes'
+                                  && entry.key !== 'Match')
+              .map((entry) => {
+                let prop: PropertyToValues<INode> = new PropertyToValues(DataFactory.instance.namedNode(entry.key))
+                prop.values.push(
+                  entry.value.indexOf('http://') === 0 ?
+                  DataFactory.instance.namedNode(entry.value) :
+                  DataFactory.instance.literal(entry.value)
+                )
+                return prop
+              })
+            // Handle OWL.sameAs
+            entries
+              .filter((entry) => entry.key === OWL.sameAs.value && entry.value)
+              .forEach((entry) => {
+                let prop: PropertyToValues<INode> = new PropertyToValues(DataFactory.instance.nodeFromNode(OWL.sameAs))
+                prop.values.push(DataFactory.instance.namedNode(entry.value))
+                props.push(prop)
+              })
+            console.log(props)
+            return this.fibraService.dispatchAction(
+              this.fibraService.itemProperty(
+                new NamedNode(row['FibraId']),
+                props
+              )
+            )
+          })).then((states: State[]) => states[states.length - 1])
+        ]
+
+        this.$q.all(proms).then(() => {
           this.query().then((items) => {
             this.build.bind(this)(items)
           })
@@ -180,6 +253,12 @@ namespace fibra {
           .classed('type', true)
           .classed('inverse-icon', true)
           .text((d) => d.value.label)
+
+      typesDivsEnter
+        .append('span')
+          .classed('glyphicon', true)
+          .classed('glyphicon-download', true)
+          .on('click', (d) => this.downloadCSV(d))
 
       typesDivsEnter
         .append('span')

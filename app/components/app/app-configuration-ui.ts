@@ -12,7 +12,7 @@ namespace fibra {
     socialAuthService: SocialAuthService
   }
 
-  let m: angular.IModule = angular.module('fibra', [ 'http-auth-interceptor', 'ngStorage', 'ui.router', 'ui.bootstrap', 'ui.bootstrap.tpls', 'ngAnimate' ])
+  let m: angular.IModule = angular.module('fibra', [ 'http-auth-interceptor', 'ngStorage', 'ui.router', 'ui.bootstrap', 'ui.bootstrap.tpls', 'ngAnimate', 'ngFileSaver' ])
   m.config(($stateProvider: angular.ui.IStateProvider,
             $urlServiceProvider: any,
             $locationProvider: any,
