@@ -1,29 +1,79 @@
-script(type="text/ng-template",id="treenode.html")
-  | {{node.label}}
-  span(ng-if="node.instances>0") &nbsp;({{node.instances | number}})
-  ul
-    li(ng-repeat="node in node.children track by $index",ng-include="'treenode.html'")
 .container
-  h3 Select configuration
-  .well(ng-repeat="configuration in $ctrl.configurations")
-    h4: a(ng-click="$ctrl.setConfiguration(configuration)") {{configuration.name}}
-    div(ng-if="configuration.authorityEndpoints.length > 0")
-      h5 Configured Authorities:
-      ul: li(ng-repeat="endpoint in configuration.authorityEndpoints")
-        a(ng-if="endpoint.citation.url",ng-href="{{endpoint.citation.url}}") {{endpoint.citation.name}}
-        span(ng-if="!endpoint.citation.url") {{endpoint.citation.name}}
-        span(ng-if="endpoint.citation.rightsholder") &nbsp;(
-          a(ng-if="endpoint.citation.rightsholderurl",ng-href="{{endpoint.citation.rightsholderurl}}") {{endpoint.citation.rightsholder}}
-          span(ng-if="!endpoint.citation.rightsholderurl") {{endpoint.citation.rightsholder}}
-          | )
-        ul: li(ng-repeat="node in $ctrl.statistics[endpoint.id]",ng-include="'treenode.html'")
-    div(ng-if="configuration.archiveEndpoints.length > 0")
-      h5 Configured Archives:
-      ul: li(ng-repeat="endpoint in configuration.archiveEndpoints")
-        a(ng-if="endpoint.citation.url",ng-href="{{endpoint.citation.url}}") {{endpoint.citation.name}}
-        span(ng-if="!endpoint.citation.url") {{endpoint.citation.name}}
-        span(ng-if="endpoint.citation.rightsholder") &nbsp;(
-          a(ng-if="endpoint.citation.rightsholderurl",ng-href="{{endpoint.citation.rightsholderurl}}") {{endpoint.citation.rightsholder}}
-          span(ng-if="!endpoint.citation.rightsholderurl") {{endpoint.citation.rightsholder}}
-          | )
-        ul: li(ng-repeat="node in $ctrl.statistics[endpoint.id] track by $index",ng-include="'treenode.html'")
+  h1 Fibra
+
+  citable-editor(citable="$ctrl.project",no-id)
+
+  h4 Schemas
+  .form-group
+    .form-group
+      label.checkbox-inline(ng-repeat="schema in $ctrl.schemas")
+        input(type="checkbox",ng-model="$ctrl.selectedSchemas[schema.id]")
+        citable(citable="schema")
+
+  h4 Authorities
+  .form-group
+    label.checkbox-inline(ng-repeat="authority in $ctrl.authorities")
+      input(type="checkbox",ng-model="$ctrl.selectedAuthorities[authority.id]")
+      citable(citable="authority")
+
+  h4 Archives
+  .form-group
+    label.checkbox-inline(ng-repeat="archive in $ctrl.archives")
+      input(type="checkbox",ng-model="$ctrl.selectedArchives[archive.id]")
+      citable(citable="archive")
+
+  button.btn.btn-success(ng-click="$ctrl.saveAndOpen()") Save and open
+  button.btn.btn-danger(ng-click="$ctrl.delete()") Delete
+
+  div(ng-show="!details")
+    span.glyphicon.glyphicon-chevron-down(title="details",ng-click="details=true")
+  div(ng-show="details")
+    span.glyphicon.glyphicon-chevron-up(title="details",ng-click="details=false")
+    .form-group
+      label Project ID
+      input.form-control(type="text",ng-model="$ctrl.project.id")
+    .form-group
+      label Project storage
+      select.form-control(ng-model="$ctrl.projectSource",ng-options="ps as ps.id for ps in $ctrl.projectSources",ng-change="$ctrl.onUpdatedProjectSource()")
+    .form-group
+      label Schema namespace
+      input.form-control(type="text",ng-model="$ctrl.project.schemaNS")
+    .form-group
+      label Instance namespace
+      input.form-control(type="text",ng-model="$ctrl.project.instanceNS")
+    .form-group
+      label Project Query Endpoint
+      input.form-control(type="text",ng-model="$ctrl.project.endpoint")
+    .form-group
+      label Project Update Endpoint
+      input.form-control(type="text",ng-model="$ctrl.project.updateEndpoint")
+    .form-group
+      label Project Graph Store Endpoint
+      input.form-control(type="text",ng-model="$ctrl.project.graphStoreEndpoint")
+    .form-group
+      label Project Graph
+      input.form-control(type="text",ng-model="$ctrl.project.graph")
+    .form-group
+      label Template
+      .radio(ng-repeat="template in $ctrl.primaryEndpointConfigurations")
+        label
+          input(type="radio",name="selectedTemplate",ng-value="template",ng-model="$ctrl.selectedTemplate",ng-change="$ctrl.changeTemplate()")
+          citable(citable="template")
+    .form-group
+      label Autocompletion Query
+      yasqe(content="$ctrl.project.autocompletionQuery",on-content-changed="$ctrl.project.autocompletionQuery=content")
+    .form-group
+      label Item Query
+      yasqe(content="$ctrl.project.itemQuery",on-content-changed="$ctrl.project.itemQuery=content")
+    .form-group
+      label Delete Item Query
+      yasqe(content="$ctrl.project.deleteItemQuery",on-content-changed="$ctrl.project.deleteItemQuery=content")
+    .form-group
+      label Tree Query
+      yasqe(content="$ctrl.project.treeQuery",on-content-changed="$ctrl.project.treeQuery=content")
+    .form-group
+      label Class Query
+      yasqe(content="$ctrl.project.classQuery",on-content-changed="$ctrl.project.classQuery=content")
+    .form-group
+      label Property Query
+      yasqe(content="$ctrl.project.propertyQuery",on-content-changed="$ctrl.project.propertyQuery=content")

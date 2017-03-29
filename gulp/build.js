@@ -42,8 +42,8 @@ gulp.task('docs', function() {
         mode: 'file',
         out: "docs/",
         name: "Fibra"
-    }))
-})
+    }));
+});
 
 gulp.task('clean', function(cb){
   return require('del')(['.tmp', 'dist'], cb);
@@ -52,8 +52,8 @@ gulp.task('clean', function(cb){
 gulp.task('lint', function() {
   return gulp.src('app/components/**/*.ts')
     .pipe($.tslint({ formatter: 'verbose' }))
-    .pipe($.tslint.report())
-})
+    .pipe($.tslint.report());
+});
 
 gulp.task('build', function(cb){
   return require('run-sequence')('clean', 'wire', ['templates', 'styles', 'scripts'], cb);

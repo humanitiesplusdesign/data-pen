@@ -1,0 +1,21 @@
+.container
+  h1 Fibra
+  h2 Edit schema
+  citable-editor(citable="$ctrl.ps")
+  .form.group
+    label endpoint for schema definition
+    input.form-control(type="text",ng-model="$ctrl.ps.sourceEndpoint")
+  .form.group
+    label graph for schema definition
+    input.form-control(type="text",ng-model="$ctrl.ps.sourceGraph")
+  .form.group
+    label schema endpoint
+    input.form-control(type="text",ng-model="$ctrl.ps.endpoint")
+  .form-group
+    label Class query template
+    yasqe(content="$ctrl.ps.classQuery",on-content-changed="$ctrl.ps.classQuery = content")
+  .form-group
+    label Property query template
+    yasqe(content="$ctrl.ps.propertyQuery",on-content-changed="$ctrl.ps.propertyQuery = content")
+  button.btn.btn-success(ng-click="$ctrl.save()",ng-disabled="$ctrl.disabled") Save to endpoint
+  button.btn.btn-danger(ng-click="$ctrl.delete()",ng-disabled="$ctrl.disabled") Delete

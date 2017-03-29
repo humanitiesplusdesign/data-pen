@@ -15,6 +15,8 @@ nav#menu-bar.navbar.navbar-default.navbar-static-top.palette-relevant(ng-class="
         span.glyphicon.glyphicon-upload(aria-hidden="true")
       button.btn.btn-xs(ng-click="$ctrl.downloadRDF()")
         span.glyphicon.glyphicon-download(aria-hidden="true")
+    span.btn-group
+      button.btn.btn-xs(ui-sref="configure({id:$ctrl.state.project.id,endpoint:$ctrl.state.project.sourceEndpoint,graph:$ctrl.state.project.sourceGraph})"): span.glyphicon.glyphicon-cog
   .pull-right
     span {{ $ctrl.loginState() }}
     a(ng-if="$ctrl.loginState() !== 'Not logged in'" ng-click="$ctrl.socialAuthService.logout()") &nbsp;Log out

@@ -1,0 +1,14 @@
+h1 RDFStore test view
+
+.form-group
+  label data
+  ui-codemirror(ui-codemirror-opts="$ctrl.editorOptions",ng-model="$ctrl.data")
+  button.btn.btn-success(ng-click="$ctrl.loadData()") Load
+  | {{$ctrl.status}}: {{$ctrl.message}}
+.form-group
+  label query
+  yasqe(on-content-changed="$ctrl.query=content",on-init="$ctrl.getPrefixes = yasqe.getPrefixesFromQuery")
+  button.btn.btn-success(ng-click="$ctrl.runQuery()") Query
+.form-group
+  label results
+  yasr(data="$ctrl.results",prefixes="$ctrl.getPrefixes")

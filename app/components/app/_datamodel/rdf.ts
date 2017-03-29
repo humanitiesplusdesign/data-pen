@@ -14,7 +14,7 @@ namespace fibra {
       switch (this.termType) {
         case 'NamedNode': return '<' + this.value + '>'
         case 'BlankNode': return '_:' + this.value
-        case 'Literal': return JSON.stringify(this.value) + (this.language ? '@' + this.language : (XMLSchema.string.equals(this.datatype!) ? '' : '^^' + this.datatype!.toCanonical()))
+        case 'Literal': return s.SparqlService.stringToSPARQLString(this.value) + (this.language ? '@' + this.language : (!this.datatype || RDF.langString.equals(this.datatype!) || XMLSchema.string.equals(this.datatype!) ? '' : '^^' + this.datatype!.toCanonical()))
         case 'Variable': return '?' + this.value
         case 'DefaultGraph': return ''
         case 'UNDEF': return 'UNDEF'
@@ -71,7 +71,7 @@ namespace fibra {
     public language: string
     public datatype: INamedNode
     constructor(value: string, language: string = '', datatype?: INamedNode) {
-      super(value, 'Literal', language, datatype ? datatype : (language !== '' ? RDF.langString : XMLSchema.string))
+      super(value, 'Literal', language, datatype ? datatype : (language ? RDF.langString : XMLSchema.string))
     }
   }
 
@@ -109,7 +109,7 @@ namespace fibra {
   export class Graph {
     constructor(
       public graph: INode,
-      public triples: IQuad[] = []
+      public triples: ITriple[] = []
     ) {}
   }
 
@@ -118,6 +118,32 @@ namespace fibra {
     public static instance: DataFactory = new DataFactory()
 
     private nextBlankNodeId: number = 0
+
+    public static nodeFromBinding(binding: s.ISparqlBinding): INode {
+      return DataFactory.instance.nodeFromBinding(binding)
+    }
+
+    public static nodeFromNode(other: ITerm): INode {
+      return DataFactory.instance.nodeFromNode(other)
+    }
+
+    public static nodeFromCanonicalRepresentation(id: string): INode {
+      return DataFactory.instance.nodeFromCanonicalRepresentation(id)
+    }
+
+    public static namedNode(value: string): INamedNode { return DataFactory.instance.namedNode(value) }
+    public static blankNode(value?: string): IBlankNode { return DataFactory.instance.blankNode(value) }
+    public static literal(value: string, languageOrDatatype?: string|NamedNode): ILiteral {
+      return DataFactory.instance.literal(value, languageOrDatatype)
+    }
+    public static variable(value: string): IVariable { return DataFactory.instance.variable(value) }
+    public static defaultGraph(): IDefaultGraph { return DataFactory.instance.defaultGraph() }
+    public static triple(subject: ITerm, predicate: ITerm, object: ITerm): ITriple {
+      return DataFactory.instance.triple(subject, predicate, object)
+    }
+    public static quad(subject: ITerm, predicate: ITerm, object: ITerm, graph?: ITerm): IQuad {
+      return DataFactory.instance.quad(subject, predicate, object, graph)
+    }
 
     public nodeFromBinding(binding: s.ISparqlBinding): INode {
       let n: Node = new Node(binding.value, binding.type === 'literal' ? 'Literal' : (binding.type === 'uri' ? 'NamedNode' : 'BlankNode'))
@@ -132,6 +158,7 @@ namespace fibra {
       if (other.termType === 'Literal') return new Literal(other.value, (<ILiteral>other).language, (<ILiteral>other).datatype)
       else return new Node(other.value, other.termType)
     }
+
     public nodeFromCanonicalRepresentation(id: string): INode {
       if (id.indexOf('<') === 0)
         return new NamedNode(id.substring(1, id.length - 1))
@@ -146,6 +173,7 @@ namespace fibra {
         else return new Literal(value)
       }
     }
+
     public namedNode(value: string): INamedNode { return new NamedNode(value) }
     public blankNode(value?: string): IBlankNode { return new BlankNode(value ? value : ('b' + ++this.nextBlankNodeId)) }
     public literal(value: string, languageOrDatatype?: string|NamedNode): ILiteral {
@@ -154,7 +182,7 @@ namespace fibra {
     }
     public variable(value: string): IVariable { return new Variable(value) }
     public defaultGraph(): IDefaultGraph { return DefaultGraph.instance }
-    public triple(subject: ITerm, predicate: ITerm, object: ITerm): IQuad {
+    public triple(subject: ITerm, predicate: ITerm, object: ITerm): ITriple {
       return new Triple(subject, predicate, object)
     }
     public quad(subject: ITerm, predicate: ITerm, object: ITerm, graph?: ITerm): IQuad {
@@ -163,27 +191,77 @@ namespace fibra {
   }
 
   // DRAFT
-  export class FibraInternal {
+  export class FIBRA {
     public static ns: string = 'http://hdlab.stanford.edu/fibra/ontology#'
-    public static linked: INamedNode = new NamedNode(FibraInternal.ns + 'linked') // Deprecated
+
+    public static Project: INamedNode = new NamedNode(FIBRA.ns + 'Project')
+    public static graph: INamedNode = new NamedNode(FIBRA.ns + 'graph')
+    public static qualifiedAssertion: INamedNode = new NamedNode(FIBRA.ns + 'qualifiedAssertion')
+    public static order: INamedNode = new NamedNode(FIBRA.ns + 'order')
+    public static schemaNS: INamedNode = new NamedNode(FIBRA.ns + 'schemaNS')
+    public static instanceNS: INamedNode = new NamedNode(FIBRA.ns + 'instanceNS')
+    public static updateEndpoint: INamedNode = new NamedNode(FIBRA.ns + 'updateEndpoint')
+    public static configuration: INamedNode = new NamedNode(FIBRA.ns + 'configuration')
+    public static configurationReference: INamedNode = new NamedNode(FIBRA.ns + 'configurationReference')
+    public static schema: INamedNode = new NamedNode(FIBRA.ns + 'schema')
+    public static schemaReference: INamedNode = new NamedNode(FIBRA.ns + 'schemaReference')
+    public static autocompletionQuery: INamedNode = new NamedNode(FIBRA.ns + 'autocompletionQuery')
+    public static propertyQuery: INamedNode = new NamedNode(FIBRA.ns + 'propertyQuery')
+    public static classQuery: INamedNode = new NamedNode(FIBRA.ns + 'classQuery')
+    public static itemQuery: INamedNode = new NamedNode(FIBRA.ns + 'itemQuery')
+    public static deleteItemQuery: INamedNode = new NamedNode(FIBRA.ns + 'deleteItemQuery')
+
+    public static RemoteEndpointConfiguration: INamedNode = new NamedNode(FIBRA.ns + 'RemoteEndpointConfiguration')
+    public static PrimaryEndpointConfiguration: INamedNode = new NamedNode(FIBRA.ns + 'PrimaryEndpointConfiguration')
+    public static AuthorityEndpointConfiguration: INamedNode = new NamedNode(FIBRA.ns + 'AuthorityEndpointConfiguration')
+    public static ArchiveEndpointConfiguration: INamedNode = new NamedNode(FIBRA.ns + 'ArchiveEndpointConfiguration')
+    public static Schema: INamedNode = new NamedNode(FIBRA.ns + 'Schema')
+  }
+
+  export class SD {
+    public static ns: string = 'http://www.w3.org/ns/sparql-service-description#'
+    public static _name: INamedNode = new NamedNode(SD.ns + 'name')
   }
 
   export class SKOS {
     public static ns: string = 'http://www.w3.org/2004/02/skos/core#'
     public static prefLabel: INamedNode = new NamedNode(SKOS.ns + 'prefLabel')
+    public static altLabel: INamedNode = new NamedNode(SKOS.ns + 'altLabel')
     public static related: INamedNode = new NamedNode(SKOS.ns + 'related')
+  }
+
+  export class VOID {
+    public static ns: string = 'http://rdfs.org/ns/void#'
+    public static sparqlEndpoint: INamedNode = new NamedNode(VOID.ns + 'sparqlEndpoint')
+  }
+
+  export class DCTerms {
+    public static ns: string = 'http://purl.org/dc/terms/'
+    public static rightsHolder: INamedNode = new NamedNode(DCTerms.ns + 'rightsHolder')
+    public static description: INamedNode = new NamedNode(DCTerms.ns + 'description')
+  }
+
+  export class FOAF {
+    public static ns: string = 'http://xmlns.com/foaf/0.1/'
+    public static homepage: INamedNode = new NamedNode(FOAF.ns + 'homepage')
   }
 
   export class OWL {
     public static ns: string = 'http://www.w3.org/2002/07/owl#'
     public static sameAs: INamedNode = new NamedNode(OWL.ns + 'sameAs')
     public static Thing: INamedNode = new NamedNode(OWL.ns + 'Thing')
+    public static Class: INamedNode = new NamedNode(OWL.ns + 'Class')
   }
 
   export class RDF {
     public static ns: string = 'http://www.w3.org/1999/02/22-rdf-syntax-ns#'
     public static type: INamedNode = new NamedNode(RDF.ns + 'type')
     public static langString: INamedNode = new NamedNode(RDF.ns + 'langString')
+    public static Triple: INamedNode = new NamedNode(RDF.ns + 'Triple')
+    public static subject: INamedNode = new NamedNode(RDF.ns + 'subject')
+    public static predicate: INamedNode = new NamedNode(RDF.ns + 'predicate')
+    public static object: INamedNode = new NamedNode(RDF.ns + 'object')
+    public static value: INamedNode = new NamedNode(RDF.ns + 'value')
   }
 
   export class XMLSchema {
@@ -221,7 +299,7 @@ namespace fibra {
   }
 
   export class ENodeMap<V> {
-    constructor(private create: (key?: INode) => V = () => { return <V>{}}, private map: EMap<V> = new EMap<V>()) {}
+    constructor(private create: (key?: INode) => V = () => { return <V>{}}, private map: IEMap<V> = new EMap<V>()) {}
     public goc(key: INode, create?: (key?: INode) => V): V {
       if (!this.has(key))
         this.set(key, create ? create(key) : this.create(key))
@@ -269,7 +347,7 @@ namespace fibra {
 
   export class NodeSet<N extends INode> {
     public m: ENodeMap<N>
-    constructor(map: EMap<N> = new EMap<N>()) {
+    constructor(map: IEMap<N> = new EMap<N>()) {
       this.m = new ENodeMap<N>(undefined, map)
     }
     public add(value: N): NodeSet<N> {

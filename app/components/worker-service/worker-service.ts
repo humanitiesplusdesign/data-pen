@@ -11,6 +11,7 @@ namespace fibra {
       var window = self
       self.history = {}
       self.Node = function () {}
+      self.setImmediate = function(fn) { return window.setTimeout(fn, 0) }
       var document = {
         readyState: 'complete',
         cookie: '',
@@ -61,7 +62,7 @@ namespace fibra {
     }
     private static savePrototypesInternal(args: any): void {
       if (!args || args.__className || typeof args !== 'object') return
-      if (args instanceof Array) args.forEach(arg => WorkerService.savePrototypes(arg))
+      if (args instanceof Array) args.forEach(arg => WorkerService.savePrototypesInternal(arg))
       else {
         if (args.constructor.__name || args.constructor.name !== 'Object') {
           let currentPrototype: {} = Object.getPrototypeOf(args)
@@ -77,7 +78,7 @@ namespace fibra {
           if (!args.__className) args.__className = 'Object'
         }
         for (let key in args) if (args.hasOwnProperty(key))
-          WorkerService.savePrototypes(args[key])
+          WorkerService.savePrototypesInternal(args[key])
       }
     }
 
@@ -237,6 +238,10 @@ namespace fibra {
           },
           (error) => {
             delete this.cancellers[message.id!]
+            if (error instanceof Error) {
+              self.postMessage({event: 'failure', id: message.id, data: { name: error.name, message: error.message, stack: error.stack }})
+              throw error
+            }
             self.postMessage({event: 'failure', id: message.id, data: WorkerService.savePrototypes(WorkerWorkerService.stripFunctions(error))})
           },
           (update) =>

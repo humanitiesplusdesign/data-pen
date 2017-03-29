@@ -70,7 +70,7 @@ namespace fibra {
           return node.localProperties.concat(node.remoteProperties)
         } else {
           // Property node
-          return node.values
+          return node.values ? node.values.map(n => n.value) : undefined
         }
       })
 
@@ -90,8 +90,8 @@ namespace fibra {
               .style('left', (d3.event.pageX + 10) + 'px')
               .style('visibility', 'visible')
               .text(d.depth === 2 ?
-                (d.data.label.value + " (click to add)") :
-                (d.data.label.value + " (click to add all children)"))
+                (d.data.label + " (click to add)") :
+                (d.data.label + " (click to add all children)"))
           })
           .on('mouseout', () => {
             this.sbTooltip.style('visibility', 'hidden')

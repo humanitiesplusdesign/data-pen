@@ -16,51 +16,46 @@ namespace fibra {
 
   export class Result {
     public additionalInformation: {[varName: string]: INode[]} = {}
-    constructor(public ids: INode[], public datasources: EndpointConfiguration[], public matchedLabel: INode, public prefLabel: INode) {}
+    constructor(public ids: INode[], public datasources: string[], public matchedLabel: INode, public prefLabel: INode) {}
   }
 
   export class SparqlAutocompleteService {
 
-    public static naiveMatchQueryTemplate: string = `
-  PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-  PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
-  PREFIX mads: <http://www.loc.gov/mads/rdf/v1#>
-  PREFIX owl: <http://www.w3.org/2002/07/owl#>
-  PREFIX dcterms: <http://purl.org/dc/terms/>
-  SELECT ?groupId ?groupLabel ?id ?prefLabel ?matchedLabel ?sameAs ?altLabel { # ADDITIONALVARIABLES
-    GRAPH <GRAPH> {
-      {
-        SELECT ?groupId ?id {
-          {
-            ?id skos:prefLabel|rdfs:label|skos:altLabel|mads:authoritativeLabel|mads:variantLabel <QUERY> .
-          } UNION {
-            ?id skos:prefLabel|rdfs:label|skos:altLabel|mads:authoritativeLabel|mads:variantLabel <QUERY>@<PREFLANG> .
-          }
-          ?id a ?groupId .
+    public static naiveMatchQueryTemplate: string = `PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+PREFIX mads: <http://www.loc.gov/mads/rdf/v1#>
+PREFIX owl: <http://www.w3.org/2002/07/owl#>
+PREFIX dcterms: <http://purl.org/dc/terms/>
+SELECT ?groupId ?id ?prefLabel ?matchedLabel ?sameAs ?altLabel { # ADDITIONALVARIABLES
+  GRAPH <GRAPH> {
+    {
+      SELECT ?groupId ?id {
+        {
+          ?id skos:prefLabel|rdfs:label|skos:altLabel|mads:authoritativeLabel|mads:variantLabel <QUERY> .
+        } UNION {
+          ?id skos:prefLabel|rdfs:label|skos:altLabel|mads:authoritativeLabel|mads:variantLabel <QUERY>@<PREFLANG> .
         }
-        GROUP BY ?groupId ?id
-        HAVING(BOUND(?id))
-        LIMIT <LIMIT>
+        ?id a ?groupId .
       }
-      ?id skos:prefLabel|rdfs:label|skos:altLabel|mads:authoritativeLabel|mads:variantLabel ?matchedLabel .
-      FILTER (REGEX(LCASE(?matchedLabel),CONCAT("\\\\b",LCASE(<QUERY>))))
-      OPTIONAL {
-        ?groupId skos:prefLabel|rdfs:label|skos:altLabel|mads:authoritativeLabel|mads:variantLabel ?groupLabelP .
-      }
-      BIND(COALESCE(?groupLabelP,REPLACE(REPLACE(REPLACE(REPLACE(STR(?groupId),".*/",""),".*#",""),"_"," "),"([A-ZÅÄÖ])"," $1")) AS ?groupLabel)
-      {
-        ?id  rdfs:label|skos:prefLabel|mads:authoritativeLabel ?prefLabel .
-      } UNION {
-        ?id owl:sameAs ?sameAs .
-      } UNION {
-        ?id skos:altLabel|mads:variantLabel ?altLabel .
-      }
-      # ADDITIONALSELECT
+      GROUP BY ?groupId ?id
+      HAVING(BOUND(?id))
+      LIMIT <LIMIT>
     }
+    ?id skos:prefLabel|rdfs:label|skos:altLabel|mads:authoritativeLabel|mads:variantLabel ?matchedLabel .
+    FILTER (REGEX(LCASE(?matchedLabel),CONCAT("\\\\b",LCASE(<QUERY>))))
+    BIND(COALESCE(?groupLabelP,REPLACE(REPLACE(REPLACE(REPLACE(STR(?groupId),".*/",""),".*#",""),"_"," "),"([A-ZÅÄÖ])"," $1")) AS ?groupLabel)
+    {
+      ?id  rdfs:label|skos:prefLabel|mads:authoritativeLabel ?prefLabel .
+    } UNION {
+      ?id owl:sameAs ?sameAs .
+    } UNION {
+      ?id skos:altLabel|mads:variantLabel ?altLabel .
+    }
+    # ADDITIONALSELECT
   }
-  `
+}`
 
-    public static defaultMatchQueryTemplate: string = `
+    public static defaultMatchQuery: string = `
 PREFIX text: <http://jena.apache.org/text#>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
@@ -69,7 +64,7 @@ PREFIX owl: <http://www.w3.org/2002/07/owl#>
 PREFIX sf: <http://ldf.fi/functions#>
 PREFIX fibra: <http://ldf.fi/fibra/schema#>
 PREFIX dcterms: <http://purl.org/dc/terms/>
-SELECT ?groupId ?groupLabel ?id ?prefLabel ?matchedLabel ?sameAs ?altLabel { # ADDITIONALVARIABLES
+SELECT ?groupId ?id ?prefLabel ?matchedLabel ?sameAs ?altLabel { # ADDITIONALVARIABLES
   # STARTGRAPH
     {
       SELECT ?groupId ?id (SUM(?sc) AS ?score) {
@@ -79,8 +74,8 @@ SELECT ?groupId ?groupLabel ?id ?prefLabel ?matchedLabel ?sameAs ?altLabel { # A
             (?id ?sc) text:query ?query .
             ?id skos:prefLabel|rdfs:label|skos:altLabel|mads:authoritativeLabel|mads:variantLabel ?matchedLabel
             FILTER (LCASE(?matchedLabel)=LCASE(<QUERY>))
-            ?id a ?groupId .
-            # GROUPID
+            ?id a ?groupIdLocal .
+            BIND(?groupIdLocal AS ?groupId)
             # CONSTRAINTS
           }
           GROUP BY ?groupId ?id ?sc
@@ -89,8 +84,8 @@ SELECT ?groupId ?groupLabel ?id ?prefLabel ?matchedLabel ?sameAs ?altLabel { # A
           SELECT ?groupId ?id ?sc {
             BIND(CONCAT(REPLACE(<QUERY>,"([\\\\+\\\\-\\\\&\\\\|\\\\!\\\\(\\\\)\\\\{\\\\}\\\\[\\\\]\\\\^\\\\\\"\\\\~\\\\*\\\\?\\\\:\\\\/\\\\\\\\])","\\\\$1"),"*") AS ?query)
             (?id ?sc) text:query ?query .
-            ?id a ?groupId .
-            # GROUPID
+            ?id a ?groupIdLocal .
+            BIND(?groupIdLocal AS ?groupId)
             # CONSTRAINTS
           }
           GROUP BY ?groupId ?id ?sc
@@ -104,11 +99,6 @@ SELECT ?groupId ?groupLabel ?id ?prefLabel ?matchedLabel ?sameAs ?altLabel { # A
     ?id skos:prefLabel|rdfs:label|skos:altLabel|mads:authoritativeLabel|mads:variantLabel ?matchedLabel
     FILTER (REGEX(LCASE(?matchedLabel),CONCAT("\\\\b",LCASE(<QUERY>))))
     {
-      OPTIONAL {
-        ?groupId sf:preferredLanguageLiteral (skos:prefLabel mads:authoritativeLabel rdfs:label skos:altLabel mads:variantLabel '<PREFLANG>' '' ?groupLabelP) .
-      }
-      BIND(COALESCE(?groupLabelP,REPLACE(REPLACE(REPLACE(REPLACE(STR(?groupId),".*/",""),".*#",""),"_"," "),"([A-ZÅÄÖ])"," $1")) AS ?groupLabel)
-    } UNION {
       ?id sf:preferredLanguageLiteral (skos:prefLabel mads:authoritativeLabel rdfs:label skos:altLabel mads:variantLabel '<PREFLANG>' '' ?prefLabel) .
     } UNION {
       ?id owl:sameAs ?sameAs .
@@ -135,13 +125,13 @@ SELECT ?groupId ?groupLabel ?id ?prefLabel ?matchedLabel ?sameAs ?altLabel { # A
     public idToPrefLabelSet: EMap<ONodeSet<INode>> = new EMap<ONodeSet<INode>>(() => new ONodeSet<INode>())
     public idToMatchedLabelSet: EMap<ONodeSet<INode>> = new EMap<ONodeSet<INode>>(() => new ONodeSet<INode>())
     public idToAltLabelSet: EMap<ONodeSet<INode>> = new EMap<ONodeSet<INode>>(() => new ONodeSet<INode>())
-    public idToDatasourceSet: EMap<IdentitySet<EndpointConfiguration>> = new EMap<IdentitySet<EndpointConfiguration>>(() => new IdentitySet<EndpointConfiguration>())
+    public idToDatasourceSet: EMap<StringSet> = new EMap<StringSet>(() => new StringSet())
     public seen: StringSet = new StringSet()
   }
 
   export class SparqlAutocompleteWorkerService {
 
-    private static processBindings(pd: ProcessingData, endpoint: EndpointConfiguration, result: s.ISparqlBindingResult<{[id: string]: s.ISparqlBinding}>): void {
+    private static processBindings(pd: ProcessingData, endpoint: string, result: s.ISparqlBindingResult<{[id: string]: s.ISparqlBinding}>): void {
       result.results.bindings.forEach(binding => {
         let id: string = binding['id'].value
         pd.idToIdSet.goc(id).add(id)
@@ -161,8 +151,7 @@ SELECT ?groupId ?groupLabel ?id ?prefLabel ?matchedLabel ?sameAs ?altLabel { # A
           pd.idToIdSet.get(id).add(binding['sameAs'].value)
           pd.idToIdSet.goc(binding['sameAs'].value).add(id)
         }
-        // FIXME: demo hack
-        for (let v of result.head.vars) if ((v.indexOf('ifp') === 0 || v === 'prefLabel') && binding[v]) pd.ifpVarPlusValueToIdSet.goc(v.substring(3)).goc(binding[v].value).add(id)
+        for (let v of result.head.vars) if (v.indexOf('ifp') === 0 && binding[v]) pd.ifpVarPlusValueToIdSet.goc(v.substring(3)).goc(binding[v].value).add(id)
       })
     }
 
@@ -203,8 +192,8 @@ SELECT ?groupId ?groupLabel ?id ?prefLabel ?matchedLabel ?sameAs ?altLabel { # A
           pd.idToIdSet.set(oid, idSet)
 
           idSet.adds(oidSet)
-          let datasourceSet: IdentitySet<EndpointConfiguration> = pd.idToDatasourceSet.get(id)
-          let oDatasourceSet: IdentitySet<EndpointConfiguration> = pd.idToDatasourceSet.get(oid)
+          let datasourceSet: StringSet = pd.idToDatasourceSet.get(id)
+          let oDatasourceSet: StringSet = pd.idToDatasourceSet.get(oid)
           if (datasourceSet) {
             if (oDatasourceSet) datasourceSet.adds(oDatasourceSet)
             pd.idToDatasourceSet.set(oid, datasourceSet)
@@ -237,40 +226,39 @@ SELECT ?groupId ?groupLabel ?id ?prefLabel ?matchedLabel ?sameAs ?altLabel { # A
       }))
     }
 
-    constructor(private $q: angular.IQService, private sparqlService: s.SparqlService, private configurationWorkerService: ConfigurationWorkerService) {
+    constructor(private $q: angular.IQService, private fibraSparqlService: FibraSparqlService, private stateWorkerService: StateWorkerService) {
     }
 
     public autocomplete(query: string, limit: number, queryRemote: boolean = false, limits: string = '', canceller?: angular.IPromise<any>): angular.IPromise<AutocompletionResults> {
       let d: angular.IDeferred<AutocompletionResults> = this.$q.defer()
       let results: AutocompletionResults = new AutocompletionResults()
-      let queryTemplate: string = this.configurationWorkerService.configuration.primaryEndpoint.autocompletionTextMatchQueryTemplate
+      let queryTemplate: string = this.stateWorkerService.state.project.autocompletionQuery
       queryTemplate = queryTemplate.replace(/<QUERY>/g, s.SparqlService.stringToSPARQLString(query))
       queryTemplate = queryTemplate.replace(/<LIMIT>/g, '' + limit)
-      queryTemplate = queryTemplate.replace(/# CONSTRAINTS/g, limits + this.configurationWorkerService.configuration.primaryEndpoint.dataModelConfiguration.typeConstraints)
-      queryTemplate = queryTemplate.replace(/<PREFLANG>/g, this.configurationWorkerService.configuration.preferredLanguage)
+      queryTemplate = queryTemplate.replace(/# CONSTRAINTS/g, limits)
+      queryTemplate = queryTemplate.replace(/<PREFLANG>/g, this.stateWorkerService.state.language)
       let pd: ProcessingData = new ProcessingData()
-      let primaryProcessed: angular.IPromise<void> = this.sparqlService.query(this.configurationWorkerService.configuration.primaryEndpoint.endpoint.value, queryTemplate, {timeout: canceller}).then(
+      let primaryProcessed: angular.IPromise<void> = this.fibraSparqlService.query(this.stateWorkerService.state.project.endpoint, queryTemplate, {timeout: canceller}).then(
         (response) => {
-          SparqlAutocompleteWorkerService.processBindings(pd, this.configurationWorkerService.configuration.primaryEndpoint, response.data)
+          SparqlAutocompleteWorkerService.processBindings(pd, this.stateWorkerService.state.project.endpoint, response)
           results.localMatchingResults = SparqlAutocompleteWorkerService.buildResults(pd, new EMap<ResultGroup>())
           if (!queryRemote) d.resolve(results)
-          else d.notify({endpointType: 'primary', endpoint: this.configurationWorkerService.configuration.primaryEndpoint.id, results: results})
+          else d.notify({endpointType: 'primary', endpoint: this.stateWorkerService.state.project.id, results: results})
         }
       )
       if (queryRemote) {
         // FIXME: It is currently possible that we miss equivalencies because equivalent data from one source doesn't fit the limit while it does for another. Add further query to make sure all equivalencies are fetched (either in autocompletion or latest in import)
         let remoteGroupIdToGroup: EMap<ResultGroup> = new EMap<ResultGroup>()
-        this.$q.all(this.configurationWorkerService.configuration.remoteEndpoints().map(endpointConfiguration => {
-          queryTemplate = endpointConfiguration.autocompletionTextMatchQueryTemplate
+        this.$q.all(this.stateWorkerService.state.project.remoteEndpoints().map(endpointConfiguration => {
+          queryTemplate = endpointConfiguration.autocompletionQuery
           queryTemplate = queryTemplate.replace(/<QUERY>/g, s.SparqlService.stringToSPARQLString(query))
           queryTemplate = queryTemplate.replace(/<LIMIT>/g, '' + limit)
-          queryTemplate = queryTemplate.replace(/# CONSTRAINTS/g, endpointConfiguration.dataModelConfiguration.typeConstraints)
-          queryTemplate = queryTemplate.replace(/<PREFLANG>/g, this.configurationWorkerService.configuration.preferredLanguage)
-          return this.sparqlService.query(endpointConfiguration.endpoint.value, queryTemplate, {timeout: canceller}).then(
+          queryTemplate = queryTemplate.replace(/<PREFLANG>/g, this.stateWorkerService.state.language)
+          return this.fibraSparqlService.query(endpointConfiguration.endpoint, queryTemplate, {timeout: canceller}).then(
           (response) => {
-            if (response.data.results.bindings.length !== 0) {
+            if (response.results.bindings.length !== 0) {
               primaryProcessed.then(() => {
-                SparqlAutocompleteWorkerService.processBindings(pd, endpointConfiguration, response.data)
+                SparqlAutocompleteWorkerService.processBindings(pd, endpointConfiguration.id, response)
                 SparqlAutocompleteWorkerService.unifyResults(pd)
                 results.remoteResults = results.remoteResults.concat(SparqlAutocompleteWorkerService.buildResults(pd, remoteGroupIdToGroup))
                 d.notify({endpointType: 'remote', endpoint: endpointConfiguration.id, results: results})

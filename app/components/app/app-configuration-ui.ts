@@ -12,16 +12,18 @@ namespace fibra {
     socialAuthService: SocialAuthService
   }
 
-  let m: angular.IModule = angular.module('fibra', [ 'http-auth-interceptor', 'ngStorage', 'ui.router', 'ui.bootstrap', 'ui.bootstrap.tpls', 'ngAnimate', 'ngFileSaver' ])
+  let m: angular.IModule = angular.module('fibra', [ 'http-auth-interceptor', 'ngStorage', 'ui.router', 'ui.bootstrap', 'ui.bootstrap.tpls', 'ngAnimate', 'fi.seco.yasqe', 'fi.seco.yasr', 'toastr', 'fi.seco.sparql', 'ui.codemirror', 'ngFileSaver' ])
+  m.config((toastrConfig: angular.toastr.IToastConfig) =>
+    angular.extend(toastrConfig, { positionClass: 'toast-top-full-width'}))
   m.config(($stateProvider: angular.ui.IStateProvider,
             $urlServiceProvider: any,
-            $locationProvider: any,
+            $locationProvider: angular.ILocationProvider,
             $uiRouterProvider: any) => {
     $urlServiceProvider.rules.otherwise((match, url, router) => {
       // Manually parse the search because it is not visible to Angular.
       let search: {} = url.search
       window.location.search.replace('?', '').split('&').forEach((pair: string) => {
-        let pa = pair.split('=')
+        let pa: string[] = pair.split('=')
         search[pa[0]] = pa[1]
       })
       if (search['code']) {
@@ -32,28 +34,44 @@ namespace fibra {
     })
     $stateProvider.state('projects', {
       url: '/projects',
-      template: '<projects-view></projects-view>',
-      data: { requiresAuth: true }
+      template: '<projects-view></projects-view>'
+    })
+    $stateProvider.state('rdfstoreTest', {
+      url: '/rdfstore-test',
+      template: '<rdfstore-test-view></rdfstore-test-view>'
+    })
+    $stateProvider.state('projectSources', {
+      url: '/project-sources?id&endpoint&graph&type',
+      template: '<project-sources-view></project-sources-view>',
+    })
+    $stateProvider.state('editPrimaryEndpointConfiguration', {
+      url: '/edit-primary-endpoint-configuration?endpoint&id&graph',
+      template: '<edit-primary-endpoint-configuration-view></edit-primary-endpoint-configuration-view>',
+    })
+    $stateProvider.state('editRemoteEndpointConfiguration', {
+      url: '/edit-remote-endpoint-configuration?endpoint&id&graph',
+      template: '<edit-remote-endpoint-configuration-view></edit-remote-endpoint-configuration-view>',
+    })
+    $stateProvider.state('editSchema', {
+      url: '/edit-schema?endpoint&id&graph',
+      template: '<edit-schema-view></edit-schema-view>',
     })
     $stateProvider.state('configure', {
-      url: '/configure',
-      template: '<configure-view></configure-view>',
-      data: { requiresAuth: true }
-    })
-    $stateProvider.state('select', {
-      url: '/select',
-      template: '<select-view></select-view>',
-      data: { requiresAuth: true }
+      url: '/configure?endpoint&graph&id',
+      template: '<configure-view></configure-view>'
     })
     $stateProvider.state('construct', {
-      url: '/construct',
+      url: '/construct?id&endpoint&graph',
+      resolve: { project: (projectService: ProjectService, fibraService: FibraService, $stateParams: any) =>
+        projectService.loadProject($stateParams.endpoint, $stateParams.id, $stateParams.graph).then(
+          project => fibraService.dispatchAction(fibraService.setProject(project))
+        )
+      },
       template: '<construct-view></construct-view>',
-      data: { requiresAuth: true }
     })
     $stateProvider.state('author', {
       url: '/author',
       template: '<author-view></author-view>',
-      data: { requiresAuth: true }
     })
     $stateProvider.state('login', {
       url: '/login',
@@ -77,9 +95,7 @@ namespace fibra {
       }
     })
   })
-  m.config(($localStorageProvider) => {
-    $localStorageProvider.setKeyPrefix('fibra-');
-  })
+  m.config($localStorageProvider => $localStorageProvider.setKeyPrefix('fibra-'))
   m.value('workerServiceConfiguration', {
     appName: 'fibra',
     workerThreads: 8,
@@ -87,17 +103,28 @@ namespace fibra {
       'bower_components/angular/angular.js',
       'bower_components/angular-http-auth/src/http-auth-interceptor.js',
       'bower_components/angular-sparql-service/dist/sparql-service.js',
+      'bower_components/rdfstore/dist/rdfstore.js',
+      'components/app/_datamodel/citable.js',
+      'components/app/_datamodel/rdf.js',
+      'components/app/_datamodel/richnode.js',
       'components/app/app-configuration-worker.js',
       'components/app/app-configuration-common.js',
-      'components/worker-service/worker-service.js',
-      'components/app/configuration-service.js',
+      'components/app/fibra-service.js',
+      'components/project-service/project.js',
+      'components/project-service/schema.js',
+      'components/project-service/primary-endpoint-configuration.js',
+      'components/project-service/remote-endpoint-configuration.js',
+      'components/project-service/data-model.js',
+      'components/project-service/project-service.js',
       'components/collection-utils.js',
-      'components/rdf/rdf.js',
       'components/sparql-item/sparql-item-service.js',
+      'components/worker-service/worker-service.js',
+      'components/app/fibra-sparql-service.js',
       'components/sparql-autocomplete/sparql-autocomplete-service.js',
       'components/sparql-tree-service.js',
       'components/sparql-update-service.js',
-      'components/tree/tree-component.js'
+      'components/tree/tree-component.js',
+      'components/misc-utils.js'
       ]
   })
   m.run(( $rootScope: IAuthenticationRootScopeService,
@@ -133,14 +160,14 @@ namespace fibra {
     $rootScope.$on('event:auth-loginRequired', () => $rootScope.authInfo.authOpen = true)
 
     // Social logon
-    let requiresAuthCriteria = {
+    let requiresAuthCriteria: {} = {
       to: (state) => state.data && state.data.requiresAuth
     };
 
     // Function that returns a redirect for the current transition to the login state
     // if the user is not currently authenticated (according to the AuthService)
 
-    let redirectToLogin = (transition) => {
+    let redirectToLogin: (any) => boolean = (transition) => {
       if (!socialAuthService.isAuthenticated()) {
         // Save state token on local storage.
         return transition.router.stateService.target('login', { redirect_hash: window.location.hash })

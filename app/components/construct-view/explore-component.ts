@@ -20,7 +20,7 @@ namespace fibra {
   }
 
   interface IExploreItemLink extends d3.SimulationLinkDatum<IExploreItem> {
-    property?: PropertyToValues<INodePlusLabel>
+    property?: PropertyToValues
   }
 
   class ExploreComponentController {
@@ -138,7 +138,7 @@ namespace fibra {
 
           if (this.primaryItems[0] && this.primaryItems[0].localProperties) {
             for (let p of this.primaryItems[0].localProperties)
-              this.properties.push({key: p.toCanonical(), value: p.label.value })
+              this.properties.push({key: p.toCanonical(), value: p.label })
           }
           this.links = this.mergeLinks(this.links)
           console.log(this.links)
@@ -164,7 +164,7 @@ namespace fibra {
           return pr.value === 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type'
         })
         if(typeProp[0]) {
-          return typeProp[0].values.map((v) => { return v.value; }).indexOf(type) !== -1
+          return typeProp[0].values.map((v) => { return v.value.value; }).indexOf(type) !== -1
         } else {
           return false;
         }
@@ -259,9 +259,7 @@ namespace fibra {
                     .each((f: IExploreItem, j) => {
                       if (Math.abs(lineX - f.x) < this.radius && Math.abs(lineY - f.y) < this.radius) {
                         nodeDrop = true
-                        let linkedProp: PropertyToValues<INode> = new PropertyToValues(SKOS.related)
-                        linkedProp.values.push(DataFactory.instance.nodeFromNode(d))
-                        this.fibraService.dispatchAction(this.fibraService.itemProperty(f, [linkedProp], []))
+                        this.fibraService.dispatchAction(this.fibraService.itemProperty(f, [new PropertyAndValue(SKOS.related, DataFactory.instance.nodeFromNode(d))], []))
                           .then((state) => {
                             this.dragline.remove()
                             this.queryAndBuild()
@@ -280,7 +278,7 @@ namespace fibra {
             this.tooltip.style('top', (d3.event.pageY - 10) + 'px')
               .style('left', (d3.event.pageX + 10) + 'px')
               .style('visibility', 'visible')
-              .text(d.label.value)
+              .text(d.label)
           })
           .on('mouseout', (d: IExploreItem, i: number) => {
             this.svgSel.selectAll('line').classed('relevant', false)
@@ -376,7 +374,7 @@ namespace fibra {
               .attr('r', (d: IExploreItem) => { return this.radius + (d.selected ? 3 : 0) + 'px' })
               .style('cursor', this.linkMode ? 'crosshair' : 'initial')
       this.svgSel.selectAll('.node-circle')
-        .classed('labeled', (d: IExploreItem) => { return d.label.value ? true : false; })
+        .classed('labeled', (d: IExploreItem) => { return d.label ? true : false; })
         // We should only count 'sameAs' relations as verified if they are against the configuration,
         // but this doesn't make that distinction.
         .classed('verified', (d: IExploreItem) => { return d.localProperties.filter((p) => { return p.value === 'http://www.w3.org/2002/07/owl#sameAs' }).length > 0; })
@@ -452,7 +450,7 @@ namespace fibra {
             this.tooltip.style('top', (d3.event.pageY - 10) + 'px')
               .style('left', (d3.event.pageX + 10) + 'px')
               .style('visibility', 'visible')
-              .text(d.property.label.value)
+              .text(d.property.label)
           })
           .on('mouseout', (d: IExploreItemLink, i: number) => {
             this.tooltip.style('visibility', 'hidden')
@@ -566,10 +564,10 @@ namespace fibra {
       let sameAs: ENodeMap<Item> = new ENodeMap<Item>()
       for (let item of items) {
         sameAs.set(item, item)
-        let sameAsProp: PropertyToValues<INodePlusLabel> = item.localProperties.filter((p) =>
+        let sameAsProp: PropertyToValues = item.localProperties.filter((p) =>
           OWL.sameAs.equals(p)
         )[0]
-        if (sameAsProp && sameAsProp.values) for (let n of sameAsProp.values) sameAs.set(n, item)
+        if (sameAsProp && sameAsProp.values) for (let n of sameAsProp.values) sameAs.set(n.value, item)
       }
 
       // Iterate over item property values to see if they match the id of any
@@ -577,10 +575,10 @@ namespace fibra {
       for (let item of items) {
         for (let p of item.localProperties) {
           for (let v of p.values) {
-            if (sameAs.has(v) && item !== sameAs.get(v) && items.indexOf(sameAs.get(v)) !== -1) {
+            if (sameAs.has(v.value) && item !== sameAs.get(v.value) && items.indexOf(sameAs.get(v.value)) !== -1) {
               newLinks.push({
                 source: <IExploreItem>item,
-                target: <IExploreItem>sameAs.get(v),
+                target: <IExploreItem>sameAs.get(v.value),
                 property: p
               })
             }

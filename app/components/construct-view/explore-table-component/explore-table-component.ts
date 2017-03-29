@@ -23,7 +23,7 @@ namespace fibra {
 
     private removedProperties: String[] = []
 
-    private originalPropertiesMap: { [id: string] : PropertyToValues<INode>[] } = { }
+    private originalPropertiesMap: { [id: string] : PropertyToValues[] } = { }
     private editItem: Item
 
     public constructor( private fibraService: FibraService,
@@ -42,15 +42,15 @@ namespace fibra {
     private selectItem(item: Item): void {
       this.editItem = item
 
-      let origProps: PropertyToValues<INode>[] = item.localProperties.map((prop) => {
+      let origProps: PropertyToValues[] = item.localProperties.map((prop) => {
         let newProp = new PropertyToValues(prop)
         prop.values
           // Only handle literal values
-          .filter((vl) => { return vl.termType === 'Literal' })
-          .forEach((vl: SourcedNodePlusLabel) => {
-            let literalNode = DataFactory.instance.literal(vl.value)
-            let snpl = new SourcedNodePlusLabel(literalNode, vl.label, vl.sourceEndpoints)
-            newProp.values.push(snpl)
+          .filter((vl) => { return vl.value.termType === 'Literal' })
+          .forEach((vl: IRichPropertyValue) => {
+            let literalNode = DataFactory.instance.literal(vl.value.value)
+            let snpl = new FullRichNodeFromNode(literalNode, vl.value.label, undefined, undefined, vl.value.sourceEndpoints)
+            newProp.values.push(new RichPropertyValue(snpl, vl.properties))
           })
         return newProp
       }).filter((prop) => { return prop.values.length > 0 })
@@ -64,17 +64,14 @@ namespace fibra {
     private saveItem(item: Item): void {
       // Currently this just replaces all properties on the item. We should really only update
       // properties that have changed.
-      let newProps: PropertyToValues<INode>[] = item.localProperties.map((prop) => {
-        let newProp = new PropertyToValues(prop)
+      let newProps = item.localProperties.map(prop =>
         prop.values
-          .filter((vl) => { return vl.termType === 'Literal' })
-          .forEach((vl: SourcedNodePlusLabel) => {
-            let literalNode = DataFactory.instance.literal(vl.value)
-            newProp.values.push(literalNode)
-          })
-        return newProp
-      }).filter((prop) => { return prop.values.length > 0 })
-      this.fibraService.dispatchAction(this.fibraService.itemProperty(item, newProps, this.originalPropertiesMap[item.value]))
+          .filter((vl) => { return vl.value.termType === 'Literal' })
+          .map((vl: IRichPropertyValue) =>
+            new PropertyAndValue(prop, DataFactory.instance.literal(vl.value.value))
+          )
+      ).reduce((acc, val) => acc.concat(val), [])
+      this.fibraService.dispatchAction(this.fibraService.itemProperty(item, newProps, this.originalPropertiesMap[item.value].map(v => v.toPropertyAndValues()).reduce((acc, val) => acc.concat(val), [])))
         .then(() => {
           this.fibraService.dispatch('change')
           this.editItem = null
@@ -85,7 +82,7 @@ namespace fibra {
       return this.fibraService.dispatchAction(this.fibraService.hideItem(id)).then(() => { return 'ok' })
     }
 
-    private delete(id: INode): angular.IPromise<State> {
+    private delete(id: INode): angular.IPromise<UIState> {
       return this.fibraService.dispatchAction(this.fibraService.deleteItem(id))
     }
 

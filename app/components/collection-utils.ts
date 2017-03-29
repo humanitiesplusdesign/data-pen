@@ -1,20 +1,14 @@
 namespace fibra {
   'use strict'
 
-  export class EMap<V> implements d3.Map<V> {
+  export class Map<V> implements d3.Map<V> {
 
     public s: {[id: string]: V} = {}
-
-    constructor(protected create: (key?: string) => V = () => { return <V>{} }) {}
 
     public has(key: string): boolean {
       return this.s[key] !== undefined
     }
-    public goc(key: string, create?: (key?: string) => V): V {
-      if (!this.has(key))
-        this.set(key, create ? create(key) : this.create(key))
-      return this.get(key)
-    }
+
     public set(key: string, value: V): this {
       this.s[key] = value
       return this
@@ -54,7 +48,7 @@ namespace fibra {
       for (let key in this.s) ret.push({ key, value: this.s[key] })
       return ret
     }
-    public each(func: (value: V, key: string, map: EMap<V>) => void): undefined {
+    public each(func: (value: V, key: string, map: Map<V>) => void): undefined {
       for (let key in this.s)
         func(this.s[key], key, this)
       return undefined
@@ -68,6 +62,21 @@ namespace fibra {
     }
     public empty(): boolean {
       return this.size() === 0
+    }
+  }
+
+  export interface IEMap<V> extends d3.Map<V> {
+    goc(key: string, create?: (key?: string) => V): V
+  }
+
+  export class EMap<V> extends Map<V> implements IEMap<V> {
+
+    constructor(protected create: (key?: string) => V = () => { return <V>{} }) { super() }
+
+    public goc(key: string, create?: (key?: string) => V): V {
+      if (!this.has(key))
+        this.set(key, create ? create(key) : this.create(key))
+      return this.get(key)
     }
   }
 
@@ -163,17 +172,9 @@ namespace fibra {
     }
   }
 
-  export class EOMap<V> extends EMap<V> {
+  export class OMap<V> extends Map<V> {
     public a: V[] = []
-    constructor(create?: (key?: string) => V) {
-      super(create)
-    }
 
-    public goc(key: string, create?: (key?: string) => V): V {
-      if (!this.has(key))
-        this.set(key, create ? create(key) : this.create(key))
-      return this.get(key)
-    }
     public set(key: string, value: V): this {
       if (!this.has(key)) {
         super.set(key, value)
@@ -199,6 +200,16 @@ namespace fibra {
       super.clear()
       this.a = []
       return this
+    }
+  }
+
+  export class EOMap<V> extends OMap<V> implements IEMap<V> {
+    constructor(protected create?: (key?: string) => V) { super() }
+
+    public goc(key: string, create?: (key?: string) => V): V {
+      if (!this.has(key))
+        this.set(key, create ? create(key) : this.create(key))
+      return this.get(key)
     }
   }
 

@@ -10,7 +10,7 @@ namespace fibra {
     private queryString: string = ''
     private canceller: angular.IDeferred<any>
     private matchingResults: ResultGroup[]
-    private relevantTypes: INodePlusLabel[] = []
+    private relevantTypes: IRichNode[] = []
 
     public constructor( private fibraService: FibraService,
                         private $q: angular.IQService,
@@ -21,7 +21,7 @@ namespace fibra {
 
     public $onChanges(chngsObj: any): void {
       if (this.node) {
-        this.queryString = this.node.label.value
+        this.queryString = this.node.label
         if (this.node) {
           this.runQuery()
         }
@@ -35,8 +35,8 @@ namespace fibra {
       this.error = false
       this.limitFilter = ''
       this.canceller = this.$q.defer()
-      let nodeTypes: PropertyToValues<INodePlusLabel> = this.node.localProperties.filter((p) => p.value === 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type')[0]
-      this.relevantTypes = nodeTypes ? nodeTypes.values : []
+      let nodeTypes: PropertyToValues = this.node.localProperties.filter((p) => p.value === 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type')[0]
+      this.relevantTypes = nodeTypes ? nodeTypes.values.map(v => v.value) : []
       this.relevantTypes.forEach((t) => { if (t) this.limitFilter += '<' + t.value + '>' + ',' })
       if (this.limitFilter.length !== 0) this.limitFilter = 'FILTER (?groupId IN (' + this.limitFilter.substring(0, this.limitFilter.length - 1) + '))'
       this.sparqlAutocompleteService.autocomplete(this.queryString, 6, true, this.limitFilter, this.canceller.promise).then(
@@ -56,28 +56,24 @@ namespace fibra {
     }
 
     private updateResults(results: AutocompletionResults) {
-      let typeLabels: string[] = this.relevantTypes.map((t) => { return t.label.value })
+      let typeLabels: string[] = this.relevantTypes.map((t) => { return t.label })
       this.matchingResults = results.remoteResults.filter((r) => typeLabels.indexOf(r.label) !== -1)
       console.log(this.matchingResults)
     }
 
     private sourcesFromResult(result: Result): string {
-      return ' (Sources: ' + result.datasources.map((ds) => ds.name).join(', ') + ')'
+      return ' (Sources: ' + result.datasources.join(', ') + ')'
     }
 
-    private verify(result: Result) {
-      let prop: PropertyToValues<INode> = new PropertyToValues(OWL.sameAs)
-      result.ids.forEach((id) => {
-        let tempNode: INamedNode = new NamedNode(id.value)
-        prop.values.push(tempNode)
-      })
-      this.fibraService.dispatchAction(this.fibraService.itemProperty(this.node, [prop]))
+    private verify(result: Result): void {
+      let prop: IPropertyAndValue[] = result.ids.map(id => new PropertyAndValue(OWL.sameAs, id))
+      this.fibraService.dispatchAction(this.fibraService.itemProperty(this.node, prop))
         .then(() => {
           this.clear()
         })
     }
 
-    private clear() {
+    private clear(): void {
       this.fibraService.dispatchAction(this.fibraService.verifyItem(null))
     }
   }

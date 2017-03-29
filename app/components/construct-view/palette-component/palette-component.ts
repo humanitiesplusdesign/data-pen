@@ -39,7 +39,6 @@ namespace fibra {
     private typeForCreation: string
 
     public constructor( private fibraService: FibraService,
-                        private configurationService: ConfigurationService,
                         private $element: angular.IAugmentedJQuery,
                         private sparqlItemService: SparqlItemService,
                         private sparqlTreeService: SparqlTreeService,
@@ -158,7 +157,7 @@ namespace fibra {
           return !row['FibraId']  // Not an update
         })
         let labelColumnKey = parsedCSV.columns[0]
-        let proms: angular.IPromise<State>[] = [
+        let proms: angular.IPromise<UIState>[] = [
           newRows.length > 0 ? this.fibraService.dispatchAction(
             this.fibraService.createItems(
               newRows.map((row) => {
@@ -177,29 +176,22 @@ namespace fibra {
               delete row['Match']
             }
             let entries = d3.entries(row)
-            let props: PropertyToValues<INode>[] = entries
+            let props: IPropertyAndValue[] = entries
               .filter((entry) =>  entry.key !== 'FibraId'
                                   && entry.value
                                   && entry.key !== OWL.sameAs.value
                                   && entry.key !== 'Notes'
                                   && entry.key !== 'Match')
-              .map((entry) => {
-                let prop: PropertyToValues<INode> = new PropertyToValues(DataFactory.instance.namedNode(entry.key))
-                prop.values.push(
+              .map(entry =>
+                new PropertyAndValue(DataFactory.instance.namedNode(entry.key),
                   entry.value.indexOf('http://') === 0 ?
                   DataFactory.instance.namedNode(entry.value) :
-                  DataFactory.instance.literal(entry.value)
-                )
-                return prop
-              })
+                  DataFactory.instance.literal(entry.value))
+              )
             // Handle OWL.sameAs
             entries
               .filter((entry) => entry.key === OWL.sameAs.value && entry.value)
-              .forEach((entry) => {
-                let prop: PropertyToValues<INode> = new PropertyToValues(DataFactory.instance.nodeFromNode(OWL.sameAs))
-                prop.values.push(DataFactory.instance.namedNode(entry.value))
-                props.push(prop)
-              })
+              .forEach((entry) => props.push(new PropertyAndValue(OWL.sameAs, DataFactory.instance.namedNode(entry.value))))
             console.log(props)
             return this.fibraService.dispatchAction(
               this.fibraService.itemProperty(
@@ -207,7 +199,7 @@ namespace fibra {
                 props
               )
             )
-          })).then((states: State[]) => states[states.length - 1])
+          })).then((states: UIState[]) => states[states.length - 1])
         ]
 
         this.$q.all(proms).then(() => {
@@ -309,7 +301,7 @@ namespace fibra {
             this.tooltip.style('top', (d3.event.pageY - 10) + 'px')
               .style('left', (d3.event.pageX + 10) + 'px')
               .style('visibility', 'visible')
-              .text(d.label.value + ' (' + d.typeLabel + ')')
+              .text(d.label + ' (' + d.typeLabel + ')')
           })
           .on('mouseout', (d: IExploreItem, i: number) => {
             this.tooltip.style('visibility', 'hidden')
@@ -368,7 +360,7 @@ namespace fibra {
       let c: d3.Selection<d3.BaseType, IPaletteItem, SVGSVGElement, {}> = circles ? circles : this.circles
 
       c .classed('displayed', (d: IPaletteItem) => this.fibraService.getState().construct.itemIndex[d.value] ? true : false)
-        .classed('filtered', (d: IPaletteItem) => this.labelFilter && !(d.label.value.toUpperCase().indexOf(this.labelFilter.toUpperCase()) !== -1))
+        .classed('filtered', (d: IPaletteItem) => this.labelFilter && !(d.label.toUpperCase().indexOf(this.labelFilter.toUpperCase()) !== -1))
     }
 
     private updateSizing(): void {
@@ -384,10 +376,10 @@ namespace fibra {
       })
 
       newItems.forEach((item) => {
-        let typeProp: IPropertyToValues<INodePlusLabel> = item.localProperties.filter((p) => p.value === RDF.type.value)[0]
+        let typeProp = item.localProperties.filter((p) => p.value === RDF.type.value)[0]
         if (typeProp && typeProp.values[0]) {
-          item.typeValue = typeProp.values[0].value
-          item.typeLabel = typeProp.values[0].label.value
+          item.typeValue = typeProp.values[0].value.value
+          item.typeLabel = typeProp.values[0].value.label
 
           // Add type to the type map
           if (!this.typeItemTree.has(item.typeValue)) {
@@ -406,7 +398,7 @@ namespace fibra {
       })
       // Sort by label
       this.typeItemTree.values().forEach((v) => {
-        v.items.sort((a: IPaletteItem, b: IPaletteItem) => a.label.value === b.label.value ? 0 : a.label.value > b.label.value ? 1 : -1)
+        v.items.sort((a: IPaletteItem, b: IPaletteItem) => a.label === b.label ? 0 : a.label > b.label ? 1 : -1)
       })
       return this.typeItemTree
     }

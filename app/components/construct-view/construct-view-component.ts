@@ -10,9 +10,9 @@ namespace fibra {
     public classTreePromise: angular.IPromise<TreeNode[]>
     public selectedItem: INode
     public types: TreeNode[] = []
-    private limitFilter: string = ''
-    public state: fibra.State
+    public state: UIState
     public paletteDisplay: boolean = false
+    private limitFilter: string = ''
 
     public createItem(item: Result) {
       // Is there a type on this item? If so, and it is not already in chosenTypes,
@@ -32,7 +32,7 @@ namespace fibra {
     }
 
     public downloadRDF() {
-      let currentConfig = this.configurationService.configuration.graph.value
+      let currentConfig = this.fibraService.getState().project.graph
       let downloadlink = "http://ldf.fi/fibra/sparql?graph=" + currentConfig // + "&force-accept=application/rdf+xml"
       let request = new XMLHttpRequest()
       request.open("GET", downloadlink, true)
@@ -54,15 +54,14 @@ namespace fibra {
         request.send(null);
     }
 
-    constructor(private configurationService: ConfigurationService,
-                private sparqlTreeService: SparqlTreeService,
+    constructor(private sparqlTreeService: SparqlTreeService,
                 private sparqlItemService: SparqlItemService,
                 private socialAuthService: SocialAuthService,
                 private $localStorage: any,
                 private $sessionStorage: any,
                 private fibraService: FibraService,
                 private $q: angular.IQService) {
-
+      console.log(fibraService.getState().project)
       fibraService.on('change', () => {
         let chosenTypes = fibraService.getState().construct.displayTypes
         this.limitFilter = ''
@@ -70,7 +69,7 @@ namespace fibra {
         if (this.limitFilter.length !== 0) this.limitFilter = 'FILTER (?groupId IN (' + this.limitFilter.substring(0, this.limitFilter.length - 1) + '))'
         return this.$q.resolve('ok')
       })
-      this.classTreePromise = sparqlTreeService.getTree(this.configurationService.configuration.primaryEndpoint.endpoint.value, this.configurationService.configuration.primaryEndpoint.treeQueryTemplate)
+      this.classTreePromise = sparqlTreeService.getTree(this.fibraService.getState().project.endpoint, this.fibraService.getState().project.treeQuery)
       this.classTreePromise.then(c => {
         this.classTree = c;
         this.fibraService.dispatchAction(this.fibraService.clearTypes())
@@ -79,7 +78,7 @@ namespace fibra {
         this.traverseClassTree(c, n => this.types.indexOf(n) === -1 && n.children.length === 0, n => addType(n))
       })
       this.fibraService.on('change', () => {
-        this.classTreePromise = sparqlTreeService.getTree(this.configurationService.configuration.primaryEndpoint.endpoint.value, SparqlTreeService.getClassTreeQuery)
+        this.classTreePromise = sparqlTreeService.getTree(this.fibraService.getState().project.endpoint, SparqlTreeService.getClassTreeQuery)
         return this.classTreePromise.then(c => {
           this.classTree = c
           return 'ok'

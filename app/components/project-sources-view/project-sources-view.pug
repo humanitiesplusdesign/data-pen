@@ -1,0 +1,20 @@
+.container
+  h1 Fibra
+  h2 Your project sources
+  .well(ng-repeat="source in $ctrl.projectSources")
+    .pull-right
+      button.btn.btn-xs.btn-danger(ng-click="$ctrl.deleteProjectSource($index)"): span.glyphicon.glyphicon-remove
+    .form-group
+      label Name
+      input.form-control(type="text",ng-model="source.id")
+    .form-group
+      label Endpoint address
+      input.form-control(type="text",ng-model="source.endpoint")
+    .form-group
+      label Graph
+      input.form-control(type="text",ng-model="source.graph")
+    .form-group
+      label Type IRI
+      input.form-control(type="text",ng-model="source.type")
+  button.btn.btn-success(ng-click="$ctrl.addNewProjectSource()") Add new
+  a(ui-sref="projects()") Back to projects

@@ -3,51 +3,91 @@ namespace fibra {
 
   import s = fi.seco.sparql
 
-  export interface ISourcedNode extends INode {
-    sourceEndpoints: EndpointConfiguration[]
+  export interface IPropertyToValues extends IRichNode {
+    values: IRichPropertyValue[]
+    pruned(): IPropertyToValues
+    toPropertyAndValues(): IPropertyAndValue[]
+    toTriples(subject: INode): ITriple[]
+    toQuads(subject: INode, graph: INode): IQuad[]
   }
 
-  export interface INodePlusLabel extends INode {
-    label: INode
+  export interface IPropertyAndValue {
+    property: INode
+    object: INode
+    pruned(): IPropertyAndValue
   }
 
-  export interface ISourcedNodePlusLabel extends INodePlusLabel, ISourcedNode {}
-
-  export class NodePlusLabel extends NodeFromNode implements INodePlusLabel {
-    public label: INode
-    constructor(node: INode, label?: INode) {
-      super(node)
-      if (label) this.label = label
+  export class PropertyAndValue {
+    constructor(public property: INode, public object: INode) {}
+    public pruned(): IPropertyAndValue {
+      return new PropertyAndValue(new PrunedRichNodeFromNode(this.property), new PrunedRichNodeFromNode(this.object))
     }
   }
 
-  export class SourcedNodePlusLabel extends NodePlusLabel implements ISourcedNodePlusLabel {
-    constructor(node: INode, label?: INode, public sourceEndpoints: EndpointConfiguration[] = []) {
-      super(node, label)
+  export interface IRichPropertyValue {
+    value: IRichNode
+    properties: IPropertyToValues[]
+  }
+
+  export class RichPropertyValue implements IRichPropertyValue {
+    constructor(public value: IRichNode, public properties: IPropertyToValues[] = []) {}
+  }
+
+  export class PrunedPropertyValuesFromPropertyValues extends PrunedRichNodeFromNode implements IPropertyToValues {
+    public values: IRichPropertyValue[]
+    constructor(pv: IPropertyToValues) {
+      super(pv)
+      this.values = pv.values.map(v => new RichPropertyValue(new PrunedRichNodeFromNode(v.value)))
+    }
+    public toPropertyAndValues(): IPropertyAndValue[] {
+      return PropertyToValues.toPropertyAndValues(this)
+    }
+    public toTriples(subject: INode): ITriple[] {
+      return PropertyToValues.toTriples(subject, this)
+    }
+    public toQuads(subject: INode, graph: INode): IQuad[] {
+      return PropertyToValues.toQuads(subject, this, graph)
+    }
+    public pruned(): IPropertyToValues {
+      return this
     }
   }
 
-  export interface IPropertyToValues<T extends INode> extends INodePlusLabel {
-    values: T[]
-  }
+  export class PropertyToValues extends RichNodeFromRichNode implements IPropertyToValues {
+    public values: IRichPropertyValue[] = []
 
-  export class PropertyToValues<T extends INode> extends NodePlusLabel implements IPropertyToValues<T> {
-    public values: T[] = []
-    constructor(property: INode) {
+    public static toPropertyAndValues(pv: IPropertyToValues): IPropertyAndValue[] {
+      return pv.values.map(v => new PropertyAndValue(pv, v.value))
+    }
+    public static toTriples(subject: INode, pv: IPropertyToValues): ITriple[] {
+      return PropertyToValues.toQuads(subject, pv, DefaultGraph.instance) as ITriple[]
+    }
+    public static toQuads(subject: INode, pv: IPropertyToValues,  graph: INode, ): IQuad[] {
+      return pv.values.map(v => DataFactory.instance.quad(subject, pv, v.value, graph))
+    }
+
+    constructor(property: IRichNode) {
       super(property)
     }
+    public pruned(): IPropertyToValues {
+      return new PrunedPropertyValuesFromPropertyValues(this)
+    }
+    public toPropertyAndValues(): IPropertyAndValue[] {
+      return PropertyToValues.toPropertyAndValues(this)
+    }
+    public toTriples(subject: INode): ITriple[] {
+      return PropertyToValues.toTriples(subject, this)
+    }
+    public toQuads(subject: INode, graph: INode): IQuad[] {
+      return PropertyToValues.toQuads(subject, this, graph)
+    }
   }
 
-  export class SourcePlusProperties {
-    public properties: PropertyToValues<INodePlusLabel>[] = []
-    constructor(public source: EndpointConfiguration) {}
-  }
-
-  export class Item extends NodePlusLabel {
-    public localProperties: PropertyToValues<INodePlusLabel>[] = []
-    public remoteProperties: PropertyToValues<INodePlusLabel>[] = []
-    public localInverseProperties: PropertyToValues<INodePlusLabel>[] = []
-    public remoteInverseProperties: PropertyToValues<INodePlusLabel>[] = []
+  export class Item extends FullRichNodeFromNode {
+    public localProperties: PropertyToValues[] = []
+    public remoteProperties: PropertyToValues[] = []
+    public localInverseProperties: PropertyToValues[] = []
+    public remoteInverseProperties: PropertyToValues[] = []
   }
 
   export interface IConstraint {
@@ -67,13 +107,12 @@ namespace fibra {
 
   export class SparqlItemService {
 
-    public static naiveGetLocalItemPropertiesQuery: string = `
-PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+    public static naiveGetLocalItemPropertiesQuery: string = `PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
 PREFIX mads: <http://www.loc.gov/mads/rdf/v1#>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX owl: <http://www.w3.org/2002/07/owl#>
 SELECT ?id ?itemLabel ?property ?propertyLabel ?object ?objectLabel {
-  GRAPH <GRAPH> {
+  # STARTGRAPH
     VALUES ?id { <IDS> }
     ?id skos:prefLabel|mads:authoritativeLabel|rdfs:label ?itemLabel .
     FILTER(LANG(?itemLabel)='' || LANG(?itemLabel)='<PREFLANG>')
@@ -88,17 +127,16 @@ SELECT ?id ?itemLabel ?property ?propertyLabel ?object ?objectLabel {
       FILTER(LANG(?objectLabelP)='' || LANG(?objectLabelP)='<PREFLANG>')
     }
     BIND (IF(ISIRI(?object),COALESCE(?objectLabelP,REPLACE(REPLACE(REPLACE(REPLACE(STR(?object),".*/",""),".*#",""),"_"," "),"([A-ZÅÄÖ])"," $1")),?object) AS ?objectLabel)
-  }
+  # ENDGRAPH
 }`
 
-    public static getLocalItemPropertiesQuery: string = `
-PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+    public static getLocalItemPropertiesQuery: string = `PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
 PREFIX mads: <http://www.loc.gov/mads/rdf/v1#>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX owl: <http://www.w3.org/2002/07/owl#>
 PREFIX sf: <http://ldf.fi/functions#>
 SELECT ?id ?itemLabel ?property ?propertyLabel ?object ?objectLabel {
-  GRAPH <GRAPH> {
+  # STARTGRAPH
     VALUES ?id { <IDS> }
     { ?id ?property ?object . }
     UNION
@@ -112,11 +150,10 @@ SELECT ?id ?itemLabel ?property ?propertyLabel ?object ?objectLabel {
       ?object sf:preferredLanguageLiteral (skos:prefLabel mads:authoritativeLabel rdfs:label skos:altLabel mads:variantLabel '<PREFLANG>' '' ?objectLabelP) .
     }
     BIND (IF(ISIRI(?object),COALESCE(?objectLabelP,REPLACE(REPLACE(REPLACE(REPLACE(STR(?object),".*/",""),".*#",""),"_"," "),"([A-ZÅÄÖ])"," $1")),?object) AS ?objectLabel)
-  }
+  # ENDGRAPH
 }`
 
-    public static getRemoteItemPropertiesQuery: string = `
-PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+    public static getRemoteItemPropertiesQuery: string = `PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
 PREFIX mads: <http://www.loc.gov/mads/rdf/v1#>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX owl: <http://www.w3.org/2002/07/owl#>
@@ -135,39 +172,18 @@ SELECT ?id ?property ?propertyLabel ?object ?objectLabel {
 }
 `
 
-    public static deleteItemQuery: string = `
-DELETE {
-  GRAPH <GRAPH> {
+    public static deleteItemQuery: string = `DELETE {
+  # STARTGRAPH
     <ID> ?p ?o .
     ?s ?p <ID> .
-  }
+  # ENDGRAPH
 }
 WHERE {
-  GRAPH <GRAPH> {
+  # STARTGRAPH
     { <ID> ?p ?o } UNION { ?s ?p <ID> }
-  }
+  # ENDGRAPH
 }
 `
-
-    private static lut: string[] = (() => {
-      let lut: string[] = []
-      for (let i: number = 0; i < 256; i++)
-        lut[i] = (i < 16 ? '0' : '') + i.toString(16)
-      return lut
-    })()
-
-    public static UUID(): string {
-      /* tslint:disable:no-bitwise */
-      let d0: number = Math.random() * 0xffffffff | 0
-      let d1: number = Math.random() * 0xffffffff | 0
-      let d2: number = Math.random() * 0xffffffff | 0
-      let d3: number = Math.random() * 0xffffffff | 0
-      return SparqlItemService.lut[d0 & 0xff] + SparqlItemService.lut[d0 >> 8 & 0xff] + SparqlItemService.lut[d0 >> 16 & 0xff] + SparqlItemService.lut[d0 >> 24 & 0xff] + '-' +
-        SparqlItemService.lut[d1 & 0xff] + SparqlItemService.lut[d1 >> 8 & 0xff] + '-' + SparqlItemService.lut[d1 >> 16 & 0x0f | 0x40] + SparqlItemService.lut[d1 >> 24 & 0xff] + '-' +
-        SparqlItemService.lut[d2 & 0x3f | 0x80] + SparqlItemService.lut[d2 >> 8 & 0xff] + '-' + SparqlItemService.lut[d2 >> 16 & 0xff] + SparqlItemService.lut[d2 >> 24 & 0xff] +
-        SparqlItemService.lut[d3 & 0xff] + SparqlItemService.lut[d3 >> 8 & 0xff] + SparqlItemService.lut[d3 >> 16 & 0xff] + SparqlItemService.lut[d3 >> 24 & 0xff]
-      /* tslint:enable:no-bitwise */
-    }
 
     constructor(private workerService: WorkerService) {}
 
@@ -177,7 +193,7 @@ WHERE {
      * @param canceller promise that can be resolved to cancel a remote fetch
      */
     public getItem(id: INode, queryRemote: boolean = false, canceller?: angular.IPromise<any>): angular.IPromise<Item> {
-      return this.workerService.call('sparqlItemWorkerService', 'getItems', [[id], queryRemote], canceller).then((items: Item[]) => items[0], null, (info: {endpointType: 'primary' | 'remote', endpoint: string, items: Item[]}) => { return { endpointType: info.endpointType, endpoint: info.endpoint, item: info.items[0] } })
+      return this.workerService.call('sparqlItemWorkerService', 'getItems', [[id.toCanonical()], queryRemote], canceller).then((items: Item[]) => items[0], null, (info: {endpointType: 'primary' | 'remote', endpoint: string, items: Item[]}) => { return { endpointType: info.endpointType, endpoint: info.endpoint, item: info.items[0] } })
     }
 
     /**
@@ -186,19 +202,19 @@ WHERE {
      * @param canceller promise that can be resolved to cancel a remote fetch
      */
     public getItems(ids: INode[], queryRemote: boolean = false, canceller?: angular.IPromise<any>): angular.IPromise<Item[]> {
-      return this.workerService.call('sparqlItemWorkerService', 'getItems', [ids, queryRemote], canceller)
+      return this.workerService.call('sparqlItemWorkerService', 'getItems', [ids.map(id => id.toCanonical()), queryRemote], canceller)
     }
 
     public getAllItems(queryRemote: boolean = false, canceller?: angular.IPromise<any>): angular.IPromise<Item[]> {
       return this.workerService.call('sparqlItemWorkerService', 'getItems', [false, queryRemote], canceller)
     }
 
-    public createNewItem(equivalentNodes: INode[] = [], properties: IPropertyToValues<INode>[] = []): angular.IPromise<INode> {
-      return this.workerService.call('sparqlItemWorkerService', 'createNewItem', [equivalentNodes, properties])
+    public createNewItem(properties: IPropertyAndValue[] = []): angular.IPromise<INode> {
+      return this.workerService.call('sparqlItemWorkerService', 'createNewItem', [properties.map(pv => pv.pruned())])
     }
 
-    public alterItem(id: INode, propertiesToAdd: IPropertyToValues<INode>[], propertiesToRemove: IPropertyToValues<INode>[] = []): angular.IPromise<string> {
-      return this.workerService.call('sparqlItemWorkerService', 'alterItem', [id, propertiesToAdd, propertiesToRemove])
+    public alterItem(id: INode, propertiesToAdd: IPropertyAndValue[], propertiesToRemove: IPropertyAndValue[] = []): angular.IPromise<string> {
+      return this.workerService.call('sparqlItemWorkerService', 'alterItem', [(id), propertiesToAdd.map(pv => pv.pruned()), propertiesToRemove.map(pv => pv.pruned())])
     }
 
     public deleteItem(id: INode): angular.IPromise<string> {
@@ -208,62 +224,62 @@ WHERE {
 
   export class SparqlItemWorkerService {
 
-    private static processItemResult(properties: PropertyToValues<INodePlusLabel>[], propertyMap: EMap<PropertyToValues<INodePlusLabel>>, propertyValueMap: EMap<EMap<ISourcedNodePlusLabel>>, sameAses: INode[], endpoint: EndpointConfiguration, b: {[varId: string]: s.ISparqlBinding}): void {
+    private static processItemResult(properties: PropertyToValues[], propertyMap: EMap<PropertyToValues>, propertyValueMap: EMap<EMap<IRichNode>>, sameAses: INode[], endpoint: string, b: {[varId: string]: s.ISparqlBinding}): void {
       if (b['property']) {
-        let n: ISourcedNodePlusLabel = propertyValueMap.goc(b['property'].value).goc(b['object'].value, () => {
-          let propertyToValues: PropertyToValues<INodePlusLabel> = propertyMap.goc(b['property'].value, () => {
-            let ret: PropertyToValues<INodePlusLabel> = new PropertyToValues<INodePlusLabel>(DataFactory.instance.nodeFromBinding(b['property']))
-            if (b['propertyLabel']) ret.label = DataFactory.instance.nodeFromBinding(b['propertyLabel'])
+        let n: IRichNode = propertyValueMap.goc(b['property'].value).goc(b['object'].value, () => {
+          let propertyToValues: PropertyToValues = propertyMap.goc(b['property'].value, () => {
+            let ret: PropertyToValues = new PropertyToValues(DataFactory.instance.nodeFromBinding(b['property']))
+            if (b['propertyLabel']) ret.label = b['propertyLabel'].value
             properties.push(ret)
             return ret
           })
-          let oNode: ISourcedNodePlusLabel = new SourcedNodePlusLabel(DataFactory.instance.nodeFromBinding(b['object']))
-          propertyToValues.values.push(oNode)
+          let oNode: IRichNode = new FullRichNodeFromNode(DataFactory.instance.nodeFromBinding(b['object']))
+          oNode.sourceEndpoints = []
+          propertyToValues.values.push(new RichPropertyValue(oNode))
           if (OWL.sameAs.equals(propertyToValues)) sameAses.push(oNode)
           return oNode
         })
         n.sourceEndpoints.push(endpoint)
-        if (b['objectLabel'] && !n.label) n.label = DataFactory.instance.nodeFromBinding(b['objectLabel'])
+        if (b['objectLabel'] && !n.label) n.label = b['objectLabel'].value
       }
     }
 
-    constructor(private sparqlService: s.SparqlService, private $q: angular.IQService, private sparqlUpdateWorkerService: SparqlUpdateWorkerService, private configurationWorkerService: ConfigurationWorkerService) {}
+    constructor(private fibraSparqlService: FibraSparqlService, private $q: angular.IQService, private sparqlUpdateWorkerService: SparqlUpdateWorkerService, private stateWorkerService: StateWorkerService) {}
 
-    public getItems(ids: INode[] | boolean, queryRemote: boolean = false, canceller?: angular.IPromise<any>): angular.IPromise<Item[]> {
-      let queryTemplate: string = this.configurationWorkerService.configuration.primaryEndpoint.localItemQueryTemplate
+    public getItems(ids: string[] | boolean, queryRemote: boolean = false, canceller?: angular.IPromise<any>): angular.IPromise<Item[]> {
+      let queryTemplate: string = this.stateWorkerService.state.project.itemQuery
       if (!ids) queryTemplate = queryTemplate.replace(/VALUES \?id { <IDS> }/g, '')
-      let nodeIds: INode[] = ids ? <INode[]> ids : []
-      queryTemplate = queryTemplate.replace(/<IDS>/g, nodeIds.map(id => id.toCanonical()).join(''))
-      queryTemplate = queryTemplate.replace(/<PREFLANG>/g, this.configurationWorkerService.configuration.preferredLanguage)
+      else queryTemplate = queryTemplate.replace(/<IDS>/g, (ids as string[]).join(''))
+      queryTemplate = queryTemplate.replace(/<PREFLANG>/g, this.stateWorkerService.state.language)
       let items: EMap<Item> = new EMap<Item>((id) => new Item(DataFactory.instance.namedNode(id)))
       let ret: angular.IDeferred<Item[]> = this.$q.defer()
-      this.sparqlService.query(this.configurationWorkerService.configuration.primaryEndpoint.endpoint.value, queryTemplate, {timeout: canceller}).then(
-        (response: angular.IHttpPromiseCallbackArg<s.ISparqlBindingResult<{[id: string]: s.ISparqlBinding}>>) => {
-          let idPropertyMap: EMap<EMap<PropertyToValues<INodePlusLabel>>> = new EMap<EMap<PropertyToValues<INodePlusLabel>>>(() => new EMap<PropertyToValues<INodePlusLabel>>())
-          let idPropertyValueMap: EMap<EMap<EMap<ISourcedNodePlusLabel>>> = new EMap<EMap<EMap<ISourcedNodePlusLabel>>>(() => new EMap<EMap<ISourcedNodePlusLabel>>(() => new EMap<ISourcedNodePlusLabel>()))
+      this.fibraSparqlService.query(this.stateWorkerService.state.project.endpoint, queryTemplate, {timeout: canceller}).then(
+        response => {
+          let idPropertyMap: EMap<EMap<PropertyToValues>> = new EMap<EMap<PropertyToValues>>(() => new EMap<PropertyToValues>())
+          let idPropertyValueMap: EMap<EMap<EMap<IRichNode>>> = new EMap<EMap<EMap<IRichNode>>>(() => new EMap<EMap<IRichNode>>(() => new EMap<IRichNode>()))
           let idSameAses: ENodeMap<INode[]> = new ENodeMap<INode[]>(() => [])
-          for (let b of response.data!.results.bindings) {
+          for (let b of response.results.bindings) {
             let item: Item = items.goc(b['id'].value)
-            if (b['itemLabel']) item.label = DataFactory.instance.nodeFromBinding(b['itemLabel'])
-            SparqlItemWorkerService.processItemResult(item.localProperties, idPropertyMap.goc(b['id'].value), idPropertyValueMap.goc(b['id'].value), idSameAses.goc(item), this.configurationWorkerService.configuration.primaryEndpoint, b)
+            if (b['itemLabel']) item.label = b['itemLabel'].value
+            SparqlItemWorkerService.processItemResult(item.localProperties, idPropertyMap.goc(b['id'].value), idPropertyValueMap.goc(b['id'].value), idSameAses.goc(item), this.stateWorkerService.state.project.endpoint, b)
           }
           if (queryRemote) {
-            ret.notify({ endpointType: 'primary', endpoint: this.configurationWorkerService.configuration.primaryEndpoint.id, items: items.values()})
+            ret.notify({ endpointType: 'primary', endpoint: this.stateWorkerService.state.project.endpoint, items: items.values()})
             let itemIdQuery: string = ''
             for (let item of items.values()) {
               itemIdQuery += '(' + item.toCanonical() + item.toCanonical() + ')'
               for (let item2 of idSameAses.get(item)) itemIdQuery += '(' + item.toCanonical() + item2.toCanonical() + ')'
             }
-            this.$q.all(this.configurationWorkerService.configuration.remoteEndpoints().map(endpoint => {
-              let queryTemplate2: string = endpoint.remoteItemQueryTemplate
+            this.$q.all(this.stateWorkerService.state.project.remoteEndpoints().map(endpoint => {
+              let queryTemplate2: string = endpoint.itemQuery
               queryTemplate2 = queryTemplate2.replace(/<IDPAIRS>/g, itemIdQuery)
-              queryTemplate2 = queryTemplate2.replace(/<PREFLANG>/g, this.configurationWorkerService.configuration.preferredLanguage)
-              return this.sparqlService.query(endpoint.endpoint.value, queryTemplate2, {timeout: canceller}).then(
-                (response2: angular.IHttpPromiseCallbackArg<s.ISparqlBindingResult<{[id: string]: s.ISparqlBinding}>>) => {
-                  if (response2.data!.results.bindings.length !== 0) {
-                    for (let b of response2.data!.results.bindings) {
+              queryTemplate2 = queryTemplate2.replace(/<PREFLANG>/g, this.stateWorkerService.state.language)
+              return this.fibraSparqlService.query(endpoint.endpoint, queryTemplate2, {timeout: canceller}).then(
+                response2 => {
+                  if (response2.results.bindings.length !== 0) {
+                    for (let b of response2.results.bindings) {
                       let item: Item = items.goc(b['id'].value)
-                      SparqlItemWorkerService.processItemResult(item.remoteProperties, idPropertyMap.goc(b['id'].value), idPropertyValueMap.goc(b['id'].value), idSameAses.goc(item), endpoint, b)
+                      SparqlItemWorkerService.processItemResult(item.remoteProperties, idPropertyMap.goc(b['id'].value), idPropertyValueMap.goc(b['id'].value), idSameAses.goc(item), endpoint.id, b)
                     }
                     ret.notify({ endpointType: 'remote', endpoint: endpoint.id, items: items.values()})
                   }
@@ -278,40 +294,27 @@ WHERE {
     }
 
     public deleteItem(id: INode): angular.IPromise<boolean> {
-      return this.sparqlService.update(this.configurationWorkerService.configuration.primaryEndpoint.updateEndpoint.value, this.configurationWorkerService.configuration.deleteItemQuery.replace(/<ID>/g, id.toCanonical())).then(
-        (r) => r.status === 204,
+      return this.fibraSparqlService.update(this.stateWorkerService.state.project.updateEndpoint, this.stateWorkerService.state.project.deleteItemQuery.replace(/<ID>/g, id.toCanonical())).then(
+        (r) => true,
         (r) => false
       )
     }
 
-    public alterItem(id: INode, propertiesToAdd: IPropertyToValues<INode>[], propertiesToRemove: IPropertyToValues<INode>[] = []): angular.IPromise<boolean> {
+    public alterItem(id: INode, propertiesToAdd: IPropertyAndValue[], propertiesToRemove: IPropertyAndValue[] = []): angular.IPromise<boolean> {
       let triplesToAdd: ITriple[] = []
       let triplesToRemove: ITriple[] = []
-      propertiesToAdd.forEach(property => {
-        if (property.label) triplesToAdd.push(new Triple(property, SKOS.prefLabel, property.label))
-        property.values.forEach(value => {
-          triplesToAdd.push(new Triple(id, property, value))
-          if ((<NodePlusLabel>value).label) triplesToAdd.push(new Triple(value, SKOS.prefLabel, (<NodePlusLabel>value).label))
-        })
-      })
-      propertiesToRemove.forEach(property => property.values.forEach(value => triplesToRemove.push(new Triple(id, property, value))))
-      return this.sparqlUpdateWorkerService.updateGraphs(this.configurationWorkerService.configuration.primaryEndpoint.updateEndpoint.value, [new Graph(this.configurationWorkerService.configuration.graph, triplesToAdd)], [new Graph(this.configurationWorkerService.configuration.graph, triplesToRemove)])
+      propertiesToAdd.forEach(property => triplesToAdd.push(new Triple(id, property.property, property.object)))
+      propertiesToRemove.forEach(property => triplesToRemove.push(new Triple(id, property.property, property.object)))
+      return this.sparqlUpdateWorkerService.updateGraphs(this.stateWorkerService.state.project.updateEndpoint, [new Graph(this.stateWorkerService.state.project.graph ? DataFactory.namedNode(this.stateWorkerService.state.project.graph) : DefaultGraph.instance, triplesToAdd)], [new Graph(this.stateWorkerService.state.project.graph ? DataFactory.namedNode(this.stateWorkerService.state.project.graph) : DefaultGraph.instance, triplesToRemove)])
     }
 
-    public createNewItem(equivalentNodes: INode[] = [], properties: PropertyToValues<INode>[] = []): angular.IPromise<INode> {
+    public createNewItem(properties: IPropertyAndValue[] = []): angular.IPromise<INode> {
       let deferred: angular.IDeferred<INode> = this.$q.defer()
-      let subject: INode = new NamedNode(this.configurationWorkerService.configuration.instanceNS + SparqlItemService.UUID())
+      let subject: INode = new NamedNode(this.stateWorkerService.state.project.instanceNS + UUID())
       deferred.notify(subject)
       let triplesToAdd: ITriple[] = []
-      equivalentNodes.forEach(node => triplesToAdd.push(new Triple(subject, OWL.sameAs, node)))
-      properties.forEach(property => {
-        if (property.label) triplesToAdd.push(new Triple(property, SKOS.prefLabel, property.label))
-        property.values.forEach(value => {
-          triplesToAdd.push(new Triple(subject, property, value))
-          if ((<NodePlusLabel>value).label) triplesToAdd.push(new Triple(value, SKOS.prefLabel, (<NodePlusLabel>value).label))
-        })
-      })
-      this.sparqlUpdateWorkerService.updateGraphs(this.configurationWorkerService.configuration.primaryEndpoint.updateEndpoint.value, [new Graph(this.configurationWorkerService.configuration.graph, triplesToAdd)]).then(
+      properties.forEach(property => triplesToAdd.push(new Triple(subject, property.property, property.object)))
+      this.sparqlUpdateWorkerService.updateGraphs(this.stateWorkerService.state.project.updateEndpoint, [new Graph(this.stateWorkerService.state.project.graph ? DataFactory.namedNode(this.stateWorkerService.state.project.graph) : DefaultGraph.instance, triplesToAdd)]).then(
         () => deferred.resolve(subject),
         deferred.reject,
         deferred.notify

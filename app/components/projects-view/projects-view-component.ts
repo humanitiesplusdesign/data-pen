@@ -2,23 +2,52 @@ namespace fibra {
   'use strict'
 
   export class ProjectsViewComponentController implements angular.IComponentController {
-    public setProject(identifier: string): void {
-      let c: Configuration
-      // FIXME: hardcoded
-      if (identifier === 'set1') c = this.configurationService.presets[2]; else c = this.configurationService.presets[0]
-      c.graph = DataFactory.instance.namedNode('http://ldf.fi/fibra/' + identifier + '/')
-      c.primaryEndpoint.localItemQueryTemplate = c.primaryEndpoint.localItemQueryTemplate.replace(/GRAPH <GRAPH>/g, 'GRAPH <http://ldf.fi/fibra/' + identifier + '/>')
-      c.primaryEndpoint.autocompletionTextMatchQueryTemplate = c.primaryEndpoint.autocompletionTextMatchQueryTemplate.replace(/GRAPH <GRAPH>/g, 'GRAPH <http://ldf.fi/fibra/' + identifier + '/>')
-      c.primaryEndpoint.treeQueryTemplate = c.primaryEndpoint.treeQueryTemplate.replace(/GRAPH <GRAPH>/g, 'GRAPH <http://ldf.fi/fibra/' + identifier + '/>')
-      c.deleteItemQuery = c.deleteItemQuery.replace(/GRAPH <GRAPH>/g, 'GRAPH <http://ldf.fi/fibra/' + identifier + '/>')
-      this.configurationService.setConfiguration(c)
-      this.$state.go('construct')
+
+    public projectSourceState: {[id: string]: 'loading'|'error'|'ready' } = {}
+    public projects: {[id: string]: ICitable[]} = {}
+    public projectSources: {[id: string]: ProjectSourceInfo} = {}
+    public lang: string
+
+    public deleteProject(sourceId: string, projectIndex: number, project: ICitable): void {
+      this.projects[sourceId].splice(projectIndex, 1)
+      this.projectService.deleteCitable(project)
     }
-    constructor(private configurationService: ConfigurationService, private $state: angular.ui.IStateService) {}
+
+    constructor(private projectService: ProjectService, socialAuthService: SocialAuthService, $localStorage: any) {
+      let projectSources: ProjectSourceInfo[] = $localStorage['projectSources']
+      if (!projectSources || projectSources.length === 0) {
+        projectSources = []
+        // projectSources.push(new ProjectSourceInfo('Private projects in local browser storage', 'local:projects', '', 'http://ldf.fi/fibra/rdfstoreJSEndpoint'))
+        // http://localhost:3000/#!/project-sources?id=Private projects in local browser storage&endpoint=local:projects&type=http://ldf.fi/fibra/rdfstoreJSEndpoint
+        // projectSources.push(new ProjectSourceInfo('Projects in local Fuseki SPARQL server', 'http://localhost:3030/fibra/sparql', '', 'http://ldf.fi/fibra/fusekiEndpoint'))
+        // http://localhost:3000/#!/project-sources?id=Projects in local Fuseki SPARQL server&endpoint=http://localhost:3030/fibra/sparql&type=http://ldf.fi/fibra/fusekiEndpoint
+        projectSources.push(new ProjectSourceInfo('Shared projects on the public LDF.fi endpoint', 'http://ldf.fi/fibra/sparql', 'http://ldf.fi/fibra/shared-projects/', 'http://ldf.fi/fibra/fusekiEndpointWithTextIndexAndSecoFunctions'))
+        $localStorage['projectSources'] = projectSources
+      }
+      if (socialAuthService.isLoggedIn() && !projectSources.some(s => s.id === 'Personal projects on the public LDF.fi endpoint')) {
+        let uid: string = CryptoJS.SHA256(socialAuthService.loginState())
+        projectSources.push(new ProjectSourceInfo('Personal projects on the public LDF.fi endpoint', 'http://ldf.fi/fibra/sparql', 'http://ldf.fi/fibra/user/' + uid + '/projects/', 'http://ldf.fi/fibra/fusekiEndpointWithTextIndexAndSecoFunctions'))
+      }
+      projectSources.forEach(source => {
+        this.projectSources[source.id] = source
+        this.projects[source.id] = []
+        this.projectSourceState[source.id] = 'loading'
+        projectService.listProjects(source.endpoint, source.graph).then(
+          projects => {
+            this.projectSourceState[source.id] = 'ready'
+            this.projects[source.id] = projects
+          },
+          err => {
+            this.projectSourceState[source.id] = 'error'
+            this.projects[source.id] = err
+          })
+      })
+    }
   }
 
   export class ProjectsViewComponent implements angular.IComponentOptions {
       public controller: string = 'ProjectsViewComponentController' // (new (...args: any[]) => angular.IController) = SelectViewComponentController
       public templateUrl: string = 'components/projects-view/projects-view.html'
   }
+
 }

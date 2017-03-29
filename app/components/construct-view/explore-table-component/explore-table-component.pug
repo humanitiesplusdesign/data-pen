@@ -12,13 +12,13 @@ uib-tabset
           td(ng-repeat="p in $ctrl[t].properties" ng-if="item === $ctrl.editItem")
             input(type="text"
               ng-repeat="e in $ctrl.editItem.localProperties"
-              ng-if="e.label.value == p && e.values[0].termType === 'Literal'"
-              ng-model="e.values[0].value")
+              ng-if="e.label.value == p && e.values[0].value.termType === 'Literal'"
+              ng-model="e.values[0].value.value")
             small(ng-repeat="e in item.localProperties"
-              ng-if="e.label.value == p && e.values[0].termType !== 'Literal'") {{e.values[0].label.value}}
+              ng-if="e.label.value == p && e.values[0].value.termType !== 'Literal'") {{e.values[0].value.label.value}}
           td(ng-repeat="p in $ctrl[t].properties", ng-click="$ctrl.selectItem(item)" ng-if="item !== $ctrl.editItem")
             small(ng-repeat="e in item.localProperties" ng-if="e.label.value == p")
-              p(ng-repeat="i in e.values") {{i.label.value}}
+              p(ng-repeat="i in e.values") {{i.value.label.value}}
           td
             a(ng-click="$ctrl.hide(item)") Hide
             a(ng-click="$ctrl.verify(item)" ng-if="!$ctrl.itemVerified(item)") &nbsp;Verify

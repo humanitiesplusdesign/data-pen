@@ -16,7 +16,7 @@ namespace fibra {
 
     public addPopover(this, $scope, types, baseSVG, d, i, g): void {
       let enterNode: any = this
-      let propertyPopover: d3.Selection<HTMLDivElement, {}, HTMLBodyElement, undefined> = 
+      let propertyPopover: d3.Selection<HTMLDivElement, {}, HTMLBodyElement, undefined> =
         d3.select(baseSVG.node().parentElement.parentElement).select<HTMLDivElement>('div.property-popover')
       propertyPopover.select('property-popover').remove()
       propertyPopover
@@ -80,11 +80,11 @@ namespace fibra {
     }
 
     public $postLink(): void {
-      this.label = this.node.label.value
+      this.label = this.node.label
 
       let nodeType: string = this.node.localProperties.filter((p) => {
         return p.value === 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type'
-      })[0].values[0].value
+      })[0].values[0].value.value
       this.chosenType = this.types.filter((t:TreeNode) => { return t.id === nodeType})[0]
       if (this.chosenType) this.typeQuery = this.chosenType.label
     }
@@ -114,13 +114,11 @@ namespace fibra {
     private typeChange(type: TreeNode) {
 
       this.chosenType = type
-      let oldTypes: PropertyToValues<INode> = this.node.localProperties.filter((p) => { return p.value === RDF.type.value })[0]
-      let typeProp: PropertyToValues<INode> = new PropertyToValues(RDF.type)
+      let oldTypes: PropertyToValues = this.node.localProperties.filter((p) => { return p.value === RDF.type.value })[0]
       let typeNode: INamedNode = new NamedNode(type.id)
-      typeProp.values.push(typeNode)
       this.showTypeCreate = false
 
-      return this.fibraService.dispatchAction(this.fibraService.itemProperty(this.node, [typeProp], [oldTypes])).then((state) => {
+      return this.fibraService.dispatchAction(this.fibraService.itemProperty(this.node, [new PropertyAndValue(RDF.type, typeNode)], oldTypes.toPropertyAndValues())).then((state) => {
         // Update the type displayed in the construct interface if appropriate (duplicative)
         let chosenTypes: TreeNode[] = this.fibraService.getState().construct.displayTypes
         if (!chosenTypes[0] && type) {
@@ -133,15 +131,12 @@ namespace fibra {
       })
     }
 
-    private labelChange() {
-      let oldLabels: PropertyToValues<INode> = this.node.localProperties.filter((p) => { return p.value === SKOS.prefLabel.value })[0]
-      let prefLabel: PropertyToValues<INode> = new PropertyToValues(SKOS.prefLabel)
-      prefLabel.values.push(DataFactory.instance.literal(this.label))
-
-      this.fibraService.dispatchAction(this.fibraService.itemProperty(this.node, [prefLabel], [oldLabels]))
+    private labelChange(): void {
+      let oldLabels: PropertyToValues = this.node.localProperties.filter((p) => { return p.value === SKOS.prefLabel.value })[0]
+      this.fibraService.dispatchAction(this.fibraService.itemProperty(this.node, [new PropertyAndValue(SKOS.prefLabel, DataFactory.instance.literal(this.label))], oldLabels.toPropertyAndValues()))
     }
 
-    private deleteAndClose() {
+    private deleteAndClose(): void {
       this.fibraService.dispatchAction(this.fibraService.deleteItem(this.node))
         .then(() => {
           this.fibraService.dispatch('change')
@@ -149,7 +144,7 @@ namespace fibra {
         })
     }
 
-    private closePopover() {
+    private closePopover(): void {
       this.close()
       this.fibraService.dispatch('change')
     }

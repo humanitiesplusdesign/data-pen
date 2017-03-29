@@ -1,23 +1,13 @@
 .container
   h1 Fibra
-  h2 New project
-  ol
-    li: a(ui-sref="configure") Configure
-    li Select
-    li Construct
-  h2 Existing projects
-  ul
-    li
-      a(ng-click="$ctrl.setProject('set2')") People two degrees removed from John Locke from SDFB and associated places from EMLO
-      ul
-        li 1,227 Person
-        li 204 Place
-    li
-      a(ng-click="$ctrl.setProject('set3')") People two degrees removed from John Locke from SDFB
-      ul
-        li 1,215 Person
-    li
-      a(ng-click="$ctrl.setProject('set1')") The Ancient World (Pleiades &amp; Pelagios)
-      ul
-        li 1,188 Place
-        li 22,564 Thing
+  h2 Your projects
+  div(ng-repeat="(id,projectSource) in $ctrl.projectSources track by $index")
+    h3 {{id}}&nbsp;
+      span.glyphicon.glyphicon-refresh.fa-spin(ng-if="$ctrl.projectSourceState[id]=='loading'")
+    .alert.alert-danger(ng-if="$ctrl.projectSourceState[id]=='error'") Error loading: {{projects}}
+    ul
+      li(ng-if="$ctrl.projectSourceState[id]=='ready'",ng-repeat="project in $ctrl.projects[id] track by $index")
+        a(ui-sref="construct({id:project.id,endpoint:project.sourceEndpoint,graph:project.sourceGraph})"): citable(citable="project",no-link)
+        // button.btn.btn-xs.btn-danger(ng-click="$ctrl.deleteProject(id, $index, project)"): span.glyphicon.glyphicon-remove
+      li: a(ui-sref="configure({endpoint:projectSource.endpoint,graph:projectSource.graph, name: projectSource.name})") new project
+  button.btn.btn-xs(ui-sref="projectSources()",title="Configure project sources"): span.glyphicon.glyphicon-cog

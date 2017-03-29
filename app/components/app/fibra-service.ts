@@ -2,19 +2,28 @@ namespace fibra {
   'use strict'
   type CallbackFunction = () => angular.IPromise<string>
   type RemovalFunction = () => void
-  export type State = {
-    construct: {
-      types: TreeNode[],
-      userTypes: TreeNode[],
-      displayTypes: TreeNode[],
-      items: any[],
-      itemIndex: {},
-      localItems: IGridNode[],
-      verifyItem: Item
-    },
-    actionsRunning: number
+  export class CommonState {
+    constructor(public project: Project = null, public language: string = 'en') {}
   }
-  type Store = [State]
+
+  export class ConstructState {
+    public types: TreeNode[] = []
+    public userTypes: TreeNode[] = []
+    public displayTypes: TreeNode[] = []
+    public items: any[] = []
+    public itemIndex: {} = {}
+    public localItems: IGridNode[] = []
+    public verifyItem: Item
+  }
+
+  export class UIState extends CommonState {
+    public construct: ConstructState = new ConstructState()
+    public actionsRunning: number = 0
+    public toCommonState(): CommonState {
+      return new CommonState(this.project, this.language)
+    }
+  }
+  type Store = [UIState]
   type Action = {
     type: string,
     payload: any
@@ -33,25 +42,15 @@ namespace fibra {
   const CREATE_LOCAL_ITEM: string = 'CREATE_LOCAL_ITEM'
   const ITEM_PROPERTIES: string = 'ITEM_PROPERTIES'
   const SET_ORDERED_TYPES: string = 'SET_ORDERED_TYPES'
-  const INITIAL_STATE: State = {
-    construct: {
-      types: [],
-      userTypes: [],
-      displayTypes: [],
-      items: [],
-      itemIndex: {},
-      localItems: [],
-      verifyItem: null
-    },
-    actionsRunning: 0
-  }
+  const SET_LANGUAGE: string = 'SET_LANGUAGE'
+  const SET_PROJECT: string = 'SET_PROJECT'
+  const INITIAL_STATE: UIState = new UIState()
   const DEFAULT_ACTION: Action = { type: '', payload: null }
 
   export class FibraService {
 
     // Event model - Based on d3.event
-    private q: angular.IQService
-    private callbacks: {} = {}
+    private callbacks: {[evnt: string]: CallbackFunction[] } = {}
 
     // Returns a function that can be called to remove the callback
     public on(evnt: string, callback: CallbackFunction): RemovalFunction {
@@ -65,15 +64,17 @@ namespace fibra {
     }
 
     public dispatch(evnt: string): angular.IPromise<Array<string>> {
+      if (this.callbacks[evnt] === undefined)
+        this.callbacks[evnt] = Array<CallbackFunction> ()
       let proms: Array<angular.IPromise<string>> = this.callbacks[evnt].map((cb) => cb())
-      return this.q.all(proms)
+      return this.$q.all(proms)
     }
 
     // Action Queue - redux-style...
     // This is a very initial draft and will change.
 
     // State and store
-    private state: State
+    private state: UIState
     private createState() {
       this.state = INITIAL_STATE
       if(!this.store) {
@@ -93,6 +94,10 @@ namespace fibra {
         payload: prom
       }
     }
+
+    public setLanguage(language: string): Action { return { type: SET_LANGUAGE, payload: language} }
+
+    public setProject(project: Project): Action { return { type: SET_PROJECT, payload: project} }
 
     public createLocalItem(item: ITerm): Action {
       return {
@@ -128,7 +133,7 @@ namespace fibra {
       }
     }
 
-    public itemProperty(item: INode, propertiesToAdd: PropertyToValues<INode>[], propertiesToRemove?: PropertyToValues<INode>[]) {
+    public itemProperty(item: INode, propertiesToAdd: IPropertyAndValue[], propertiesToRemove?: IPropertyAndValue[]) {
       return {
         type: ITEM_PROPERTIES,
         payload: {
@@ -222,7 +227,7 @@ namespace fibra {
     }
 
     // Reducers
-    private itemReducer(state: State = INITIAL_STATE, action: Action = DEFAULT_ACTION): angular.IPromise<State> {
+    private itemReducer(state: UIState = INITIAL_STATE, action: Action = DEFAULT_ACTION): angular.IPromise<UIState> {
       switch(action.type) {
 
       case DISPLAY_ITEMS:
@@ -239,7 +244,7 @@ namespace fibra {
           }
         })
         this.dispatch('change')
-        return this.q.resolve(state)
+        return this.$q.resolve(state)
 
       case HIDE_ITEM:
         let it = state.construct.itemIndex[action.payload.value]
@@ -248,12 +253,12 @@ namespace fibra {
           delete state.construct.itemIndex[action.payload.value]
         }
         this.dispatch('change')
-        return this.q.resolve(state)
+        return this.$q.resolve(state)
 
       case CREATE_LOCAL_ITEM:
         let item: IGridNode = action.payload
         state.construct.localItems.push(item)
-        return this.q.resolve(state)
+        return this.$q.resolve(state)
 
       case CREATE_ITEMS:
         return this.createItemsInternal(action, state).then((nodes) => {
@@ -266,7 +271,7 @@ namespace fibra {
         })
 
       case DELETE_ITEMS:
-        return this.q.all(action.payload.map((item: INode) => {
+        return this.$q.all(action.payload.map((item: INode) => {
           return this.sparqlItemService.deleteItem(item)
         })).then(() => {
           this.dispatch('change')
@@ -276,7 +281,7 @@ namespace fibra {
       case VERIFY_ITEM:
         this.state.construct.verifyItem = action.payload
         this.dispatch('change')
-        return this.q.resolve(this.state)
+        return this.$q.resolve(this.state)
 
       case ITEM_PROPERTIES:
         return this.sparqlItemService.alterItem(action.payload.item, action.payload.propertiesToAdd, action.payload.propertiesToRemove).then((str) => {
@@ -284,11 +289,24 @@ namespace fibra {
         })
 
       default:
-        return this.q.resolve(state)
+        return this.$q.resolve(state)
       }
     }
 
-    private constructReducer(state: State = INITIAL_STATE, action: Action = DEFAULT_ACTION): angular.IPromise<State> {
+    private sessionReducer(state: UIState = INITIAL_STATE, action: Action = DEFAULT_ACTION): angular.IPromise<UIState> {
+      switch (action.type) {
+        case SET_LANGUAGE:
+          state.language = action.payload
+          return this.$q.resolve(state)
+        case SET_PROJECT:
+          state.project = action.payload
+          return this.$q.resolve(state)
+        default:
+          return this.$q.resolve(state)
+      }
+    }
+
+    private constructReducer(state: UIState = INITIAL_STATE, action: Action = DEFAULT_ACTION): angular.IPromise<UIState> {
       switch(action.type) {
 
       case PLACEHOLDER:
@@ -305,27 +323,25 @@ namespace fibra {
         if(dupType) {
           state.construct.userTypes.splice(state.construct.userTypes.indexOf(dupType), 1)
         }
-        return this.q.resolve(state)
+        return this.$q.resolve(state)
 
       case CLEAR_TYPES:
         state.construct.types = []
-        return this.q.resolve(state)
+        return this.$q.resolve(state)
 
       case SET_ORDERED_TYPES:
         state.construct.displayTypes = action.payload
-        return this.q.resolve(state)
+        return this.$q.resolve(state)
 
       case CREATE_TYPE:
-        let prefLabel: PropertyToValues<INode> = new PropertyToValues(SKOS.prefLabel)
-        prefLabel.values.push(DataFactory.instance.literal(action.payload))
-        return this.sparqlItemService.createNewItem([], [prefLabel]).then((node) => {
+        return this.sparqlItemService.createNewItem([new PropertyAndValue(SKOS.prefLabel, DataFactory.instance.literal(action.payload)), new PropertyAndValue(RDF.type, OWL.Class)]).then((node) => {
           let tn: TreeNode = new TreeNode(node.value, action.payload)
           this.state.construct.userTypes.push(tn)
           return this.state
         })
 
       default:
-        return this.q.resolve(state)
+        return this.$q.resolve(state)
       }
     }
 
@@ -335,14 +351,10 @@ namespace fibra {
 
       if (items[0]) {
         let proms = items.map((node) => {
-          let prefLabel: PropertyToValues<INode> = new PropertyToValues(SKOS.prefLabel)
-          let type: PropertyToValues<INode> = new PropertyToValues(RDF.type)
-          type.values.push(typeNode)
           if (node.value) {
-            prefLabel.values.push(DataFactory.instance.literal(node.value))
-            return this.sparqlItemService.createNewItem([], [prefLabel, type])
+            return this.sparqlItemService.createNewItem([new PropertyAndValue(SKOS.prefLabel, DataFactory.instance.literal(node.value)), new PropertyAndValue(RDF.type, typeNode)])
           } else {
-            return this.sparqlItemService.createNewItem([], [type])
+            return this.sparqlItemService.createNewItem([new PropertyAndValue(RDF.type, typeNode)])
           }
 
           // return this.sparqlItemService.getItem(node).then((item) => {
@@ -363,32 +375,36 @@ namespace fibra {
           //   return this.dispatchAction(this.displayItem(node))
           // })
         })
-        return this.q.all(proms)
+        return this.$q.all(proms)
       } else {
-        let type: PropertyToValues<INode> = new PropertyToValues(RDF.type)
-        type.values.push(typeNode)
-        let prefLabel: PropertyToValues<INode> = new PropertyToValues(SKOS.prefLabel)
-        prefLabel.values.push(DataFactory.instance.literal(''))
-        return this.sparqlItemService.createNewItem([], [type, prefLabel]).then((node) => {
+        return this.sparqlItemService.createNewItem([new PropertyAndValue(RDF.type, typeNode), new PropertyAndValue(SKOS.prefLabel, DataFactory.instance.literal(''))]).then((node) => {
           return [node]
         })
       }
     }
 
     // Public API
-    public dispatchAction(action: Action): angular.IPromise<State> {
-      this.state.actionsRunning = this.state.actionsRunning+1
+    public dispatchAction(action: Action): angular.IPromise<UIState> {
+      this.state.actionsRunning = this.state.actionsRunning + 1
       console.log(action.type, this.state.actionsRunning)
       this.dispatch('action')
+      let oldCommonState: CommonState = this.state.toCommonState()
       return this.constructReducer(this.state, action)
         .then((state) => this.itemReducer(state, action))
+        .then((state) => this.sessionReducer(state, action))
         .then((state) => {
-          this.state.actionsRunning = this.state.actionsRunning-1
+          if (state.language !== oldCommonState.language || state.project !== oldCommonState.project) {
+            let wstate: CommonState = state.toCommonState()
+            WorkerService.savePrototypes(wstate)
+            this.workerService.callAll('stateWorkerService', 'setState', [wstate])
+          }
+          this.state = state
+          this.state.actionsRunning = this.state.actionsRunning - 1
           return state
         })
     }
 
-    public getState(): State {
+    public getState(): UIState {
       return this.state
     }
 
@@ -396,13 +412,18 @@ namespace fibra {
 
     }
 
-
-
-    constructor($q: angular.IQService,
+    constructor(private $q: angular.IQService,
+                private workerService: WorkerService,
                 private sparqlItemService: SparqlItemService,
                 private sparqlTreeService: SparqlTreeService) {
-      this.q = $q
       this.createState()
+    }
+  }
+
+  export class StateWorkerService {
+    public state: CommonState
+    public setState(state: CommonState): void {
+      this.state = state
     }
   }
 }
