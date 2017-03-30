@@ -21,6 +21,7 @@ html(lang="en",ng-app="fibra",ng-hint)
   body
     .pull-right
       span(ng-bind="socialAuthService.loginState()")
+      a(ng-if="!socialAuthService.isLoggedIn()" ui-sref="login") &nbsp;Login
       a(ng-if="socialAuthService.isLoggedIn()" ng-click="socialAuthService.logout()") &nbsp;Log out
     .modal(ng-class="authInfo.authOpen ? 'modal-open fade in' : ''",ng-style="authInfo.authOpen ? {display:'block'} : {}"): .modal-dialog(ng-show="authInfo.authOpen"): form.modal-content
       .modal-header: h4.modal-title Authentication required
