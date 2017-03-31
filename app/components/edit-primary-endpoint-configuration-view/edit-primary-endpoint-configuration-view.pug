@@ -1,35 +1,32 @@
 .container
   h1 Fibra
   h2 Edit project template
-  citable-editor(citable="$ctrl.ps")
-  .form.group
-    label endpoint
-    input.form-control(type="text",ng-model="$ctrl.ps.sourceEndpoint")
-  .form.group
-    label graph
-    input.form-control(type="text",ng-model="$ctrl.ps.sourceGraph")
+  citable-editor(citable="$ctrl.c")
+  .form-group
+    label Project storage
+    select.form-control(ng-model="$ctrl.projectSource",ng-options="ps as ps.id for ps in $ctrl.projectSources")
   h4 Compatible endpoints
-  .form-group(ng-repeat="ce in $ctrl.ps.compatibleEndpoints")
+  .form-group(ng-repeat="ce in $ctrl.c.compatibleEndpoints")
     button.pull-right.btn.btn-xs(ng-click="$ctrl.removeCompatibleEndpoint($index)"): span.glyphicon.glyphicon-remove
     label endpoint IRI
-    input.form-control(type="text",ng-model="$ctrl.ps.compatibleEndpoints[$index]")
+    input.form-control(type="text",ng-model="$ctrl.c.compatibleEndpoints[$index]")
   button.btn.btn-xs(ng-click="$ctrl.addCompatibleEndpoint()"): span.glyphicon.glyphicon-plus
   .form-group
     label Autocompletion query template
-    yasqe(content="$ctrl.ps.autocompletionQuery",on-content-changed="$ctrl.ps.autocompletionQuery = content")
+    yasqe(content="$ctrl.c.autocompletionQuery",on-content-changed="$ctrl.c.autocompletionQuery = content")
   .form-group
     label Item query template
-    yasqe(content="$ctrl.ps.itemQuery",on-content-changed="$ctrl.ps.itemQuery = content")
+    yasqe(content="$ctrl.c.itemQuery",on-content-changed="$ctrl.c.itemQuery = content")
   .form-group
     label Item deletion query template
-    yasqe(content="$ctrl.ps.deleteItemQuery",on-content-changed="$ctrl.ps.deleteItemQuery = content")
+    yasqe(content="$ctrl.c.deleteItemQuery",on-content-changed="$ctrl.c.deleteItemQuery = content")
   .form-group
     label Tree query template
-    yasqe(content="$ctrl.ps.treeQuery",on-content-changed="$ctrl.ps.treeQuery = content")
+    yasqe(content="$ctrl.c.treeQuery",on-content-changed="$ctrl.c.treeQuery = content")
   .form-group
     label Class query template
-    yasqe(content="$ctrl.ps.classQuery",on-content-changed="$ctrl.ps.classQuery = content")
+    yasqe(content="$ctrl.c.classQuery",on-content-changed="$ctrl.c.classQuery = content")
   .form-group
     label Property query template
-    yasqe(content="$ctrl.ps.propertyQuery",on-content-changed="$ctrl.ps.propertyQuery = content")
+    yasqe(content="$ctrl.c.propertyQuery",on-content-changed="$ctrl.c.propertyQuery = content")
   button.btn.btn-success(ng-click="$ctrl.save()",ng-disabled="$ctrl.disabled") Save to endpoint

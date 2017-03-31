@@ -184,14 +184,14 @@ SELECT ?labels ?descriptions ?url ?rightsHolders ?rightsHolderslabels ?rightsHol
           })
           f = f.substring(0, f.length - 2) + ' ;'
           this.schemas
-            .filter(ae => ae.sourceEndpoint !== this.sourceEndpoint || this.sourceGraph !== ae.sourceGraph)
+            .filter(ae => ae.source.sparqlEndpoint !== this.source.sparqlEndpoint || this.source.graph !== ae.source.graph)
             .forEach(ae => {
               f = f + `
   fibra:schemaReference [
     rdf:value <${ae.id}> ;
-    void:sparqlEndpoint <${ae.sourceEndpoint}> ;`
-              if (ae.sourceGraph) f = f + `
-    fibra:graph <${ae.sourceGraph}>`
+    void:sparqlEndpoint <${ae.source.sparqlEndpoint}> ;`
+              if (ae.source.graph) f = f + `
+    fibra:graph <${ae.source.graph}>`
               f = f + `
   ] ;`
           })
@@ -224,14 +224,14 @@ SELECT ?labels ?descriptions ?url ?rightsHolders ?rightsHolderslabels ?rightsHol
           })
           f = f.substring(0, f.length - 2) + ' ;'
           this.archiveEndpoints
-            .filter(ae => ae.sourceEndpoint !== this.sourceEndpoint || this.sourceGraph !== ae.sourceGraph)
+            .filter(ae => ae.source.sparqlEndpoint !== this.source.sparqlEndpoint || this.source.graph !== ae.source.graph)
             .forEach(ae => {
               f = f + `
   fibra:archiveEndpointReference [
     rdf:value <${ae.id}> ;
-    void:sparqlEndpoint <${ae.sourceEndpoint}> ;`
-              if (ae.sourceGraph) f = f + `
-    fibra:graph <${ae.sourceGraph}>`
+    void:sparqlEndpoint <${ae.source.sparqlEndpoint}> ;`
+              if (ae.source.graph) f = f + `
+    fibra:graph <${ae.source.graph}>`
               f = f + `
   ] ;`
           })

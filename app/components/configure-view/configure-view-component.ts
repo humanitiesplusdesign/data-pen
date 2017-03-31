@@ -19,11 +19,11 @@ namespace fibra {
       this.project.authorityEndpoints = this.authorities.filter(a => this.selectedAuthorities[a.id])
       this.project.archiveEndpoints = this.archives.filter(a => this.selectedArchives[a.id])
       this.project.schemas = this.schemas.filter(a => this.selectedSchemas[a.id])
-      this.projectService.saveCitable(this.project).then(() => this.$state.go('construct', { id: this.project.id, endpoint: this.project.sourceEndpoint, graph: this.project.sourceGraph}))
+      this.projectService.saveCitable(this.projectSource.updateEndpoint, this.projectSource.graphStoreEndpoint, this.project).then(() => this.$state.go('construct', { id: this.project.id, endpoint: this.project.sourceEndpoint, graph: this.project.sourceGraph}))
     }
 
     public delete(): void {
-      this.projectService.deleteCitable(this.project).then(() => this.$state.go('projects'))
+      this.projectService.deleteCitable(this.projectSource.updateEndpoint, this.project).then(() => this.$state.go('projects'))
     }
 
     public changeTemplate(): void {
@@ -31,8 +31,10 @@ namespace fibra {
     }
 
     constructor(private $q: angular.IQService, private projectService: ProjectService, fibraService: FibraService, private sparqlTreeService: SparqlTreeService, $stateParams: any, private $state: angular.ui.IStateService) {
+      this.projectSources = projectService.getProjectSources()
+      this.projectSource = this.projectSources.find(ps => ps.sparqlEndpoint === $stateParams.endpoint && ($stateParams.graph ? ps.graph === $stateParams.graph : ps.graph === ''))
       if ($stateParams.id) {
-        projectService.loadProject($stateParams.endpoint, $stateParams.id, $stateParams.graph).then(p => {
+        projectService.loadProject(this.projectSource, $stateParams.id).then(p => {
           this.project = p
           this.selectedTemplate = p.asTemplate()
         })
@@ -48,10 +50,8 @@ namespace fibra {
         this.project.graphStoreEndpoint = this.project.sourceEndpoint
         this.project.graph = pid
       }
-      this.projectSources = projectService.getProjectSources()
-      this.projectSource = this.projectSources.find(ps => ps.endpoint === $stateParams.endpoint && ($stateParams.graph ? ps.graph === $stateParams.graph : ps.graph === ''))
       this.projectSources.forEach(ps => {
-        projectService.listPrimaryEndpointConfigurations(ps.endpoint, ps.graph).then(pt => {
+        projectService.listPrimaryEndpointConfigurations(ps).then(pt => {
           if (!this.selectedTemplate) {
             let matchingEC: PrimaryEndpointConfiguration = pt.find(ec => ec.compatibleEndpoints.find(et => et === this.projectSource.type) !== undefined)
             if (matchingEC) {
@@ -61,9 +61,9 @@ namespace fibra {
           }
           this.primaryEndpointConfigurations = this.primaryEndpointConfigurations.concat(pt)
         })
-        projectService.listAuthorityEndpointConfigurations(ps.endpoint, ps.graph).then(pt => this.authorities = this.authorities.concat(pt))
-        projectService.listArchiveEndpointConfigurations(ps.endpoint, ps.graph).then(pt => this.archives = this.archives.concat(pt))
-        projectService.listSchemas(ps.endpoint, ps.graph).then(pt => this.schemas = this.schemas.concat(pt))
+        projectService.listAuthorityEndpointConfigurations(ps).then(pt => this.authorities = this.authorities.concat(pt))
+        projectService.listArchiveEndpointConfigurations(ps).then(pt => this.archives = this.archives.concat(pt))
+        projectService.listSchemas(ps).then(pt => this.schemas = this.schemas.concat(pt))
       })
     }
 

@@ -3,7 +3,9 @@ namespace fibra {
 
   type ProjectSourceParams = {
     id?: string
-    endpoint?: string
+    sparqlEndpoint?: string
+    updateEndpoint?: string
+    graphStoreEndpoint?: string
     graph?: string
     type?: string
   }
@@ -15,20 +17,20 @@ namespace fibra {
       this.projectSources.splice(index, 1)
     }
     public addNewProjectSource(): void {
-      this.projectSources.push(new ProjectSourceInfo('', '' , '', ''))
+      this.projectSources.push(new ProjectSourceInfo('', '' , '', '', '', ''))
     }
 
     constructor(private $state: angular.ui.IStateService, $stateParams: ProjectSourceParams, projectService: ProjectService) {
       this.projectSources = projectService.getProjectSources()
-      if ($stateParams.id && $stateParams.endpoint && $stateParams.type) {
-        this.projectSources.push(new ProjectSourceInfo($stateParams.id, $stateParams.endpoint, $stateParams.graph, $stateParams.type))
+      if ($stateParams.id && $stateParams.sparqlEndpoint && $stateParams.type) {
+        this.projectSources.push(new ProjectSourceInfo($stateParams.id, $stateParams.sparqlEndpoint, $stateParams.updateEndpoint ? $stateParams.updateEndpoint : $stateParams.sparqlEndpoint, $stateParams.graphStoreEndpoint ? $stateParams.graphStoreEndpoint : $stateParams.sparqlEndpoint, $stateParams.graph, $stateParams.type))
         $state.go('projects')
       }
     }
   }
 
-  export class ProjectSourceInfo {
-    constructor(public id: string, public endpoint: string, public graph: string, public type: string) {}
+  export class ProjectSourceInfo implements ICitableSource {
+    constructor(public id: string, public sparqlEndpoint: string, public updateEndpoint: string, public graphStoreEndpoint: string, public graph: string, public type: string) {}
   }
 
   export class ProjectSourcesViewComponent implements angular.IComponentOptions {

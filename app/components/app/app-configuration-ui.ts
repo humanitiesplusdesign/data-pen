@@ -41,29 +41,29 @@ namespace fibra {
       template: '<rdfstore-test-view></rdfstore-test-view>'
     })
     $stateProvider.state('projectSources', {
-      url: '/project-sources?id&endpoint&graph&type',
+      url: '/project-sources?id&sparqlEndpoint&updateEndpoint&graphStoreEndpoint&graph&type',
       template: '<project-sources-view></project-sources-view>',
     })
     $stateProvider.state('editPrimaryEndpointConfiguration', {
-      url: '/edit-primary-endpoint-configuration?endpoint&id&graph',
+      url: '/edit-primary-endpoint-configuration?sourceId&id',
       template: '<edit-primary-endpoint-configuration-view></edit-primary-endpoint-configuration-view>',
     })
     $stateProvider.state('editRemoteEndpointConfiguration', {
-      url: '/edit-remote-endpoint-configuration?endpoint&id&graph',
+      url: '/edit-remote-endpoint-configuration?sourceId&id',
       template: '<edit-remote-endpoint-configuration-view></edit-remote-endpoint-configuration-view>',
     })
     $stateProvider.state('editSchema', {
-      url: '/edit-schema?endpoint&id&graph',
+      url: '/edit-schema?sourceId&id',
       template: '<edit-schema-view></edit-schema-view>',
     })
     $stateProvider.state('configure', {
-      url: '/configure?endpoint&graph&id',
+      url: '/configure?sourceId&id',
       template: '<configure-view></configure-view>'
     })
     $stateProvider.state('construct', {
-      url: '/construct?id&endpoint&graph',
+      url: '/construct?id&sparqlEndpoint&graph',
       resolve: { project: (projectService: ProjectService, fibraService: FibraService, $stateParams: any) =>
-        projectService.loadProject($stateParams.endpoint, $stateParams.id, $stateParams.graph).then(
+        projectService.loadProject({ sparqlEndpoint: $stateParams.sparqlEndpoint, graph: $stateParams.graph }, $stateParams.id).then(
           project => fibraService.dispatchAction(fibraService.setProject(project))
         )
       },

@@ -1,20 +1,20 @@
 namespace fibra {
   'use strict'
 
-  export class EditSchemaViewComponentController implements angular.IComponentController {
-
-    public ps: Schema
+  export class EditCitableComponentController<T extends ICitable> implements angular.IComponentController {
+    public c: T
     public disabled: boolean = false
+    public projectSource: ProjectSourceInfo
 
     public delete(): void {
       this.disabled = true
-      this.projectService.deleteCitable(this.ps).then(
+      this.projectService.deleteCitable(this.projectSource.updateEndpoint, this.c).then(
         () => {
-          this.toastr.success('Schema deleted')
+          this.toastr.success('Resource deleted')
           this.disabled = false
         },
         (err) => {
-          this.toastr.error('Error deleting schema', err)
+          this.toastr.error('Error deleting resource', err)
           this.disabled = false
         }
       )
@@ -22,27 +22,35 @@ namespace fibra {
 
     public save(): void {
       this.disabled = true
-      this.projectService.saveCitable(this.ps).then(
+      this.c.source = this.projectSource
+      this.projectService.saveCitable(this.projectSource.updateEndpoint, this.projectSource.graphStoreEndpoint, this.c).then(
         () => {
-          this.toastr.success('Schema saved')
+          this.toastr.success('Resource saved')
           this.disabled = false
         },
         (err) => {
-          this.toastr.error('Error saving schema', err)
+          this.toastr.error('Error saving resource', err)
           this.disabled = false
         }
       )
     }
 
-    constructor($stateParams: any, private fibraService: FibraService, private projectService: ProjectService, private toastr: angular.toastr.IToastrService) {
-      if ($stateParams.id) projectService.loadSchema($stateParams.endpoint, $stateParams.id, $stateParams.graph).then(ps => this.ps = ps)
+    constructor(sourceId: string, private projectService: ProjectService, private toastr: angular.toastr.IToastrService) {
+      this.projectSource = projectService.getProjectSources().find(cs2 => cs2.id === sourceId)
+    }
+
+  }
+
+  export class EditSchemaViewComponentController extends EditCitableComponentController<Schema> {
+
+    constructor($stateParams: any, fibraService: FibraService, projectService: ProjectService, toastr: angular.toastr.IToastrService) {
+      super($stateParams.sourceId, projectService, toastr)
+      if ($stateParams.id) projectService.loadSchema(this.projectSource, $stateParams.id).then(ps => this.c = ps)
       else {
-        this.ps = new Schema()
-        this.ps.labels = [ DataFactory.literal('', fibraService.getState().language)]
-        this.ps.descriptions = [ DataFactory.literal('', fibraService.getState().language)]
-        this.ps.sourceEndpoint = $stateParams.endpoint
-        this.ps.endpoint = $stateParams.endpoint
-        this.ps.sourceGraph = $stateParams.graph
+        this.c = new Schema()
+        this.c.labels = [ DataFactory.literal('', fibraService.getState().language)]
+        this.c.descriptions = [ DataFactory.literal('', fibraService.getState().language)]
+        this.c.endpoint = this.projectSource.sparqlEndpoint
       }
     }
   }

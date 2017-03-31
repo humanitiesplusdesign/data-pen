@@ -1,33 +1,15 @@
 namespace fibra {
   'use strict'
 
-  export class EditRemoteEndpointConfigurationViewComponentController implements angular.IComponentController {
+  export class EditRemoteEndpointConfigurationViewComponentController extends EditCitableComponentController<RemoteEndpointConfiguration> {
 
-    public ps: RemoteEndpointConfiguration
-    public disabled: boolean = false
-
-    public save(): void {
-      this.disabled = true
-      this.projectService.saveCitable(this.ps).then(
-        () => {
-          this.toastr.success('Configuration saved')
-          this.disabled = false
-        },
-        (err) => {
-          this.toastr.error('Error saving configuration', err)
-          this.disabled = false
-        }
-      )
-    }
-
-    constructor($stateParams: any, private fibraService: FibraService, private projectService: ProjectService, private toastr: angular.toastr.IToastrService) {
-      if ($stateParams.id) projectService.loadRemoteEndpointConfiguration($stateParams.endpoint, $stateParams.id, $stateParams.graph).then(ps => this.ps = ps)
+    constructor($stateParams: any, fibraService: FibraService, projectService: ProjectService, toastr: angular.toastr.IToastrService) {
+      super($stateParams.sourceId, projectService, toastr)
+      if ($stateParams.id) projectService.loadRemoteEndpointConfiguration(this.projectSource, $stateParams.id).then(ps => this.c = ps)
       else {
-        this.ps = new RemoteEndpointConfiguration()
-        this.ps.labels = [ DataFactory.literal('', fibraService.getState().language)]
-        this.ps.descriptions = [ DataFactory.literal('', fibraService.getState().language)]
-        this.ps.sourceEndpoint = $stateParams.endpoint
-        this.ps.sourceGraph = $stateParams.graph
+        this.c = new RemoteEndpointConfiguration()
+        this.c.labels = [ DataFactory.literal('', fibraService.getState().language)]
+        this.c.descriptions = [ DataFactory.literal('', fibraService.getState().language)]
       }
     }
   }

@@ -8,8 +8,14 @@
       label Name
       input.form-control(type="text",ng-model="source.id")
     .form-group
-      label Endpoint address
-      input.form-control(type="text",ng-model="source.endpoint")
+      label SPARQL query endpoint address
+      input.form-control(type="text",ng-model="source.sparqlEndpoint")
+    .form-group
+      label SPARQL update endpoint address
+      input.form-control(type="text",ng-model="source.updateEndpoint")
+    .form-group
+      label SPARQL graph store protocol endpoint address
+      input.form-control(type="text",ng-model="source.graphStoreEndpoint")
     .form-group
       label Graph
       input.form-control(type="text",ng-model="source.graph")

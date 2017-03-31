@@ -24,6 +24,13 @@ WHERE {
     constructor(private workerService: WorkerService, private fibraService: FibraService, private fibraSparqlService: FibraSparqlService, private $localStorage: any) {
       if (!$localStorage.projectSources)
         $localStorage.projectSources = []
+      else $localStorage.projectSources.forEach(ps => { // upgrade of earlier format
+        if (!ps.sparqlEndpoint) {
+          ps.sparqlEndpoint = ps['endpoint']
+          ps.updateEndpoint = ps['endpoint']
+          ps.graphStoreEndpoint = ps['endpoint']
+        }
+      })
     }
 
     public getCurrentProject(): Project {
@@ -38,61 +45,61 @@ WHERE {
       return this.$localStorage.projectSources
     }
 
-    public listPrimaryEndpointConfigurations(endpoint: string, graph?: string): angular.IPromise<PrimaryEndpointConfiguration[]> {
-      return this.workerService.call('projectWorkerService', 'listPrimaryEndpointConfigurations', [endpoint, graph])
+    public listPrimaryEndpointConfigurations(source: ICitableSource): angular.IPromise<PrimaryEndpointConfiguration[]> {
+      return this.workerService.call('projectWorkerService', 'listPrimaryEndpointConfigurations', [source])
     }
 
-    public loadPrimaryEndpointConfiguration(endpoint: string, templateId: string, graph?: string): angular.IPromise<PrimaryEndpointConfiguration> {
-      return this.workerService.call('projectWorkerService', 'loadPrimaryEndpointConfiguration', [endpoint, templateId, graph])
+    public loadPrimaryEndpointConfiguration(source: ICitableSource, templateId: string): angular.IPromise<PrimaryEndpointConfiguration> {
+      return this.workerService.call('projectWorkerService', 'loadPrimaryEndpointConfiguration', [source, templateId])
     }
 
-    public listArchiveEndpointConfigurations(endpoint: string, graph?: string): angular.IPromise<RemoteEndpointConfiguration[]> {
-      return this.workerService.call('projectWorkerService', 'listArchiveEndpointConfigurations', [endpoint, graph])
+    public listArchiveEndpointConfigurations(source: ICitableSource): angular.IPromise<RemoteEndpointConfiguration[]> {
+      return this.workerService.call('projectWorkerService', 'listArchiveEndpointConfigurations', [source])
     }
 
-    public listAuthorityEndpointConfigurations(endpoint: string, graph?: string): angular.IPromise<RemoteEndpointConfiguration[]> {
-      return this.workerService.call('projectWorkerService', 'listAuthorityEndpointConfigurations', [endpoint, graph])
+    public listAuthorityEndpointConfigurations(source: ICitableSource): angular.IPromise<RemoteEndpointConfiguration[]> {
+      return this.workerService.call('projectWorkerService', 'listAuthorityEndpointConfigurations', [source])
     }
 
-    public loadRemoteEndpointConfiguration(endpoint: string, templateId: string, graph?: string): angular.IPromise<RemoteEndpointConfiguration> {
-      return this.workerService.call('projectWorkerService', 'loadRemoteEndpointConfiguration', [endpoint, templateId, graph])
+    public loadRemoteEndpointConfiguration(source: ICitableSource, templateId: string): angular.IPromise<RemoteEndpointConfiguration> {
+      return this.workerService.call('projectWorkerService', 'loadRemoteEndpointConfiguration', [source, templateId])
     }
 
-    public listSchemas(endpoint: string, graph?: string): angular.IPromise<Schema[]> {
-      return this.workerService.call('projectWorkerService', 'listSchemas', [endpoint, graph])
+    public listSchemas(source: ICitableSource): angular.IPromise<Schema[]> {
+      return this.workerService.call('projectWorkerService', 'listSchemas', [source])
     }
 
-    public loadSchema(endpoint: string, id: string, graph?: string): angular.IPromise<Schema> {
-      return this.workerService.call('projectWorkerService', 'loadSchema', [endpoint, id, graph])
+    public loadSchema(source: ICitableSource, id: string): angular.IPromise<Schema> {
+      return this.workerService.call('projectWorkerService', 'loadSchema', [source, id])
     }
 
-    public listProjects(endpoint: string, graph?: string): angular.IPromise<Project[]> {
-      return this.workerService.call('projectWorkerService', 'listProjects', [endpoint, graph])
+    public listProjects(source: ICitableSource): angular.IPromise<Project[]> {
+      return this.workerService.call('projectWorkerService', 'listProjects', [source])
     }
 
-    public loadProject(endpoint: string, projectId: string, graph?: string): angular.IPromise<Project> {
-      return this.workerService.call('projectWorkerService', 'loadProject', [endpoint, projectId, graph])
+    public loadProject(source: ICitableSource, projectId: string): angular.IPromise<Project> {
+      return this.workerService.call('projectWorkerService', 'loadProject', [source, projectId])
     }
 
-    public deleteCitable(citable: ICitable): angular.IPromise<{}> {
-      return this.deleteObject(citable.sourceEndpoint, citable.id, citable.sourceGraph)
+    public deleteCitable(updateEndpoint: string, citable: ICitable): angular.IPromise<{}> {
+      return this.deleteObject(updateEndpoint, citable.id, citable.source.graph)
     }
 
-    public deleteObjects(endpoint: string, ids: string[], graph?: string): angular.IPromise<{}> {
+    public deleteObjects(updateEndpoint: string, ids: string[], graph?: string): angular.IPromise<{}> {
       let dq: string = graph ? ProjectService.deleteQuery.replace(/# STARTGRAPH/g, 'GRAPH <' + graph + '> {').replace(/# ENDGRAPH/g, '}') : ProjectService.deleteQuery.replace(/.*# STARTGRAPH\n/g, '').replace(/.*# ENDGRAPH\n/g, '')
       dq = dq.replace(/# PATTERNS/g, ids.reduce((acc: string, id: string, index: number) => acc + ' <' + id + '> ?p' + index + ' ?o' + index + ' .', ''))
-      return this.fibraSparqlService.update(endpoint, dq)
+      return this.fibraSparqlService.update(updateEndpoint, dq)
     }
 
-    public deleteObject(endpoint: string, id: string, graph?: string): angular.IPromise<{}> {
-      return this.deleteObjects(endpoint, [id], graph)
+    public deleteObject(updateEndpoint: string, id: string, graph?: string): angular.IPromise<{}> {
+      return this.deleteObjects(updateEndpoint, [id], graph)
     }
 
-    public saveCitable(ps: ICitable): angular.IPromise<{}> {
+    public saveCitable(updateEndpoint: string, graphStoreEndpoint: string, ps: ICitable): angular.IPromise<{}> {
       let m: d3.Map<string> = new Map<string>()
       let prefixes: {} = {}
       ps.toTurtle(m, prefixes)
-      return this.deleteObjects(ps.sourceEndpoint, m.keys(), ps.sourceGraph).then(() => this.fibraSparqlService.post(ps.sourceEndpoint, toTurtle(prefixes, m), ps.sourceGraph))
+      return this.deleteObjects(updateEndpoint, m.keys(), ps.source.graph).then(() => this.fibraSparqlService.post(graphStoreEndpoint, toTurtle(prefixes, m), ps.source.graph))
     }
 
   }
@@ -100,36 +107,36 @@ WHERE {
   export class ProjectWorkerService {
     constructor(private fibraSparqlService: FibraSparqlService, private $q: angular.IQService) {}
 
-    public loadPrimaryEndpointConfiguration(endpoint: string, templateId: string, graph?: string): angular.IPromise<PrimaryEndpointConfiguration> {
-      return this.runSingleQuery(endpoint, PrimaryEndpointConfiguration.primaryEndpointConfigurationQuery, templateId, new PrimaryEndpointConfiguration(templateId, endpoint, graph), graph)
+    public loadPrimaryEndpointConfiguration(source: ICitableSource, templateId: string): angular.IPromise<PrimaryEndpointConfiguration> {
+      return this.runSingleQuery(source, PrimaryEndpointConfiguration.primaryEndpointConfigurationQuery, templateId, new PrimaryEndpointConfiguration(templateId, source))
     }
 
-    public listPrimaryEndpointConfigurations(endpoint: string, graph?: string): angular.IPromise<PrimaryEndpointConfiguration[]> {
-      return this.runListQuery(endpoint, PrimaryEndpointConfiguration.listPrimaryEndpointConfigurationsQuery, (id: string) => new PrimaryEndpointConfiguration(id, endpoint, graph), graph)
+    public listPrimaryEndpointConfigurations(source: ICitableSource): angular.IPromise<PrimaryEndpointConfiguration[]> {
+      return this.runListQuery(source, PrimaryEndpointConfiguration.listPrimaryEndpointConfigurationsQuery, (id: string) => new PrimaryEndpointConfiguration(id, source))
     }
 
-    public loadRemoteEndpointConfiguration(endpoint: string, templateId: string, graph?: string): angular.IPromise<RemoteEndpointConfiguration> {
-      return this.runSingleQuery(endpoint, RemoteEndpointConfiguration.remoteEndpointConfigurationQuery, templateId, new RemoteEndpointConfiguration(templateId, endpoint, graph), graph)
+    public loadRemoteEndpointConfiguration(source: ICitableSource, templateId: string): angular.IPromise<RemoteEndpointConfiguration> {
+      return this.runSingleQuery(source, RemoteEndpointConfiguration.remoteEndpointConfigurationQuery, templateId, new RemoteEndpointConfiguration(templateId, source))
     }
 
-    public listArchiveEndpointConfigurations(endpoint: string, graph?: string): angular.IPromise<RemoteEndpointConfiguration[]> {
-      return this.runListQuery(endpoint, RemoteEndpointConfiguration.listArchiveEndpointConfigurationsQuery, (id: string) => new RemoteEndpointConfiguration(id, endpoint, graph), graph)
+    public listArchiveEndpointConfigurations(source: ICitableSource): angular.IPromise<RemoteEndpointConfiguration[]> {
+      return this.runListQuery(source, RemoteEndpointConfiguration.listArchiveEndpointConfigurationsQuery, (id: string) => new RemoteEndpointConfiguration(id, source))
     }
 
-    public listAuthorityEndpointConfigurations(endpoint: string, graph?: string): angular.IPromise<RemoteEndpointConfiguration[]> {
-      return this.runListQuery(endpoint, RemoteEndpointConfiguration.listAuthorityEndpointConfigurationsQuery, (id: string) => new RemoteEndpointConfiguration(id, endpoint, graph), graph)
+    public listAuthorityEndpointConfigurations(source: ICitableSource): angular.IPromise<RemoteEndpointConfiguration[]> {
+      return this.runListQuery(source, RemoteEndpointConfiguration.listAuthorityEndpointConfigurationsQuery, (id: string) => new RemoteEndpointConfiguration(id, source))
     }
 
-    public listProjects(endpoint: string, graph?: string): angular.IPromise<Project[]> {
-      return this.runListQuery(endpoint, Project.listProjectsQuery, (id: string) => new Project(id, endpoint, graph), graph)
+    public listProjects(source: ICitableSource): angular.IPromise<Project[]> {
+      return this.runListQuery(source, Project.listProjectsQuery, (id: string) => new Project(id, source))
     }
 
-    public listSchemas(endpoint: string, graph?: string): angular.IPromise<Schema[]> {
-      return this.runListQuery(endpoint, Schema.listSchemasQuery, (id: string) => new Schema(id, endpoint, graph), graph)
+    public listSchemas(source: ICitableSource): angular.IPromise<Schema[]> {
+      return this.runListQuery(source, Schema.listSchemasQuery, (id: string) => new Schema(id, source))
     }
 
-    public loadSchema(endpoint: string, id: string, graph?: string): angular.IPromise<Schema> {
-      return this.runSingleQuery(endpoint, Schema.schemaQuery, id, new Schema(id, endpoint, graph), graph)
+    public loadSchema(source: ICitableSource, id: string): angular.IPromise<Schema> {
+      return this.runSingleQuery(source, Schema.schemaQuery, id, new Schema(id, source))
     }
 
     public loadDataModel(schemas: Schema[]): angular.IPromise<DataModel> {
@@ -200,17 +207,17 @@ WHERE {
       })
     }
 
-    public loadProject(endpoint: string, id: string, graph?: string): angular.IPromise<Project> {
-      return this.runSingleQuery(endpoint, Project.projectQuery, id, new Project(id), graph).then(p => {
+    public loadProject(source: ICitableSource, id: string): angular.IPromise<Project> {
+      return this.runSingleQuery(source, Project.projectQuery, id, new Project(id, source)).then(p => {
         let promises: angular.IPromise<any>[] = []
-        promises.push(this.$q.all(p.schemas.map(schema => this.loadSchema(schema.sourceEndpoint, schema.id, schema.sourceGraph))).then(schemas => {
+        promises.push(this.$q.all(p.schemas.map(schema => this.loadSchema(schema.source, schema.id))).then(schemas => {
           p.schemas = schemas
           return this.loadDataModel(schemas).then(dm => p.dataModel = dm)
         }))
         let narche: RemoteEndpointConfiguration[] = []
         let nauthe: RemoteEndpointConfiguration[] = []
-        p.archiveEndpoints.forEach(ae => promises.push(this.loadRemoteEndpointConfiguration(ae.sourceEndpoint, ae.id, ae.sourceGraph).then(ae2 => narche.push(ae2))))
-        p.authorityEndpoints.forEach(ae => promises.push(this.loadRemoteEndpointConfiguration(ae.sourceEndpoint, ae.id, ae.sourceGraph).then(ae2 => nauthe.push(ae2))))
+        p.archiveEndpoints.forEach(ae => promises.push(this.loadRemoteEndpointConfiguration(ae.source, ae.id).then(ae2 => narche.push(ae2))))
+        p.authorityEndpoints.forEach(ae => promises.push(this.loadRemoteEndpointConfiguration(ae.source, ae.id).then(ae2 => nauthe.push(ae2))))
         return this.$q.all(promises).then(() => {
           p.archiveEndpoints = narche
           p.authorityEndpoints = nauthe
@@ -219,25 +226,23 @@ WHERE {
       })
     }
 
-    private runSingleQuery<T extends ICitable>(endpoint: string, tq: string, id: string, ps: T, graph?: string): angular.IPromise<T> {
-      tq = graph ? tq.replace(/# STARTGRAPH/g, 'GRAPH <' + graph + '> {').replace(/# ENDGRAPH/g, '}') : tq.replace(/.*# STARTGRAPH\n/g, '').replace(/.*# ENDGRAPH\n/g, '')
+    private runSingleQuery<T extends ICitable>(source: ICitableSource, tq: string, id: string, ps: T): angular.IPromise<T> {
+      tq = source.graph ? tq.replace(/# STARTGRAPH/g, 'GRAPH <' + source.graph + '> {').replace(/# ENDGRAPH/g, '}') : tq.replace(/.*# STARTGRAPH\n/g, '').replace(/.*# ENDGRAPH\n/g, '')
       tq = tq.replace(/<ID>/g, '<' + id + '>')
       let deferred: angular.IDeferred<T> = this.$q.defer()
-      this.fibraSparqlService.query(endpoint, tq).then(response => {
-        ps.sourceEndpoint = endpoint
-        ps.sourceGraph = graph
+      this.fibraSparqlService.query(source.sparqlEndpoint, tq).then(response => {
         let conf: s.IBindingsToObjectConfiguration = {
           bindingTypes: { rightsHolders: {}, schemas: {}, authorityEndpoints: {}, archiveEndpoints: {}},
           bindingConverters: {
             types: (binding) => DataFactory.nodeFromBinding(binding),
             labels: (binding) => DataFactory.nodeFromBinding(binding),
             descriptions: (binding) => DataFactory.nodeFromBinding(binding),
-            schemas: (binding) => new Schema(binding.value, endpoint, graph),
-            authorityEndpoints: (binding) => new RemoteEndpointConfiguration(binding.value, endpoint, graph),
-            archiveEndpoints: (binding) => new RemoteEndpointConfiguration(binding.value, endpoint, graph),
+            schemas: (binding) => new Schema(binding.value, source),
+            authorityEndpoints: (binding) => new RemoteEndpointConfiguration(binding.value, source),
+            archiveEndpoints: (binding) => new RemoteEndpointConfiguration(binding.value, source),
             rightsHolderslabels: (binding) => DataFactory.nodeFromBinding(binding),
             rightsHoldersdescriptions: (binding) => DataFactory.nodeFromBinding(binding),
-            rightsHolders: (binding) => new Citable(binding.value, endpoint, graph)
+            rightsHolders: (binding) => new Citable(binding.value, source)
           },
           subObjectPrefixes: { rightsHolders: {}, schemas: {}, authorityEndpoints: {}, archiveEndpoints: {}}
         }
@@ -248,28 +253,23 @@ WHERE {
       return deferred.promise
     }
 
-    private runListQuery<T extends ICitable>(endpoint: string, lq: string, oc: (id: string) => T, graph?: string): angular.IPromise<T[]> {
-      lq = graph ? lq.replace(/# STARTGRAPH/g, 'GRAPH <' + graph + '> {').replace(/# ENDGRAPH/g, '}') : lq.replace(/.*# STARTGRAPH\n/g, '').replace(/.*# ENDGRAPH\n/g, '')
-      return this.fibraSparqlService.query(endpoint, lq).then(
+    private runListQuery<T extends ICitable>(source: ICitableSource, lq: string, oc: (id: string) => T): angular.IPromise<T[]> {
+      lq = source.graph ? lq.replace(/# STARTGRAPH/g, 'GRAPH <' + source.graph + '> {').replace(/# ENDGRAPH/g, '}') : lq.replace(/.*# STARTGRAPH\n/g, '').replace(/.*# ENDGRAPH\n/g, '')
+      return this.fibraSparqlService.query(source.sparqlEndpoint, lq).then(
         response => {
-          let projects: EMap<T> = new EMap<T>((id: string) => {
-            let ret: T = oc(id)
-            ret.sourceEndpoint = endpoint
-            ret.sourceGraph = graph
-            return ret
-          })
+          let projects: EMap<T> = new EMap<T>(oc)
           let conf: s.IBindingsToObjectConfiguration = {
             bindingTypes: { rightsHolders: {}, schemas: {}, authorityEndpoints: {}, archiveEndpoints: {}},
             bindingConverters: {
               types: (binding) => DataFactory.nodeFromBinding(binding),
               labels: (binding) => DataFactory.nodeFromBinding(binding),
               descriptions: (binding) => DataFactory.nodeFromBinding(binding),
-              schemas: (binding) => new Schema(binding.value, endpoint, graph),
-              authorityEndpoints: (binding) => new RemoteEndpointConfiguration(binding.value, endpoint, graph),
-              archiveEndpoints: (binding) => new RemoteEndpointConfiguration(binding.value, endpoint, graph),
+              schemas: (binding) => new Schema(binding.value, source),
+              authorityEndpoints: (binding) => new RemoteEndpointConfiguration(binding.value, source),
+              archiveEndpoints: (binding) => new RemoteEndpointConfiguration(binding.value, source),
               rightsHolderslabels: (binding) => DataFactory.nodeFromBinding(binding),
               rightsHoldersdescriptions: (binding) => DataFactory.nodeFromBinding(binding),
-              rightsHolders: (binding) => new Citable(binding.value, endpoint, graph)
+              rightsHolders: (binding) => new Citable(binding.value, source)
             },
             subObjectPrefixes: { rightsHolders: {}, schemas: {}, authorityEndpoints: {}, archiveEndpoints: {}}
           }

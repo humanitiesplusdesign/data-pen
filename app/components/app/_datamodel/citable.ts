@@ -1,19 +1,24 @@
 namespace fibra {
   'use strict'
 
+  export interface ICitableSource {
+    sparqlEndpoint: string
+    graph?: string
+  }
+
   export interface ICitable {
     id: string
     labels: ILiteral[]
     descriptions: ILiteral[]
     url?: string
     rightsHolders: ICitable[]
-    sourceEndpoint?: string
-    sourceGraph?: string
+    source: ICitableSource
     toTurtle(fragmentsById: d3.Map<string>, prefixes: {[id: string]: string}): void
   }
 
   export class Citable implements ICitable {
     public id: string
+    public source: ICitableSource
     public static toTurtle(c: ICitable, fragmentsById: d3.Map<string>, prefixes: {[id: string]: string}): void {
       prefixes['skos'] = SKOS.ns
       prefixes['dcterms'] = DCTerms.ns
@@ -50,8 +55,9 @@ namespace fibra {
       }
       fragmentsById.set(c.id, f)
     }
-    constructor(id?: string, public sourceEndpoint?: string, public sourceGraph?: string, public labels: ILiteral[] = [], public url?: string, public descriptions: ILiteral[] = [], public rightsHolders: ICitable[] = []) {
+    constructor(id?: string, source?: ICitableSource, public labels: ILiteral[] = [], public url?: string, public descriptions: ILiteral[] = [], public rightsHolders: ICitable[] = []) {
       this.id = id
+      this.source = source
     }
     public toTurtle(fragmentsById: d3.Map<string>, prefixes: {[id: string]: string}): void { Citable.toTurtle(this, fragmentsById, prefixes) }
   }
