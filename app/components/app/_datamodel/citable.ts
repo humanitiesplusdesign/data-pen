@@ -6,6 +6,12 @@ namespace fibra {
     graph?: string
   }
 
+  export class CitableSource implements ICitableSource {
+    public static clone(source: ICitableSource): ICitableSource { return new CitableSource(source.sparqlEndpoint, source.graph) }
+
+    constructor(public sparqlEndpoint: string, public graph?: string) {}
+  }
+
   export interface ICitable {
     id: string
     labels: ILiteral[]
@@ -18,7 +24,9 @@ namespace fibra {
 
   export class Citable implements ICitable {
     public id: string
-    public source: ICitableSource
+    public source: ICitableSource = {
+      sparqlEndpoint: null
+    }
     public static toTurtle(c: ICitable, fragmentsById: d3.Map<string>, prefixes: {[id: string]: string}): void {
       prefixes['skos'] = SKOS.ns
       prefixes['dcterms'] = DCTerms.ns

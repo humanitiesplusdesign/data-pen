@@ -11,6 +11,7 @@ namespace fibra {
     public selectedItem: INode
     public types: TreeNode[] = []
     public state: UIState
+    public currentProjectSource: ProjectSourceInfo
     public paletteDisplay: boolean = false
     private limitFilter: string = ''
 
@@ -59,9 +60,11 @@ namespace fibra {
                 private socialAuthService: SocialAuthService,
                 private $localStorage: any,
                 private $sessionStorage: any,
+                private projectService: ProjectService,
                 private fibraService: FibraService,
                 private $q: angular.IQService) {
-      console.log(fibraService.getState().project)
+                  let currentProject: Project = projectService.getCurrentProject()
+                  this.currentProjectSource = projectService.getProjectSources().find(ps => ps.sparqlEndpoint === currentProject.source.sparqlEndpoint && ps.graph === currentProject.source.graph)
       fibraService.on('change', () => {
         let chosenTypes = fibraService.getState().construct.displayTypes
         this.limitFilter = ''

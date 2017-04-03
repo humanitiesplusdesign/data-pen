@@ -7,7 +7,7 @@
     .alert.alert-danger(ng-if="$ctrl.projectSourceState[id]=='error'") Error loading: {{projects}}
     ul
       li(ng-if="$ctrl.projectSourceState[id]=='ready'",ng-repeat="project in $ctrl.projects[id] track by $index")
-        a(ui-sref="construct({id:project.id,endpoint:project.sourceEndpoint,graph:project.sourceGraph})"): citable(citable="project",no-link)
+        a(ui-sref="construct({id:project.id,sparqlEndpoint:project.source.sparqlEndpoint,graph:project.source.graph})"): citable(citable="project",no-link)
         // button.btn.btn-xs.btn-danger(ng-click="$ctrl.deleteProject(id, $index, project)"): span.glyphicon.glyphicon-remove
       li: a(ui-sref="configure({sourceId:id})") new project
   button.btn.btn-xs(ui-sref="projectSources()",title="Configure project sources"): span.glyphicon.glyphicon-cog

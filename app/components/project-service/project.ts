@@ -11,7 +11,7 @@ PREFIX dcterms: <http://purl.org/dc/terms/>
 PREFIX foaf: <http://xmlns.com/foaf/0.1/>
 PREFIX void: <http://rdfs.org/ns/void#>
 PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
-SELECT ?id ?labels ?descriptions ?url ?rightsHolders ?rightsHolderslabels ?rightsHoldersdescriptions ?rightsHoldersurl ?rightsHoldersorder ?instanceNS ?schemaNS ?endpoint ?graphStoreEndpoint ?updateEndpoint ?graph ?autocompletionQuery ?treeQuery ?itemQuery ?deleteItemQuery ?authorityEndpoints ?authorityEndpointssourceGraph ?authorityEndpointssourceEndpoint ?archiveEndpoints ?archiveEndpointssourceGraph ?archiveEndpointssourceEndpoint ?schemas ?schemassourceGraph ?schemassourceEndpoint {
+SELECT ?id ?labels ?descriptions ?url ?rightsHolders ?rightsHolders_labels ?rightsHolders_descriptions ?rightsHolder_surl ?rightsHolders_order ?instanceNS ?schemaNS ?endpoint ?graphStoreEndpoint ?updateEndpoint ?graph ?autocompletionQuery ?treeQuery ?itemQuery ?deleteItemQuery ?authorityEndpoints ?authorityEndpoints_source_graph ?authorityEndpoints_source_sparqlEndpoint ?archiveEndpoints ?archiveEndpoints_source_graph ?archiveEndpoints_source_sparqlEndpoint ?schemas ?schemas_source_graph ?schemas_source_sparqlEndpoint {
   # STARTGRAPH
     ?id a fibra:Project .
     {
@@ -34,22 +34,22 @@ SELECT ?id ?labels ?descriptions ?url ?rightsHolders ?rightsHolderslabels ?right
     } UNION {
       ?id fibra:schemaReference ?ar .
       ?ar rdf:value ?schemas .
-      ?ar void:sparqlEndpoint ?schemassourceEndpoint .
-      OPTIONAL { ?ar fibra:graph ?schemassourceGraph }
+      ?ar void:sparqlEndpoint ?schemas_source_sparqlEndpoint .
+      OPTIONAL { ?ar fibra:graph ?schemas_source_graph }
     } UNION {
       ?id fibra:authorityEndpoint ?authorityEndpoints
     } UNION {
       ?id fibra:authorityEndpointReference ?ar .
       ?ar rdf:value ?authorityEndpoints .
-      ?ar void:sparqlEndpoint ?authorityEndpointssourceEndpoint .
-      OPTIONAL { ?ar fibra:graph ?authorityEndpointssourceGraph }
+      ?ar void:sparqlEndpoint ?authorityEndpoints_source_sparqlEndpoint .
+      OPTIONAL { ?ar fibra:graph ?authorityEndpoints_source_graph }
     } UNION {
       ?id fibra:archiveEndpoint ?archiveEndpoints
     } UNION {
       ?id fibra:archiveEndpointReference ?ar .
       ?ar rdf:value ?archiveEndpoints .
-      ?ar void:sparqlEndpoint ?archiveEndpointssourceEndpoint .
-      OPTIONAL { ?ar fibra:graph ?archiveEndpointssourceGraph }
+      ?ar void:sparqlEndpoint ?archiveEndpoints_source_sparqlEndpoint .
+      OPTIONAL { ?ar fibra:graph ?archiveEndpoints_source_graph }
     } UNION {
       ?id dcterms:description ?descriptions
     } UNION {
@@ -59,14 +59,14 @@ SELECT ?id ?labels ?descriptions ?url ?rightsHolders ?rightsHolderslabels ?right
         ?id fibra:qualifiedAssertion ?qa .
         ?qa rdf:predicate dcterms:rightsHolder .
         ?qa rdf:object ?rightsHolders .
-        OPTIONAL { ?qa fibra:order ?rightsHoldersorder }
+        OPTIONAL { ?qa fibra:order ?rightsHolders_order }
       }
       {
-        ?rightsHolders skos:prefLabel ?rightsHolderslabels
+        ?rightsHolders skos:prefLabel ?rightsHolders_labels
       } UNION {
-        ?rightsHolders foaf:homepage ?rightsHoldersurl
+        ?rightsHolders foaf:homepage ?rightsHolders_url
       } UNION {
-        ?rightsHolders dcterms:description ?rightsHoldersdescriptions
+        ?rightsHolders dcterms:description ?rightsHolders_descriptions
       }
     }
   # ENDGRAPH
@@ -78,7 +78,7 @@ PREFIX dcterms: <http://purl.org/dc/terms/>
 PREFIX foaf: <http://xmlns.com/foaf/0.1/>
 PREFIX void: <http://rdfs.org/ns/void#>
 PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
-SELECT ?labels ?descriptions ?url ?rightsHolders ?rightsHolderslabels ?rightsHoldersdescriptions ?rightsHoldersurl ?rightsHoldersorder ?instanceNS ?schemaNS ?endpoint ?graphStoreEndpoint ?updateEndpoint ?graph ?autocompletionQuery ?treeQuery ?itemQuery ?deleteItemQuery  ?authorityEndpoints ?authorityEndpointssourceGraph ?authorityEndpointssourceEndpoint ?archiveEndpoints ?archiveEndpointssourceGraph ?archiveEndpointssourceEndpoint ?schemas ?schemassourceGraph ?schemassourceEndpoint {
+SELECT ?labels ?descriptions ?url ?rightsHolders ?rightsHolders_labels ?rightsHolders_descriptions ?rightsHolder_surl ?rightsHolders_order ?instanceNS ?schemaNS ?endpoint ?graphStoreEndpoint ?updateEndpoint ?graph ?autocompletionQuery ?treeQuery ?itemQuery ?deleteItemQuery ?authorityEndpoints ?authorityEndpoints_source_graph ?authorityEndpoints_source_sparqlEndpoint ?archiveEndpoints ?archiveEndpoints_source_graph ?archiveEndpoints_source_sparqlEndpoint ?schemas ?schemas_source_graph ?schemas_source_sparqlEndpoint {
   # STARTGRAPH
     {
       <ID> skos:prefLabel ?labels
@@ -100,22 +100,22 @@ SELECT ?labels ?descriptions ?url ?rightsHolders ?rightsHolderslabels ?rightsHol
     } UNION {
       <ID> fibra:schemaReference ?ar .
       ?ar rdf:value ?schemas .
-      ?ar void:sparqlEndpoint ?schemassourceEndpoint .
-      OPTIONAL { ?ar fibra:graph ?schemassourceGraph }
+      ?ar void:sparqlEndpoint ?schemas_source_sparqlEndpoint .
+      OPTIONAL { ?ar fibra:graph ?schemas_source_graph }
     } UNION {
       <ID> fibra:authorityEndpoint ?authorityEndpoints
     } UNION {
       <ID> fibra:authorityEndpointReference ?ar .
       ?ar rdf:value ?authorityEndpoints .
-      ?ar void:sparqlEndpoint ?authorityEndpointssourceEndpoint .
-      OPTIONAL { ?ar fibra:graph ?authorityEndpointssourceGraph }
+      ?ar void:sparqlEndpoint ?authorityEndpoints_source_sparqlEndpoint .
+      OPTIONAL { ?ar fibra:graph ?authorityEndpoints_source_graph }
     } UNION {
       <ID> fibra:archiveEndpoint ?archiveEndpoints
     } UNION {
       <ID> fibra:archiveEndpointReference ?ar .
       ?ar rdf:value ?archiveEndpoints .
-      ?ar void:sparqlEndpoint ?archiveEndpointssourceEndpoint .
-      OPTIONAL { ?ar fibra:graph ?archiveEndpointssourceGraph }
+      ?ar void:sparqlEndpoint ?archiveEndpoints_source_sparqlEndpoint .
+      OPTIONAL { ?ar fibra:graph ?archiveEndpoints_source_graph }
     } UNION {
       <ID> dcterms:description ?descriptions
     } UNION {
@@ -125,14 +125,14 @@ SELECT ?labels ?descriptions ?url ?rightsHolders ?rightsHolderslabels ?rightsHol
         <ID> fibra:qualifiedAssertion ?qa .
         ?qa rdf:predicate dcterms:rightsHolder .
         ?qa rdf:object ?rightsHolders .
-        OPTIONAL { ?qa fibra:order ?rightsHoldersorder }
+        OPTIONAL { ?qa fibra:order ?rightsHolders_order }
       }
       {
-        ?rightsHolders skos:prefLabel ?rightsHolderslabels
+        ?rightsHolders skos:prefLabel ?rightsHolders_labels
       } UNION {
-        ?rightsHolders foaf:homepage ?rightsHoldersurl
+        ?rightsHolders foaf:homepage ?rightsHolders_url
       } UNION {
-        ?rightsHolders dcterms:description ?rightsHoldersdescriptions
+        ?rightsHolders dcterms:description ?rightsHolders_descriptions
       }
     }
   # ENDGRAPH
@@ -154,8 +154,6 @@ SELECT ?labels ?descriptions ?url ?rightsHolders ?rightsHolderslabels ?rightsHol
     public authorityEndpoints: RemoteEndpointConfiguration[] = []
     public archiveEndpoints: RemoteEndpointConfiguration[] = []
     public schemas: Schema[] = []
-    public sourceEndpoint: string
-    public sourceGraph: string
     public remoteEndpoints(): RemoteEndpointConfiguration[] {
       return this.archiveEndpoints.concat(this.authorityEndpoints)
     }
@@ -204,14 +202,14 @@ SELECT ?labels ?descriptions ?url ?rightsHolders ?rightsHolderslabels ?rightsHol
           })
           f = f.substring(0, f.length - 2) + ' ;'
           this.authorityEndpoints
-            .filter(ae => ae.sourceEndpoint !== this.sourceEndpoint || this.sourceGraph !== ae.sourceGraph)
+            .filter(ae => ae.source.sparqlEndpoint !== this.source.sparqlEndpoint || this.source.graph !== ae.source.graph)
             .forEach(ae => {
               f = f + `
   fibra:authorityEndpointReference [
     rdf:value <${ae.id}> ;
-    void:sparqlEndpoint <${ae.sourceEndpoint}> ;`
-              if (ae.sourceGraph) f = f + `
-    fibra:graph <${ae.sourceGraph}>`
+    void:sparqlEndpoint <${ae.source.sparqlEndpoint}> ;`
+              if (ae.source.graph) f = f + `
+    fibra:graph <${ae.source.graph}>`
               f = f + `
   ] ;`
           })

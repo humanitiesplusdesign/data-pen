@@ -155,7 +155,7 @@ WHERE {
       schemas.forEach(schema => {
         promises.push(this.fibraSparqlService.query(schema.endpoint, schema.classQuery).then(response => {
           let conf: s.IBindingsToObjectConfiguration = {
-            bindingTypes: { types: {} },
+            bindingTypes: { types: 'uniqueArray' },
             bindingConverters: {
               superClasses: (binding) => classes.goc(binding.value),
               subClasses: (binding) => classes.goc(binding.value),
@@ -164,11 +164,12 @@ WHERE {
               descriptions: (binding) => DataFactory.nodeFromBinding(binding),
             }
           }
-          response.results.bindings.forEach(binding => s.SparqlService.bindingsToObject(binding, classes.goc(binding['id'].value), conf))
+          let tracker: s.UniqueObjectTracker = new s.UniqueObjectTracker()
+          response.results.bindings.forEach(binding => s.SparqlService.bindingsToObject(binding, classes.goc(binding['id'].value), conf, tracker))
         }))
         promises.push(this.fibraSparqlService.query(schema.endpoint, schema.propertyQuery).then(response => {
           let conf: s.IBindingsToObjectConfiguration = {
-            bindingTypes: { types: {} },
+            bindingTypes: { types: 'uniqueArray' },
             bindingConverters: {
               superProperties: (binding) => properties.goc(binding.value),
               subProperties: (binding) => properties.goc(binding.value),
@@ -180,7 +181,8 @@ WHERE {
               descriptions: (binding) => DataFactory.nodeFromBinding(binding),
             }
           }
-          response.results.bindings.forEach(binding => s.SparqlService.bindingsToObject(binding, properties.goc(binding['id'].value), conf))
+          let tracker: s.UniqueObjectTracker = new s.UniqueObjectTracker()
+          response.results.bindings.forEach(binding => s.SparqlService.bindingsToObject(binding, properties.goc(binding['id'].value), conf, tracker))
         }))
       })
       return this.$q.all(promises).then(() => {
@@ -232,21 +234,21 @@ WHERE {
       let deferred: angular.IDeferred<T> = this.$q.defer()
       this.fibraSparqlService.query(source.sparqlEndpoint, tq).then(response => {
         let conf: s.IBindingsToObjectConfiguration = {
-          bindingTypes: { rightsHolders: {}, schemas: {}, authorityEndpoints: {}, archiveEndpoints: {}},
+          bindingTypes: { rightsHolders: 'uniqueArray', schemas: 'uniqueArray', authorityEndpoints: 'uniqueArray', archiveEndpoints: 'uniqueArray'},
           bindingConverters: {
             types: (binding) => DataFactory.nodeFromBinding(binding),
             labels: (binding) => DataFactory.nodeFromBinding(binding),
             descriptions: (binding) => DataFactory.nodeFromBinding(binding),
-            schemas: (binding) => new Schema(binding.value, source),
-            authorityEndpoints: (binding) => new RemoteEndpointConfiguration(binding.value, source),
-            archiveEndpoints: (binding) => new RemoteEndpointConfiguration(binding.value, source),
-            rightsHolderslabels: (binding) => DataFactory.nodeFromBinding(binding),
-            rightsHoldersdescriptions: (binding) => DataFactory.nodeFromBinding(binding),
+            schemas: (binding) => new Schema(binding.value, CitableSource.clone(source)),
+            authorityEndpoints: (binding) => new RemoteEndpointConfiguration(binding.value, CitableSource.clone(source)),
+            archiveEndpoints: (binding) => new RemoteEndpointConfiguration(binding.value, CitableSource.clone(source)),
+            rightsHolders_labels: (binding) => DataFactory.nodeFromBinding(binding),
+            rightsHolders_descriptions: (binding) => DataFactory.nodeFromBinding(binding),
             rightsHolders: (binding) => new Citable(binding.value, source)
-          },
-          subObjectPrefixes: { rightsHolders: {}, schemas: {}, authorityEndpoints: {}, archiveEndpoints: {}}
+          }
         }
-        response.results.bindings.forEach(b => s.SparqlService.bindingsToObject(b, ps, conf))
+        let tracker: s.UniqueObjectTracker = new s.UniqueObjectTracker()
+        response.results.bindings.forEach(b => s.SparqlService.bindingsToObject(b, ps, conf, tracker))
         ProjectService.orderCitables(ps.rightsHolders)
         deferred.resolve(ps)
       })
@@ -259,21 +261,21 @@ WHERE {
         response => {
           let projects: EMap<T> = new EMap<T>(oc)
           let conf: s.IBindingsToObjectConfiguration = {
-            bindingTypes: { rightsHolders: {}, schemas: {}, authorityEndpoints: {}, archiveEndpoints: {}},
+            bindingTypes: { rightsHolders: 'uniqueArray', schemas: 'uniqueArray', authorityEndpoints: 'uniqueArray', archiveEndpoints: 'uniqueArray'},
             bindingConverters: {
               types: (binding) => DataFactory.nodeFromBinding(binding),
               labels: (binding) => DataFactory.nodeFromBinding(binding),
               descriptions: (binding) => DataFactory.nodeFromBinding(binding),
-              schemas: (binding) => new Schema(binding.value, source),
-              authorityEndpoints: (binding) => new RemoteEndpointConfiguration(binding.value, source),
-              archiveEndpoints: (binding) => new RemoteEndpointConfiguration(binding.value, source),
-              rightsHolderslabels: (binding) => DataFactory.nodeFromBinding(binding),
-              rightsHoldersdescriptions: (binding) => DataFactory.nodeFromBinding(binding),
+              schemas: (binding) => new Schema(binding.value, CitableSource.clone(source)),
+              authorityEndpoints: (binding) => new RemoteEndpointConfiguration(binding.value, CitableSource.clone(source)),
+              archiveEndpoints: (binding) => new RemoteEndpointConfiguration(binding.value, CitableSource.clone(source)),
+              rightsHolders_labels: (binding) => DataFactory.nodeFromBinding(binding),
+              rightsHolders_descriptions: (binding) => DataFactory.nodeFromBinding(binding),
               rightsHolders: (binding) => new Citable(binding.value, source)
-            },
-            subObjectPrefixes: { rightsHolders: {}, schemas: {}, authorityEndpoints: {}, archiveEndpoints: {}}
+            }
           }
-          response.results.bindings.forEach(binding => s.SparqlService.bindingsToObject(binding, projects.goc(binding['id'].value), conf))
+          let tracker: s.UniqueObjectTracker = new s.UniqueObjectTracker()
+          response.results.bindings.forEach(binding => s.SparqlService.bindingsToObject(binding, projects.goc(binding['id'].value), conf, tracker))
           projects.values().forEach(p => ProjectService.orderCitables(p.rightsHolders))
           return projects.values()
         })

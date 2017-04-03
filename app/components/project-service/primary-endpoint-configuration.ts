@@ -9,7 +9,7 @@ PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
 PREFIX dcterms: <http://purl.org/dc/terms/>
 PREFIX foaf: <http://xmlns.com/foaf/0.1/>
 PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
-SELECT ?id ?labels ?descriptions ?compatibleEndpoints ?rightsHolders ?rightsHolderslabels ?rightsHoldersdescriptions ?rightsHoldersurl ?rightsHoldersorder ?url ?autocompletionQuery ?itemQuery ?deleteItemQuery ?treeQuery ?properyQuery ?classQuery {
+SELECT ?id ?labels ?descriptions ?compatibleEndpoints ?rightsHolders ?rightsHolders_labels ?rightsHolders_descriptions ?rightsHolders_url ?rightsHolders_order ?url ?autocompletionQuery ?itemQuery ?deleteItemQuery ?treeQuery ?properyQuery ?classQuery {
   # STARTGRAPH
     ?id a fibra:PrimaryEndpointConfiguration .
     { ?id skos:prefLabel ?labels }
@@ -33,14 +33,14 @@ SELECT ?id ?labels ?descriptions ?compatibleEndpoints ?rightsHolders ?rightsHold
         ?id fibra:qualifiedAssertion ?qa .
         ?qa rdf:predicate dcterms:rightsHolder .
         ?qa rdf:object ?rightsHolders .
-        OPTIONAL { ?qa fibra:order ?rightsHoldersorder }
+        OPTIONAL { ?qa fibra:order ?rightsHolders_order }
       }
       {
-        ?rightsHolders skos:prefLabel ?rightsHolderslabels
+        ?rightsHolders skos:prefLabel ?rightsHolders_labels
       } UNION {
-        ?rightsHolders foaf:homepage ?rightsHoldersurl
+        ?rightsHolders foaf:homepage ?rightsHolders_url
       } UNION {
-        ?rightsHolders dcterms:description ?rightsHoldersdescriptions
+        ?rightsHolders dcterms:description ?rightsHolders_descriptions
       }
     }
   # ENDGRAPH
@@ -50,7 +50,7 @@ PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
 PREFIX dcterms: <http://purl.org/dc/terms/>
 PREFIX foaf: <http://xmlns.com/foaf/0.1/>
 PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
-SELECT ?labels ?descriptions ?compatibleEndpoints ?rightsHolders ?rightsHolderslabels ?rightsHoldersdescriptions ?rightsHoldersurl ?rightsHoldersorder ?url ?autocompletionQuery ?itemQuery ?deleteItemQuery ?treeQuery ?properyQuery ?classQuery {
+SELECT ?labels ?descriptions ?compatibleEndpoints ?rightsHolders ?rightsHolders_labels ?rightsHolders_descriptions ?rightsHolders_url ?rightsHolders_order ?url ?autocompletionQuery ?itemQuery ?deleteItemQuery ?treeQuery ?properyQuery ?classQuery {
   # STARTGRAPH
     { <ID> skos:prefLabel ?labels }
     UNION
@@ -73,14 +73,14 @@ SELECT ?labels ?descriptions ?compatibleEndpoints ?rightsHolders ?rightsHoldersl
         <ID> fibra:qualifiedAssertion ?qa .
         <ID> rdf:predicate dcterms:rightsHolder .
         <ID> rdf:object ?rightsHolders .
-        OPTIONAL { <ID> fibra:order ?rightsHoldersorder }
+        OPTIONAL { <ID> fibra:order ?rightsHolders_order }
       }
       {
-        ?rightsHolders skos:prefLabel ?rightsHolderslabels
+        ?rightsHolders skos:prefLabel ?rightsHolders_labels
       } UNION {
-        ?rightsHolders foaf:homepage ?rightsHoldersurl
+        ?rightsHolders foaf:homepage ?rightsHolders_url
       } UNION {
-        ?rightsHolders dcterms:description ?rightsHoldersdescriptions
+        ?rightsHolders dcterms:description ?rightsHolders_descriptions
       }
     }
   # ENDGRAPH

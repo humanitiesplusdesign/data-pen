@@ -10,7 +10,7 @@ PREFIX dcterms: <http://purl.org/dc/terms/>
 PREFIX foaf: <http://xmlns.com/foaf/0.1/>
 PREFIX void: <http://rdfs.org/ns/void#>
 PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
-SELECT ?id ?type ?labels ?descriptions ?rightsHolders ?rightsHolderslabels ?rightsHoldersdescriptions ?rightsHoldersurl ?rightsHoldersorder ?url ?endpoint ?autocompletionQuery ?itemQuery ?treeQuery ?propertyQuery ?classQuery {
+SELECT ?id ?type ?labels ?descriptions ?rightsHolders ?rightsHolders_labels ?rightsHolders_descriptions ?rightsHolders_url ?rightsHolders_order ?url ?endpoint ?autocompletionQuery ?itemQuery ?treeQuery ?propertyQuery ?classQuery {
   # STARTGRAPH
     ?id a fibra:AuthorityEndpointConfiguration .
     ?id a ?type .
@@ -33,14 +33,14 @@ SELECT ?id ?type ?labels ?descriptions ?rightsHolders ?rightsHolderslabels ?righ
         ?id fibra:qualifiedAssertion ?qa .
         ?qa rdf:predicate dcterms:rightsHolder .
         ?qa rdf:object ?rightsHolders .
-        OPTIONAL { ?qa fibra:order ?rightsHoldersorder }
+        OPTIONAL { ?qa fibra:order ?rightsHolders_order }
       }
       {
-        ?rightsHolders skos:prefLabel ?rightsHolderslabels
+        ?rightsHolders skos:prefLabel ?rightsHolders_labels
       } UNION {
-        ?rightsHolders foaf:homepage ?rightsHoldersurl
+        ?rightsHolders foaf:homepage ?rightsHolders_url
       } UNION {
-        ?rightsHolders dcterms:description ?rightsHoldersdescriptions
+        ?rightsHolders dcterms:description ?rightsHolders_descriptions
       }
     }
   # ENDGRAPH
@@ -52,7 +52,7 @@ PREFIX dcterms: <http://purl.org/dc/terms/>
 PREFIX foaf: <http://xmlns.com/foaf/0.1/>
 PREFIX void: <http://rdfs.org/ns/void#>
 PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
-SELECT ?type ?labels ?descriptions ?rightsHolders ?rightsHolderslabels ?rightsHoldersdescriptions ?rightsHoldersurl ?rightsHoldersorder ?url ?endpoint ?autocompletionQuery ?itemQuery ?treeQuery ?propertyQuery ?classQuery {
+SELECT ?type ?labels ?descriptions ?rightsHolders ?rightsHolders_labels ?rightsHolders_descriptions ?rightsHolders_url ?rightsHolders_order ?url ?endpoint ?autocompletionQuery ?itemQuery ?treeQuery ?propertyQuery ?classQuery {
   # STARTGRAPH
     { <ID> skos:prefLabel ?labels }
     UNION
@@ -74,14 +74,14 @@ SELECT ?type ?labels ?descriptions ?rightsHolders ?rightsHolderslabels ?rightsHo
         <ID> fibra:qualifiedAssertion ?qa .
         ?qa rdf:predicate dcterms:rightsHolder .
         ?qa rdf:object ?rightsHolders .
-        OPTIONAL { ?qa fibra:order ?rightsHoldersorder }
+        OPTIONAL { ?qa fibra:order ?rightsHolders_order }
       }
       {
-        ?rightsHolders skos:prefLabel ?rightsHolderslabels
+        ?rightsHolders skos:prefLabel ?rightsHolders_labels
       } UNION {
-        ?rightsHolders foaf:homepage ?rightsHoldersurl
+        ?rightsHolders foaf:homepage ?rightsHolders_url
       } UNION {
-        ?rightsHolders dcterms:description ?rightsHoldersdescriptions
+        ?rightsHolders dcterms:description ?rightsHolders_descriptions
       }
     }
   # ENDGRAPH
@@ -93,8 +93,6 @@ SELECT ?type ?labels ?descriptions ?rightsHolders ?rightsHolderslabels ?rightsHo
     public itemQuery: string = SparqlItemService.getRemoteItemPropertiesQuery
     // TODO remove
     public treeQuery: string = SparqlTreeService.getClassTreeQuery
-    public sourceEndpoint: string
-    public sourceGraph: string
     public endpoint: string
     public toTurtle(fragmentsById: d3.Map<string>, prefixes: {[id: string]: string}): void {
       if (!fragmentsById.has(this.id)) {

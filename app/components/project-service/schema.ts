@@ -10,7 +10,7 @@ PREFIX dcterms: <http://purl.org/dc/terms/>
 PREFIX foaf: <http://xmlns.com/foaf/0.1/>
 PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
 PREFIX void: <http://rdfs.org/ns/void#>
-SELECT ?id ?labels ?descriptions ?rightsHolders ?rightsHolderslabels ?rightsHoldersdescriptions ?rightsHoldersurl ?rightsHoldersorder ?url ?endpoint ?classQuery ?propertyQuery {
+SELECT ?id ?labels ?descriptions ?rightsHolders ?rightsHolders_labels ?rightsHolders_descriptions ?rightsHolders_url ?rightsHolders_order ?url ?endpoint ?classQuery ?propertyQuery {
   # STARTGRAPH
     ?id a fibra:Schema .
     { ?id skos:prefLabel ?labels }
@@ -30,14 +30,14 @@ SELECT ?id ?labels ?descriptions ?rightsHolders ?rightsHolderslabels ?rightsHold
         ?id fibra:qualifiedAssertion ?qa .
         ?qa rdf:predicate dcterms:rightsHolder .
         ?qa rdf:object ?rightsHolders .
-        OPTIONAL { ?qa fibra:order ?rightsHoldersorder }
+        OPTIONAL { ?qa fibra:order ?rightsHolders_order }
       }
       {
-        ?rightsHolders skos:prefLabel ?rightsHolderslabels
+        ?rightsHolders skos:prefLabel ?rightsHolders_labels
       } UNION {
-        ?rightsHolders foaf:homepage ?rightsHoldersurl
+        ?rightsHolders foaf:homepage ?rightsHolders_url
       } UNION {
-        ?rightsHolders dcterms:description ?rightsHoldersdescriptions
+        ?rightsHolders dcterms:description ?rightsHolders_descriptions
       }
     }
   # ENDGRAPH
@@ -48,7 +48,7 @@ PREFIX dcterms: <http://purl.org/dc/terms/>
 PREFIX foaf: <http://xmlns.com/foaf/0.1/>
 PREFIX void: <http://rdfs.org/ns/void#>
 PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
-SELECT ?labels ?descriptions ?rightsHolders ?rightsHolderslabels ?rightsHoldersdescriptions ?rightsHoldersurl ?rightsHoldersorder ?url ?endpoint ?classQuery ?propertyQuery {
+SELECT ?labels ?descriptions ?rightsHolders ?rightsHolders_labels ?rightsHolders_descriptions ?rightsHolders_url ?rightsHolders_order ?url ?endpoint ?classQuery ?propertyQuery {
   # STARTGRAPH
     { <ID> skos:prefLabel ?labels }
     UNION
@@ -65,14 +65,14 @@ SELECT ?labels ?descriptions ?rightsHolders ?rightsHolderslabels ?rightsHoldersd
         <ID> fibra:qualifiedAssertion ?qa .
         ?qa rdf:predicate dcterms:rightsHolder .
         ?qa rdf:object ?rightsHolders .
-        OPTIONAL { ?qa fibra:order ?rightsHoldersorder }
+        OPTIONAL { ?qa fibra:order ?rightsHolders_order }
       }
       {
-        ?rightsHolders skos:prefLabel ?rightsHolderslabels
+        ?rightsHolders skos:prefLabel ?rightsHolders_labels
       } UNION {
-        ?rightsHolders foaf:homepage ?rightsHoldersurl
+        ?rightsHolders foaf:homepage ?rightsHolders_url
       } UNION {
-        ?rightsHolders dcterms:description ?rightsHoldersdescriptions
+        ?rightsHolders dcterms:description ?rightsHolders_descriptions
       }
     }
   # ENDGRAPH
