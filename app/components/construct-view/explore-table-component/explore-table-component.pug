@@ -5,20 +5,20 @@ uib-tabset
       table.exploretable.table.table-striped(style="table-layout: fixed")
         tr
           th Label
-          th(ng-repeat="p in $ctrl[t].properties" ng-click="$ctrl.removeFromProperties(p)") {{ p }}
+          th(ng-repeat="p in $ctrl[t].properties" ng-click="$ctrl.removeFromProperties(p)") {{ p.label }}
           th Actions
         tr(ng-repeat="item in $ctrl[t].items")
           td(ng-click="$ctrl.selectItem(item)") {{ item.label.value }}
           td(ng-repeat="p in $ctrl[t].properties" ng-if="item === $ctrl.editItem")
             input(type="text"
               ng-repeat="e in $ctrl.editItem.localProperties"
-              ng-if="e.label.value == p && e.values[0].value.termType === 'Literal'"
+              ng-if="e.value == p.value && e.values[0].value.termType === 'Literal'"
               ng-model="e.values[0].value.value")
             small(ng-repeat="e in item.localProperties"
-              ng-if="e.label.value == p && e.values[0].value.termType !== 'Literal'") {{e.values[0].value.label.value}}
+              ng-if="e.value == p.value && e.values[0].value.termType !== 'Literal'") {{e.values[0].value.label.value}}
           td(ng-repeat="p in $ctrl[t].properties", ng-click="$ctrl.selectItem(item)" ng-if="item !== $ctrl.editItem")
-            small(ng-repeat="e in item.localProperties" ng-if="e.label.value == p")
-              p(ng-repeat="i in e.values") {{i.value.label.value}}
+            small(ng-repeat="e in item.localProperties" ng-if="e.value == p.value")
+              p(ng-repeat="i in e.values") {{i.value.label}}
           td
             a(ng-click="$ctrl.hide(item)") Hide
             a(ng-click="$ctrl.verify(item)" ng-if="!$ctrl.itemVerified(item)") &nbsp;Verify

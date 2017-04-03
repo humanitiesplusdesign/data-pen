@@ -37,6 +37,10 @@ namespace fibra {
       this.primary.items = this.primaryItems
       this.secondary.items = this.secondaryItems
       this.sortProperties();
+      console.log(this.primary.items)
+      console.log(this.secondary.items)
+      console.log(this.primary.properties)
+      console.log(this.secondary.properties)
     }
 
     private selectItem(item: Item): void {
@@ -94,16 +98,16 @@ namespace fibra {
             let duplicate = false
 
             for (let j = 0; j < this.removedProperties.length; j++) { //if user has already hidden/removed this property, don't show it again
-              if (this.removedProperties[j] == this[key].items[i].localProperties[p].label.value) duplicate = true
+              if (this.removedProperties[j] == this[key].items[i].localProperties[p].value) duplicate = true
             }
 
             for (let j = 0; j < this[key].properties.length; j++) {
-              if (this[key].properties[j] == this[key].items[i].localProperties[p].label.value) {
+              if (this[key].properties[j] == this[key].items[i].localProperties[p].value) {
                 duplicate = true
               }
             }
             if (!duplicate) {
-              this[key].properties.push(this[key].items[i].localProperties[p].label.value)
+              this[key].properties.push(this[key].items[i].localProperties[p])
             }
           }
         }
