@@ -2,7 +2,7 @@ namespace fibra {
   'use strict'
 
   type ProjectSourceParams = {
-    id?: string
+    sourceId?: string
     sparqlEndpoint?: string
     updateEndpoint?: string
     graphStoreEndpoint?: string
@@ -22,8 +22,8 @@ namespace fibra {
 
     constructor(private $state: angular.ui.IStateService, $stateParams: ProjectSourceParams, projectService: ProjectService) {
       this.projectSources = projectService.getProjectSources()
-      if ($stateParams.id && $stateParams.sparqlEndpoint && $stateParams.type) {
-        this.projectSources.push(new ProjectSourceInfo($stateParams.id, $stateParams.sparqlEndpoint, $stateParams.updateEndpoint ? $stateParams.updateEndpoint : $stateParams.sparqlEndpoint, $stateParams.graphStoreEndpoint ? $stateParams.graphStoreEndpoint : $stateParams.sparqlEndpoint, $stateParams.graph ? $stateParams.graph : '', $stateParams.type))
+      if ($stateParams.sourceId && $stateParams.sparqlEndpoint && $stateParams.type) {
+        this.projectSources.push(new ProjectSourceInfo($stateParams.sourceId, $stateParams.sparqlEndpoint, $stateParams.updateEndpoint ? $stateParams.updateEndpoint : $stateParams.sparqlEndpoint, $stateParams.graphStoreEndpoint ? $stateParams.graphStoreEndpoint : $stateParams.sparqlEndpoint, $stateParams.graph ? $stateParams.graph : '', $stateParams.type))
         $state.go('projects')
       }
     }

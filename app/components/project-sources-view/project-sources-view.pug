@@ -22,5 +22,6 @@
     .form-group
       label Type IRI
       input.form-control(type="text",ng-model="source.type")
+    button.btn.btn-xs(ui-sref="projectSourceConfigurations({sourceId:source.id})",title="Examine project source configurations"): span.glyphicon.glyphicon-cog
   button.btn.btn-success(ng-click="$ctrl.addNewProjectSource()") Add new
   a(ui-sref="projects()") Back to projects

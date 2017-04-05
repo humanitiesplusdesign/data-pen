@@ -10,10 +10,10 @@ PREFIX dcterms: <http://purl.org/dc/terms/>
 PREFIX foaf: <http://xmlns.com/foaf/0.1/>
 PREFIX void: <http://rdfs.org/ns/void#>
 PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
-SELECT ?id ?type ?labels ?descriptions ?rightsHolders ?rightsHolders_labels ?rightsHolders_descriptions ?rightsHolders_url ?rightsHolders_order ?url ?endpoint ?autocompletionQuery ?itemQuery ?treeQuery ?propertyQuery ?classQuery {
+SELECT ?id ?types ?labels ?descriptions ?rightsHolders ?rightsHolders_labels ?rightsHolders_descriptions ?rightsHolders_url ?rightsHolders_order ?url ?endpoint ?autocompletionQuery ?itemQuery ?treeQuery ?propertyQuery ?classQuery {
   # STARTGRAPH
     ?id a fibra:AuthorityEndpointConfiguration .
-    ?id a ?type .
+    ?id a ?types .
     { ?id skos:prefLabel ?labels }
     UNION
     { ?id dcterms:description ?descriptions }
@@ -52,14 +52,14 @@ PREFIX dcterms: <http://purl.org/dc/terms/>
 PREFIX foaf: <http://xmlns.com/foaf/0.1/>
 PREFIX void: <http://rdfs.org/ns/void#>
 PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
-SELECT ?type ?labels ?descriptions ?rightsHolders ?rightsHolders_labels ?rightsHolders_descriptions ?rightsHolders_url ?rightsHolders_order ?url ?endpoint ?autocompletionQuery ?itemQuery ?treeQuery ?propertyQuery ?classQuery {
+SELECT ?types ?labels ?descriptions ?rightsHolders ?rightsHolders_labels ?rightsHolders_descriptions ?rightsHolders_url ?rightsHolders_order ?url ?endpoint ?autocompletionQuery ?itemQuery ?treeQuery ?propertyQuery ?classQuery {
   # STARTGRAPH
     { <ID> skos:prefLabel ?labels }
     UNION
     { <ID> dcterms:description ?descriptions }
     UNION
     {
-      <ID> a ?type .
+      <ID> a ?types .
       <ID> void:sparqlEndpoint ?endpoint .
       <ID> fibra:autocompletionQuery ?autocompletionQuery .
       <ID> fibra:itemQuery ?itemQuery .
@@ -86,7 +86,7 @@ SELECT ?type ?labels ?descriptions ?rightsHolders ?rightsHolders_labels ?rightsH
     }
   # ENDGRAPH
 }`
-    public type: INode
+    public types: INode[] = []
     public autocompletionQuery: string = SparqlAutocompleteService.defaultMatchQuery
     public propertyQuery: string = DataModel.propertyQuery
     public classQuery: string = DataModel.classQuery
@@ -99,9 +99,12 @@ SELECT ?type ?labels ?descriptions ?rightsHolders ?rightsHolders_labels ?rightsH
         prefixes['fibra'] = FIBRA.ns
         prefixes['void'] = VOID.ns
         prefixes['rdf'] = RDF.ns
-        fragmentsById.set(this.id, `<${this.id}> a ${this.type.toCanonical()} ;`)
+        let f: string = `<${this.id}> a `
+        this.types.forEach(type => f = f + `${type.toCanonical()} ,`)
+        f = f.substring(0, f.length - 2) + ' ;'
+        fragmentsById.set(this.id, f)
         super.toTurtle(fragmentsById, prefixes)
-        let f: string = fragmentsById.get(this.id)
+        f  = fragmentsById.get(this.id)
         f = f + `
   void:sparqlEndpoint <${this.endpoint}> ;
   fibra:autocompletionQuery ${s.stringToSPARQLString(this.autocompletionQuery)} ;

@@ -16,7 +16,7 @@ namespace fibra {
 
   export class EditRemoteEndpointConfigurationViewComponent implements angular.IComponentOptions {
       public controller: string = 'EditRemoteEndpointConfigurationViewComponentController'
-      public templateUrl: string = 'components/edit-remote-endpoint-configuration-view/edit-remote-endpoint-configuration-template-view.html'
+      public templateUrl: string = 'components/edit-remote-endpoint-configuration-view/edit-remote-endpoint-configuration-view.html'
   }
 
 }

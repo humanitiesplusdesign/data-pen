@@ -7,6 +7,13 @@ namespace fibra {
     return s
   }
 
+  export function citableToTurtle(c: ICitable): string {
+    let prefixes: {} = {}
+    let m: d3.Map<string> = new Map<string>()
+    c.toTurtle(m, prefixes)
+    return toTurtle(prefixes, m)
+  }
+
   let lut: string[] = []
   for (let i: number = 0; i < 256; i++)
     lut[i] = (i < 16 ? '0' : '') + i.toString(16)

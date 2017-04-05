@@ -1,0 +1,24 @@
+.container
+  h1 Fibra
+
+  h2 Projects
+
+  ul: li(ng-repeat="c in $ctrl.projects"): a(ui-sref="configure({sourceId:$ctrl.source.id,id:c.id})") {{c.labels | prefLang}}
+
+  h2 Schemas
+
+  ul: li(ng-repeat="c in $ctrl.schemas"): a(ui-sref="editSchema({sourceId:$ctrl.source.id,id:c.id})") {{c.labels | prefLang}}
+
+  h2 Primary endpoint configurations
+
+  ul: li(ng-repeat="c in $ctrl.primaryEndpointConfigurations"): a(ui-sref="editPrimaryEndpointConfiguration({sourceId:$ctrl.source.id,id:c.id})") {{c.labels | prefLang}}
+
+  h2 Archive endpoints
+
+  ul: li(ng-repeat="c in $ctrl.archiveEndpoints"): a(ui-sref="editRemoteEndpointConfiguration({sourceId:$ctrl.source.id,id:c.id})") {{c.labels | prefLang}}
+
+  h2 Authority endpoints
+
+  ul: li(ng-repeat="c in $ctrl.authorityEndpoints"): a(ui-sref="editRemoteEndpointConfiguration({sourceId:$ctrl.source.id,id:c.id})") {{c.labels | prefLang}}
+
+  a(ui-sref="projectSources()") Back to project sources

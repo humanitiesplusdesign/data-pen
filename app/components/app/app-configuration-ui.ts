@@ -41,8 +41,12 @@ namespace fibra {
       template: '<rdfstore-test-view></rdfstore-test-view>'
     })
     $stateProvider.state('projectSources', {
-      url: '/project-sources?id&sparqlEndpoint&updateEndpoint&graphStoreEndpoint&graph&type',
+      url: '/project-sources?sourceId&sparqlEndpoint&updateEndpoint&graphStoreEndpoint&graph&type',
       template: '<project-sources-view></project-sources-view>',
+    })
+    $stateProvider.state('projectSourceConfigurations', {
+      url: '/project-source-configurations?sourceId',
+      template: '<project-source-configurations-view></project-source-configurations-view>',
     })
     $stateProvider.state('editPrimaryEndpointConfiguration', {
       url: '/edit-primary-endpoint-configuration?sourceId&id',
@@ -179,5 +183,8 @@ namespace fibra {
     // Register the "requires auth" hook with the TransitionsService
     // Turn this off for the moment - go to #/login to login.
     $transitions.onBefore(requiresAuthCriteria, redirectToLogin, {priority: 10});
+
+    // add info on which view we're in to the page title (currently just the raw view name)
+    $transitions.onSuccess({}, transition => $rootScope.viewName = transition._targetState.name())
   })
 }
