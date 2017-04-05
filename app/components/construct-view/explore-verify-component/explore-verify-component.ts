@@ -41,14 +41,17 @@ namespace fibra {
       if (this.limitFilter.length !== 0) this.limitFilter = 'FILTER (?groupId IN (' + this.limitFilter.substring(0, this.limitFilter.length - 1) + '))'
       this.sparqlAutocompleteService.autocomplete(this.queryString, 6, true, this.limitFilter, this.canceller.promise).then(
         (results: AutocompletionResults) => {
+          console.log("Results in verify: ", results)
           this.queryRunning = false
           this.updateResults(results)
         },
         () => {
+          console.log("Error in verify")
           this.queryRunning = false
           this.error = true
         },
         (update: {error?: any, results?: AutocompletionResults}) => {
+          console.log("Update in verify: ", update)
           if (update.error) this.error = true
           else this.updateResults(update.results)
         }
@@ -56,6 +59,7 @@ namespace fibra {
     }
 
     private updateResults(results: AutocompletionResults) {
+      console.log(this.relevantTypes)
       let typeLabels: string[] = this.relevantTypes.map((t) => { return t.label })
       this.matchingResults = results.remoteResults.filter((r) => typeLabels.indexOf(r.label) !== -1)
       console.log(this.matchingResults)

@@ -161,21 +161,20 @@ SELECT ?groupId ?id ?prefLabel ?matchedLabel ?sameAs ?altLabel { # ADDITIONALVAR
         let seen: boolean = pd.seen.has(id) || idSet.values().some(id2 => pd.seen.has(id2))
         if (!seen) {
           pd.seen.adds(idSet)
-          let result: Result = new Result(idSet.values().map(oid => DataFactory.instance.namedNode(oid)), pd.idToDatasourceSet.get(id).values(), pd.idToMatchedLabelSet.get(id).values()[0], pd.idToPrefLabelSet.get(id).values()[0])
+          let result: Result = new Result(idSet.values().map(oid => DataFactory.instance.namedNode(oid)), pd.idToDatasourceSet.get(id).values(), pd.idToMatchedLabelSet.get(id).values()[0], pd.idToPrefLabelSet.has(id) ? pd.idToPrefLabelSet.get(id).values()[0] : null)
           if (pd.idToAltLabelSet.has(id)) result.additionalInformation['altLabel'] = pd.idToAltLabelSet.get(id).values()
           result.additionalInformation['type'] = pd.idToGroupIdSet.get(id).values().map(v => DataFactory.instance.namedNode(v))
           result.additionalInformation['typeLabel'] = pd.idToGroupIdSet.get(id).values().map(v => {
-            // console.log(id, v, pd.idToPrefLabelSet.get(v))
-            return pd.idToPrefLabelSet.get(v).values()[0]
+            return pd.idToPrefLabelSet.has(id) ? pd.idToPrefLabelSet.get(id).values()[0] : null
           })
           pd.idToGroupIdSet.get(id).each(gid => {
             let resultGroup: ResultGroup = groupIdToGroup.get(gid)
-            if (!resultGroup) {
+            if (!resultGroup && pd.idToPrefLabelSet.has(gid)) {
               resultGroup = new ResultGroup(pd.idToPrefLabelSet.get(gid).values()[0].value)
               groupIdToGroup.set(gid, resultGroup)
               res.push(resultGroup)
             }
-            resultGroup.results.push(result)
+            if(resultGroup) resultGroup.results.push(result)
           })
         }
       })
@@ -240,8 +239,11 @@ SELECT ?groupId ?id ?prefLabel ?matchedLabel ?sameAs ?altLabel { # ADDITIONALVAR
       let pd: ProcessingData = new ProcessingData()
       let primaryProcessed: angular.IPromise<void> = this.fibraSparqlService.query(this.stateWorkerService.state.project.endpoint, queryTemplate, {timeout: canceller}).then(
         (response) => {
+          console.log(response)
           SparqlAutocompleteWorkerService.processBindings(pd, this.stateWorkerService.state.project.endpoint, response)
+          console.log(pd)
           results.localMatchingResults = SparqlAutocompleteWorkerService.buildResults(pd, new EMap<ResultGroup>())
+          console.log(results.localMatchingResults)
           if (!queryRemote) d.resolve(results)
           else d.notify({endpointType: 'primary', endpoint: this.stateWorkerService.state.project.id, results: results})
         }
@@ -256,11 +258,14 @@ SELECT ?groupId ?id ?prefLabel ?matchedLabel ?sameAs ?altLabel { # ADDITIONALVAR
           queryTemplate = queryTemplate.replace(/<PREFLANG>/g, this.stateWorkerService.state.language)
           return this.fibraSparqlService.query(endpointConfiguration.endpoint, queryTemplate, {timeout: canceller}).then(
           (response) => {
+            console.log(response)
             if (response.results.bindings.length !== 0) {
               primaryProcessed.then(() => {
                 SparqlAutocompleteWorkerService.processBindings(pd, endpointConfiguration.id, response)
+                console.log(pd)
                 SparqlAutocompleteWorkerService.unifyResults(pd)
                 results.remoteResults = results.remoteResults.concat(SparqlAutocompleteWorkerService.buildResults(pd, remoteGroupIdToGroup))
+                console.log(results.remoteResults)
                 d.notify({endpointType: 'remote', endpoint: endpointConfiguration.id, results: results})
               })
             }
