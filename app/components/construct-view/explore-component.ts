@@ -32,14 +32,15 @@ namespace fibra {
     public properties: {}[]
     private svgSel: d3.Selection<SVGSVGElement, {}, null, undefined>
     private links: IExploreItemLink[]
-    private forceSim: d3.Simulation<IExploreItem, IExploreItemLink>
     private primaryItems: Item[] = []
     private secondaryItems: Item[] = []
     private tertiaryItems: Item[] = []
     private untypedItems: Item[] = []
     private removedUntypedItems: IExploreItem[] = []
     private allItems: Item[] = []
+    private radiusInitial: number = 1
     private radius: number = 8
+    private radiusBounce: number = 15
     private tooltip: d3.Selection<HTMLDivElement, {}, HTMLBodyElement, undefined>
     private edittip: d3.Selection<HTMLDivElement, {}, HTMLBodyElement, undefined>
     private dragline: d3.Selection<SVGLineElement, {}, null, undefined>
@@ -80,11 +81,6 @@ namespace fibra {
 
       this.sunburst.addSunburstGroup(this.svgSel)
 
-      this.forceSim = d3.forceSimulation<IExploreItem, IExploreItemLink>()
-        .force('charge', this.chargeForce)
-        .force('charge2', this.chargeForce2)
-        .force('link', d3.forceLink().id((d: IExploreItem) => '' + d.index))
-
       this.radius = 8
 
       this.tooltip = d3.select('body').append<HTMLDivElement>('div')
@@ -114,7 +110,6 @@ namespace fibra {
 
     public queryAndBuild(): angular.IPromise<string> {
       let prom: angular.IPromise<string> = this.sparqlItemService.getItems(this.fibraService.getState().construct.items, false).then((items: Item[]) => {
-          console.log('Items in explore', items)
 
           // If we are showing property popovers, hide 'em.
           this.propertyPopover.hidePopover()
@@ -141,14 +136,13 @@ namespace fibra {
               this.properties.push({key: p.toCanonical(), value: p.label })
           }
           this.links = this.mergeLinks(this.links)
-          console.log(this.links)
 
           return 'ok';
         }).then(() => this.updateExplore())
 
-        this.fibraService.dispatchAction(this.fibraService.placeHolderAction(prom))
+      this.fibraService.dispatchAction(this.fibraService.placeHolderAction(prom))
 
-        return prom
+      return prom
     }
 
     private lockExisting(nodes: IGridNode[]) {
@@ -196,18 +190,11 @@ namespace fibra {
 
       let svg_width: number = +this.svgSel.style('width').replace('px', '')
       let svg_height: number = +this.svgSel.style('height').replace('px', '')
-
-      this.forceSim.force('center', d3.forceCenter(svg_width / 2, svg_height / 2))
-      this.forceSim.force('xposition', d3.forceX(svg_width / 2).strength(0.01))
-      this.forceSim.force('yposition', d3.forceY(svg_height / 2).strength(0.01))
-
-      // Build grids
-
     }
 
     private appendNodes(enterSelection: d3.Selection<d3.BaseType, {}, SVGSVGElement, {}>, className: string) {
 
-      return enterSelection.append('g')
+      let appendSelection = enterSelection.append('g')
           .attr('id', (d, i: number) => 'node-' + i + '-' + className)
           .attr('class', 'node')
           .classed(className, true)
@@ -215,7 +202,7 @@ namespace fibra {
           .classed('node-circle', true)
           .classed(className, true)
           .attr('id', (d, i: number) => 'node-circle-' + i + '-' + className)
-          .attr('r', this.radius + 'px')
+          .attr('r', this.radiusInitial + 'px')
           .call(d3.drag()
               .on('start', (d: IExploreItem, i: number) => {
                 if (!this.linkMode) {
@@ -231,10 +218,6 @@ namespace fibra {
                   d3.select(group[i]).classed('fixed', true)
                   d.x = d3.event.x
                   d.y = d3.event.y
-                  if (d3.select(group[i]).classed('selected-circle')) {
-                  // this.item_info_tip.style('top', (d3.event.y + 30) + 'px')
-                  // .style('left', (d3.event.x + 30) + 'px')
-                  }
                 } else {
                   this.dragline.attr('x1', d.x!)
                     .attr('y1', d.y!)
@@ -285,7 +268,6 @@ namespace fibra {
             this.tooltip.style('visibility', 'hidden')
           })
           .on('click', (d: IExploreItem, i, group) => {
-            this.forceSim.stop()
             let localSelected = d.selected
             // Unselect everything
             this.svgSel.selectAll('.node')
@@ -303,6 +285,14 @@ namespace fibra {
             }
             this.highlightLinks(d, i)
           })
+
+      appendSelection
+        .transition()
+          .attr('r', (this.radius + this.radiusBounce) + 'px')
+        .transition()
+          .attr('r', this.radius + 'px')
+
+      return appendSelection
     }
 
     private snapToGrid(x: number, y: number, primary: boolean = true): number[] {
@@ -358,7 +348,7 @@ namespace fibra {
       let lSecondaryNodes: d3.Selection<d3.BaseType, {}, SVGSVGElement, {}>|d3.Transition<d3.BaseType, {}, SVGSVGElement, {}> = secondaryNodes
       let lUntypedNodes: d3.Selection<d3.BaseType, {}, SVGSVGElement, {}>|d3.Transition<d3.BaseType, {}, SVGSVGElement, {}> = untypedNodes
       let lLinkLines: d3.Selection<SVGLineElement, IExploreItemLink, SVGGElement, {}>|d3.Transition<SVGLineElement, IExploreItemLink, SVGGElement, {}> = linkLines
-      if(transition) {
+      if (transition) {
         lPrimaryNodes = lPrimaryNodes.transition()
         lSecondaryNodes = lSecondaryNodes.transition()
         lUntypedNodes = lUntypedNodes.transition()
@@ -371,7 +361,6 @@ namespace fibra {
 
       this.svgSel.selectAll('.node-circle')
               .classed('selected-circle', (d: IExploreItem) => { return d.selected })
-              .attr('r', (d: IExploreItem) => { return this.radius + (d.selected ? 3 : 0) + 'px' })
               .style('cursor', this.linkMode ? 'crosshair' : 'initial')
       this.svgSel.selectAll('.node-circle')
         .classed('labeled', (d: IExploreItem) => { return d.label ? true : false; })
@@ -405,6 +394,8 @@ namespace fibra {
       // Untyped nodes should come in one at a time based on a user's click event. For these
       // we also want append the user interface for setting type and label.
       untypedNodes.enter().each((datum: IExploreItem, i, g) => {
+        datum.x = this.lastClickX
+        datum.y = this.lastClickY
         datum.fx = this.lastClickX
         datum.fy = this.lastClickY
         datum.gx = this.lastClickX
@@ -415,6 +406,8 @@ namespace fibra {
       // Also handle position getting set from a drop (pull position from state)
       let applyOldPosition = (datum: IExploreItem) => {
         // Get position from state if it was set there.
+        datum.x = this.fibraService.getState().construct.itemIndex[datum.value].x
+        datum.y = this.fibraService.getState().construct.itemIndex[datum.value].y
         datum.fx = this.fibraService.getState().construct.itemIndex[datum.value].x
         datum.fy = this.fibraService.getState().construct.itemIndex[datum.value].y
         datum.gx = this.fibraService.getState().construct.itemIndex[datum.value].x
@@ -423,6 +416,8 @@ namespace fibra {
         // Or if node was already here, get position from old node
         let oldNode: IExploreItem = this.removedUntypedItems.filter((it) => { return it.value === datum.value })[0]
         if (oldNode) {
+          datum.x = oldNode.x
+          datum.y = oldNode.y
           datum.fx = oldNode.fx
           datum.fy = oldNode.fy
           datum.gx = oldNode.gx
@@ -461,30 +456,7 @@ namespace fibra {
       // Add sunburst again so it stays on top
       this.sunburst.addSunburstGroup(this.svgSel)
 
-      this.forceSim.stop()
-      let onTick = this.genericTick.bind(this, primaryNodes, secondaryNodes, untypedNodes, linkLines, false)
-      this.forceSim.nodes(this.primaryItems.concat(this.secondaryItems).concat(this.untypedItems))
-        .on('tick', onTick)
-      this.forceSim
-        .force<d3.ForceLink<IExploreItem, IExploreItemLink>>('link').links(this.links)
-
-      // Apply forces only to one set of items, depending on force.
-      let collideForce = this.forceSim.force('charge')
-      let collideForce2 = this.forceSim.force('charge2')
-      let centerForce = this.forceSim.force('center')
-      let xpositionForce = this.forceSim.force('xposition')
-      let ypositionForce = this.forceSim.force('yposition')
-      if(collideForce.initialize) collideForce.initialize(this.primaryItems)
-      if(collideForce2.initialize) collideForce2.initialize(this.secondaryItems)
-      // if(centerForce.initialize) centerForce.initialize(this.primaryItems)
-      // if(xpositionForce.initialize) xpositionForce.initialize(this.primaryItems)
-      // if(ypositionForce.initialize) ypositionForce.initialize(this.primaryItems)
-
-      if(runSim) {
-        this.forceSim.alpha(1).restart()
-      } else {
-        this.genericTick(primaryNodes, secondaryNodes, untypedNodes, linkLines, transition)
-      }
+      this.genericTick(primaryNodes, secondaryNodes, untypedNodes, linkLines, transition)
 
       return this.$q.resolve('ok')
     }
