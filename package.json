@@ -62,5 +62,10 @@
   },
   "scripts": {
     "postinstall": "bower install"
+  },
+  "dependencies": {
+    "ng-redux": "^3.4.0-beta.1",
+    "redux": "^3.6.0",
+    "redux-ui-router": "^0.7.1-rc.1"
   }
 }
