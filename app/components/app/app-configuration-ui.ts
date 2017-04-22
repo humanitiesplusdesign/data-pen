@@ -67,15 +67,20 @@ namespace fibra {
     $stateProvider.state('construct', {
       url: '/construct?id&sparqlEndpoint&graph',
       resolve: { project: (projectService: ProjectService, fibraService: FibraService, $stateParams: any) =>
-        projectService.loadProject({ sparqlEndpoint: $stateParams.sparqlEndpoint, graph: $stateParams.graph }, $stateParams.id).then(
+        projectService.loadProject({ sparqlEndpoint: $stateParams.sparqlEndpoint, graph: $stateParams.graph }, $stateParams.id, true).then(
           project => fibraService.dispatchAction(fibraService.setProject(project))
         )
       },
-      template: '<construct-view></construct-view>',
+      template: '<construct-view></construct-view>'
     })
     $stateProvider.state('author', {
-      url: '/author',
-      template: '<author-view></author-view>',
+      url: '/author?id&sparqlEndpoint&graph',
+      resolve: { project: (projectService: ProjectService, fibraService: FibraService, $stateParams: any) =>
+        projectService.loadProject({ sparqlEndpoint: $stateParams.sparqlEndpoint, graph: $stateParams.graph }, $stateParams.id, true).then(
+          project => fibraService.dispatchAction(fibraService.setProject(project))
+        )
+      },
+      template: '<author-view></author-view>'
     })
     $stateProvider.state('login', {
       url: '/login',

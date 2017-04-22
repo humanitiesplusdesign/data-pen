@@ -5,22 +5,20 @@ namespace fibra {
 
   export interface IPropertyToValues extends IRichNode {
     values: IRichPropertyValue[]
-    pruned(): IPropertyToValues
-    toPropertyAndValues(): IPropertyAndValue[]
-    toTriples(subject: INode): ITriple[]
-    toQuads(subject: INode, graph: INode): IQuad[]
+    toPropertyAndValues(includePropertiesOfProperties: boolean): IPropertyAndValue[]
   }
 
   export interface IPropertyAndValue {
     property: INode
     object: INode
+    properties: IPropertyAndValue[]
     pruned(): IPropertyAndValue
   }
 
   export class PropertyAndValue {
-    constructor(public property: INode, public object: INode) {}
+    constructor(public property: INode, public object: INode, public properties: IPropertyAndValue[] = []) {}
     public pruned(): IPropertyAndValue {
-      return new PropertyAndValue(new PrunedRichNodeFromNode(this.property), new PrunedRichNodeFromNode(this.object))
+      return new PropertyAndValue(new PrunedRichNodeFromNode(this.property), new PrunedRichNodeFromNode(this.object), this.properties.map(p => p.pruned()))
     }
   }
 
@@ -33,53 +31,19 @@ namespace fibra {
     constructor(public value: IRichNode, public properties: IPropertyToValues[] = []) {}
   }
 
-  export class PrunedPropertyValuesFromPropertyValues extends PrunedRichNodeFromNode implements IPropertyToValues {
-    public values: IRichPropertyValue[]
-    constructor(pv: IPropertyToValues) {
-      super(pv)
-      this.values = pv.values.map(v => new RichPropertyValue(new PrunedRichNodeFromNode(v.value)))
-    }
-    public toPropertyAndValues(): IPropertyAndValue[] {
-      return PropertyToValues.toPropertyAndValues(this)
-    }
-    public toTriples(subject: INode): ITriple[] {
-      return PropertyToValues.toTriples(subject, this)
-    }
-    public toQuads(subject: INode, graph: INode): IQuad[] {
-      return PropertyToValues.toQuads(subject, this, graph)
-    }
-    public pruned(): IPropertyToValues {
-      return this
-    }
-  }
-
   export class PropertyToValues extends RichNodeFromRichNode implements IPropertyToValues {
     public values: IRichPropertyValue[] = []
 
-    public static toPropertyAndValues(pv: IPropertyToValues): IPropertyAndValue[] {
-      return pv.values.map(v => new PropertyAndValue(pv, v.value))
+    public static toPropertyAndValues(pv: IPropertyToValues, includePropertiesOfProperties: boolean): IPropertyAndValue[] {
+      return pv.values.map(v => new PropertyAndValue(pv, v.value, flatten(v.properties.map(pv2 =>
+        pv2.values.map(v2 => new PropertyAndValue(pv2, v2.value))
+      ))))
     }
-    public static toTriples(subject: INode, pv: IPropertyToValues): ITriple[] {
-      return PropertyToValues.toQuads(subject, pv, DefaultGraph.instance) as ITriple[]
-    }
-    public static toQuads(subject: INode, pv: IPropertyToValues,  graph: INode, ): IQuad[] {
-      return pv.values.map(v => DataFactory.instance.quad(subject, pv, v.value, graph))
-    }
-
     constructor(property: IRichNode) {
       super(property)
     }
-    public pruned(): IPropertyToValues {
-      return new PrunedPropertyValuesFromPropertyValues(this)
-    }
-    public toPropertyAndValues(): IPropertyAndValue[] {
-      return PropertyToValues.toPropertyAndValues(this)
-    }
-    public toTriples(subject: INode): ITriple[] {
-      return PropertyToValues.toTriples(subject, this)
-    }
-    public toQuads(subject: INode, graph: INode): IQuad[] {
-      return PropertyToValues.toQuads(subject, this, graph)
+    public toPropertyAndValues(includePropertiesOfProperties: boolean): IPropertyAndValue[] {
+      return PropertyToValues.toPropertyAndValues(this, includePropertiesOfProperties)
     }
   }
 

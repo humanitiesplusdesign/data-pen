@@ -77,8 +77,8 @@ WHERE {
       return this.workerService.call('projectWorkerService', 'listProjects', [source])
     }
 
-    public loadProject(source: ICitableSource, projectId: string): angular.IPromise<Project> {
-      return this.workerService.call('projectWorkerService', 'loadProject', [source, projectId])
+    public loadProject(source: ICitableSource, projectId: string, loadFull: boolean): angular.IPromise<Project> {
+      return this.workerService.call('projectWorkerService', 'loadProject', [source, projectId, loadFull])
     }
 
     public deleteCitable(updateEndpoint: string, citable: ICitable): angular.IPromise<{}> {
@@ -99,6 +99,7 @@ WHERE {
       let m: d3.Map<string> = new Map<string>()
       let prefixes: {} = {}
       ps.toTurtle(m, prefixes)
+      console.log(m.keys)
       return this.deleteObjects(updateEndpoint, m.keys(), ps.source.graph).then(() => this.fibraSparqlService.post(graphStoreEndpoint, toTurtle(prefixes, m), ps.source.graph))
     }
 
@@ -209,8 +210,9 @@ WHERE {
       })
     }
 
-    public loadProject(source: ICitableSource, id: string): angular.IPromise<Project> {
-      return this.runSingleQuery(source, Project.projectQuery, id, new Project(id, source)).then(p => {
+    public loadProject(source: ICitableSource, id: string, loadFull: boolean): angular.IPromise<Project> {
+      let q: angular.IPromise<Project> = this.runSingleQuery(source, Project.projectQuery, id, new Project(id, source))
+      if (!loadFull) return q; else return q.then(p => {
         let promises: angular.IPromise<any>[] = []
         promises.push(this.$q.all(p.schemas.map(schema => this.loadSchema(schema.source, schema.id))).then(schemas => {
           p.schemas = schemas

@@ -29,6 +29,7 @@ namespace fibra {
       this.error = false
       this.sparqlAutocompleteService.autocomplete(query, this.currentLimit + 1, this.queryRemote !== undefined, this.constraints, this.canceller.promise).then(
         (results: AutocompletionResults) => {
+          this.onResults(results)
           this.queryRunning = false
         },
         () => {
@@ -45,6 +46,7 @@ namespace fibra {
       this.canceller = $q.defer()
     }
     public $onInit(): void {
+      if (!this.limit) this.limit = '10'
       this.currentLimit = parseInt(this.limit, 10)
     }
     private onResults(results: AutocompletionResults): void {

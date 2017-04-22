@@ -4,7 +4,6 @@ namespace fibra {
   export class AuthorViewComponentController implements angular.IComponentController {
     public items: Item[] = []
     constructor(private sparqlItemService: SparqlItemService) {
-
     }
   }
 

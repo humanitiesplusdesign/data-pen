@@ -155,7 +155,7 @@ SELECT ?groupId ?id ?prefLabel ?matchedLabel ?sameAs ?altLabel { # ADDITIONALVAR
       })
     }
 
-    private static buildResults(pd: ProcessingData, groupIdToGroup: EMap<ResultGroup>): ResultGroup[] {
+    private static buildResults(pd: ProcessingData, groupIdToGroup: EMap<ResultGroup>, dataModel: DataModel, prefLang: string): ResultGroup[] {
       let res: ResultGroup[] = []
       pd.idToIdSet.each((idSet: StringSet, id: string) => {
         let seen: boolean = pd.seen.has(id) || idSet.values().some(id2 => pd.seen.has(id2))
@@ -167,15 +167,15 @@ SELECT ?groupId ?id ?prefLabel ?matchedLabel ?sameAs ?altLabel { # ADDITIONALVAR
           result.additionalInformation['typeLabel'] = pd.idToGroupIdSet.get(id).values().map(v => {
             return pd.idToPrefLabelSet.has(id) ? pd.idToPrefLabelSet.get(id).values()[0] : null
           })
-          pd.idToGroupIdSet.get(id).each(gid => {
-            let resultGroup: ResultGroup = groupIdToGroup.get(gid)
-            if (!resultGroup && pd.idToPrefLabelSet.has(gid)) {
-              resultGroup = new ResultGroup(pd.idToPrefLabelSet.get(gid).values()[0].value)
-              groupIdToGroup.set(gid, resultGroup)
+          pd.idToGroupIdSet.get(id).each(gid =>
+            groupIdToGroup.goc(gid, () => {
+              let glabel: string = dataModel.classMap.has(gid) ? dataModel.classMap.get(gid).getLabel(prefLang) :
+                (pd.idToPrefLabelSet.has(gid) ? pd.idToPrefLabelSet.get(gid).values()[0].value : gid)
+              let resultGroup: ResultGroup = new ResultGroup(glabel)
               res.push(resultGroup)
-            }
-            if(resultGroup) resultGroup.results.push(result)
-          })
+              return resultGroup
+            }).results.push(result)
+          )
         }
       })
       return res
@@ -189,7 +189,6 @@ SELECT ?groupId ?id ?prefLabel ?matchedLabel ?sameAs ?altLabel { # ADDITIONALVAR
         let oidSet: StringSet = pd.idToIdSet.get(oid)
         if (idSet !== oidSet) {
           pd.idToIdSet.set(oid, idSet)
-
           idSet.adds(oidSet)
           let datasourceSet: StringSet = pd.idToDatasourceSet.get(id)
           let oDatasourceSet: StringSet = pd.idToDatasourceSet.get(oid)
@@ -239,11 +238,9 @@ SELECT ?groupId ?id ?prefLabel ?matchedLabel ?sameAs ?altLabel { # ADDITIONALVAR
       let pd: ProcessingData = new ProcessingData()
       let primaryProcessed: angular.IPromise<void> = this.fibraSparqlService.query(this.stateWorkerService.state.project.endpoint, queryTemplate, {timeout: canceller}).then(
         (response) => {
-          console.log(response)
           SparqlAutocompleteWorkerService.processBindings(pd, this.stateWorkerService.state.project.endpoint, response)
-          console.log(pd)
-          results.localMatchingResults = SparqlAutocompleteWorkerService.buildResults(pd, new EMap<ResultGroup>())
-          console.log(results.localMatchingResults)
+          //SparqlAutocompleteWorkerService.unifyResults(pd)
+          results.localMatchingResults = SparqlAutocompleteWorkerService.buildResults(pd, new EMap<ResultGroup>(), this.stateWorkerService.state.project.dataModel, this.stateWorkerService.state.language)
           if (!queryRemote) d.resolve(results)
           else d.notify({endpointType: 'primary', endpoint: this.stateWorkerService.state.project.id, results: results})
         }
@@ -258,14 +255,11 @@ SELECT ?groupId ?id ?prefLabel ?matchedLabel ?sameAs ?altLabel { # ADDITIONALVAR
           queryTemplate = queryTemplate.replace(/<PREFLANG>/g, this.stateWorkerService.state.language)
           return this.fibraSparqlService.query(endpointConfiguration.endpoint, queryTemplate, {timeout: canceller}).then(
           (response) => {
-            console.log(response)
             if (response.results.bindings.length !== 0) {
               primaryProcessed.then(() => {
                 SparqlAutocompleteWorkerService.processBindings(pd, endpointConfiguration.id, response)
-                console.log(pd)
                 SparqlAutocompleteWorkerService.unifyResults(pd)
-                results.remoteResults = results.remoteResults.concat(SparqlAutocompleteWorkerService.buildResults(pd, remoteGroupIdToGroup))
-                console.log(results.remoteResults)
+                results.remoteResults = results.remoteResults.concat(SparqlAutocompleteWorkerService.buildResults(pd, remoteGroupIdToGroup, this.stateWorkerService.state.project.dataModel, this.stateWorkerService.state.language))
                 d.notify({endpointType: 'remote', endpoint: endpointConfiguration.id, results: results})
               })
             }

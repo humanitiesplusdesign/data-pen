@@ -31,5 +31,11 @@ namespace fibra {
     /* tslint:enable:no-bitwise */
   }
 
+  export function flatten(arr: any[], initial: any[] = []): any[] {
+    return arr.reduce(
+      (flat, toFlatten) => flat.concat(Array.isArray(toFlatten) ? flatten(toFlatten) : toFlatten),
+      initial
+    )
+  }
 
 }

@@ -6,6 +6,9 @@ namespace fibra {
      public descriptions: ILiteral[] = []
      public types: Class[] = []
      public asNodes: {[lang: string]: IRichNode}
+     public getLabel(prefLang: string): string {
+       return this.asNode(prefLang).label
+     }
      public asNode(prefLang: string): IRichNode {
        let ret: IRichNode = this.asNodes[prefLang]
        if (ret) return ret

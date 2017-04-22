@@ -4,6 +4,7 @@ namespace fibra {
   export class EditCitableComponentController<T extends ICitable> implements angular.IComponentController {
     public c: T
     public disabled: boolean = false
+    public projectSources: ProjectSourceInfo[]
     public projectSource: ProjectSourceInfo
 
     public delete(): void {
@@ -36,7 +37,8 @@ namespace fibra {
     }
 
     constructor(sourceId: string, private projectService: ProjectService, private toastr: angular.toastr.IToastrService) {
-      this.projectSource = projectService.getProjectSources().find(cs2 => cs2.id === sourceId)
+      this.projectSources = projectService.getProjectSources()
+      this.projectSource = this.projectSources.find(cs2 => cs2.id === sourceId)
     }
 
   }
