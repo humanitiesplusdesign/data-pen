@@ -5,3 +5,4 @@ docs
 app/bower_components
 .publish
 .vscode
+bundle.js
