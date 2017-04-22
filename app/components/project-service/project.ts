@@ -1,6 +1,14 @@
-namespace fibra {
   'use strict'
 
+  import {Citable} from '../app/_datamodel/citable'
+  import {DataModel} from './data-model'
+  import {SparqlAutocompleteService} from '../sparql-autocomplete/sparql-autocomplete-service'
+  import {SparqlTreeService} from '../sparql-tree-service'
+  import {SparqlItemService} from '../sparql-item/sparql-item-service'
+  import {RemoteEndpointConfiguration} from './remote-endpoint-configuration'
+  import {PrimaryEndpointConfiguration} from './primary-endpoint-configuration'
+  import {Schema} from './schema'
+  import {FIBRA, VOID} from '../app/_datamodel/rdf'
   import s = fi.seco.sparql.SparqlService
 
   export class Project extends Citable {
@@ -252,5 +260,3 @@ SELECT ?labels ?descriptions ?url ?rightsHolders ?rightsHolders_labels ?rightsHo
       }
     }
   }
-
-}

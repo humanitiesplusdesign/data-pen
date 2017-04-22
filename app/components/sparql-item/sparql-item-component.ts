@@ -1,40 +1,42 @@
-namespace fibra {
-  'use strict'
+'use strict'
 
-  class SparqlItemComponentBindings {
-    public itemId: INode
+import {INode} from '../app/_datamodel/rdf'
+import {Item, SparqlItemService} from './sparql-item-service'
+import {FibraService} from '../app/fibra-service'
+
+class SparqlItemComponentBindings {
+  public itemId: INode
+}
+
+interface ISparqlItemComponentBindingChanges {
+  itemId?: angular.IChangesObject<Item>
+}
+
+class SparqlItemComponentController extends SparqlItemComponentBindings {
+  private item: Item
+  public $onChanges: (changes: ISparqlItemComponentBindingChanges) => void = (changes: ISparqlItemComponentBindingChanges) => {
+    if (this.itemId)
+      this.sparqlItemService.getItem(this.itemId).then(
+        (item: Item) => this.item = item
+      )
+  }
+  public addItem = () => {
+    // May need to handle creation here as well but for now, just display
+    this.fibraService.dispatchAction(this.fibraService.displayItem(this.item))
   }
 
-  interface ISparqlItemComponentBindingChanges {
-    itemId?: angular.IChangesObject<Item>
+  constructor(private sparqlItemService: SparqlItemService,
+              private fibraService: FibraService) {
+    super()
   }
+}
 
-  class SparqlItemComponentController extends SparqlItemComponentBindings {
-    private item: Item
-    public $onChanges: (changes: ISparqlItemComponentBindingChanges) => void = (changes: ISparqlItemComponentBindingChanges) => {
-      if (this.itemId)
-        this.sparqlItemService.getItem(this.itemId).then(
-          (item: Item) => this.item = item
-        )
+export class SparqlItemComponent implements angular.IComponentOptions {
+    public bindings: {[id: string]: string} = {
+      itemId: '<',
+      onSelect: '&',
+      showRemoteProperties: '@'
     }
-    public addItem = () => {
-      // May need to handle creation here as well but for now, just display
-      this.fibraService.dispatchAction(this.fibraService.displayItem(this.item))
-    }
-
-    constructor(private sparqlItemService: SparqlItemService,
-                private fibraService: FibraService) {
-      super()
-    }
-  }
-
-  export class SparqlItemComponent implements angular.IComponentOptions {
-      public bindings: {[id: string]: string} = {
-        itemId: '<',
-        onSelect: '&',
-        showRemoteProperties: '@'
-      }
-      public controller: string = 'SparqlItemComponentController' // (new (...args: any[]) => angular.IController) = SparqlItemComponentController
-      public templateUrl: string = 'components/sparql-item/sparql-item.html'
-  }
+    public controller: string = 'SparqlItemComponentController' // (new (...args: any[]) => angular.IController) = SparqlItemComponentController
+    public templateUrl: string = 'components/sparql-item/sparql-item.html'
 }

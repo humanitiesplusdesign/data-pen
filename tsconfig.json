@@ -74,7 +74,6 @@
         "app/components/sparql-tree-service.ts",
         "app/components/sparql-update-service.ts",
         "app/components/tree/tree-component.ts",
-        "app/components/turtle-utils.ts",
         "app/components/type-select/type-select-component.ts",
         "app/components/worker-service/worker-service.ts",
         "app/bower_components/angular-sparql-service/dist/sparql-service.d.ts",

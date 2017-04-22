@@ -47,14 +47,18 @@
     "gulp-watch": "4.3.11",
     "gulp-webserver": "0.9.1",
     "main-bower-files": "2.13.1",
+    "ng-annotate-loader": "^0.2.0",
     "nib": "1.1.2",
     "require-dir": "0.3.1",
     "run-sequence": "1.2.2",
     "sort-stream": "^1.0.1",
+    "ts-loader": "^2.0.3",
     "tslint": "4.5.1",
     "typedoc": "0.5.7",
     "typescript": "2.2.1",
     "uglify-save-license": "0.4.1",
+    "webpack": "^2.4.1",
+    "webpack-stream": "^3.2.0",
     "wiredep": "git://github.com/taptapship/wiredep"
   },
   "engines": {
@@ -62,5 +66,6 @@
   },
   "scripts": {
     "postinstall": "bower install"
-  }
+  },
+  "dependencies": {}
 }

@@ -1,5 +1,10 @@
 var gulp = require('gulp');
 var nib = require('nib');
+
+var webpack = require( 'webpack' );
+var webpackConfig = require( '../webpack.config.js' );
+var webpackStream = require( 'webpack-stream' );
+
 var $ = require('gulp-load-plugins')();
 
 gulp.task('styles', function() {
@@ -12,14 +17,21 @@ gulp.task('styles', function() {
     .pipe(gulp.dest(".tmp"));
 });
 
-var tsProject = $.typescript.createProject('tsconfig.json',{typescript:require('typescript')});
+// var tsProject = $.typescript.createProject('tsconfig.json',{typescript:require('typescript')});
+// gulp.task('scripts', function() {
+//   return tsProject.src()
+//     .pipe($.plumber({ errorHandler: $.notify.onError("<%= error.stack %>") }))
+//     .pipe($.sourcemaps.init())
+//     .pipe(tsProject()).js
+//     .pipe($.typescriptAngular({ moduleName: 'fibra' }))
+//     .pipe($.sourcemaps.write())
+//     .pipe(gulp.dest(".tmp"));
+// });
+
 gulp.task('scripts', function() {
-  return tsProject.src()
+  return gulp.src('app/index.ts')
     .pipe($.plumber({ errorHandler: $.notify.onError("<%= error.stack %>") }))
-    .pipe($.sourcemaps.init())
-    .pipe(tsProject()).js
-    .pipe($.typescriptAngular({ moduleName: 'fibra' }))
-    .pipe($.sourcemaps.write())
+    .pipe( webpackStream( webpackConfig, webpack ) )
     .pipe(gulp.dest(".tmp"));
 });
 

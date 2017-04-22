@@ -54,17 +54,17 @@ gulp.task('wire:scripts-to-templates', function() {
     .pipe(wiredep({
       directory: "app/bower_components"
     }))
-    .pipe($.inject(
-      gulp.src(["app/components/**/*.ts","!app/components/app/app-configuration-ui.ts","!app/components/app/app-configuration-worker.ts"], {read:false})
-      .pipe(sort(function (a, b) { if (a.path < b.path) return -1; if (a.path > b.path) return 1; return 0;})), {
-          starttag: "// inject:scripts",
-          endtag: "// endinject",
-          addRootSlash: false,
-          ignorePath: 'app/',
-          transform: function(filepath) {
-            return 'script(src="'+filepath.replace(/\.ts$/g,'\.js')+'")';
-          }
-        }))
+    // .pipe($.inject(
+    //   gulp.src(["app/components/**/*.ts","!app/components/app/app-configuration-ui.ts","!app/components/app/app-configuration-worker.ts"], {read:false})
+    //   .pipe(sort(function (a, b) { if (a.path < b.path) return -1; if (a.path > b.path) return 1; return 0;})), {
+    //       starttag: "// inject:scripts",
+    //       endtag: "// endinject",
+    //       addRootSlash: false,
+    //       ignorePath: 'app/',
+    //       transform: function(filepath) {
+    //         return 'script(src="'+filepath.replace(/\.ts$/g,'\.js')+'")';
+    //       }
+    //     }))
     .pipe(gulp.dest("app"));
 });
 
