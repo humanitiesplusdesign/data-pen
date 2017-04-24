@@ -17,13 +17,17 @@ interface IAuthenticationRootScopeService extends angular.IRootScopeService {
   socialAuthService: SocialAuthService
 }
 
-let m: angular.IModule = angular.module('fibra', [ 'http-auth-interceptor', 'ngStorage', 'ui.router', 'ui.bootstrap', 'ui.bootstrap.tpls', 'ngAnimate', 'fi.seco.yasqe', 'fi.seco.yasr', 'toastr', 'fi.seco.sparql', 'ui.codemirror', 'ngFileSaver' ])
-m.config((toastrConfig: angular.toastr.IToastConfig) =>
-  angular.extend(toastrConfig, { positionClass: 'toast-top-full-width'}))
-m.config(($stateProvider: angular.ui.IStateProvider,
-          $urlServiceProvider: any,
-          $locationProvider: angular.ILocationProvider,
-          $uiRouterProvider: any) => {
+export function toastConfig(toastrConfig: angular.toastr.IToastConfig): void {
+  'ngInject' // needed when directly exporting a class or function
+  angular.extend(toastrConfig, { positionClass: 'toast-top-full-width'})
+}
+export function uiConfig(
+  $stateProvider: angular.ui.IStateProvider,
+  $urlServiceProvider: any,
+  $locationProvider: angular.ILocationProvider,
+  $uiRouterProvider: any): void {
+
+  'ngInject' // needed when directly exporting a class or function
   $urlServiceProvider.rules.otherwise((match, url, router) => {
     // Manually parse the search because it is not visible to Angular.
     let search: {} = url.search
@@ -103,49 +107,26 @@ m.config(($stateProvider: angular.ui.IStateProvider,
       }
     }
   })
-})
-m.config($localStorageProvider => $localStorageProvider.setKeyPrefix('fibra-'))
-m.value('workerServiceConfiguration', {
-  appName: 'fibra',
-  workerThreads: 8,
-  importScripts: [
-    'bower_components/angular/angular.js',
-      'bower_components/angular-http-auth/src/http-auth-interceptor.js',
-      'bower_components/angular-sparql-service/dist/sparql-service.js',
-      'bower_components/rdfstore/dist/rdfstore.js',
-      'components/app/_datamodel/citable.js',
-      'components/app/_datamodel/rdf.js',
-      'components/app/_datamodel/richnode.js',
-      'components/app/app-configuration-worker.js',
-      'components/app/app-configuration-common.js',
-      'components/app/fibra-service.js',
-      'components/project-service/project.js',
-      'components/project-service/schema.js',
-      'components/project-service/primary-endpoint-configuration.js',
-      'components/project-service/remote-endpoint-configuration.js',
-      'components/project-service/data-model.js',
-      'components/project-service/project-service.js',
-      'components/collection-utils.js',
-      'components/sparql-item/sparql-item-service.js',
-      'components/worker-service/worker-service.js',
-      'components/app/fibra-sparql-service.js',
-      'components/sparql-autocomplete/sparql-autocomplete-service.js',
-      'components/sparql-tree-service.js',
-      'components/sparql-update-service.js',
-      'components/tree/tree-component.js',
-      'components/misc-utils.js'
-    ]
-})
-m.run(( $rootScope: IAuthenticationRootScopeService,
-        $localStorage: any,
-        $http: angular.IHttpService,
-        $state: angular.ui.IStateService,
-        authService: angular.httpAuth.IAuthService,
-        $location: angular.ILocationService,
-        workerService: WorkerService,
-        socialAuthService: SocialAuthService,
-        $window: angular.IWindowService,
-        $transitions: any) => {
+}
+
+export function localStorageConfig($localStorageProvider): void {
+  'ngInject' // needed when directly exporting a class or function
+  $localStorageProvider.setKeyPrefix('fibra-')
+}
+
+export function uiRun(
+  $rootScope: IAuthenticationRootScopeService,
+  $localStorage: any,
+  $http: angular.IHttpService,
+  $state: angular.ui.IStateService,
+  authService: angular.httpAuth.IAuthService,
+  $location: angular.ILocationService,
+  workerService: WorkerService,
+  socialAuthService: SocialAuthService,
+  $window: angular.IWindowService,
+  $transitions: any): void {
+
+  'ngInject' // needed when directly exporting a class or function
   $rootScope.authInfo = {
     authOpen: false,
     username: undefined,
@@ -191,4 +172,4 @@ m.run(( $rootScope: IAuthenticationRootScopeService,
 
   // add info on which view we're in to the page title (currently just the raw view name)
   $transitions.onSuccess({}, transition => $rootScope.viewName = transition._targetState.name())
-})
+}

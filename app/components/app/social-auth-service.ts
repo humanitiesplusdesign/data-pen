@@ -1,4 +1,5 @@
 'use strict'
+import * as angular from 'angular'
 
 export class SocialAuthService {
 
@@ -27,3 +28,8 @@ export class SocialAuthService {
     this.$state.go('projects')
   }
 }
+
+angular.module('fibra.services.social-auth-service', [])
+  .config(($provide) => {
+    $provide.service('socialAuthService', SocialAuthService)
+  })

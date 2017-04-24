@@ -8,6 +8,8 @@
     "@types/crypto-js": "3.1.33",
     "@types/d3": "4.5.0",
     "@types/n3": "0.0.2",
+    "babel-core": "^6.24.1",
+    "babel-loader": "^7.0.0",
     "browser-sync": "2.18.8",
     "del": "2.2.2",
     "gulp": "3.9.1",

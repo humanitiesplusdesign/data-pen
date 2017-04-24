@@ -2,16 +2,19 @@ var glob = require("glob");
 
 module.exports = {
   context: __dirname,
-  entry: './app/index.ts',
+  entry: {
+    ui: './app/index.ts',
+    worker: './app/worker-index.ts'
+  },
   output: {
-    filename: 'bundle.js',
+    filename: '[name]-bundle.js',
     path: __dirname
   },
   module: {
     rules: [
       {
         test: /\.ts?$/,
-        loader: 'ng-annotate-loader!ts-loader',
+        loader: 'ng-annotate-loader!babel-loader!ts-loader',
         exclude: /node_modules/,
       }
     ]

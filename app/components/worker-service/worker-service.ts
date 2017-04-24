@@ -1,5 +1,7 @@
 'use strict'
 
+import * as angular from 'angular'
+
 export class WorkerServiceConfiguration {
   constructor(public appName: string, public workerThreads: number, public importScripts: string[]) {}
 }
@@ -211,7 +213,8 @@ export class WorkerWorkerService {
       throw e
     }
   }
-  constructor(private workerServicePrototypeMappingConfiguration:  {[className: string]: Object}, private $injector: angular.auto.IInjectorService, private $q: angular.IQService, private $rootScope: angular.IRootScopeService) {}
+  constructor(private workerServicePrototypeMappingConfiguration:  {[className: string]: Object}, private $injector: angular.auto.IInjectorService, private $q: angular.IQService, private $rootScope: angular.IRootScopeService) {
+  }
   public onMessage(message: IMessage): void {
     if (message.id === undefined) {
       this.$rootScope.$broadcast(message.name!, this.restorePrototypes(message.args))
@@ -272,7 +275,18 @@ export class WorkerWorkerService {
   }
 }
 
-import * as angular from 'angular'
-angular.module('fibra')
-  .service('WorkerService', WorkerService)
-  .service('WorkerWorkerService', WorkerWorkerService)
+angular.module('fibra.services.worker-service', [])
+  .config(($provide) => {
+    $provide.service('workerServicePrototypeMappingConfiguration', function(): {[className: string]: {}} {
+      let mappings: {[className: string]: {}} = {
+        'Object': Object.prototype
+      }
+      for (let prop of Object.getOwnPropertyNames({})) {  // Was 'fibra' object, but no longer exists.
+        mappings[prop] = fibra[prop].prototype
+        fibra[prop].__name = prop
+      }
+      return mappings
+    })
+    $provide.service('workerService', WorkerService)
+    $provide.service('workerWorkerService', WorkerWorkerService)
+  })
