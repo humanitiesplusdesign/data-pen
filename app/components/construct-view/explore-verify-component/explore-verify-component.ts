@@ -2,9 +2,9 @@
 
 import {Item, PropertyToValues, IPropertyAndValue, PropertyAndValue} from '../../sparql-item/sparql-item-service'
 import {ResultGroup, SparqlAutocompleteService, AutocompletionResults, Result} from '../../sparql-autocomplete/sparql-autocomplete-service'
-import {IRichNode} from '../../app/_datamodel/richnode'
-import {FibraService} from '../../app/fibra-service'
-import {OWL} from '../../app/_datamodel/rdf'
+import {IRichNode} from '../../../models/richnode'
+import {FibraService} from '../../../services/fibra-service'
+import {OWL} from '../../../models/rdf'
 
 export class ExploreVerifyComponentController {
   // Bindings

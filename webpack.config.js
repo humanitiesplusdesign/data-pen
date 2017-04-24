@@ -1,6 +1,7 @@
 var glob = require("glob");
 
 module.exports = {
+  // watch: true,
   context: __dirname,
   entry: {
     ui: './app/index.ts',
@@ -20,6 +21,7 @@ module.exports = {
     ]
   },
   resolve: {
+    modules: ["node_modules", "app/bower_components"],
     extensions: [".tsx", ".ts", ".js"]
   },
   externals: {

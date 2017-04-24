@@ -1,9 +1,9 @@
 'use strict'
 import * as d3 from 'd3'
-import {INode} from '../app/_datamodel/rdf'
+import {INode} from '../../models/rdf'
 import {IGridNode, IExploreItem} from './explore-component'
-import {SparqlItemService} from '../sparql-item/sparql-item-service'
-import {FibraService} from '../app/fibra-service'
+import {SparqlItemService} from '../../services/sparql-item-service'
+import {FibraService} from '../../services/fibra-service'
 
 export class Sunburst {
   private sbRadius = 200

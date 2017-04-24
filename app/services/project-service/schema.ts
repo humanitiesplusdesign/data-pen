@@ -1,8 +1,8 @@
 'use strict'
 
-import {Citable} from '../app/_datamodel/citable'
+import {Citable} from '../../models/citable'
 import {DataModel} from './data-model'
-import {FIBRA, VOID} from '../app/_datamodel/rdf'
+import {FIBRA, VOID} from '../../models/rdf'
 
 import s = fi.seco.sparql.SparqlService
 

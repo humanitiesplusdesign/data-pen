@@ -1,11 +1,11 @@
 'use strict'
 
-import {Citable} from '../app/_datamodel/citable'
-import {SparqlAutocompleteService} from '../sparql-autocomplete/sparql-autocomplete-service'
-import {SparqlItemService} from '../sparql-item/sparql-item-service'
-import {SparqlTreeService} from '../sparql-tree-service'
+import {Citable} from '../../models/citable'
+import {SparqlAutocompleteService} from '../../components/sparql-autocomplete/sparql-autocomplete-service'
+import {SparqlItemService} from '../sparql-item-service'
+import {SparqlTreeService} from '../../services/sparql-tree-service'
 import {DataModel} from './data-model'
-import {FIBRA} from '../app/_datamodel/rdf'
+import {FIBRA} from '../../models/rdf'
 import {Project} from '../project-service/project'
 
 import s = fi.seco.sparql.SparqlService

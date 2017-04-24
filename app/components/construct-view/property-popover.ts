@@ -1,11 +1,11 @@
 'use strict'
 
-import {FibraService} from '../app/fibra-service'
+import {FibraService} from '../../services/fibra-service'
 import * as d3 from 'd3'
-import {Item, PropertyToValues, PropertyAndValue, SparqlItemService} from '../sparql-item/sparql-item-service'
+import {Item, PropertyToValues, PropertyAndValue, SparqlItemService} from '../../services/sparql-item-service'
 import {TreeNode} from '../tree/tree-component'
-import {OWL, RDF, NamedNode, SKOS, DataFactory} from '../app/_datamodel/rdf'
-import {INamedNode} from '../app/_datamodel/rdfjs'
+import {OWL, RDF, NamedNode, SKOS, DataFactory} from '../../models/rdf'
+import {INamedNode} from '../../models/rdfjs'
 
 export class PropertyPopover {
 

@@ -1,8 +1,8 @@
 'use strict'
 
 import {WorkerService} from './worker-service/worker-service'
-import {Quad, Graph, DataFactory, DefaultGraph} from './app/_datamodel/rdf'
-import {FibraSparqlService} from './app/fibra-sparql-service'
+import {Quad, Graph, DataFactory, DefaultGraph} from '../models/rdf'
+import {FibraSparqlService} from './fibra-sparql-service'
 
 export class SparqlUpdateService {
 

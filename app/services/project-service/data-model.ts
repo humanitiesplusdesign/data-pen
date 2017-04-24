@@ -1,9 +1,9 @@
 'use strict'
 
-import {ILiteral} from '../app/_datamodel/rdfjs'
-import {INode} from '../app/_datamodel/rdf'
-import {IRichNode, FullRichNodeFromNode} from '../app/_datamodel/richnode'
-import {StringSet, Map} from '../collection-utils'
+import {ILiteral} from '../../models/rdfjs'
+import {INode} from '../../models/rdf'
+import {IRichNode, FullRichNodeFromNode} from '../../models/richnode'
+import {StringSet, Map} from '../../components/collection-utils'
 
 class AsNodes {
   public labels: ILiteral[] = []

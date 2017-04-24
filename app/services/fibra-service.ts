@@ -1,14 +1,16 @@
 'use strict'
 
-import {Project} from '../project-service/project'
-import {TreeNode} from '../tree/tree-component'
-import {IGridNode} from '../construct-view/explore-component'
-import {Item, IPropertyAndValue, PropertyAndValue} from '../sparql-item/sparql-item-service'
-import {ITerm, INamedNode} from './_datamodel/rdfjs'
-import {INode, SKOS, DataFactory, RDF, OWL} from './_datamodel/rdf'
-import {WorkerService} from '../worker-service/worker-service'
-import {SparqlItemService} from '../sparql-item/sparql-item-service'
-import {SparqlTreeService} from '../sparql-tree-service'
+import * as angular from 'angular'
+
+import {Project} from './project-service/project'
+import {TreeNode} from '../components/tree/tree-component'
+import {IGridNode} from '../components/construct-view/explore-component'
+import {Item, IPropertyAndValue, PropertyAndValue} from '../services/sparql-item-service'
+import {ITerm, INamedNode} from '../models/rdfjs'
+import {INode, SKOS, DataFactory, RDF, OWL} from '../models/rdf'
+import {WorkerService} from './worker-service/worker-service'
+import {SparqlItemService} from '../services/sparql-item-service'
+import {SparqlTreeService} from './sparql-tree-service'
 
 type CallbackFunction = () => angular.IPromise<string>
 type RemovalFunction = () => void
@@ -436,3 +438,8 @@ export class StateWorkerService {
     this.state = state
   }
 }
+
+angular.module('fibra.services.fibra-service', [])
+  .config(($provide) => {
+    $provide.service('fibraService', FibraService)
+  })

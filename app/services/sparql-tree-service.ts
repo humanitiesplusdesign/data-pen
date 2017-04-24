@@ -1,8 +1,9 @@
 'use strict'
 
+import * as angular from 'angular'
 import {WorkerService} from './worker-service/worker-service'
-import {FibraSparqlService} from './app/fibra-sparql-service'
-import {TreeNode} from './tree/tree-component'
+import {FibraSparqlService} from './fibra-sparql-service'
+import {TreeNode} from '../components/tree/tree-component'
 
 export class SparqlTreeService {
 
@@ -77,3 +78,7 @@ export class SparqlTreeWorkerService {
   }
 }
 
+angular.module('fibra.services.sparql-tree-service', [])
+  .config(($provide) => {
+    $provide.service('sparqlTreeService', SparqlTreeService)
+  })

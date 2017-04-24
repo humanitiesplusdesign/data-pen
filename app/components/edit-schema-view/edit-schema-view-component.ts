@@ -1,10 +1,10 @@
 'use strict'
 
 import {EditCitableComponentController} from '../citable-editor/citable-editor-component'
-import {FibraService} from '../app/fibra-service'
+import {FibraService} from '../../services/fibra-service'
 import {ProjectService} from '../project-service/project-service'
 import {Schema} from '../project-service/schema'
-import {DataFactory} from '../app/_datamodel/rdf'
+import {DataFactory} from '../../models/rdf'
 
 export class EditSchemaViewComponentController extends EditCitableComponentController<Schema> {
 

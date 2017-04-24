@@ -1,14 +1,13 @@
 'use strict'
 
 import {TreeNode} from '../tree/tree-component'
-import {INode} from '../app/_datamodel/rdf'
-import {UIState} from '../app/fibra-service'
+import {INode} from '../../models/rdf'
+import {UIState, FibraService} from '../../services/fibra-service'
 import {ProjectSourceInfo} from '../project-sources-view/project-sources-view-component'
 import {Result} from '../sparql-autocomplete/sparql-autocomplete-service'
 import {SparqlTreeService} from '../sparql-tree-service'
-import {SparqlItemService} from '../sparql-item/sparql-item-service'
+import {SparqlItemService} from '../../services/sparql-item-service'
 import {ProjectService} from '../project-service/project-service'
-import {FibraService} from '../app/fibra-service'
 import {Project} from '../project-service/project'
 
 class TreeViewConfiguration {

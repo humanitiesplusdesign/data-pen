@@ -1,7 +1,7 @@
 'use strict'
 
-import {ProjectService} from '../project-service/project-service'
-import {ICitableSource} from '../app/_datamodel/citable'
+import {ProjectService} from '../../services/project-service/project-service'
+import {ICitableSource} from '../../models/citable'
 
 type ProjectSourceParams = {
   sourceId?: string

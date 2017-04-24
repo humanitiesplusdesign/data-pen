@@ -1,9 +1,10 @@
 'use strict'
+import * as angular from 'angular'
 
-import {ICitable} from '../app/_datamodel/citable'
+import {ICitable} from '../../models/citable'
 import {ProjectSourceInfo} from '../project-sources-view/project-sources-view-component'
-import {ProjectService} from '../project-service/project-service'
-import {SocialAuthService} from '../app/social-auth-service'
+import {ProjectService} from '../../services/project-service/project-service'
+import {SocialAuthService} from '../../services/social-auth-service'
 import * as CryptoJS from 'crypto-js'
 
 export class ProjectsViewComponentController implements angular.IComponentController {
@@ -51,6 +52,9 @@ export class ProjectsViewComponentController implements angular.IComponentContro
 }
 
 export class ProjectsViewComponent implements angular.IComponentOptions {
-    public controller: string = 'ProjectsViewComponentController' // (new (...args: any[]) => angular.IController) = SelectViewComponentController
+    public controller = ProjectsViewComponentController // (new (...args: any[]) => angular.IController) = SelectViewComponentController
     public templateUrl: string = 'components/projects-view/projects-view.html'
 }
+
+angular.module('fibra.components.projects-view', [])
+  .component('projectsView', new ProjectsViewComponent())

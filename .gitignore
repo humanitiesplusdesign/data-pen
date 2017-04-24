@@ -6,3 +6,5 @@ app/bower_components
 .publish
 .vscode
 bundle.js
+ui-bundle.js
+worker-bundle.js

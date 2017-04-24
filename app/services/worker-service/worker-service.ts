@@ -281,7 +281,8 @@ angular.module('fibra.services.worker-service', [])
       let mappings: {[className: string]: {}} = {
         'Object': Object.prototype
       }
-      for (let prop of Object.getOwnPropertyNames({})) {  // Was 'fibra' object, but no longer exists.
+      let fibra = {}
+      for (let prop of Object.getOwnPropertyNames(fibra)) {  // Was 'fibra' object, but no longer exists.
         mappings[prop] = fibra[prop].prototype
         fibra[prop].__name = prop
       }

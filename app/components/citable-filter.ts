@@ -1,7 +1,7 @@
 'use strict'
 
-import {ICitable} from './app/_datamodel/citable'
-import {FibraService} from './app/fibra-service'
+import {ICitable} from '../models/citable'
+import {FibraService} from '../services/fibra-service'
 import {getPrefLangString} from './preferred-language-filter'
 declare var angular
 

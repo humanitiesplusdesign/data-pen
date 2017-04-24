@@ -1,7 +1,7 @@
 'use strict'
 
-import {ILiteral} from './app/_datamodel/rdfjs'
-import {FibraService} from './app/fibra-service'
+import {ILiteral} from '../models/rdfjs'
+import {FibraService} from '../services/fibra-service'
 declare var angular
 
 export function getPrefLangString(literals: ILiteral[], prefLang: string): string {

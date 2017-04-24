@@ -2,7 +2,7 @@
 
 import s = fi.seco.sparql
 import { ITerm, INamedNode, ILiteral, IDefaultGraph, IUNDEF, IVariable, IBlankNode, IQuad, ITriple, IDataFactory} from './rdfjs'
-import { IEMap, EMap, EOMap } from '../../collection-utils'
+import { IEMap, EMap, EOMap } from '../components/collection-utils'
 
 export interface INode extends ITerm {
   language?: string

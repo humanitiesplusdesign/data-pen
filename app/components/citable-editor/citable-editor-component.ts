@@ -1,11 +1,11 @@
 'use strict'
 
-import {ICitable, Citable} from '../app/_datamodel/citable'
+import {ICitable, Citable} from '../../models/citable'
 import {ProjectSourceInfo} from '../project-sources-view/project-sources-view-component'
 import {ProjectService} from '../project-service/project-service'
 import {UUID} from '../misc-utils'
-import {DataFactory} from '../app/_datamodel/rdf'
-import {FibraService} from '../app/fibra-service'
+import {DataFactory} from '../../models/rdf'
+import {FibraService} from '../../services/fibra-service'
 
 export class EditCitableComponentController<T extends ICitable> implements angular.IComponentController {
   public c: T

@@ -1,7 +1,7 @@
 'use strict'
 
 import {TreeNode} from '../../tree/tree-component'
-import {FibraService} from '../../app/fibra-service'
+import {FibraService} from '../../../services/fibra-service'
 
 export class ExploreTypeComponentController {
   private types: () => TreeNode[]

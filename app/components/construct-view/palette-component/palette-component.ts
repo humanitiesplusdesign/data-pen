@@ -2,10 +2,10 @@
 
 import {Item, SparqlItemService, IPropertyAndValue, PropertyAndValue} from '../../sparql-item/sparql-item-service'
 import * as d3 from 'd3'
-import {FibraService, UIState} from '../../app/fibra-service'
+import {FibraService, UIState} from '../../../services/fibra-service'
 import {SparqlTreeService} from '../../sparql-tree-service'
 import {TreeNode} from '../../tree/tree-component'
-import {DataFactory, INode, SKOS, OWL, NamedNode, RDF} from '../../app/_datamodel/rdf'
+import {DataFactory, INode, SKOS, OWL, NamedNode, RDF} from '../../../models/rdf'
 import {IExploreItem} from '../explore-component'
 
 interface IPaletteItem extends Item {

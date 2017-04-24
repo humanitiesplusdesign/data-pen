@@ -1,11 +1,11 @@
 'use strict'
 
-import {Citable} from '../app/_datamodel/citable'
-import {INode, FIBRA, VOID, RDF} from '../app/_datamodel/rdf'
-import {SparqlAutocompleteService} from '../sparql-autocomplete/sparql-autocomplete-service'
+import {Citable} from '../../models/citable'
+import {INode, FIBRA, VOID, RDF} from '../../models/rdf'
+import {SparqlAutocompleteService} from '../../components/sparql-autocomplete/sparql-autocomplete-service'
 import {DataModel} from './data-model'
-import {SparqlItemService} from '../sparql-item/sparql-item-service'
-import {SparqlTreeService} from '../sparql-tree-service'
+import {SparqlItemService} from '../sparql-item-service'
+import {SparqlTreeService} from '../../services/sparql-tree-service'
 
 import s = fi.seco.sparql.SparqlService
 

@@ -1,7 +1,8 @@
 'use strict'
 
+import * as angular from 'angular'
 import s = fi.seco.sparql
-import {EMap, StringSet} from '../collection-utils'
+import {EMap, StringSet} from '../components/collection-utils'
 
 export class SparqlServiceDefinition {
   constructor(public type: 'local'|'remote', public id: string) {}
@@ -184,3 +185,7 @@ export class RDFStoreInternalSparqlService implements IInternalSparqlService {
   }
 }
 
+angular.module('fibra.services.fibra-sparql-service', [])
+  .config(($provide) => {
+    $provide.service('fibraSparqlService', FibraSparqlService)
+  })

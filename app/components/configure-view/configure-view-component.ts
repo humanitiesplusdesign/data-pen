@@ -7,9 +7,9 @@ import {RemoteEndpointConfiguration} from '../project-service/remote-endpoint-co
 import {TreeNode} from '../tree/tree-component'
 import {Schema} from '../project-service/schema'
 import {ProjectService} from '../project-service/project-service'
-import {FibraService} from '../app/fibra-service'
+import {FibraService} from '../../services/fibra-service'
 import {UUID} from '../misc-utils'
-import {DataFactory} from '../app/_datamodel/rdf'
+import {DataFactory} from '../../models/rdf'
 import {SparqlTreeService} from '../sparql-tree-service'
 
 export class ConfigureViewComponentController implements angular.IComponentController {

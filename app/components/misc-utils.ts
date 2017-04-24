@@ -1,5 +1,5 @@
 'use strict'
-import {ICitable} from './app/_datamodel/citable'
+import {ICitable} from '../models/citable'
 import {Map} from './collection-utils'
 
 export function toTurtle(prefixes: {}, m: d3.Map<string>): string {

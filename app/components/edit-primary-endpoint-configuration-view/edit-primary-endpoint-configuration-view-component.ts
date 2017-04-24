@@ -2,9 +2,9 @@
 
 import {EditCitableComponentController} from '../citable-editor/citable-editor-component'
 import {PrimaryEndpointConfiguration} from '../project-service/primary-endpoint-configuration'
-import {FibraService} from '../app/fibra-service'
+import {FibraService} from '../../services/fibra-service'
 import {ProjectService} from '../project-service/project-service'
-import {DataFactory} from '../app/_datamodel/rdf'
+import {DataFactory} from '../../models/rdf'
 
 export class EditPrimaryEndpointConfigurationViewComponentController  extends EditCitableComponentController<PrimaryEndpointConfiguration> {
 

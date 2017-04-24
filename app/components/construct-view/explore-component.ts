@@ -1,12 +1,12 @@
 'use strict'
 
-import {Item, PropertyToValues, SparqlItemService, PropertyAndValue} from '../sparql-item/sparql-item-service'
+import {Item, PropertyToValues, SparqlItemService, PropertyAndValue} from '../../services/sparql-item-service'
 import {Sunburst} from './sunburst'
 import {PropertyPopover} from './property-popover'
 import * as d3 from 'd3'
 import {TreeNode} from '../tree/tree-component'
-import {OWL, SKOS, DataFactory, ENodeMap} from '../app/_datamodel/rdf'
-import {FibraService} from '../app/fibra-service'
+import {OWL, SKOS, DataFactory, ENodeMap} from '../../models/rdf'
+import {FibraService} from '../../services/fibra-service'
 
 interface IExploreComponentInterface extends angular.IComponentController {
 }

@@ -1,9 +1,9 @@
 'use strict'
 
 import {Item, PropertyToValues, SparqlItemService, IRichPropertyValue, RichPropertyValue, PropertyAndValue} from '../../sparql-item/sparql-item-service'
-import {FibraService, UIState} from '../../app/fibra-service'
-import {DataFactory, OWL, INode} from '../../app/_datamodel/rdf'
-import {FullRichNodeFromNode} from '../../app/_datamodel/richnode'
+import {FibraService, UIState} from '../../../services/fibra-service'
+import {DataFactory, OWL, INode} from '../../../models/rdf'
+import {FullRichNodeFromNode} from '../../../models/richnode'
 
 type TableInfo = {
   properties: String[],

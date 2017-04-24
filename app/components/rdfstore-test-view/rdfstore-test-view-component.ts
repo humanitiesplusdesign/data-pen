@@ -1,6 +1,6 @@
 'use strict'
 
-import {FibraSparqlService} from '../app/fibra-sparql-service'
+import {FibraSparqlService} from '../../services/fibra-sparql-service'
 
 declare var CodeMirror: any
 

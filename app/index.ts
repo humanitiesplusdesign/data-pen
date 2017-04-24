@@ -1,13 +1,13 @@
 import * as angular from 'angular'
-import * as uiConfig from './components/app/app-configuration-ui.ts'
+import * as uiConfig from './app/app-configuration-ui'
 
 // Register modules
-import './components/worker-service/worker-service'
-import './components/app/social-auth-service'
+import './services'
+import './components'
 
 let m: angular.IModule = angular.module('fibra', [
-  'fibra.services.worker-service',
-  'fibra.services.social-auth-service',
+  'fibra.services',
+  'fibra.components',
   'http-auth-interceptor',
   'ngStorage',
   'ui.router',
@@ -28,11 +28,11 @@ m.value('workerServiceConfiguration', {
   workerThreads: 8,
   importScripts: [
     'bower_components/angular/angular.js',
-      'bower_components/angular-http-auth/src/http-auth-interceptor.js',
-      'bower_components/angular-sparql-service/dist/sparql-service.js',
-      'bower_components/rdfstore/dist/rdfstore.js',
-      'worker-bundle.js'
-    ]
+    'bower_components/angular-http-auth/src/http-auth-interceptor.js',
+    'bower_components/angular-sparql-service/dist/sparql-service.js',
+    'bower_components/rdfstore/dist/rdfstore.js',
+    'worker-bundle.js'
+  ]
 })
 
 m

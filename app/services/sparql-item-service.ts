@@ -1,14 +1,15 @@
 'use strict'
 
-import {IRichNode, PrunedRichNodeFromNode, RichNodeFromRichNode, FullRichNodeFromNode} from '../app/_datamodel/richnode'
-import {INode, DataFactory, DefaultGraph, ENodeMap, OWL, Triple, Graph, NamedNode} from '../app/_datamodel/rdf'
-import {IQuad, ITriple} from '../app/_datamodel/rdfjs'
-import {WorkerService, WorkerWorkerService} from '../worker-service/worker-service'
-import {EMap} from '../collection-utils'
-import {FibraSparqlService} from '../app/fibra-sparql-service'
-import {SparqlUpdateWorkerService} from '../sparql-update-service'
-import {StateWorkerService} from '../app/fibra-service'
-import {UUID} from '../misc-utils'
+import * as angular from 'angular'
+import {IRichNode, PrunedRichNodeFromNode, RichNodeFromRichNode, FullRichNodeFromNode} from '../models/richnode'
+import {INode, DataFactory, DefaultGraph, ENodeMap, OWL, Triple, Graph, NamedNode} from '../models/rdf'
+import {IQuad, ITriple} from '../models/rdfjs'
+import {WorkerService, WorkerWorkerService} from '../services/worker-service/worker-service'
+import {EMap} from '../components/collection-utils'
+import {FibraSparqlService} from './fibra-sparql-service'
+import {SparqlUpdateWorkerService} from './sparql-update-service'
+import {StateWorkerService} from './fibra-service'
+import {UUID} from '../components/misc-utils'
 
 import s = fi.seco.sparql
 
@@ -332,3 +333,8 @@ export class SparqlItemWorkerService {
   }
 
 }
+
+angular.module('fibra.services.sparql-item-service', [])
+  .config(($provide) => {
+    $provide.service('sparqlItemService', SparqlItemService)
+  })

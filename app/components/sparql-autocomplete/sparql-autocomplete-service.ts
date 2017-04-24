@@ -1,10 +1,10 @@
 'use strict'
 
-import {INode, ONodeSet, DataFactory} from '../app/_datamodel/rdf'
-import {WorkerService, WorkerWorkerService} from '../worker-service/worker-service'
+import {INode, ONodeSet, DataFactory} from '../../models/rdf'
+import {WorkerService, WorkerWorkerService} from '../../services/worker-service/worker-service'
 import {EMap, StringSet} from '../collection-utils'
-import {FibraSparqlService} from '../app/fibra-sparql-service'
-import {StateWorkerService} from '../app/fibra-service'
+import {FibraSparqlService} from '../../services/fibra-sparql-service'
+import {StateWorkerService} from '../../services/fibra-service'
 import s = fi.seco.sparql
 
 export class AutocompletionResults {

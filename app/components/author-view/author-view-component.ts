@@ -1,6 +1,6 @@
 'use strict'
 
-import {Item, SparqlItemService} from '../sparql-item/sparql-item-service'
+import {Item, SparqlItemService} from '../../services/sparql-item-service'
 
 export class AuthorViewComponentController implements angular.IComponentController {
   public items: Item[] = []

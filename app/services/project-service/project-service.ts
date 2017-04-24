@@ -1,19 +1,19 @@
 'use strict'
+import * as angular from 'angular'
 
-import {ICitable, ICitableSource, CitableSource, Citable} from '../app/_datamodel/citable'
-import {WorkerService} from '../worker-service/worker-service'
-import {FibraService, UIState} from '../app/fibra-service'
+import {ICitable, ICitableSource, CitableSource, Citable} from '../../models/citable'
+import {WorkerService} from '../../services/worker-service/worker-service'
+import {FibraService, UIState} from '../../services/fibra-service'
 import {Project} from './project'
-import {ProjectSourceInfo} from '../project-sources-view/project-sources-view-component'
-import {FibraSparqlService} from '../app/fibra-sparql-service'
+import {ProjectSourceInfo} from '../../components/project-sources-view/project-sources-view-component'
+import {FibraSparqlService} from '../../services/fibra-sparql-service'
 import {PrimaryEndpointConfiguration} from './primary-endpoint-configuration'
 import {RemoteEndpointConfiguration} from './remote-endpoint-configuration'
 import {Schema} from './schema'
-import {Map, IEMap, EMap} from '../collection-utils'
-import {toTurtle} from '../misc-utils'
-import {DataFactory} from '../app/_datamodel/rdf'
+import {Map, IEMap, EMap} from '../../components/collection-utils'
+import {toTurtle} from '../../components/misc-utils'
+import {DataFactory} from '../../models/rdf'
 import {DataModel, Class, Property} from './data-model'
-
 
 import s = fi.seco.sparql
 
@@ -294,5 +294,13 @@ export class ProjectWorkerService {
         return projects.values()
       })
   }
-
 }
+
+angular.module('fibra.services.project-service', [
+  'fibra.services.fibra-service',
+  'fibra.services.fibra-sparql-service'
+])
+  .config(($provide) => {
+    $provide.service('projectService', ProjectService)
+    $provide.service('projectWorkerService', ProjectWorkerService)
+  })

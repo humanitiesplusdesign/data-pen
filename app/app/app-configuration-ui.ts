@@ -1,10 +1,10 @@
 'use strict'
 
-import {SocialAuthService} from './social-auth-service'
+import {SocialAuthService} from '../services/social-auth-service'
 import * as angular from 'angular'
-import {FibraService} from './fibra-service'
-import {ProjectService} from '../project-service/project-service'
-import {WorkerService} from '../worker-service/worker-service'
+import {FibraService} from '../services/fibra-service'
+import {ProjectService} from '../services/project-service/project-service'
+import {WorkerService} from '../services/worker-service/worker-service'
 
 interface IAuthenticationRootScopeService extends angular.IRootScopeService {
   setAuth: () => void

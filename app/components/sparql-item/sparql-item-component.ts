@@ -1,8 +1,8 @@
 'use strict'
 
-import {INode} from '../app/_datamodel/rdf'
+import {INode} from '../../models/rdf'
 import {Item, SparqlItemService} from './sparql-item-service'
-import {FibraService} from '../app/fibra-service'
+import {FibraService} from '../../services/fibra-service'
 
 class SparqlItemComponentBindings {
   public itemId: INode
