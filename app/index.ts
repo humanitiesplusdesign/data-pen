@@ -4,10 +4,12 @@ import * as uiConfig from './app/app-configuration-ui'
 // Register modules
 import './services'
 import './components'
+import './filters'
 
 let m: angular.IModule = angular.module('fibra', [
   'fibra.services',
   'fibra.components',
+  'fibra.filters',
   'http-auth-interceptor',
   'ngStorage',
   'ui.router',

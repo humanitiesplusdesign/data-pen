@@ -1,6 +1,7 @@
 'use strict'
 
 import {Project} from '../project-service/project'
+import {Class, Property} from '../project-service/data-model'
 import {Node} from '../../models/rdf'
 import {Citable} from '../../models/citable'
 import {Map} from '../../components/collection-utils'
@@ -16,7 +17,9 @@ angular.module('fibra.services.worker-service-prototype-mapping-configuration', 
         'Project': Project,
         'Node': Node,
         'Citable': Citable,
-        'Map': Map
+        'Map': Map,
+        'Class': Class,
+        'Property': Property
       } // List out classes here
       for (let prop of Object.getOwnPropertyNames(fibra)) {
         mappings[prop] = fibra[prop].prototype

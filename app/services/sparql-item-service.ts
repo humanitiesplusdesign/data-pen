@@ -8,7 +8,7 @@ import {WorkerService, WorkerWorkerService} from '../services/worker-service/wor
 import {EMap} from '../components/collection-utils'
 import {FibraSparqlService} from './fibra-sparql-service'
 import {SparqlUpdateWorkerService} from './sparql-update-service'
-import {StateWorkerService} from './fibra-service'
+import {StateWorkerService} from './worker-service/worker-service'
 import {UUID} from '../components/misc-utils'
 
 import s = fi.seco.sparql

@@ -2,6 +2,7 @@
 
 import * as angular from 'angular'
 import './prototype-mapping-configuration'
+import {CommonState} from '../fibra-service'
 
 export class WorkerServiceConfiguration {
   constructor(public appName: string, public workerThreads: number, public importScripts: string[]) {}
@@ -276,8 +277,16 @@ export class WorkerWorkerService {
   }
 }
 
+export class StateWorkerService {
+  public state: CommonState
+  public setState(state: CommonState): void {
+    this.state = state
+  }
+}
+
 angular.module('fibra.services.worker-service', ['fibra.services.worker-service-prototype-mapping-configuration'])
   .config(($provide) => {
+    $provide.service('stateWorkerService', StateWorkerService)
     $provide.service('workerService', WorkerService)
     $provide.service('workerWorkerService', WorkerWorkerService)
   })

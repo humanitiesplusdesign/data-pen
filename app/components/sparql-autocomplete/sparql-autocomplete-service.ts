@@ -4,7 +4,7 @@ import {INode, ONodeSet, DataFactory} from '../../models/rdf'
 import {WorkerService, WorkerWorkerService} from '../../services/worker-service/worker-service'
 import {EMap, StringSet} from '../collection-utils'
 import {FibraSparqlService} from '../../services/fibra-sparql-service'
-import {StateWorkerService} from '../../services/fibra-service'
+import {StateWorkerService} from '../../services/worker-service/worker-service'
 import s = fi.seco.sparql
 
 export class AutocompletionResults {

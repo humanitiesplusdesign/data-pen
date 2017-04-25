@@ -2,7 +2,7 @@
 
 import {ILiteral} from '../models/rdfjs'
 import {FibraService} from '../services/fibra-service'
-declare var angular
+import * as angular from 'angular'
 
 export function getPrefLangString(literals: ILiteral[], prefLang: string): string {
   let dl: string = null
@@ -17,7 +17,8 @@ export function getPrefLangString(literals: ILiteral[], prefLang: string): strin
   return al
 }
 
-angular.module('fibra').filter('prefLang', (fibraService: FibraService) => (literals: ILiteral[]) => {
-  return getPrefLangString(literals, fibraService.getState().language)
-})
+angular.module('fibra.filters.pref-lang', [])
+  .filter('prefLang', (fibraService: FibraService) => (literals: ILiteral[]) => {
+    return getPrefLangString(literals, fibraService.getState().language)
+  })
 

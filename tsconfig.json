@@ -22,6 +22,7 @@
         "app/components/*.ts",
         "app/services/*.ts",
         "app/models/*.ts",
+        "app/filters/*.ts",
         "app/*.ts",
         "app/bower_components/**/*.d.ts",
         "node_modules/@types/**/*.d.ts"

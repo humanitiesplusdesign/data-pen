@@ -1,7 +1,7 @@
 import * as angular from 'angular'
 
 // Register modules
-import {WorkerWorkerService} from './services/worker-service/worker-service'
+import {WorkerWorkerService, StateWorkerService} from './services/worker-service/worker-service'
 import {ProjectWorkerService} from './services/project-service/project-service'
 import {FibraSparqlService} from './services/fibra-sparql-service'
 import './services/worker-service/prototype-mapping-configuration'
@@ -11,6 +11,7 @@ let m: angular.IModule = angular.module('fibra', ['fi.seco.sparql', 'http-auth-i
 m.config(($provide) => {
   $provide.service('fibraSparqlService', FibraSparqlService)
   $provide.service('projectWorkerService', ProjectWorkerService)
+  $provide.service('stateWorkerService', StateWorkerService)
   $provide.service('workerWorkerService', WorkerWorkerService)
 })
 m.run(($rootScope: angular.IRootScopeService, workerWorkerService: WorkerWorkerService) => {

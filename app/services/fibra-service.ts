@@ -432,13 +432,6 @@ export class FibraService {
   }
 }
 
-export class StateWorkerService {
-  public state: CommonState
-  public setState(state: CommonState): void {
-    this.state = state
-  }
-}
-
 angular.module('fibra.services.fibra-service', [])
   .config(($provide) => {
     $provide.service('fibraService', FibraService)
