@@ -1,6 +1,7 @@
 'use strict'
 
 import * as angular from 'angular'
+import './prototype-mapping-configuration'
 
 export class WorkerServiceConfiguration {
   constructor(public appName: string, public workerThreads: number, public importScripts: string[]) {}
@@ -275,19 +276,8 @@ export class WorkerWorkerService {
   }
 }
 
-angular.module('fibra.services.worker-service', [])
+angular.module('fibra.services.worker-service', ['fibra.services.worker-service-prototype-mapping-configuration'])
   .config(($provide) => {
-    $provide.service('workerServicePrototypeMappingConfiguration', function(): {[className: string]: {}} {
-      let mappings: {[className: string]: {}} = {
-        'Object': Object.prototype
-      }
-      let fibra = {}
-      for (let prop of Object.getOwnPropertyNames(fibra)) {  // Was 'fibra' object, but no longer exists.
-        mappings[prop] = fibra[prop].prototype
-        fibra[prop].__name = prop
-      }
-      return mappings
-    })
     $provide.service('workerService', WorkerService)
     $provide.service('workerWorkerService', WorkerWorkerService)
   })
