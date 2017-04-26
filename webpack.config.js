@@ -7,6 +7,7 @@ var ExtractTextPlugin = require('extract-text-webpack-plugin');
 
 module.exports = {
   // watch: true,
+  devtool: 'cheap-module-eval-source-map',
   context: __dirname,
   entry: {
     ui: './app/index.ts',
@@ -20,7 +21,13 @@ module.exports = {
     rules: [
       {
         test: /\.ts?$/,
-        loader: 'ng-annotate-loader!babel-loader!ts-loader',
+        use: [ /*{
+          loader: 'angular-hot-loader',
+          options: {
+            log: false,
+            rootElement: 'html'
+          }
+        }*/ 'ng-annotate-loader', 'babel-loader', 'ts-loader' ],
         exclude: /node_modules/,
       },
       {
@@ -47,6 +54,7 @@ module.exports = {
   },
   plugins: [
     new webpack.HotModuleReplacementPlugin(),
+    new webpack.optimize.CommonsChunkPlugin({ name: "commons", filename: "commons-bundle.js" }),
     new CopyWebpackPlugin([
             { from: 'app/bower_components', to: 'bower_components' }]),
     new HtmlWebpackPlugin({
@@ -59,6 +67,7 @@ module.exports = {
   ],
   devServer: {
     hot: true,
-    port: 3000
+    port: 3000,
+    stats: { chunkModules: false }
   }
 };

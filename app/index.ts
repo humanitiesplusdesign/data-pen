@@ -34,6 +34,7 @@ m.value('workerServiceConfiguration', {
     'bower_components/angular-http-auth/src/http-auth-interceptor.js',
     'bower_components/angular-sparql-service/dist/sparql-service.js',
     'bower_components/rdfstore/dist/rdfstore.js',
+    'commons-bundle.js',
     'worker-bundle.js'
   ]
 })
