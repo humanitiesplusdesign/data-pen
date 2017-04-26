@@ -7,7 +7,7 @@ export class CitableComponent implements angular.IComponentOptions {
     citable: '<',
     noLink: '@'
   }
-  public templateUrl: string = 'components/citable/citable.html'
+  public template: string = require('./citable.pug')()
 }
 
 angular.module('fibra.components.citable', [])

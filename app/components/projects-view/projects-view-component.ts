@@ -53,7 +53,7 @@ export class ProjectsViewComponentController implements angular.IComponentContro
 
 export class ProjectsViewComponent implements angular.IComponentOptions {
     public controller = ProjectsViewComponentController // (new (...args: any[]) => angular.IController) = SelectViewComponentController
-    public templateUrl: string = 'components/projects-view/projects-view.html'
+    public template: string = require('./projects-view.pug')()
 }
 
 angular.module('fibra.components.projects-view', [])

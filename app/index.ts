@@ -1,6 +1,7 @@
 import * as angular from 'angular'
 import * as uiConfig from './app/app-configuration-ui'
 
+import './styles/main.styl'
 // Register modules
 import './services'
 import './components'
