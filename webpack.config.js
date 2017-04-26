@@ -1,5 +1,6 @@
 var glob = require("glob");
 var path = require("path");
+var webpack = require("webpack");
 var CopyWebpackPlugin = require('copy-webpack-plugin');
 var HtmlWebpackPlugin = require('html-webpack-plugin');
 var ExtractTextPlugin = require('extract-text-webpack-plugin');
@@ -45,6 +46,7 @@ module.exports = {
     fi: 'angular-sparql-service'
   },
   plugins: [
+    new webpack.HotModuleReplacementPlugin(),
     new CopyWebpackPlugin([
             { from: 'app/bower_components', to: 'bower_components' }]),
     new HtmlWebpackPlugin({
@@ -56,6 +58,7 @@ module.exports = {
     new ExtractTextPlugin('styles.css')
   ],
   devServer: {
+    hot: true,
     port: 3000
   }
 };
