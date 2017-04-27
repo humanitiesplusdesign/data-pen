@@ -12,10 +12,10 @@ export class WorkerService {
 
   private static workerTemplate: string = `
     var window = self
-    self.history = {}
-    self.Node = function () {}
-    self.setImmediate = function(fn) { return window.setTimeout(fn, 0) }
-    var document = {
+    window.history = {}
+    window.Node = function () {}
+    //self.setImmediate = function(fn) { return window.setTimeout(fn, 0) }
+    window.document = {
       readyState: 'complete',
       cookie: '',
       querySelector: function () {},
@@ -32,6 +32,12 @@ export class WorkerService {
       self.addEventListener('message', function(e) { workerWorkerService.onMessage(e.data) })
     }])
     window.angular.bootstrap(null, ['<APP_NAME>'])
+    setTimeout(function() {
+      self.history = undefined
+      self.Node = undefined
+      self.document = undefined
+      self.window = undefined
+    }, 0)
   `
 
   private workers: Worker[]
