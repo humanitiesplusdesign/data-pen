@@ -1,9 +1,10 @@
 'use strict'
 
-import {Item, PropertyToValues, SparqlItemService, IRichPropertyValue, RichPropertyValue, PropertyAndValue} from '../../sparql-item/sparql-item-service'
+import {Item, PropertyToValues, SparqlItemService, IRichPropertyValue, RichPropertyValue, PropertyAndValue} from '../../../services/sparql-item-service'
 import {FibraService, UIState} from '../../../services/fibra-service'
 import {DataFactory, OWL, INode} from '../../../models/rdf'
 import {FullRichNodeFromNode} from '../../../models/richnode'
+import * as angular from 'angular'
 
 type TableInfo = {
   properties: String[],
@@ -163,10 +164,13 @@ export class ExploreTableComponentController {
 }
 
 export class ExploreTableComponent implements angular.IComponentOptions {
-    public templateUrl: string = 'components/construct-view/explore-table-component/explore-table-component.html'
-    public controller = 'ExploreTableComponentController'
+    public template = require('./explore-table-component.pug')()
+    public controller = ExploreTableComponentController
     public bindings: {[id: string]: string} = {
       primaryItems: '<',
       secondaryItems: '<'
     }
 }
+
+angular.module('fibra.components.explore-table', ['fibra.services'])
+  .component('exploreTable', new ExploreTableComponent())

@@ -1,7 +1,7 @@
 'use strict'
 
 import {Citable} from '../../models/citable'
-import {SparqlAutocompleteService} from '../../components/sparql-autocomplete/sparql-autocomplete-service'
+import {SparqlAutocompleteService} from '../sparql-autocomplete-service'
 import {SparqlItemService} from '../sparql-item-service'
 import {SparqlTreeService} from '../../services/sparql-tree-service'
 import {DataModel} from './data-model'

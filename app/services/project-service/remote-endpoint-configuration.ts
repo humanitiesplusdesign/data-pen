@@ -2,7 +2,7 @@
 
 import {Citable} from '../../models/citable'
 import {INode, FIBRA, VOID, RDF} from '../../models/rdf'
-import {SparqlAutocompleteService} from '../../components/sparql-autocomplete/sparql-autocomplete-service'
+import {SparqlAutocompleteService} from '../sparql-autocomplete-service'
 import {DataModel} from './data-model'
 import {SparqlItemService} from '../sparql-item-service'
 import {SparqlTreeService} from '../../services/sparql-tree-service'

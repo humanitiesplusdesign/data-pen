@@ -1,11 +1,12 @@
 'use strict'
 
-import {INode, ONodeSet, DataFactory} from '../../models/rdf'
-import {WorkerService, WorkerWorkerService} from '../../services/worker-service/worker-service'
-import {EMap, StringSet} from '../collection-utils'
-import {FibraSparqlService} from '../../services/fibra-sparql-service'
-import {StateWorkerService} from '../../services/worker-service/worker-service'
+import {INode, ONodeSet, DataFactory} from '../models/rdf'
+import {WorkerService, WorkerWorkerService} from './worker-service/worker-service'
+import {EMap, StringSet} from '../components/collection-utils'
+import {FibraSparqlService} from './fibra-sparql-service'
+import {StateWorkerService} from './worker-service/worker-service'
 import s = fi.seco.sparql
+import * as angular from 'angular'
 
 export class AutocompletionResults {
   public localMatchingResults: ResultGroup[] = []
@@ -280,3 +281,9 @@ export class SparqlAutocompleteWorkerService {
     return d.promise
   }
 }
+
+
+angular.module('fibra.services.sparql-autocomplete-service', [])
+  .config(($provide) => {
+    $provide.service('sparqlAutocompleteService', SparqlAutocompleteService)
+  })

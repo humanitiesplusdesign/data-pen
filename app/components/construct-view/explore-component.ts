@@ -7,6 +7,7 @@ import * as d3 from 'd3'
 import {TreeNode} from '../tree/tree-component'
 import {OWL, SKOS, DataFactory, ENodeMap} from '../../models/rdf'
 import {FibraService} from '../../services/fibra-service'
+import * as angular from 'angular'
 
 interface IExploreComponentInterface extends angular.IComponentController {
 }
@@ -573,6 +574,9 @@ export class ExploreComponent implements angular.IComponentOptions {
   public bindings: {[id: string]: string} = {
     linkMode: '<',
   }
-  public controller: string = 'ExploreComponentController' // (new (...args: any[]) => angular.IController) = ExploreComponentController
-  public templateUrl: string = 'components/construct-view/explore.html'
+  public controller = ExploreComponentController // (new (...args: any[]) => angular.IController) = ExploreComponentController
+  public template: string = require('./explore.pug')()
 }
+
+angular.module('fibra.components.explore', ['fibra.services'])
+  .component('explore', new ExploreComponent())

@@ -1,12 +1,13 @@
 'use strict'
 
-import {Item, SparqlItemService, IPropertyAndValue, PropertyAndValue} from '../../sparql-item/sparql-item-service'
+import {Item, SparqlItemService, IPropertyAndValue, PropertyAndValue} from '../../../services/sparql-item-service'
 import * as d3 from 'd3'
 import {FibraService, UIState} from '../../../services/fibra-service'
-import {SparqlTreeService} from '../../sparql-tree-service'
+import {SparqlTreeService} from '../../../services/sparql-tree-service'
 import {TreeNode} from '../../tree/tree-component'
 import {DataFactory, INode, SKOS, OWL, NamedNode, RDF} from '../../../models/rdf'
 import {IExploreItem} from '../explore-component'
+import * as angular from 'angular'
 
 interface IPaletteItem extends Item {
   typeValue: string
@@ -412,6 +413,9 @@ export class PaletteComponentController {
 }
 
 export class PaletteComponent implements angular.IComponentOptions {
-  public templateUrl: string = 'components/construct-view/palette-component/palette-component.html'
-  public controller: string = 'PaletteComponentController'
+  public template = require('./palette-component.pug')()
+  public controller = PaletteComponentController
 }
+
+angular.module('fibra.components.palette', ['fibra.services'])
+  .component('palette', new PaletteComponent())

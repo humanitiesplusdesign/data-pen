@@ -1,10 +1,11 @@
 'use strict'
 
-import {Item, PropertyToValues, IPropertyAndValue, PropertyAndValue} from '../../sparql-item/sparql-item-service'
-import {ResultGroup, SparqlAutocompleteService, AutocompletionResults, Result} from '../../sparql-autocomplete/sparql-autocomplete-service'
+import {Item, PropertyToValues, IPropertyAndValue, PropertyAndValue} from '../../../services/sparql-item-service'
+import {ResultGroup, SparqlAutocompleteService, AutocompletionResults, Result} from '../../../services/sparql-autocomplete-service'
 import {IRichNode} from '../../../models/richnode'
 import {FibraService} from '../../../services/fibra-service'
 import {OWL} from '../../../models/rdf'
+import * as angular from 'angular'
 
 export class ExploreVerifyComponentController {
   // Bindings
@@ -89,9 +90,12 @@ export class ExploreVerifyComponentController {
 }
 
 export class ExploreVerifyComponent implements angular.IComponentOptions {
-  public templateUrl: string = 'components/construct-view/explore-verify-component/explore-verify-component.html'
-  public controller = 'ExploreVerifyComponentController'
+  public template = require('./explore-verify-component.pug')()
+  public controller = ExploreVerifyComponentController
   public bindings: {[id: string]: string} = {
     node: '<'
   }
 }
+
+angular.module('fibra.components.verify', ['fibra.services'])
+  .component('verify', new ExploreVerifyComponent())

@@ -2,6 +2,7 @@
 
 import {TreeNode} from '../../tree/tree-component'
 import {FibraService} from '../../../services/fibra-service'
+import * as angular from 'angular'
 
 export class ExploreTypeComponentController {
   private types: () => TreeNode[]
@@ -33,6 +34,10 @@ export class ExploreTypeComponentController {
 }
 
 export class ExploreTypeComponent implements angular.IComponentOptions {
-    public templateUrl: string = 'components/construct-view/explore-type-component/explore-type-component.html'
-    public controller: string = 'ExploreTypeComponentController'
+    public template = require('./explore-type-component.pug')()
+    public controller = ExploreTypeComponentController
 }
+
+
+angular.module('fibra.components.explore-type', ['fibra.services'])
+  .component('exploreType', new ExploreTypeComponent())

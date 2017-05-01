@@ -2,7 +2,7 @@
 
 import {Citable} from '../../models/citable'
 import {DataModel} from './data-model'
-import {SparqlAutocompleteService} from '../../components/sparql-autocomplete/sparql-autocomplete-service'
+import {SparqlAutocompleteService} from '../sparql-autocomplete-service'
 import {SparqlTreeService} from '../../services/sparql-tree-service'
 import {SparqlItemService} from '../sparql-item-service'
 import {RemoteEndpointConfiguration} from './remote-endpoint-configuration'

@@ -8,6 +8,7 @@ import './fibra-service'
 import './fibra-sparql-service'
 import './sparql-item-service'
 import './sparql-tree-service'
+import './sparql-autocomplete-service'
 
 angular.module('fibra.services', [
   'fibra.services.social-auth-service',
@@ -16,5 +17,6 @@ angular.module('fibra.services', [
   'fibra.services.fibra-service',
   'fibra.services.fibra-sparql-service',
   'fibra.services.sparql-item-service',
-  'fibra.services.sparql-tree-service'
+  'fibra.services.sparql-tree-service',
+  'fibra.services.sparql-autocomplete-service'
 ])

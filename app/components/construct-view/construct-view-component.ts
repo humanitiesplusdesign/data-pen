@@ -1,23 +1,21 @@
 'use strict'
 
 import {TreeNode} from '../tree/tree-component'
-import {INode} from '../../models/rdf'
 import {UIState, FibraService} from '../../services/fibra-service'
 import {ProjectSourceInfo} from '../project-sources-view/project-sources-view-component'
-import {Result} from '../sparql-autocomplete/sparql-autocomplete-service'
-import {SparqlTreeService} from '../sparql-tree-service'
-import {SparqlItemService} from '../../services/sparql-item-service'
-import {ProjectService} from '../project-service/project-service'
-import {Project} from '../project-service/project'
+import {Result} from '../../services/sparql-autocomplete-service'
+import {SparqlTreeService} from '../../services/sparql-tree-service'
+import {ProjectService} from '../../services/project-service/project-service'
+import {Project} from '../../services/project-service/project'
+import * as angular from 'angular'
 
-class TreeViewConfiguration {
-  constructor(public endpoint: string, public queryTemplate: string) {}
-}
+// class TreeViewConfiguration {
+//   constructor(public endpoint: string, public queryTemplate: string) {}
+// }
 
 export class ConstructViewComponentController {
   public classTree: TreeNode[]
   public classTreePromise: angular.IPromise<TreeNode[]>
-  public selectedItem: INode
   public types: TreeNode[] = []
   public state: UIState
   public currentProjectSource: ProjectSourceInfo
@@ -65,14 +63,11 @@ export class ConstructViewComponentController {
   }
 
   constructor(private sparqlTreeService: SparqlTreeService,
-              private sparqlItemService: SparqlItemService,
-              private $localStorage: any,
-              private $sessionStorage: any,
               private projectService: ProjectService,
               private fibraService: FibraService,
               private $q: angular.IQService) {
-                let currentProject: Project = projectService.getCurrentProject()
-                this.currentProjectSource = projectService.getProjectSources().find(ps => ps.sparqlEndpoint === currentProject.source.sparqlEndpoint && ps.graph === currentProject.source.graph)
+    let currentProject: Project = projectService.getCurrentProject()
+    this.currentProjectSource = projectService.getProjectSources().find(ps => ps.sparqlEndpoint === currentProject.source.sparqlEndpoint && ps.graph === currentProject.source.graph)
     fibraService.on('change', () => {
       let chosenTypes = fibraService.getState().construct.displayTypes
       this.limitFilter = ''
@@ -114,6 +109,9 @@ export class ConstructViewComponentController {
 }
 
 export class ConstructViewComponent implements angular.IComponentOptions {
-    public controller: string = 'ConstructViewComponentController' // (new (...args: any[]) => angular.IController) = ConstructViewComponentController
-    public templateUrl: string = 'components/construct-view/construct-view.html'
+  public controller = ConstructViewComponentController // (new (...args: any[]) => angular.IController) = ConstructViewComponentController
+  public template: string = require('./construct-view.pug')()
 }
+
+angular.module('fibra.components.construct-view', ['fibra.services'])
+  .component('constructView', new ConstructViewComponent())

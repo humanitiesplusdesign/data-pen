@@ -6,6 +6,7 @@ import {Item, PropertyToValues, PropertyAndValue, SparqlItemService} from '../..
 import {TreeNode} from '../tree/tree-component'
 import {OWL, RDF, NamedNode, SKOS, DataFactory} from '../../models/rdf'
 import {INamedNode} from '../../models/rdfjs'
+import * as angular from 'angular'
 
 export class PropertyPopover {
 
@@ -51,9 +52,12 @@ export class PropertyPopoverComponent implements angular.IComponentOptions {
     node: '=',
     close: '='
   }
-  public templateUrl: string = 'components/construct-view/property-popover-component.html'
-  public controller = 'PropertyPopoverComponentController'
+  public template = require('./property-popover-component.pug')()
+  public controller = PropertyPopoverComponentController
 }
+
+angular.module('fibra.components.property-popover', ['fibra.services'])
+  .component('propertyPopover', new PropertyPopoverComponent())
 
 interface IPropertyPopoverScope extends angular.IScope {
   selected?: (sel: string) => string
