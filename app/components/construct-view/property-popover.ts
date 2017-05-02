@@ -23,7 +23,6 @@ export class PropertyPopover {
   }
 
   public addPopover(this, $scope, types, baseSVG, d, i, g): void {
-    let enterNode: any = this
     let propertyPopover: d3.Selection<HTMLDivElement, {}, HTMLBodyElement, undefined> =
       d3.select(baseSVG.node().parentElement.parentElement).select<HTMLDivElement>('div.property-popover')
     propertyPopover.select('property-popover').remove()
@@ -36,7 +35,6 @@ export class PropertyPopover {
     cscope['close'] = () => {
       propertyPopover.style('visibility', 'hidden')
     }
-    console.log(cscope['close'])
     propertyPopover.node().appendChild(this.$compile('<property-popover node="node" types="types" close="close"></property-popover>')(cscope)[0])
     propertyPopover.style('visibility', 'visible')
   }
@@ -55,9 +53,6 @@ export class PropertyPopoverComponent implements angular.IComponentOptions {
   public template = require('./property-popover-component.pug')()
   public controller = PropertyPopoverComponentController
 }
-
-angular.module('fibra.components.property-popover', ['fibra.services'])
-  .component('propertyPopover', new PropertyPopoverComponent())
 
 interface IPropertyPopoverScope extends angular.IScope {
   selected?: (sel: string) => string
@@ -113,7 +108,6 @@ export class PropertyPopoverComponentController {
   }
 
   private typeEvaluate(label) {
-    console.log(label, this.getTypes())
     if(label && !this.getTypes().filter((t: TreeNode) => { return t.label === label})[0]) {
       this.showTypeCreate = true
     } else {
@@ -160,3 +154,6 @@ export class PropertyPopoverComponentController {
     this.fibraService.dispatch('change')
   }
 }
+
+angular.module('fibra.components.property-popover', ['fibra.services', 'ui.bootstrap'])
+  .component('propertyPopover', new PropertyPopoverComponent())

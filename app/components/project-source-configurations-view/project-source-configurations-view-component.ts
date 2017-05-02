@@ -1,11 +1,12 @@
 'use strict'
 
-import {Project} from '../project-service/project'
+import {Project} from '../../services/project-service/project'
 import {ProjectSourceInfo} from '../project-sources-view/project-sources-view-component'
-import {RemoteEndpointConfiguration} from '../project-service/remote-endpoint-configuration'
-import {PrimaryEndpointConfiguration} from '../project-service/primary-endpoint-configuration'
-import {Schema} from '../project-service/schema'
-import {ProjectService} from '../project-service/project-service'
+import {RemoteEndpointConfiguration} from '../../services/project-service/remote-endpoint-configuration'
+import {PrimaryEndpointConfiguration} from '../../services/project-service/primary-endpoint-configuration'
+import {Schema} from '../../services/project-service/schema'
+import {ProjectService} from '../../services/project-service/project-service'
+import * as angular from 'angular'
 
 type ProjectSourceConfigurationsParams = {
   sourceId?: string
@@ -31,6 +32,9 @@ export class ProjectSourceConfigurationsViewComponentController implements angul
 }
 
 export class ProjectSourceConfigurationsViewComponent implements angular.IComponentOptions {
-    public controller: string = 'ProjectSourceConfigurationsViewComponentController' // (new (...args: any[]) => angular.IController) = SelectViewComponentController
-    public templateUrl: string = 'components/project-source-configurations-view/project-source-configurations-view.html'
+    public controller = ProjectSourceConfigurationsViewComponentController // (new (...args: any[]) => angular.IController) = SelectViewComponentController
+    public template = require('./project-source-configurations-view.pug')()
 }
+
+angular.module('fibra.components.project-source-configurations-view', ['fibra.services'])
+  .component('projectSourceConfigurationsView', new ProjectSourceConfigurationsViewComponent())

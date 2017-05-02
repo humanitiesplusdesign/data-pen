@@ -1,10 +1,11 @@
 'use strict'
 
 import {EditCitableComponentController} from '../citable-editor/citable-editor-component'
-import {RemoteEndpointConfiguration} from '../project-service/remote-endpoint-configuration'
+import {RemoteEndpointConfiguration} from '../../services/project-service/remote-endpoint-configuration'
 import {FibraService} from '../../services/fibra-service'
-import {ProjectService} from '../project-service/project-service'
+import {ProjectService} from '../../services/project-service/project-service'
 import {DataFactory} from '../../models/rdf'
+import * as angular from 'angular'
 
 export class EditRemoteEndpointConfigurationViewComponentController extends EditCitableComponentController<RemoteEndpointConfiguration> {
 
@@ -20,7 +21,9 @@ export class EditRemoteEndpointConfigurationViewComponentController extends Edit
 }
 
 export class EditRemoteEndpointConfigurationViewComponent implements angular.IComponentOptions {
-    public controller: string = 'EditRemoteEndpointConfigurationViewComponentController'
-    public templateUrl: string = 'components/edit-remote-endpoint-configuration-view/edit-remote-endpoint-configuration-view.html'
+    public controller = EditRemoteEndpointConfigurationViewComponentController
+    public template = require('./edit-remote-endpoint-configuration-view.pug')()
 }
 
+angular.module('fibra.components.edit-remote-endpoint-configuration', ['fibra.services'])
+  .component('editRemoteEndpointConfigurationView', new EditRemoteEndpointConfigurationViewComponent())

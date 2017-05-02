@@ -1,5 +1,5 @@
 'use strict'
-import {Result, AutocompletionResults, SparqlAutocompleteService} from './sparql-autocomplete-service'
+import {Result, AutocompletionResults, SparqlAutocompleteService} from '../../services/sparql-autocomplete-service'
 
 class SparqlAutocompleteComponentController {
   public limit: string

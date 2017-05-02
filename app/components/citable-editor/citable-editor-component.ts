@@ -2,10 +2,11 @@
 
 import {ICitable, Citable} from '../../models/citable'
 import {ProjectSourceInfo} from '../project-sources-view/project-sources-view-component'
-import {ProjectService} from '../project-service/project-service'
+import {ProjectService} from '../../services/project-service/project-service'
 import {UUID} from '../misc-utils'
 import {DataFactory} from '../../models/rdf'
 import {FibraService} from '../../services/fibra-service'
+import * as angular from 'angular'
 
 export class EditCitableComponentController<T extends ICitable> implements angular.IComponentController {
   public c: T
@@ -80,6 +81,9 @@ export class CitableEditorComponent implements angular.IComponentOptions {
     noId: '@',
     noRightsHolderIds: '@'
   }
-  public controller: string = 'CitableEditorComponentController' // (new (...args: any[]) => angular.IController) = ConfigureViewComponentController
-  public templateUrl: string = 'components/citable-editor/citable-editor.html'
+  public controller = CitableEditorComponentController // (new (...args: any[]) => angular.IController) = ConfigureViewComponentController
+  public template = require('./citable-editor.pug')
 }
+
+angular.module('fibra.components.citable-editor', ['fibra.services'])
+  .component('citable-editor', new CitableEditorComponent())

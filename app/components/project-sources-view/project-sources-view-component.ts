@@ -2,6 +2,7 @@
 
 import {ProjectService} from '../../services/project-service/project-service'
 import {ICitableSource} from '../../models/citable'
+import * as angular from 'angular'
 
 type ProjectSourceParams = {
   sourceId?: string
@@ -36,6 +37,9 @@ export class ProjectSourceInfo implements ICitableSource {
 }
 
 export class ProjectSourcesViewComponent implements angular.IComponentOptions {
-    public controller: string = 'ProjectSourcesViewComponentController' // (new (...args: any[]) => angular.IController) = SelectViewComponentController
-    public templateUrl: string = 'components/project-sources-view/project-sources-view.html'
+    public controller = ProjectSourcesViewComponentController // (new (...args: any[]) => angular.IController) = SelectViewComponentController
+    public template = require('./project-sources-view.pug')()
 }
+
+angular.module('fibra.components.project-sources-view', ['fibra.services'])
+  .component('projectSourcesView', new ProjectSourcesViewComponent())

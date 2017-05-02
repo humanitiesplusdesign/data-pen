@@ -2,9 +2,10 @@
 
 import {EditCitableComponentController} from '../citable-editor/citable-editor-component'
 import {FibraService} from '../../services/fibra-service'
-import {ProjectService} from '../project-service/project-service'
-import {Schema} from '../project-service/schema'
+import {ProjectService} from '../../services/project-service/project-service'
+import {Schema} from '../../services/project-service/schema'
 import {DataFactory} from '../../models/rdf'
+import * as angular from 'angular'
 
 export class EditSchemaViewComponentController extends EditCitableComponentController<Schema> {
 
@@ -21,7 +22,10 @@ export class EditSchemaViewComponentController extends EditCitableComponentContr
 }
 
 export class EditSchemaViewComponent implements angular.IComponentOptions {
-    public controller: string = 'EditSchemaViewComponentController'
-    public templateUrl: string = 'components/edit-schema-view/edit-schema-view.html'
+    public controller = EditSchemaViewComponentController
+    public template = require('./edit-schema-view.pug')
 }
+
+angular.module('fibra.components.edit-schema-view', ['fibra.services'])
+  .component('editSchemaView', new EditSchemaViewComponent())
 

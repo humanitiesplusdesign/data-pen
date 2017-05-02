@@ -1,11 +1,14 @@
-namespace fibra {
-  'use strict'
+'use strict'
 
-  export class TypeSelectComponent implements angular.IComponentOptions {
-      public bindings: {[id: string]: string} = {
-        tree: '<',
-        onSelect: '&',
-      }
-      public templateUrl: string = 'components/type-select/type-select.html'
-  }
+import * as angular from 'angular'
+
+export class TypeSelectComponent implements angular.IComponentOptions {
+    public bindings: {[id: string]: string} = {
+      tree: '<',
+      onSelect: '&',
+    }
+    public template = require('./type-select.pug')
 }
+
+angular.module('fibra.components.type-select', [])
+  .component('typeSelect', new TypeSelectComponent())

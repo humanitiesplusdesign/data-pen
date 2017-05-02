@@ -1,10 +1,11 @@
 'use strict'
 
 import {EditCitableComponentController} from '../citable-editor/citable-editor-component'
-import {PrimaryEndpointConfiguration} from '../project-service/primary-endpoint-configuration'
+import {PrimaryEndpointConfiguration} from '../../services/project-service/primary-endpoint-configuration'
 import {FibraService} from '../../services/fibra-service'
-import {ProjectService} from '../project-service/project-service'
+import {ProjectService} from '../../services/project-service/project-service'
 import {DataFactory} from '../../models/rdf'
+import * as angular from 'angular'
 
 export class EditPrimaryEndpointConfigurationViewComponentController  extends EditCitableComponentController<PrimaryEndpointConfiguration> {
 
@@ -28,6 +29,9 @@ export class EditPrimaryEndpointConfigurationViewComponentController  extends Ed
 }
 
 export class EditPrimaryEndpointConfigurationViewComponent implements angular.IComponentOptions {
-    public controller: string = 'EditPrimaryEndpointConfigurationViewComponentController'
-    public templateUrl: string = 'components/edit-primary-endpoint-configuration-view/edit-primary-endpoint-configuration-view.html'
+    public controller = EditPrimaryEndpointConfigurationViewComponentController
+    public template = require('./edit-primary-endpoint-configuration-view.pug')()
 }
+
+angular.module('fibra.components.edit-primary-endpoint-configuration', ['fibra.services'])
+  .component('editPrimaryEndpointConfigurationView', new EditPrimaryEndpointConfigurationViewComponent())

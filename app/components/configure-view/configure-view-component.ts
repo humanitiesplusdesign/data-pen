@@ -1,16 +1,17 @@
 'use strict'
 
-import {Project} from '../project-service/project'
+import {Project} from '../../services/project-service/project'
 import {ProjectSourceInfo} from '../project-sources-view/project-sources-view-component'
-import {PrimaryEndpointConfiguration} from '../project-service/primary-endpoint-configuration'
-import {RemoteEndpointConfiguration} from '../project-service/remote-endpoint-configuration'
+import {PrimaryEndpointConfiguration} from '../../services/project-service/primary-endpoint-configuration'
+import {RemoteEndpointConfiguration} from '../../services/project-service/remote-endpoint-configuration'
 import {TreeNode} from '../tree/tree-component'
-import {Schema} from '../project-service/schema'
-import {ProjectService} from '../project-service/project-service'
+import {Schema} from '../../services/project-service/schema'
+import {ProjectService} from '../../services/project-service/project-service'
 import {FibraService} from '../../services/fibra-service'
 import {UUID} from '../misc-utils'
 import {DataFactory} from '../../models/rdf'
-import {SparqlTreeService} from '../sparql-tree-service'
+import {SparqlTreeService} from '../../services/sparql-tree-service'
+import * as angular from 'angular'
 
 export class ConfigureViewComponentController implements angular.IComponentController {
   public project: Project
@@ -80,6 +81,9 @@ export class ConfigureViewComponentController implements angular.IComponentContr
 }
 
 export class ConfigureViewComponent implements angular.IComponentOptions {
-    public controller: string = 'ConfigureViewComponentController' // (new (...args: any[]) => angular.IController) = ConfigureViewComponentController
-    public templateUrl: string = 'components/configure-view/configure-view.html'
+    public controller = ConfigureViewComponentController // (new (...args: any[]) => angular.IController) = ConfigureViewComponentController
+    public template = require('./configure-view.pug')()
 }
+
+angular.module('fibra.components.configure', ['fibra.services'])
+  .component('configureView', new ConfigureViewComponent())
