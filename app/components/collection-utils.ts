@@ -133,7 +133,7 @@ export class StringSet implements d3.Set {
     return this.s[key] !== undefined
   }
   public add(key: string): this {
-    this.s[key] = key
+    this.s[key] = ''
     return this
   }
   public adda(arr: string[]): this {
@@ -151,7 +151,7 @@ export class StringSet implements d3.Set {
   }
   public each(func: (value: string, valueRepeat: string, set: StringSet) => void): undefined {
     for (let key in this.s)
-      func(this.s[key], key, this)
+      func(key, key, this)
     return undefined
   }
   public size(): number {

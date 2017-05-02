@@ -123,7 +123,7 @@ export class PropertyPopoverComponentController {
     let typeNode: INamedNode = new NamedNode(type.id)
     this.showTypeCreate = false
 
-    return this.fibraService.dispatchAction(this.fibraService.itemProperty(this.node, [new PropertyAndValue(RDF.type, typeNode)], oldTypes.toPropertyAndValues())).then((state) => {
+    return this.fibraService.dispatchAction(this.fibraService.itemProperty(this.node, [new PropertyAndValue(RDF.type, typeNode)], oldTypes.toPropertyAndValues(false))).then((state) => {
       // Update the type displayed in the construct interface if appropriate (duplicative)
       let chosenTypes: TreeNode[] = this.fibraService.getState().construct.displayTypes
       if (!chosenTypes[0] && type) {
@@ -138,7 +138,7 @@ export class PropertyPopoverComponentController {
 
   private labelChange(): void {
     let oldLabels: PropertyToValues = this.node.localProperties.filter((p) => { return p.value === SKOS.prefLabel.value })[0]
-    this.fibraService.dispatchAction(this.fibraService.itemProperty(this.node, [new PropertyAndValue(SKOS.prefLabel, DataFactory.instance.literal(this.label))], oldLabels.toPropertyAndValues()))
+    this.fibraService.dispatchAction(this.fibraService.itemProperty(this.node, [new PropertyAndValue(SKOS.prefLabel, DataFactory.instance.literal(this.label))], oldLabels.toPropertyAndValues(false)))
   }
 
   private deleteAndClose(): void {

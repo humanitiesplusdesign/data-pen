@@ -32,3 +32,10 @@ export function UUID(): string {
     lut[d3 & 0xff] + lut[d3 >> 8 & 0xff] + lut[d3 >> 16 & 0xff] + lut[d3 >> 24 & 0xff]
   /* tslint:enable:no-bitwise */
 }
+
+export function flatten(arr: any[], initial: any[] = []): any[] {
+  return arr.reduce(
+    (flat, toFlatten) => flat.concat(Array.isArray(toFlatten) ? flatten(toFlatten) : toFlatten),
+    initial
+  )
+}

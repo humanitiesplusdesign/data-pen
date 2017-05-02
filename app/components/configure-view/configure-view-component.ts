@@ -46,7 +46,7 @@ export class ConfigureViewComponentController implements angular.IComponentContr
     this.projectSources = projectService.getProjectSources()
     this.projectSource = this.projectSources.find(ps => ps.id === $stateParams.sourceId)
     if ($stateParams.id) {
-      projectService.loadProject(this.projectSource, $stateParams.id).then(p => {
+      projectService.loadProject(this.projectSource, $stateParams.id, false).then(p => {
         this.project = p
         this.selectedTemplate = p.asTemplate()
       })

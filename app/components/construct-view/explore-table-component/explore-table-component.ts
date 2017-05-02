@@ -80,11 +80,7 @@ export class ExploreTableComponentController {
           new PropertyAndValue(prop, DataFactory.instance.literal(vl.value.value))
         )
     ).reduce((acc, val) => acc.concat(val), [])
-    this.fibraService.dispatchAction(this.fibraService.itemProperty(item, newProps, this.originalPropertiesMap[item.value].map(v => v.toPropertyAndValues()).reduce((acc, val) => acc.concat(val), [])))
-      .then(() => {
-        this.fibraService.dispatch('change')
-        this.editItem = null
-      })
+    this.fibraService.dispatchAction(this.fibraService.itemProperty(item, newProps, this.originalPropertiesMap[item.value].map(v => v.toPropertyAndValues(true)).reduce((acc, val) => acc.concat(val), [])))
   }
 
   private hide(id: INode): angular.IPromise<string> {
