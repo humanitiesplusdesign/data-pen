@@ -73,7 +73,9 @@ export class CitableEditorComponentController implements angular.IComponentContr
   public removeDescription(index: number): void {
     this.citable.descriptions.splice(index, 1)
   }
-  constructor(private fibraService: FibraService) {}
+  constructor(private fibraService: FibraService) {
+    console.log('constructor')
+  }
 }
 
 export class CitableEditorComponent implements angular.IComponentOptions {
@@ -83,9 +85,9 @@ export class CitableEditorComponent implements angular.IComponentOptions {
     noId: '@',
     noRightsHolderIds: '@'
   }
-  public controller = CitableEditorComponentController // (new (...args: any[]) => angular.IController) = ConfigureViewComponentController
-  public template = require('./citable-editor.pug')
+  public controller: (new (...args: any[]) => angular.IController) = CitableEditorComponentController // (new (...args: any[]) => angular.IController) = ConfigureViewComponentController
+  public template: string = require('./citable-editor.pug')()
 }
 
 angular.module('fibra.components.citable-editor', ['fibra.services'])
-  .component('citable-editor', new CitableEditorComponent())
+  .component('citableEditor', new CitableEditorComponent())
