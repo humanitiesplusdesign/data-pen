@@ -28,7 +28,7 @@ let m: angular.IModule = angular.module('fibra', [
 
 m.value('workerServiceConfiguration', {
   appName: 'fibra',
-  workerThreads: 8,
+  workerThreads: 1,
   importScripts: [
     'bower_components/angular/angular.js',
     'bower_components/angular-http-auth/src/http-auth-interceptor.js',
