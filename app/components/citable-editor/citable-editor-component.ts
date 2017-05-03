@@ -74,7 +74,6 @@ export class CitableEditorComponentController implements angular.IComponentContr
     this.citable.descriptions.splice(index, 1)
   }
   constructor(private fibraService: FibraService) {
-    console.log('constructor')
   }
 }
 
