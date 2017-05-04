@@ -23,6 +23,7 @@ let m: angular.IModule = angular.module('fibra', [
   'fi.seco.sparql',
   'ui.codemirror',
   'ngFileSaver',
+  'ngRedux'
   ])
   .constant('version', '0.5.0')
 
@@ -40,6 +41,7 @@ m.value('workerServiceConfiguration', {
 })
 
 m
+  .config(uiConfig.reduxConfig)
   .config(uiConfig.toastConfig)
   .config(uiConfig.uiConfig)
   .config(uiConfig.localStorageConfig)

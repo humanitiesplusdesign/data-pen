@@ -6,6 +6,13 @@ import {FibraService} from '../services/fibra-service'
 import {ProjectService} from '../services/project-service/project-service'
 import {WorkerService} from '../services/worker-service/worker-service'
 
+import { INgReduxProvider } from 'ng-redux'
+import rootReducer from '../reducers'
+
+export function reduxConfig($ngReduxProvider: INgReduxProvider) {
+  $ngReduxProvider.createStoreWith(rootReducer, [], [])
+}
+
 interface IAuthenticationRootScopeService extends angular.IRootScopeService {
   setAuth: () => void
   dismissAuth: () => void
