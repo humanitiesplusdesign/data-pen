@@ -8,6 +8,8 @@ import {TreeNode} from '../tree/tree-component'
 import {OWL, SKOS, DataFactory, ENodeMap} from '../../models/rdf'
 import {FibraService} from '../../services/fibra-service'
 import * as angular from 'angular'
+import { INgRedux } from 'ng-redux'
+import * as VerifyActions from '../../actions/verify'
 
 interface IExploreComponentInterface extends angular.IComponentController {
 }
@@ -64,7 +66,9 @@ class ExploreComponentController {
   private sunburst: Sunburst
   private propertyPopover: PropertyPopover
 
-  private verifyItem: Item = null
+  // Actions
+  private unsubscribe: any
+  private verifyItem: any
 
   public $onChanges(chngsObj: any): void {
     if(this.svgSel) {
@@ -480,6 +484,10 @@ class ExploreComponentController {
     }
   }
 
+  public $onDestroy(): void {
+    this.unsubscribe()
+  }
+
   constructor(private $element: angular.IAugmentedJQuery,
               private $compile: angular.ICompileService,
               private $window: angular.IWindowService,
@@ -487,13 +495,17 @@ class ExploreComponentController {
               private $timeout: angular.ITimeoutService,
               private sparqlItemService: SparqlItemService,
               private fibraService: FibraService,
+              private $ngRedux: INgRedux,
               private $q: angular.IQService) {
+
+    console.log(VerifyActions)
+    this.unsubscribe = $ngRedux.connect(this.mapStateToThis, VerifyActions)(this)
 
     this.sunburst = new Sunburst($element, $compile, $scope, sparqlItemService, fibraService)
     this.propertyPopover = new PropertyPopover($element, $scope, fibraService, $compile)
 
     this.fibraService.on('change', () => {
-      this.verifyItem = this.fibraService.getState().construct.verifyItem
+      // this.verifyItem = this.fibraService.getState().construct.verifyItem
       return this.queryAndBuild()
     })
     this.itemService = sparqlItemService
@@ -505,6 +517,12 @@ class ExploreComponentController {
 
     this.$scope.$watch('layout.choice', this.updateExplore.bind(this, false))
     this.$scope.$watch('layout.links', this.updateExplore.bind(this, false))
+  }
+
+  private mapStateToThis(state) {
+    return {
+      verify: state.verify
+    }
   }
 
   private mergeNodes(oldNodes: Item[], nodes: Item[]): IExploreItem[] {

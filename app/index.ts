@@ -1,11 +1,16 @@
 import * as angular from 'angular'
 import * as uiConfig from './app/app-configuration-ui'
+import reduxConfig from './app/app-configuration-redux'
 
 import './styles/main.styl'
 // Register modules
 import './services'
 import './components'
 import './filters'
+
+// Forces the build to include ng-redux from node_modules
+// tslint:disable-next-line:no-var-requires
+require('../node_modules/ng-redux/dist/ng-redux')
 
 let m: angular.IModule = angular.module('fibra', [
   'fibra.services',
@@ -41,7 +46,7 @@ m.value('workerServiceConfiguration', {
 })
 
 m
-  .config(uiConfig.reduxConfig)
+  .config(reduxConfig)
   .config(uiConfig.toastConfig)
   .config(uiConfig.uiConfig)
   .config(uiConfig.localStorageConfig)

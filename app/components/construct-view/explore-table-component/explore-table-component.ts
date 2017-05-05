@@ -5,6 +5,8 @@ import {FibraService, UIState} from '../../../services/fibra-service'
 import {DataFactory, OWL, INode} from '../../../models/rdf'
 import {FullRichNodeFromNode} from '../../../models/richnode'
 import * as angular from 'angular'
+import { INgRedux } from 'ng-redux'
+import * as VerifyActions from '../../../actions/verify'
 
 type TableInfo = {
   properties: String[],
@@ -15,6 +17,11 @@ export class ExploreTableComponentController {
   // bindings
   private primaryItems: Item[] = []
   private secondaryItems: Item[] = []
+
+  // Actions
+  private unsubscribe: any
+  private verifyItem: any
+  private verify: INode
 
   private tableTypes: string[] = ['primary', 'secondary']
   private primary: TableInfo = {
@@ -32,8 +39,14 @@ export class ExploreTableComponentController {
   private editItem: Item
 
   public constructor( private fibraService: FibraService,
+                      private $ngRedux: INgRedux,
                       private sparqlItemService: SparqlItemService) {
     this.fibraService = fibraService
+    this.unsubscribe = $ngRedux.connect(this.mapStateToThis, VerifyActions)(this)
+  }
+
+  public $onDestroy(): void {
+    this.unsubscribe()
   }
 
   public $onChanges(chngsObj: any): void {
@@ -42,10 +55,12 @@ export class ExploreTableComponentController {
     this.primary.items = this.primaryItems
     this.secondary.items = this.secondaryItems
     this.sortProperties();
-    console.log(this.primary.items)
-    console.log(this.secondary.items)
-    console.log(this.primary.properties)
-    console.log(this.secondary.properties)
+  }
+
+  private mapStateToThis(state) {
+    return {
+      verify: state.verify
+    }
   }
 
   private selectItem(item: Item): void {
@@ -136,10 +151,6 @@ export class ExploreTableComponentController {
     }
 
     this.fibraService.dispatch('change')
-  }
-
-  private verify(node: Item) {
-    this.fibraService.dispatchAction(this.fibraService.verifyItem(node))
   }
 
   // start of csv download capability

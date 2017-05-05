@@ -5,7 +5,9 @@ import {ResultGroup, SparqlAutocompleteService, AutocompletionResults, Result} f
 import {IRichNode} from '../../../models/richnode'
 import {FibraService} from '../../../services/fibra-service'
 import {OWL} from '../../../models/rdf'
+import { INgRedux } from 'ng-redux'
 import * as angular from 'angular'
+import * as VerifyActions from '../../../actions/verify'
 
 export class ExploreVerifyComponentController {
   // Bindings
@@ -17,20 +19,32 @@ export class ExploreVerifyComponentController {
   private canceller: angular.IDeferred<any>
   private matchingResults: ResultGroup[]
   private relevantTypes: IRichNode[] = []
+  private unsubscribe: any
+  private verifyItem: any
 
   public constructor( private fibraService: FibraService,
+                      private $ngRedux: INgRedux,
                       private $q: angular.IQService,
                       private sparqlAutocompleteService: SparqlAutocompleteService) {
     this.fibraService = fibraService
     this.canceller = $q.defer()
+    this.unsubscribe = $ngRedux.connect(this.mapStateToThis, VerifyActions)(this)
+  }
+
+  public $onDestroy(): void {
+    this.unsubscribe()
   }
 
   public $onChanges(chngsObj: any): void {
     if (this.node) {
       this.queryString = this.node.label
-      if (this.node) {
-        this.runQuery()
-      }
+      this.runQuery()
+    }
+  }
+
+  private mapStateToThis(state) {
+    return {
+      verify: state.verify
     }
   }
 
@@ -85,7 +99,7 @@ export class ExploreVerifyComponentController {
   }
 
   private clear(): void {
-    this.fibraService.dispatchAction(this.fibraService.verifyItem(null))
+    this.verifyItem(null)
   }
 }
 

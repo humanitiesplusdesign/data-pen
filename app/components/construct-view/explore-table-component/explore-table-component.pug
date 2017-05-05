@@ -21,7 +21,7 @@ uib-tabset
               p(ng-repeat="i in e.values") {{i.value.label}}
           td
             a(ng-click="$ctrl.hide(item)") Hide
-            a(ng-click="$ctrl.verify(item)" ng-if="!$ctrl.itemVerified(item)") &nbsp;Verify
+            a(ng-click="$ctrl.verifyItem(item)" ng-if="!$ctrl.itemVerified(item)") &nbsp;Verify
             a(ng-click="$ctrl.delete(item)") &nbsp;Delete
             a(ng-click="$ctrl.saveItem($ctrl.editItem)" ng-if="item === $ctrl.editItem") &nbsp;Save
       div Hidden Properties (click to show)
