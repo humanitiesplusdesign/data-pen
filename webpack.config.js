@@ -5,29 +5,27 @@ var CopyWebpackPlugin = require('copy-webpack-plugin');
 var HtmlWebpackPlugin = require('html-webpack-plugin');
 var ExtractTextPlugin = require('extract-text-webpack-plugin');
 
-module.exports = {
-  // watch: true,
+var commonConf = {
+  cache: true,
+  watch: true,
   devtool: 'cheap-module-eval-source-map',
   context: __dirname,
-  entry: {
-    ui: './app/index.ts',
-    worker: './app/worker-index.ts'
-  },
   output: {
     filename: '[name]-bundle.js',
-    path: path.join(__dirname + '/dist')
+    path: path.join(__dirname + '/dist'),
+    publicPath: 'http://localhost:3000/'
   },
   module: {
     rules: [
       {
         test: /\.ts?$/,
-        use: [ /*{
+        use: [ {
           loader: 'angular-hot-loader',
           options: {
             log: false,
             rootElement: 'html'
           }
-        }*/ 'ng-annotate-loader', 'babel-loader', 'ts-loader' ],
+        }, 'babel-loader', 'ts-loader' ],
         exclude: /node_modules/,
       },
       {
@@ -52,9 +50,23 @@ module.exports = {
     angular: 'angular',
     fi: 'angular-sparql-service'
   },
+  devServer: {
+    hot: true,
+    inline: true,
+    port: 3000,
+    stats: { chunkModules: false }
+  }
+};
+
+module.exports = [ Object.assign({
+  name: 'ui',
+  entry: {
+    ui: './app/index.ts',
+    'webpack-dev-server-client': 'webpack-dev-server/client?http://localhost:8090'
+  },
   plugins: [
     new webpack.HotModuleReplacementPlugin(),
-    new webpack.optimize.CommonsChunkPlugin({ name: "commons", filename: "commons-bundle.js" }),
+    new webpack.NamedModulesPlugin(),
     new CopyWebpackPlugin([
             { from: 'app/bower_components', to: 'bower_components' }]),
     new HtmlWebpackPlugin({
@@ -64,10 +76,13 @@ module.exports = {
       template: 'app/index.pug'
     }),
     new ExtractTextPlugin('styles.css')
-  ],
-  devServer: {
-    hot: true,
-    port: 3000,
-    stats: { chunkModules: false }
-  }
-};
+  ]
+}, commonConf), Object.assign({
+  name: 'worker',
+  entry: { worker: './app/worker-index.ts' },
+  target: 'webworker',
+  plugins: [
+    new webpack.HotModuleReplacementPlugin(),
+    new webpack.NamedModulesPlugin()
+  ]
+}, commonConf)];

@@ -18,7 +18,9 @@ export class WorkerService {
     window.document = {
       readyState: 'complete',
       cookie: '',
-      querySelector: function () {},
+      querySelector: function (selector) {
+        if (selector=='html') return { innerHTML: '', getAttribute: function() {}} // angular-hot-loader patch
+      },
       addEventListener: function() {},
       createElement: function() {
         return {
@@ -32,11 +34,11 @@ export class WorkerService {
       self.addEventListener('message', function(e) { workerWorkerService.onMessage(e.data) })
     }])
     window.angular.bootstrap(null, ['<APP_NAME>'])
-    setTimeout(function() {
-      self.history = undefined
-      self.Node = undefined
+    window = undefined
+    self.history = undefined
+    self.Node = undefined
+    setTimeout(function() { // angular init needs this
       self.document = undefined
-      self.window = undefined
     }, 0)
   `
 

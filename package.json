@@ -8,8 +8,7 @@
     "@types/crypto-js": "3.1.33",
     "@types/d3": "4.5.0",
     "@types/n3": "0.0.2",
-    "angular": "^1.6.4",
-    "angular-hot-loader": "0.9.2",
+    "angular-hot-loader": "git://github.com/jiemakel/angular-hot-loader#v0.9.4",
     "babel-core": "^6.24.1",
     "babel-loader": "7.0.0",
     "copy-webpack-plugin": "4.0.1",
@@ -18,7 +17,7 @@
     "html-webpack-plugin": "2.28.0",
     "main-bower-files": "2.13.1",
     "ng-annotate-loader": "0.2.0",
-    "pug": "^2.0.0-rc.1",
+    "pug": "2.0.0-rc.1",
     "pug-loader": "2.3.0",
     "style-loader": "0.16.1",
     "stylus": "^0.54.5",
@@ -28,6 +27,7 @@
     "typedoc": "0.5.7",
     "typescript": "2.2.1",
     "webpack": "2.4.1",
+    "webpack-dev-server": "2.4.5",
     "webpack-stream": "3.2.0"
   },
   "engines": {
@@ -37,7 +37,9 @@
     "postinstall": "bower install"
   },
   "dependencies": {
-    "ng-redux": "^3.4.0-beta.1",
-    "redux-logger": "^3.0.1"
+    "angular": "1.6.4",
+    "angular-http-auth": "^1.5.0",
+    "ng-redux": "3.4.0-beta.1",
+    "redux-logger": "3.0.1"
   }
 }

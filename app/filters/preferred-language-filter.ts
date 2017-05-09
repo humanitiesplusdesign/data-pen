@@ -21,4 +21,3 @@ angular.module('fibra.filters.pref-lang', [])
   .filter('prefLang', (fibraService: FibraService) => (literals: ILiteral[]) => {
     return getPrefLangString(literals, fibraService.getState().language)
   })
-
