@@ -62,7 +62,7 @@ module.exports = [ Object.assign({
   name: 'ui',
   entry: {
     ui: './app/index.ts',
-    'webpack-dev-server-client': 'webpack-dev-server/client?http://localhost:8090'
+    'webpack-dev-server-client': 'webpack-dev-server/client'
   },
   plugins: [
     new webpack.HotModuleReplacementPlugin(),
@@ -79,7 +79,10 @@ module.exports = [ Object.assign({
   ]
 }, commonConf), Object.assign({
   name: 'worker',
-  entry: { worker: './app/worker-index.ts' },
+  entry: {
+    worker: './app/worker-index.ts',
+    'webpack-dev-server-client': 'webpack-dev-server/client'
+  },
   target: 'webworker',
   plugins: [
     new webpack.HotModuleReplacementPlugin(),
