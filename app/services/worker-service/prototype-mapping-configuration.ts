@@ -1,6 +1,7 @@
 'use strict'
 
 import {Project} from '../project-service/project'
+import {PrimaryEndpointConfiguration} from '../project-service/primary-endpoint-configuration'
 import {Class, Property} from '../project-service/data-model'
 import {Node} from '../../models/rdf'
 import {Citable} from '../../models/citable'
@@ -23,6 +24,7 @@ angular.module('fibra.services.worker-service-prototype-mapping-configuration', 
         'Class': Class,
         'Property': Property,
         'TreeNode': TreeNode,
+        'PrimaryEndpointConfiguration': PrimaryEndpointConfiguration,
         'PropertyAndValue': PropertyAndValue
       } // List out classes here
       for (let prop of Object.getOwnPropertyNames(fibra)) {
