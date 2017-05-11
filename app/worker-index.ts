@@ -10,6 +10,8 @@ import {SparqlUpdateWorkerService} from './services/sparql-update-service'
 import {SparqlAutocompleteWorkerService} from './services/sparql-autocomplete-service'
 import './services/worker-service/prototype-mapping-configuration'
 
+import 'angular-http-auth'
+
 let m: angular.IModule = angular.module('fibra', ['fi.seco.sparql', 'http-auth-interceptor', 'fibra.services.worker-service-prototype-mapping-configuration'])
 
 m.config(($provide) => {

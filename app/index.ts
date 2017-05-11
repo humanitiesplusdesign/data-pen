@@ -2,6 +2,8 @@ import * as angular from 'angular'
 import * as uiConfig from './app/app-configuration-ui'
 import reduxConfig from './app/app-configuration-redux'
 
+import 'angular-http-auth'
+
 import './styles/main.styl'
 // Register modules
 import './services'
@@ -37,10 +39,9 @@ m.value('workerServiceConfiguration', {
   workerThreads: 1,
   importScripts: [
     'bower_components/angular/angular.js',
-    'bower_components/angular-http-auth/src/http-auth-interceptor.js',
+//    'bower_components/angular-http-auth/src/http-auth-interceptor.js',
     'bower_components/angular-sparql-service/dist/sparql-service.js',
     'bower_components/rdfstore/dist/rdfstore.js',
-    'commons-bundle.js',
     'worker-bundle.js'
   ]
 })

@@ -10,11 +10,21 @@
 
 ### Setting up the build environment
 
-Run `npm install` (or `yarn` if you have it). This should also automatically run `bower install`, but if it doesn't, run that yourself.
+Run the following commands in the folder where you want the `fibra` folder to be:
+
+```shell
+git clone https://github.com/humanitiesplusdesign/fibra.git
+cd fibra
+npm install
+npm install -g webpack-dev-server
+webpack-dev-server
+```
+
+Running `npm install` (or `yarn` if you have it) should also automatically run `bower install`, but if it doesn't, run that yourself.
 
 ### Building
 
-To simply build the project, run `webpack`. However, when actually working, you probably want to use `webpack-dev-server` (which you need to install by `npm install -g webpack-dev-server`), which spawns the app on localhost:3000, and stays to watch for changes in the project files, automatically recompiling them and reloading them into the browser.
+To simply build the project, run `webpack`. However, when actually working, you probably want to use `webpack-dev-server` (which you need to install by `npm install -g webpack-dev-server` as mentioned above), which spawns the app on localhost:3000, and stays to watch for changes in the project files, automatically recompiling them. At the moment you still need to reload the browser to see changes, but we will eventually enable hot module loading so that they will be automatically updated with changes.
 
 ### Running completely against a local SPARQL endpoint
 
