@@ -498,7 +498,6 @@ class ExploreComponentController {
               private $ngRedux: INgRedux,
               private $q: angular.IQService) {
 
-    console.log(VerifyActions)
     this.unsubscribe = $ngRedux.connect(this.mapStateToThis, VerifyActions)(this)
 
     this.sunburst = new Sunburst($element, $compile, $scope, sparqlItemService, fibraService)

@@ -8,6 +8,8 @@ import {TreeNode} from '../../tree/tree-component'
 import {DataFactory, INode, SKOS, OWL, NamedNode, RDF} from '../../../models/rdf'
 import {IExploreItem} from '../explore-component'
 import * as angular from 'angular'
+import { INgRedux } from 'ng-redux'
+import * as TypeActions from '../../../actions/types'
 
 interface IPaletteItem extends Item {
   typeValue: string
@@ -46,14 +48,22 @@ export class PaletteComponentController {
   private typeItemTree: ItemTree = d3.map<ItemLeaf>()
   private typeForCreation: string
 
+  // Actions
+  private unsubscribe: any
+  private addType: any
+  private setOrderedTypes: any
+  private clearTypes: any
+
   public constructor( private fibraService: FibraService,
                       private $element: angular.IAugmentedJQuery,
                       private sparqlItemService: SparqlItemService,
                       private sparqlTreeService: SparqlTreeService,
                       private $scope: IPaletteScope,
                       private $q: angular.IQService,
+                      private $ngRedux: INgRedux,
                       private FileSaver: any) {
 
+    this.unsubscribe = $ngRedux.connect(this.mapStateToThis, TypeActions)(this)
     $scope.loadCSV = this.loadCSV.bind(this)
 
     this.typeItemTree.set('', {
@@ -62,6 +72,10 @@ export class PaletteComponentController {
       expanded: false
     })
     this.query()
+  }
+
+  public $onDestroy(): void {
+    this.unsubscribe()
   }
 
   public query(): angular.IPromise<ItemTree> {
@@ -105,11 +119,11 @@ export class PaletteComponentController {
     let itemType: TreeNode = this.fibraService.getState().construct.types.filter((t) => { return t.id === itemTypeKey })[0]
     let chosenTypes: TreeNode[] = this.fibraService.getState().construct.displayTypes
     if (!chosenTypes[0] && itemType) {
-      this.fibraService.dispatchAction(this.fibraService.setOrderedTypes([itemType]))
+      this.setOrderedTypes([itemType])
     } else if (!chosenTypes[1] && itemType && (chosenTypes[0] !== itemType)) {
       let newTypes: TreeNode[] = chosenTypes.concat([])
       newTypes.push(itemType)
-      this.fibraService.dispatchAction(this.fibraService.setOrderedTypes(newTypes))
+      this.setOrderedTypes(newTypes)
     }
     return this.fibraService.dispatchAction(this.fibraService.displayItem(item, coordinates)).then((state) => {
       this.fibraService.dispatch('change')
@@ -369,6 +383,12 @@ export class PaletteComponentController {
 
     c .classed('displayed', (d: IPaletteItem) => this.fibraService.getState().construct.itemIndex[d.value] ? true : false)
       .classed('filtered', (d: IPaletteItem) => this.labelFilter && !(d.label.toUpperCase().indexOf(this.labelFilter.toUpperCase()) !== -1))
+  }
+
+  private mapStateToThis(state) {
+    return {
+      types: state.types
+    }
   }
 
   private updateSizing(): void {

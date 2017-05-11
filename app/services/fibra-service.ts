@@ -41,17 +41,16 @@ type Action = {
 }
 
 const PLACEHOLDER: string = 'PLACEHOLDER'
-const CREATE_TYPE: string = 'CREATE_TYPE'
+// const CREATE_TYPE: string = 'CREATE_TYPE'
 const CREATE_ITEMS: string = 'CREATE_ITEMS'
 const CREATE_DISPLAY_ITEMS: string = 'CREATE_DISPLAY_ITEMS'
 const DELETE_ITEMS: string = 'DELETE_ITEMS'
-const ADD_TYPE: string = 'ADD_TYPE'
-const CLEAR_TYPES: string = 'CLEAR_TYPES'
+// const CLEAR_TYPES: string = 'CLEAR_TYPES'
 const DISPLAY_ITEMS: string = 'DISPLAY_ITEMS'
 const HIDE_ITEM: string = 'HIDE_ITEM'
 const CREATE_LOCAL_ITEM: string = 'CREATE_LOCAL_ITEM'
 const ITEM_PROPERTIES: string = 'ITEM_PROPERTIES'
-const SET_ORDERED_TYPES: string = 'SET_ORDERED_TYPES'
+// const SET_ORDERED_TYPES: string = 'SET_ORDERED_TYPES'
 const SET_LANGUAGE: string = 'SET_LANGUAGE'
 const SET_PROJECT: string = 'SET_PROJECT'
 const INITIAL_STATE: UIState = new UIState()
@@ -201,33 +200,26 @@ export class FibraService {
     }
   }
 
-  public addType(type: TreeNode):Action {
-    return {
-      type: ADD_TYPE,
-      payload: type
-    }
-  }
+  // public clearTypes(): Action {
+  //   return {
+  //     type: CLEAR_TYPES,
+  //     payload: undefined
+  //   }
+  // }
 
-  public clearTypes(): Action {
-    return {
-      type: CLEAR_TYPES,
-      payload: undefined
-    }
-  }
+  // public setOrderedTypes(types: TreeNode[]): Action {
+  //   return {
+  //     type: SET_ORDERED_TYPES,
+  //     payload: types
+  //   }
+  // }
 
-  public setOrderedTypes(types: TreeNode[]): Action {
-    return {
-      type: SET_ORDERED_TYPES,
-      payload: types
-    }
-  }
-
-  public createType(label: string): Action {
-    return {
-      type: CREATE_TYPE,
-      payload: label
-    }
-  }
+  // public createType(label: string): Action {
+  //   return {
+  //     type: CREATE_TYPE,
+  //     payload: label
+  //   }
+  // }
 
   // Reducers
   private itemReducer(state: UIState = INITIAL_STATE, action: Action = DEFAULT_ACTION): angular.IPromise<UIState> {
@@ -312,31 +304,20 @@ export class FibraService {
         return state
       })
 
-    case ADD_TYPE:
-      state.construct.types.push(action.payload)
-      // Check if this matches any user-defined types and remove them if so
-      let dupType = state.construct.userTypes.filter((tn) => {
-        return tn.id === action.payload.id
-      })[0]
-      if(dupType) {
-        state.construct.userTypes.splice(state.construct.userTypes.indexOf(dupType), 1)
-      }
-      return this.$q.resolve(state)
+    // case CLEAR_TYPES:
+    //   state.construct.types = []
+    //   return this.$q.resolve(state)
 
-    case CLEAR_TYPES:
-      state.construct.types = []
-      return this.$q.resolve(state)
+    // case SET_ORDERED_TYPES:
+    //   state.construct.displayTypes = action.payload
+    //   return this.$q.resolve(state)
 
-    case SET_ORDERED_TYPES:
-      state.construct.displayTypes = action.payload
-      return this.$q.resolve(state)
-
-    case CREATE_TYPE:
-      return this.sparqlItemService.createNewItem([new PropertyAndValue(SKOS.prefLabel, DataFactory.instance.literal(action.payload)), new PropertyAndValue(RDF.type, OWL.Class)]).then((node) => {
-        let tn: TreeNode = new TreeNode(node.value, action.payload)
-        this.state.construct.userTypes.push(tn)
-        return this.state
-      })
+    // case CREATE_TYPE:
+    //   return this.sparqlItemService.createNewItem([new PropertyAndValue(SKOS.prefLabel, DataFactory.instance.literal(action.payload)), new PropertyAndValue(RDF.type, OWL.Class)]).then((node) => {
+    //     let tn: TreeNode = new TreeNode(node.value, action.payload)
+    //     this.state.construct.userTypes.push(tn)
+    //     return this.state
+    //   })
 
     default:
       return this.$q.resolve(state)

@@ -8,6 +8,8 @@ import {SparqlTreeService} from '../../services/sparql-tree-service'
 import {ProjectService} from '../../services/project-service/project-service'
 import {Project} from '../../services/project-service/project'
 import * as angular from 'angular'
+import { INgRedux } from 'ng-redux'
+import * as TypeActions from '../../actions/types'
 
 // class TreeViewConfiguration {
 //   constructor(public endpoint: string, public queryTemplate: string) {}
@@ -16,24 +18,30 @@ import * as angular from 'angular'
 export class ConstructViewComponentController {
   public classTree: TreeNode[]
   public classTreePromise: angular.IPromise<TreeNode[]>
-  public types: TreeNode[] = []
+  public types: any
   public state: UIState
   public currentProjectSource: ProjectSourceInfo
   public paletteDisplay: boolean = false
   private limitFilter: string = ''
 
+  // Actions
+  private unsubscribe: any
+  private addType: any
+  private setOrderedTypes: any
+  private clearTypes: any
+
   public createItem(item: Result) {
     // Is there a type on this item? If so, and it is not already in chosenTypes,
     // add it.
     let itemTypeKey: string = item.additionalInformation['type'][0] ? item.additionalInformation['type'][0].value : ""
-    let itemType: TreeNode = this.types.filter((t) => { return t.id === itemTypeKey })[0]
+    let itemType: TreeNode = this.types.types.filter((t) => { return t.id === itemTypeKey })[0]
     let chosenTypes: TreeNode[] = this.fibraService.getState().construct.displayTypes
     if (!chosenTypes[0] && itemType) {
-      this.fibraService.dispatchAction(this.fibraService.setOrderedTypes([itemType]))
+      this.setOrderedTypes([itemType])
     } else if (!chosenTypes[1] && itemType && (chosenTypes[0] !== itemType)) {
       let newTypes: TreeNode[] = chosenTypes.concat([])
       newTypes.push(itemType)
-      this.fibraService.dispatchAction(this.fibraService.setOrderedTypes(newTypes))
+      this.setOrderedTypes(newTypes)
     }
 
     return this.fibraService.dispatchAction(this.fibraService.displayItem(item.ids[0]))
@@ -62,10 +70,17 @@ export class ConstructViewComponentController {
       request.send(null);
   }
 
+  public $onDestroy(): void {
+    this.unsubscribe()
+  }
+
   constructor(private sparqlTreeService: SparqlTreeService,
               private projectService: ProjectService,
               private fibraService: FibraService,
+              private $ngRedux: INgRedux,
               private $q: angular.IQService) {
+    this.unsubscribe = $ngRedux.connect(this.mapStateToThis, TypeActions)(this)
+
     let currentProject: Project = projectService.getCurrentProject()
     this.currentProjectSource = projectService.getProjectSources().find(ps => ps.sparqlEndpoint === currentProject.source.sparqlEndpoint && ps.graph === currentProject.source.graph)
     fibraService.on('change', () => {
@@ -78,10 +93,8 @@ export class ConstructViewComponentController {
     this.classTreePromise = sparqlTreeService.getTree(this.fibraService.getState().project.endpoint, this.fibraService.getState().project.treeQuery)
     this.classTreePromise.then(c => {
       this.classTree = c;
-      this.fibraService.dispatchAction(this.fibraService.clearTypes())
-      this.types = this.fibraService.getState().construct.types
-      let addType = (type: TreeNode) => this.fibraService.dispatchAction(this.fibraService.addType(type))
-      this.traverseClassTree(c, n => this.types.indexOf(n) === -1 && n.children.length === 0, n => addType(n))
+      this.clearTypes()
+      this.traverseClassTree(c, n => this.types.types.indexOf(n) === -1 && n.children.length === 0 , n => this.addType(n))
     })
     this.fibraService.on('change', () => {
       this.classTreePromise = sparqlTreeService.getTree(this.fibraService.getState().project.endpoint, SparqlTreeService.getClassTreeQuery)
@@ -95,6 +108,12 @@ export class ConstructViewComponentController {
       return this.$q.resolve('ok')
     })
     this.state = fibraService.getState()
+  }
+
+  private mapStateToThis(state) {
+    return {
+      types: state.types
+    }
   }
 
   private traverseClassTree(nodes: TreeNode[], test: Function, onSuccess: Function): void {

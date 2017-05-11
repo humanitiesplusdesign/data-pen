@@ -38,6 +38,8 @@
   },
   "dependencies": {
     "ng-redux": "^3.4.0-beta.1",
-    "redux-logger": "^3.0.1"
+    "redux-logger": "^3.0.1",
+    "redux-promise": "^0.5.3",
+    "redux-thunk": "^2.2.0"
   }
 }

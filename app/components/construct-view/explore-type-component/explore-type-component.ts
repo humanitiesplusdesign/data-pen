@@ -3,33 +3,49 @@
 import {TreeNode} from '../../tree/tree-component'
 import {FibraService} from '../../../services/fibra-service'
 import * as angular from 'angular'
+import { INgRedux } from 'ng-redux'
+import * as TypeActions from '../../../actions/types'
 
 export class ExploreTypeComponentController {
   private types: () => TreeNode[]
   private displayTypes: () => TreeNode[]
 
-  public constructor(private fibraService: FibraService) {
+  // Actions
+  private unsubscribe: any
+  private setOrderedTypes: any
+
+  public constructor(private fibraService: FibraService, 
+                     private $ngRedux: INgRedux,) {
+    this.unsubscribe = $ngRedux.connect(this.mapStateToThis, TypeActions)(this)
     this.fibraService = fibraService
-    this.types = () => this.fibraService.getState().construct.types.concat(this.fibraService.getState().construct.userTypes)
-    this.displayTypes = () => this.fibraService.getState().construct.displayTypes
   }
   public primaryClick(type: TreeNode): void {
     let newTypes: TreeNode[] = this.displayTypes().concat([])
     newTypes[0] = type
-    this.fibraService.dispatchAction(this.fibraService.setOrderedTypes(newTypes))
+    this.setOrderedTypes(newTypes)
     this.fibraService.dispatch('change')
   }
   public secondaryClick(type: TreeNode): void {
     let newTypes: TreeNode[] = this.displayTypes().concat([])
     newTypes[1] = type
-    this.fibraService.dispatchAction(this.fibraService.setOrderedTypes(newTypes))
+    this.setOrderedTypes(newTypes)
     this.fibraService.dispatch('change')
   }
   public tertiaryClick(type: TreeNode): void {
     let newTypes: TreeNode[] = this.displayTypes().concat([])
     newTypes[2] = type
-    this.fibraService.dispatchAction(this.fibraService.setOrderedTypes(newTypes))
+    this.setOrderedTypes(newTypes)
     this.fibraService.dispatch('change')
+  }
+
+  public $onDestroy(): void {
+    this.unsubscribe()
+  }
+
+  private mapStateToThis(state) {
+    return {
+      types: state.types
+    }
   }
 }
 
