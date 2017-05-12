@@ -150,12 +150,15 @@ export class PaletteComponentController {
     let blob: Blob = new Blob(
       [ d3.csvFormat(
         datum.value.items.map((d) => {
+          let sameAs = d.localProperties.filter((p) => p.value === OWL.sameAs.value)[0]
+          let prefLabel = d.localProperties.filter((p) => p.value === SKOS.prefLabel.value)[0]
           return {
-            [SKOS.prefLabel.value]: d.localProperties.filter((p) => p.value === SKOS.prefLabel.value)[0].values[0].value,
-            FibraId: d.value
+            [SKOS.prefLabel.value]: prefLabel ? prefLabel.values[0].value.value : '',
+            FibraId: d.value,
+            Match: sameAs ? sameAs.values[0].value.value : ''
           }
         }),
-        [SKOS.prefLabel.value, 'FibraId']
+        [SKOS.prefLabel.value, 'FibraId', 'Match']
       ) ],
       { type: 'application/csv;charset=utf-8' }
     )
