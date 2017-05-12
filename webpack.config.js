@@ -19,13 +19,13 @@ var commonConf = {
     rules: [
       {
         test: /\.ts?$/,
-        use: [ {
+        use: [ /*{
           loader: 'angular-hot-loader',
           options: {
             log: false,
             rootElement: 'html'
           }
-        }, 'babel-loader', 'ts-loader' ],
+        },*/ 'babel-loader', 'ts-loader' ],
         exclude: /node_modules/,
       },
       {

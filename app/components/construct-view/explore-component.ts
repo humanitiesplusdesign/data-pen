@@ -120,6 +120,52 @@ class ExploreComponentController {
     this.queryAndBuild()
   }
 
+  // currently broken on deleting a link
+  public highlightLinks(d: IExploreItem, i: number): void {
+    d3.selectAll('line').classed('relevant', false)
+    for (let j: number = 0; j < this.links.length; j++) {
+      let linksource: IExploreItem = <IExploreItem>this.links[j].source
+      let linktarget: IExploreItem = <IExploreItem>this.links[j].target
+      if (linksource.index === i || linktarget.index === i)
+          d3.select('#link-' + j).classed('relevant', true)
+    }
+  }
+
+  public $onDestroy(): void {
+    this.unsubscribe()
+  }
+
+  constructor(private $element: angular.IAugmentedJQuery,
+              private $compile: angular.ICompileService,
+              private $window: angular.IWindowService,
+              private $scope: IExploreScope,
+              private $timeout: angular.ITimeoutService,
+              private sparqlItemService: SparqlItemService,
+              private fibraService: FibraService,
+              private $ngRedux: INgRedux,
+              private $q: angular.IQService) {
+
+    this.unsubscribe = $ngRedux.connect(this.mapStateToThis, VerifyActions)(this)
+
+    this.sunburst = new Sunburst($element, $compile, $scope, sparqlItemService, fibraService)
+    this.propertyPopover = new PropertyPopover($element, $scope, fibraService, $compile)
+
+    this.fibraService.on('change', () => {
+      // this.verifyItem = this.fibraService.getState().construct.verifyItem
+      return this.queryAndBuild()
+    })
+    this.itemService = sparqlItemService
+    this.links = []
+    this.$scope.layout = {
+      'choice': 'force',
+      'links': 'hide'
+    }
+
+    console.log(this)
+    this.$scope.$watch('layout.choice', this.updateExplore.bind(this, false))
+    this.$scope.$watch('layout.links', this.updateExplore.bind(this, false))
+  }
+
   public queryAndBuild(): angular.IPromise<string> {
     let prom: angular.IPromise<string> = this.sparqlItemService.getItems(this.fibraService.getState().construct.items, false).then((items: Item[]) => {
 
@@ -471,51 +517,6 @@ class ExploreComponentController {
     this.genericTick(primaryNodes, secondaryNodes, untypedNodes, linkLines, transition)
 
     return this.$q.resolve('ok')
-  }
-
-  // currently broken on deleting a link
-  public highlightLinks(d: IExploreItem, i: number): void {
-    d3.selectAll('line').classed('relevant', false)
-    for (let j: number = 0; j < this.links.length; j++) {
-      let linksource: IExploreItem = <IExploreItem>this.links[j].source
-      let linktarget: IExploreItem = <IExploreItem>this.links[j].target
-      if (linksource.index === i || linktarget.index === i)
-          d3.select('#link-' + j).classed('relevant', true)
-    }
-  }
-
-  public $onDestroy(): void {
-    this.unsubscribe()
-  }
-
-  constructor(private $element: angular.IAugmentedJQuery,
-              private $compile: angular.ICompileService,
-              private $window: angular.IWindowService,
-              private $scope: IExploreScope,
-              private $timeout: angular.ITimeoutService,
-              private sparqlItemService: SparqlItemService,
-              private fibraService: FibraService,
-              private $ngRedux: INgRedux,
-              private $q: angular.IQService) {
-
-    this.unsubscribe = $ngRedux.connect(this.mapStateToThis, VerifyActions)(this)
-
-    this.sunburst = new Sunburst($element, $compile, $scope, sparqlItemService, fibraService)
-    this.propertyPopover = new PropertyPopover($element, $scope, fibraService, $compile)
-
-    this.fibraService.on('change', () => {
-      // this.verifyItem = this.fibraService.getState().construct.verifyItem
-      return this.queryAndBuild()
-    })
-    this.itemService = sparqlItemService
-    this.links = []
-    this.$scope.layout = {
-      'choice': 'force',
-      'links': 'hide'
-    }
-
-    this.$scope.$watch('layout.choice', this.updateExplore.bind(this, false))
-    this.$scope.$watch('layout.links', this.updateExplore.bind(this, false))
   }
 
   private mapStateToThis(state) {
