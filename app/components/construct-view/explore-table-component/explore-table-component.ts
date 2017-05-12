@@ -114,11 +114,11 @@ export class ExploreTableComponentController {
           let duplicate = false
 
           for (let j = 0; j < this.removedProperties.length; j++) { //if user has already hidden/removed this property, don't show it again
-            if (this.removedProperties[j] == this[key].items[i].localProperties[p].value) duplicate = true
+            if (this.removedProperties[j] === this[key].items[i].localProperties[p].value) duplicate = true
           }
 
           for (let j = 0; j < this[key].properties.length; j++) {
-            if (this[key].properties[j] == this[key].items[i].localProperties[p].value) {
+            if (this[key].properties[j].value === this[key].items[i].localProperties[p].value) {
               duplicate = true
             }
           }
@@ -133,12 +133,12 @@ export class ExploreTableComponentController {
   private removeFromProperties(property) {
       ['primary', 'secondary'].forEach((key) => {
           for (let i = 0; i < this[key].properties.length; i++) {
-            if (this[key].properties[i] == property) {
+            if (this[key].properties[i].value === property.value) {
                 this[key].properties.splice(i, 1)
               }
           }
       })
-      this.addToRemovedProperties(property);
+      this.addToRemovedProperties(property.value);
   }
 
   private addToRemovedProperties(property) {
