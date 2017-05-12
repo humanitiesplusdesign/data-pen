@@ -10,6 +10,7 @@ import {FibraService} from '../../services/fibra-service'
 import * as angular from 'angular'
 import { INgRedux } from 'ng-redux'
 import * as VerifyActions from '../../actions/verify'
+import * as TypeActions from '../../actions/types'
 
 interface IExploreComponentInterface extends angular.IComponentController {
 }
@@ -69,6 +70,7 @@ class ExploreComponentController {
   // Actions
   private unsubscribe: any
   private verifyItem: any
+  private types: any
 
   public $onChanges(chngsObj: any): void {
     if(this.svgSel) {
@@ -145,7 +147,12 @@ class ExploreComponentController {
               private $ngRedux: INgRedux,
               private $q: angular.IQService) {
 
-    this.unsubscribe = $ngRedux.connect(this.mapStateToThis, VerifyActions)(this)
+    let unsub1 = $ngRedux.connect(this.mapVerifyToThis, VerifyActions)(this)
+    let unsub2 = $ngRedux.connect(this.mapTypesToThis, TypeActions)(this)
+    this.unsubscribe = () => {
+      unsub1()
+      unsub2()
+    }
 
     this.sunburst = new Sunburst($element, $compile, $scope, sparqlItemService, fibraService)
     this.propertyPopover = new PropertyPopover($element, $scope, fibraService, $compile)
@@ -161,7 +168,6 @@ class ExploreComponentController {
       'links': 'hide'
     }
 
-    console.log(this)
     this.$scope.$watch('layout.choice', this.updateExplore.bind(this, false))
     this.$scope.$watch('layout.links', this.updateExplore.bind(this, false))
   }
@@ -177,7 +183,7 @@ class ExploreComponentController {
         this.lockExisting(this.secondaryItems)
         this.lockExisting(this.tertiaryItems)
 
-        let displayTypes: TreeNode[] = this.fibraService.getState().construct.displayTypes
+        let displayTypes: TreeNode[] = this.types.displayTypes
 
         let currentUntyped: IExploreItem[] = this.filterItemsByType(items, OWL.Thing.value)
         this.removedUntypedItems = this.untypedItems.filter((it) => currentUntyped.indexOf(it) === -1)
@@ -519,9 +525,15 @@ class ExploreComponentController {
     return this.$q.resolve('ok')
   }
 
-  private mapStateToThis(state) {
+  private mapVerifyToThis(state) {
     return {
       verify: state.verify
+    }
+  }
+
+  private mapTypesToThis(state) {
+    return {
+      types: state.types
     }
   }
 

@@ -7,32 +7,31 @@ import { INgRedux } from 'ng-redux'
 import * as TypeActions from '../../../actions/types'
 
 export class ExploreTypeComponentController {
-  private types: () => TreeNode[]
-  private displayTypes: () => TreeNode[]
 
   // Actions
   private unsubscribe: any
   private setOrderedTypes: any
+  private types: any
 
-  public constructor(private fibraService: FibraService, 
-                     private $ngRedux: INgRedux,) {
+  public constructor(private fibraService: FibraService,
+                     private $ngRedux: INgRedux) {
     this.unsubscribe = $ngRedux.connect(this.mapStateToThis, TypeActions)(this)
     this.fibraService = fibraService
   }
   public primaryClick(type: TreeNode): void {
-    let newTypes: TreeNode[] = this.displayTypes().concat([])
+    let newTypes: TreeNode[] = this.types.displayTypes.concat([])
     newTypes[0] = type
     this.setOrderedTypes(newTypes)
     this.fibraService.dispatch('change')
   }
   public secondaryClick(type: TreeNode): void {
-    let newTypes: TreeNode[] = this.displayTypes().concat([])
+    let newTypes: TreeNode[] = this.types.displayTypes.concat([])
     newTypes[1] = type
     this.setOrderedTypes(newTypes)
     this.fibraService.dispatch('change')
   }
   public tertiaryClick(type: TreeNode): void {
-    let newTypes: TreeNode[] = this.displayTypes().concat([])
+    let newTypes: TreeNode[] = this.types.displayTypes.concat([])
     newTypes[2] = type
     this.setOrderedTypes(newTypes)
     this.fibraService.dispatch('change')

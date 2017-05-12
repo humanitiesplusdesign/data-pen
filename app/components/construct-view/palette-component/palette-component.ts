@@ -36,7 +36,7 @@ export class PaletteComponentController {
   private divSel: d3.Selection<HTMLDivElement, {}, null, undefined>
   private nodeDrag: d3.Selection<SVGSVGElement, {}, null, undefined>
   private circles: d3.Selection<d3.BaseType, IPaletteItem, SVGSVGElement, {}>
-  private types: d3.Selection<d3.BaseType, ItemBranch, HTMLDivElement, {}>
+  private typesD3: d3.Selection<d3.BaseType, ItemBranch, HTMLDivElement, {}>
   private tooltip: d3.Selection<HTMLDivElement, {}, HTMLBodyElement, undefined>
   private items: IPaletteItem[]
   private paletteWidth: number
@@ -53,6 +53,7 @@ export class PaletteComponentController {
   private addType: any
   private setOrderedTypes: any
   private clearTypes: any
+  private types: any
 
   public constructor( private fibraService: FibraService,
                       private $element: angular.IAugmentedJQuery,
@@ -116,8 +117,8 @@ export class PaletteComponentController {
 
   public addItem(item: IPaletteItem, coordinates?: [number]) {
     let itemTypeKey: string = item.typeValue
-    let itemType: TreeNode = this.fibraService.getState().construct.types.filter((t) => { return t.id === itemTypeKey })[0]
-    let chosenTypes: TreeNode[] = this.fibraService.getState().construct.displayTypes
+    let itemType: TreeNode = this.types.types.filter((t) => { return t.id === itemTypeKey })[0]
+    let chosenTypes: TreeNode[] = this.types.displayTypes
     if (!chosenTypes[0] && itemType) {
       this.setOrderedTypes([itemType])
     } else if (!chosenTypes[1] && itemType && (chosenTypes[0] !== itemType)) {
@@ -258,11 +259,11 @@ export class PaletteComponentController {
     let addItem = this.addItem.bind(this)
     let paletteWidth = this.paletteWidth
 
-    this.types = this.divSel
+    this.typesD3 = this.divSel
       .selectAll('div.type')
         .data(itemTreeFiltered, (d: ItemBranch) => d.key )
-    this.types.exit().remove()
-    let typesDivsEnter = this.types.enter()
+    this.typesD3.exit().remove()
+    let typesDivsEnter = this.typesD3.enter()
       .append('div')
         .classed('type', true)
         .classed('inverse-icon', true)
@@ -293,17 +294,17 @@ export class PaletteComponentController {
       .append('svg')
         .attr('width', '100%')
 
-    this.types = typesDivsEnter
-      .merge(this.types)
+    this.typesD3 = typesDivsEnter
+      .merge(this.typesD3)
 
-    this.types.selectAll('.expand-button')
+    this.typesD3.selectAll('.expand-button')
       .classed('glyphicon-resize-small', (d: ItemBranch) => d.value.expanded)
       .classed('glyphicon-resize-full', (d: ItemBranch) => !d.value.expanded)
 
-    this.types.selectAll('svg')
+    this.typesD3.selectAll('svg')
       .style('display', (d: ItemBranch) => d.value.expanded ? 'block' : 'none')
 
-    let typeSvgs = this.types.select('svg')
+    let typeSvgs = this.typesD3.select('svg')
         .attr('height', (d) => {
           return (Math.ceil(d.value.items.length / xDots) + 1) * yOffset
         })
