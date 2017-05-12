@@ -2,17 +2,36 @@
     "compilerOptions": {
         "module": "es6",
         "moduleResolution": "node",
-        "target": "es6",
+        "target": "es5",
+        "lib": [
+            "es6",
+            "dom"
+        ],
+        "rootDir": "app",
+        "outDir": ".tmp",
         "strictNullChecks": false
     },
-   "include": [
-	"app/components/*.ts",
-	"app/services/*.ts",
-	"app/models/*.ts",
-	"app/filters/*.ts",
-	"app/*.ts",
-	"app/bower_components/**/*.d.ts",
-	"node_modules/@types/**/*.d.ts"
-   ]
-
+    "filesGlob": [
+        "app/**/*.ts",
+        "app/bower_components/**/*.d.ts",
+        "node_modules/@types/**/*.d.ts",
+        "!app/bower_components/**/node_modules/**/*.ts",
+        "!app/bower_components/**/typings/**/*.ts"
+    ],
+    "include": [
+        "app/components/*.ts",
+        "app/services/*.ts",
+        "app/models/*.ts",
+        "app/filters/*.ts",
+        "app/*.ts",
+        "app/bower_components/**/*.d.ts",
+        "node_modules/@types/**/*.d.ts"
+    ],
+    "exclude": [
+        "app/bower_components/*/node_modules/**/*.ts",
+        "app/bower_components/*/typings/**/*.ts"
+    ],
+    "atom": {
+        "rewriteTsconfig": true
+    }
 }
