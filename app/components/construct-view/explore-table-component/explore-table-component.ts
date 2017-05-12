@@ -9,7 +9,7 @@ import { INgRedux } from 'ng-redux'
 import * as VerifyActions from '../../../actions/verify'
 
 type TableInfo = {
-  properties: String[],
+  properties: FullRichNodeFromNode[],
   items: Item[]
 }
 
@@ -158,11 +158,16 @@ export class ExploreTableComponentController {
     let table = this.primary.items;
     let csv= "data:text/csv;charset=utf-8,";
 
+    for (let i = 0; i < this.primary.properties.length; i++) {
+      csv += this.primary.properties[i].label + ','
+    }
+    csv += '\n'
+
     for (let i = 0; i < table.length; i++) {
         for (let j = 0; j < table[i].localProperties.length; j++) {
-          csv += table[i].localProperties[j].values[0].value + ",";
+          csv += table[i].localProperties[j].values[0].value.value + ','
         }
-        csv += "\n";
+        csv += '\n'
     }
 
     let encUri = encodeURI(csv);
