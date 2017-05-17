@@ -242,6 +242,7 @@ export class PaletteComponentController {
 
   public build(itemTree: ItemTree) {
     this.updateSizing()
+    console.log(itemTree.entries())
     let itemTreeFiltered = itemTree.entries().filter((d) => d.key !== '')
     let items: IPaletteItem[] = itemTreeFiltered.reduce(
       (a: IPaletteItem[], b: ItemBranch) => {

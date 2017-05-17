@@ -28,7 +28,7 @@ export default function types(state = {userTypes: [], types: [], displayTypes: [
       })
 
     case TYPE_CREATED:
-      let tn: TreeNode = new TreeNode(action.payload.value, action.payload.label)
+      let tn: TreeNode = new TreeNode(action.payload.node.value, action.payload.label)
       let newUserTypes2 = state.userTypes.slice(0)
       newUserTypes2.push(tn)
       return Object.assign({}, state, {

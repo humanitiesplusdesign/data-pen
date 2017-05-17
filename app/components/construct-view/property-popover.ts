@@ -24,7 +24,7 @@ export class PropertyPopover {
       .classed('property-popover', true)
   }
 
-  public addPopover(this, $scope, types, baseSVG, d, i, g): void {
+  public addPopover(this, $scope, baseSVG, d, i, g): void {
     let propertyPopover: d3.Selection<HTMLDivElement, {}, HTMLBodyElement, undefined> =
       d3.select(baseSVG.node().parentElement.parentElement).select<HTMLDivElement>('div.property-popover')
     propertyPopover.select('property-popover').remove()
@@ -33,7 +33,6 @@ export class PropertyPopover {
       .style('top', (d.fy + 12) + 'px')
     let cscope: angular.IScope = $scope.$new(true)
     cscope['node'] = d
-    cscope['types'] = types
     cscope['close'] = () => {
       propertyPopover.style('visibility', 'hidden')
     }
@@ -48,7 +47,6 @@ export class PropertyPopover {
 
 export class PropertyPopoverComponent implements angular.IComponentOptions {
   public bindings: {[id: string]: string} = {
-    types: '=',
     node: '=',
     close: '='
   }
@@ -61,7 +59,7 @@ interface IPropertyPopoverScope extends angular.IScope {
 }
 
 export class PropertyPopoverComponentController {
-  public types
+  public types: any
   public node: Item
   public close: () => void
   public chosenType: TreeNode
@@ -90,7 +88,9 @@ export class PropertyPopoverComponentController {
   ) {
     this.unsubscribe = $ngRedux.connect(this.mapStateToThis, TypeActions)(this)
 
-    this.getTypes = () => this.fibraService.getState().construct.types.concat(this.fibraService.getState().construct.userTypes)
+    this.getTypes = () => {
+      return this.types.types.concat(this.types.userTypes)
+    }
   }
 
   public $postLink(): void {
@@ -99,7 +99,7 @@ export class PropertyPopoverComponentController {
     let nodeType: string = this.node.localProperties.filter((p) => {
       return p.value === 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type'
     })[0].values[0].value.value
-    this.chosenType = this.types.filter((t:TreeNode) => { return t.id === nodeType})[0]
+    this.chosenType = this.types.types.filter((t:TreeNode) => { return t.id === nodeType})[0]
     if (this.chosenType) this.typeQuery = this.chosenType.label
   }
 
@@ -111,13 +111,13 @@ export class PropertyPopoverComponentController {
   }
 
   private typeCreate(label) {
-    if (label && !this.types.filter((t:TreeNode) => { return t.label === label})[0]) {
+    if (label && !this.types.types.filter((t:TreeNode) => { return t.label === label})[0]) {
       // We have a string and no matching type is in scope.
-      this.createType(label, this.sparqlItemService).then((state) => {
+      this.createType(label, this.sparqlItemService).then(() => {
         // Type should now show up in the list. Assign the type that was picked
         let typePicked: TreeNode = this.types.userTypes.filter((t) => t.label === label)[0]
         if (typePicked) return this.typeChange(typePicked)
-        else return this.$q.resolve(state)
+        else return this.$q.resolve({})
       })
     }
   }
@@ -138,9 +138,8 @@ export class PropertyPopoverComponentController {
   }
 
   private typeChange(type: TreeNode) {
-
     this.chosenType = type
-    let oldTypes: IPropertyAndValue[] = [new PropertyAndValue(RDF.type, this.node.localProperties.filter((p) => { return p.value === RDF.type.value })[0])]
+    let oldTypes: IPropertyAndValue[] = this.node.localProperties.filter((p) => { return p.value === RDF.type.value })[0].values.map((n) => { return new PropertyAndValue(RDF.type, n.value) })
     let typeNode: INamedNode = new NamedNode(type.id)
     this.showTypeCreate = false
 
@@ -158,7 +157,7 @@ export class PropertyPopoverComponentController {
   }
 
   private labelChange(): void {
-    let oldLabels: IPropertyAndValue[] = [new PropertyAndValue(SKOS.prefLabel, this.node.localProperties.filter((p) => { return p.value === SKOS.prefLabel.value })[0])]
+    let oldLabels: IPropertyAndValue[] = this.node.localProperties.filter((p) => { return p.value === SKOS.prefLabel.value })[0].values.map((n) => { return new PropertyAndValue(SKOS.prefLabel, n.value)})
     this.fibraService.dispatchAction(this.fibraService.itemProperty(this.node, [new PropertyAndValue(SKOS.prefLabel, DataFactory.instance.literal(this.label))], oldLabels))
   }
 

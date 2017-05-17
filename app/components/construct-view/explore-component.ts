@@ -464,7 +464,7 @@ class ExploreComponentController {
       datum.fy = this.lastClickY
       datum.gx = this.lastClickX
       datum.gy = this.lastClickY
-    }).each(this.propertyPopover.addPopover.bind(this, this.$scope, this.fibraService.getState().construct.types, this.svgSel))
+    }).each(this.propertyPopover.addPopover.bind(this, this.$scope, this.svgSel))
 
     // If a node went from being untyped to being primary or secondary, bring along its position
     // Also handle position getting set from a drop (pull position from state)
