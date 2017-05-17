@@ -187,7 +187,6 @@ export class PaletteComponentController {
         newRows.length > 0 ? this.fibraService.dispatchAction(
           this.fibraService.createItems(
             newRows.map((row) => {
-              console.log(row)
               let node: INode = DataFactory.instance.namedNode(row[labelColumnKey])
               return node
             }),
@@ -209,16 +208,17 @@ export class PaletteComponentController {
                                 && entry.key !== 'Notes'
                                 && entry.key !== 'Match')
             .map(entry =>
-              new PropertyAndValue(DataFactory.instance.namedNode(entry.key),
+              new PropertyAndValue(
+                DataFactory.instance.namedNode(entry.key),
                 entry.value.indexOf('http://') === 0 ?
                 DataFactory.instance.namedNode(entry.value) :
-                DataFactory.instance.literal(entry.value))
+                DataFactory.instance.literal(entry.value)
+              )
             )
           // Handle OWL.sameAs
           entries
             .filter((entry) => entry.key === OWL.sameAs.value && entry.value)
             .forEach((entry) => props.push(new PropertyAndValue(OWL.sameAs, DataFactory.instance.namedNode(entry.value))))
-          console.log(props)
           return this.fibraService.dispatchAction(
             this.fibraService.itemProperty(
               new NamedNode(row['FibraId']),
