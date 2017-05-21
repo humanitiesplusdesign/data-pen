@@ -1,11 +1,11 @@
 'use strict'
 
-import {Item, SparqlItemService, IPropertyAndValue, PropertyAndValue} from '../../../services/sparql-item-service'
+import {Item, SparqlItemService} from '../../../services/sparql-item-service'
 import * as d3 from 'd3'
-import {FibraService, UIState} from '../../../services/fibra-service'
+import {FibraService} from '../../../services/fibra-service'
 import {SparqlTreeService} from '../../../services/sparql-tree-service'
 import {TreeNode} from '../../tree/tree-component'
-import {DataFactory, INode, SKOS, OWL, NamedNode, RDF} from '../../../models/rdf'
+import {DataFactory, INode, SKOS, OWL, RDF} from '../../../models/rdf'
 import {IExploreItem} from '../explore-component'
 import * as angular from 'angular'
 import { INgRedux } from 'ng-redux'
@@ -26,10 +26,6 @@ type ItemBranch = {
   'value': ItemLeaf
 }
 type ItemTree = d3.Map<ItemLeaf>
-
-interface IPaletteScope extends angular.IScope {
-  loadCSV
-}
 
 export class PaletteComponentController {
 
@@ -59,13 +55,11 @@ export class PaletteComponentController {
                       private $element: angular.IAugmentedJQuery,
                       private sparqlItemService: SparqlItemService,
                       private sparqlTreeService: SparqlTreeService,
-                      private $scope: IPaletteScope,
                       private $q: angular.IQService,
                       private $ngRedux: INgRedux,
                       private FileSaver: any) {
 
     this.unsubscribe = $ngRedux.connect(this.mapStateToThis, TypeActions)(this)
-    $scope.loadCSV = this.loadCSV.bind(this)
 
     this.typeItemTree.set('', {
       label: 'No type defined',
@@ -141,11 +135,6 @@ export class PaletteComponentController {
     })
   }
 
-  public uploadCSV(datum: ItemBranch): void {
-    this.typeForCreation = datum.key
-    $('#dataModelSelector').click();
-  }
-
   public downloadCSV(datum: ItemBranch): void {
     let blob: Blob = new Blob(
       [ d3.csvFormat(
@@ -164,80 +153,6 @@ export class PaletteComponentController {
     )
     let filename: string = datum.value.label + '.csv'
     this.FileSaver.saveAs(blob, filename)
-  }
-
-  public loadCSV(file): void {
-    // Notes: column headers we should handle
-    //  - 'FibraId' - this will be the matching Fibra identifier. In this case we should not createItem
-    //              but rather update an existing item if necessary
-    //  - SKOS.prefLabel.value - Will be the label to use
-    //  - 'Match' - will be the Recon matched value and should go to OWL.sameAs property
-    //  - 'Notes' - will do onto a notes property?
-
-
-    // Just uses the first column of the file as labels
-    let reader: FileReader = new FileReader();
-    reader.onload = () => {
-      let parsedCSV = d3.csvParse(reader.result)
-      let newRows: d3.DSVRowString[] = parsedCSV.filter((row) => {
-        return !row['FibraId']  // Not an update
-      })
-      let labelColumnKey = parsedCSV.columns[0]
-      let proms: angular.IPromise<UIState>[] = [
-        newRows.length > 0 ? this.fibraService.dispatchAction(
-          this.fibraService.createItems(
-            newRows.map((row) => {
-              let node: INode = DataFactory.instance.namedNode(row[labelColumnKey])
-              return node
-            }),
-            this.typeForCreation
-          )
-        ) : this.$q.resolve(this.fibraService.getState()),
-        this.$q.all(parsedCSV.filter((row) => {
-          return !!row['FibraId']
-        }).map((row) => {
-          if(row['Match'] && !row[OWL.sameAs.value]) {
-            row[OWL.sameAs.value] = row['Match']
-            delete row['Match']
-          }
-          let entries = d3.entries(row)
-          let props: IPropertyAndValue[] = entries
-            .filter((entry) =>  entry.key !== 'FibraId'
-                                && entry.value
-                                && entry.key !== OWL.sameAs.value
-                                && entry.key !== 'Notes'
-                                && entry.key !== 'Match')
-            .map(entry =>
-              new PropertyAndValue(
-                DataFactory.instance.namedNode(entry.key),
-                entry.value.indexOf('http://') === 0 ?
-                DataFactory.instance.namedNode(entry.value) :
-                DataFactory.instance.literal(entry.value)
-              )
-            )
-          // Handle OWL.sameAs
-          entries
-            .filter((entry) => entry.key === OWL.sameAs.value && entry.value)
-            .forEach((entry) => props.push(new PropertyAndValue(OWL.sameAs, DataFactory.instance.namedNode(entry.value))))
-          return this.fibraService.dispatchAction(
-            this.fibraService.itemProperty(
-              new NamedNode(row['FibraId']),
-              props
-            )
-          )
-        })).then((states: UIState[]) => states[states.length - 1])
-      ]
-
-      this.$q.all(proms).then(() => {
-        this.query().then((items) => {
-          this.build.bind(this)(items)
-        })
-      })
-    };
-    reader.readAsText(file.files[0]);
-    // We need to clear the input so that we pick up future uploads. This is *not*
-    // cross-browser-compatible.
-    file.value = null;
   }
 
   public build(itemTree: ItemTree) {
@@ -278,12 +193,6 @@ export class PaletteComponentController {
         .classed('glyphicon', true)
         .classed('glyphicon-download', true)
         .on('click', (d) => this.downloadCSV(d))
-
-    typesDivsEnter
-      .append('span')
-        .classed('glyphicon', true)
-        .classed('glyphicon-upload', true)
-        .on('click', this.uploadCSV.bind(this))
 
     typesDivsEnter
       .append('span')

@@ -20,6 +20,7 @@ import './edit-schema-view/edit-schema-view-component'
 import './project-source-configurations-view/project-source-configurations-view-component'
 import './project-sources-view/project-sources-view-component'
 import './type-select/type-select-component'
+import './upload/upload-component'
 
 angular.module('fibra.components', [
   'fibra.components.construct-view',
@@ -40,5 +41,6 @@ angular.module('fibra.components', [
   'fibra.components.edit-schema-view',
   'fibra.components.project-source-configurations-view',
   'fibra.components.project-sources-view',
-  'fibra.components.type-select'
+  'fibra.components.type-select',
+  'fibra.components.upload'
 ])

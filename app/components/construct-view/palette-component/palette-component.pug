@@ -1,10 +1,10 @@
 .inner-palette-container
   div.palette
   svg.palette-node-drag
+  .palette-upload(ng-show="displayUpload")
+    upload(on-upload="displayUpload=false")
   input.palette-filter(type="text" placeholder="filter by label" ng-model="$ctrl.labelFilter" ng-change="$ctrl.update()")
   span(ng-click="$ctrl.createItem($ctrl.labelFilter)")
     span.glyphicon.glyphicon-plus.inverse-icon
-  input(type="file"
-        id="dataModelSelector"
-        style="display:none"
-        onchange="angular.element(this).scope().loadCSV(this)")
+  span(ng-default="displayUpload=false", ng-click="displayUpload = true")
+    span.glyphicon.glyphicon-upload.inverse-icon

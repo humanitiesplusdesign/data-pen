@@ -1,0 +1,17 @@
+.panel.panel-default
+  .panel-body
+    h4 Upload data
+    form.form-horizontal
+      .form-group
+        label.col-sm-2.control-label(for="upload-file") File
+        .col-sm-9.col-sm-offset-1
+          input(type="file" id="upload-file" onchange="angular.element(this).scope().registerFile(this)")
+      .form-group
+        label.col-sm-2.control-label(for="upload-class") Class
+        .col-sm-9.col-sm-offset-1
+          select.form-control(ng-model="$ctrl.classSelect")
+            option(ng-repeat="type in $ctrl.types.types" value="{{type.id}}") {{ type.label }}
+            option(value="") + add class
+    .info Fibra will assume that the first column of your CSV contains the labels of your entities and that all entities are unique
+    .info If you are unsure about formatting, take a look at the documentation
+    .btn.btn-primary(ng-click="$ctrl.uploadFile()") Upload to palette!
