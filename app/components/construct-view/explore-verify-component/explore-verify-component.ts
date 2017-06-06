@@ -8,6 +8,7 @@ import {OWL} from '../../../models/rdf'
 import { INgRedux } from 'ng-redux'
 import * as angular from 'angular'
 import * as VerifyActions from '../../../actions/verify'
+import * as ItemActions from '../../../actions/items'
 
 export class ExploreVerifyComponentController {
   // Bindings
@@ -21,6 +22,7 @@ export class ExploreVerifyComponentController {
   private relevantTypes: IRichNode[] = []
   private unsubscribe: any
   private verifyItem: any
+  private itemProperty: any
 
   public constructor( private fibraService: FibraService,
                       private $ngRedux: INgRedux,
@@ -28,7 +30,12 @@ export class ExploreVerifyComponentController {
                       private sparqlAutocompleteService: SparqlAutocompleteService) {
     this.fibraService = fibraService
     this.canceller = $q.defer()
-    this.unsubscribe = $ngRedux.connect(this.mapStateToThis, VerifyActions)(this)
+    let unsub1 = $ngRedux.connect(this.mapVerifyToThis, VerifyActions)(this)
+    let unsub2 = $ngRedux.connect(this.mapItemsToThis, VerifyActions)(this)
+    this.unsubscribe = () => {
+      unsub1()
+      unsub2()
+    }
   }
 
   public $onDestroy(): void {
@@ -42,9 +49,15 @@ export class ExploreVerifyComponentController {
     }
   }
 
-  private mapStateToThis(state) {
+  private mapVerifyToThis(state) {
     return {
       verify: state.verify
+    }
+  }
+
+  private mapItemsToThis(state) {
+    return {
+      items: state.items
     }
   }
 
@@ -92,7 +105,7 @@ export class ExploreVerifyComponentController {
 
   private verify(result: Result): void {
     let prop: IPropertyAndValue[] = result.ids.map(id => new PropertyAndValue(OWL.sameAs, id))
-    this.fibraService.dispatchAction(this.fibraService.itemProperty(this.node, prop))
+    this.fibraService.dispatchAction(this.itemProperty(this.node, prop))
       .then(() => {
         this.clear()
       })

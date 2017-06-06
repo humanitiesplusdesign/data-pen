@@ -10,6 +10,7 @@ import {IExploreItem} from '../explore-component'
 import * as angular from 'angular'
 import { INgRedux } from 'ng-redux'
 import * as TypeActions from '../../../actions/types'
+import * as ItemActions from '../../../actions/items'
 
 interface IPaletteItem extends Item {
   typeValue: string
@@ -34,7 +35,7 @@ export class PaletteComponentController {
   private circles: d3.Selection<d3.BaseType, IPaletteItem, SVGSVGElement, {}>
   private typesD3: d3.Selection<d3.BaseType, ItemBranch, HTMLDivElement, {}>
   private tooltip: d3.Selection<HTMLDivElement, {}, HTMLBodyElement, undefined>
-  private items: IPaletteItem[]
+  private paletteItems: IPaletteItem[]
   private paletteWidth: number
   private paletteHeight: number
   private paletteSearchHeight: number = 40
@@ -46,10 +47,13 @@ export class PaletteComponentController {
 
   // Actions
   private unsubscribe: any
+  private displayItem: any
+  private createItem: any
   private addType: any
   private setOrderedTypes: any
   private clearTypes: any
   private types: any
+  private items: any
 
   public constructor( private fibraService: FibraService,
                       private $element: angular.IAugmentedJQuery,
@@ -59,7 +63,12 @@ export class PaletteComponentController {
                       private $ngRedux: INgRedux,
                       private FileSaver: any) {
 
-    this.unsubscribe = $ngRedux.connect(this.mapStateToThis, TypeActions)(this)
+    let unsub1 = $ngRedux.connect(this.mapTypesToThis, TypeActions)(this)
+    let unsub2 = $ngRedux.connect(this.mapItemsToThis, ItemActions)(this)
+    this.unsubscribe = () => {
+      unsub1()
+      unsub2()
+    }
 
     this.typeItemTree.set('', {
       label: 'No type defined',
@@ -75,7 +84,7 @@ export class PaletteComponentController {
 
   public query(): angular.IPromise<ItemTree> {
     return this.typeItemTreePromise = this.sparqlItemService.getAllItems().then((items: IPaletteItem[]) => {
-      return this.mergeItems(this.items, items)
+      return this.mergeItems(this.paletteItems, items)
     })
   }
 
@@ -120,19 +129,14 @@ export class PaletteComponentController {
       newTypes.push(itemType)
       this.setOrderedTypes(newTypes)
     }
-    return this.fibraService.dispatchAction(this.fibraService.displayItem(item, coordinates)).then((state) => {
-      this.fibraService.dispatch('change')
-      return state
-    })
+    this.displayItem(item, coordinates)
+    this.fibraService.dispatch('change')
+    return this.$q.resolve()
   }
 
-  public createItem(label: string): void {
+  public createItemLocal(label: string): void {
     let node: INode = DataFactory.instance.namedNode(label)
-    this.fibraService.dispatchAction(this.fibraService.createItem(node)).then(() => {
-      this.query().then((items) => {
-        this.build.bind(this)(items)
-      })
-    })
+    this.createItem(node)
   }
 
   public downloadCSV(datum: ItemBranch): void {
@@ -157,7 +161,6 @@ export class PaletteComponentController {
 
   public build(itemTree: ItemTree) {
     this.updateSizing()
-    console.log(itemTree.entries())
     let itemTreeFiltered = itemTree.entries().filter((d) => d.key !== '')
     let items: IPaletteItem[] = itemTreeFiltered.reduce(
       (a: IPaletteItem[], b: ItemBranch) => {
@@ -295,13 +298,19 @@ export class PaletteComponentController {
   public update(circles: d3.Selection<d3.BaseType, IPaletteItem, SVGSVGElement, {}>) {
     let c: d3.Selection<d3.BaseType, IPaletteItem, SVGSVGElement, {}> = circles ? circles : this.circles
 
-    c .classed('displayed', (d: IPaletteItem) => this.fibraService.getState().construct.itemIndex[d.value] ? true : false)
+    c .classed('displayed', (d: IPaletteItem) => this.items.itemIndex[d.value] ? true : false)
       .classed('filtered', (d: IPaletteItem) => this.labelFilter && !(d.label.toUpperCase().indexOf(this.labelFilter.toUpperCase()) !== -1))
   }
 
-  private mapStateToThis(state) {
+  private mapTypesToThis(state) {
     return {
       types: state.types
+    }
+  }
+
+  private mapItemsToThis(state) {
+    return {
+      items: state.items
     }
   }
 

@@ -27,7 +27,9 @@ export class Sunburst {
               private $compile: angular.ICompileService,
               private $scope: angular.IScope,
               private sparqlItemService: SparqlItemService,
-              private fibraService: FibraService) {
+              private fibraService: FibraService,
+              private displayItem: any,
+              private displayItems: any) {
     this.sbTooltip = d3.select('body').append<HTMLDivElement>('div')
       .style('position', 'absolute')
       .style('z-index', '20')
@@ -104,10 +106,10 @@ export class Sunburst {
         .on('click', (d: d3.HierarchyNode<IExploreItem>, i: number) => {
           if(d.depth === 2) {
             // Leaf
-            this.fibraService.dispatchAction(this.fibraService.displayItem(d.data))
+            this.fibraService.dispatchAction(this.displayItem(d.data))
           } else {
             // Property
-            this.fibraService.dispatchAction(this.fibraService.displayItems(
+            this.fibraService.dispatchAction(this.displayItems(
               d.children.map((hn) => { return hn.data })
             ))
           }

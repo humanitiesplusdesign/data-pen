@@ -7,6 +7,7 @@ import {FullRichNodeFromNode} from '../../../models/richnode'
 import * as angular from 'angular'
 import { INgRedux } from 'ng-redux'
 import * as VerifyActions from '../../../actions/verify'
+import * as ItemActions from '../../../actions/items'
 
 type TableInfo = {
   properties: FullRichNodeFromNode[],
@@ -20,6 +21,9 @@ export class ExploreTableComponentController {
 
   // Actions
   private unsubscribe: any
+  private deleteItem: any
+  private hideItem: any
+  private itemProperty: any
   private verifyItem: any
   private verify: INode
 
@@ -40,9 +44,15 @@ export class ExploreTableComponentController {
 
   public constructor( private fibraService: FibraService,
                       private $ngRedux: INgRedux,
+                      private $q: angular.IQService,
                       private sparqlItemService: SparqlItemService) {
     this.fibraService = fibraService
-    this.unsubscribe = $ngRedux.connect(this.mapStateToThis, VerifyActions)(this)
+    let unsub1 = $ngRedux.connect(this.mapVerifyToThis, VerifyActions)(this)
+    let unsub2 = $ngRedux.connect(this.mapItemsToThis, ItemActions)(this)
+    this.unsubscribe = () => {
+      unsub1()
+      unsub2()
+    }
   }
 
   public $onDestroy(): void {
@@ -57,9 +67,15 @@ export class ExploreTableComponentController {
     this.sortProperties();
   }
 
-  private mapStateToThis(state) {
+  private mapVerifyToThis(state) {
     return {
       verify: state.verify
+    }
+  }
+
+  private mapItemsToThis(state) {
+    return {
+      items: state.items
     }
   }
 
@@ -95,15 +111,18 @@ export class ExploreTableComponentController {
           new PropertyAndValue(prop, DataFactory.instance.literal(vl.value.value))
         )
     ).reduce((acc, val) => acc.concat(val), [])
-    this.fibraService.dispatchAction(this.fibraService.itemProperty(item, newProps, this.originalPropertiesMap[item.value].map(v => v.toPropertyAndValues(true)).reduce((acc, val) => acc.concat(val), [])))
+    this.itemProperty(item, newProps, this.originalPropertiesMap[item.value].map(v => v.toPropertyAndValues(true)).reduce((acc, val) => acc.concat(val), []))
   }
 
-  private hide(id: INode): angular.IPromise<string> {
-    return this.fibraService.dispatchAction(this.fibraService.hideItem(id)).then(() => { return 'ok' })
+  private hide(id: INode): void {
+    this.hideItem(id)
+    this.fibraService.dispatch('change')
   }
 
-  private delete(id: INode): angular.IPromise<UIState> {
-    return this.fibraService.dispatchAction(this.fibraService.deleteItem(id))
+  private delete(id: INode): void {
+    this.deleteItem(this.$q, this.sparqlItemService, id).then(() => {
+      this.fibraService.dispatch('change')
+    })
   }
 
   private sortProperties(): void {

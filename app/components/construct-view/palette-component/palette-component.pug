@@ -4,7 +4,7 @@
   .palette-upload(ng-show="displayUpload")
     upload(on-upload="displayUpload=false")
   input.palette-filter(type="text" placeholder="filter by label" ng-model="$ctrl.labelFilter" ng-change="$ctrl.update()")
-  span(ng-click="$ctrl.createItem($ctrl.labelFilter)")
+  span(ng-click="$ctrl.createItemLocal($ctrl.labelFilter)")
     span.glyphicon.glyphicon-plus.inverse-icon
   span(ng-default="displayUpload=false", ng-click="displayUpload = true")
     span.glyphicon.glyphicon-upload.inverse-icon

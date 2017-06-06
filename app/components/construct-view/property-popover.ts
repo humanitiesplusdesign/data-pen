@@ -9,6 +9,7 @@ import {INamedNode} from '../../models/rdfjs'
 import * as angular from 'angular'
 import { INgRedux } from 'ng-redux'
 import * as TypeActions from '../../actions/types'
+import * as ItemActions from '../../actions/items'
 
 export class PropertyPopover {
 
@@ -71,6 +72,8 @@ export class PropertyPopoverComponentController {
   private unsubscribe: any
   private createType: any
   private setOrderedTypes: any
+  private itemProperty: any
+  private deleteItem: any
 
   private typeQuery: string = ''
   private getTypes: () => TreeNode[]
@@ -86,7 +89,12 @@ export class PropertyPopoverComponentController {
     private $q: angular.IQService,
     private $ngRedux: INgRedux
   ) {
-    this.unsubscribe = $ngRedux.connect(this.mapStateToThis, TypeActions)(this)
+    let unsub1 = $ngRedux.connect(this.mapTypesToThis, TypeActions)(this)
+    let unsub2 = $ngRedux.connect(this.mapItemsToThis, ItemActions)(this)
+    this.unsubscribe = () => {
+      unsub1()
+      unsub2()
+    }
 
     this.getTypes = () => {
       return this.types.types.concat(this.types.userTypes)
@@ -122,9 +130,15 @@ export class PropertyPopoverComponentController {
     }
   }
 
-  private mapStateToThis(state) {
+  private mapTypesToThis(state) {
     return {
       types: state.types
+    }
+  }
+
+  private mapItemsToThis(state) {
+    return {
+      items: state.items
     }
   }
 
@@ -143,9 +157,9 @@ export class PropertyPopoverComponentController {
     let typeNode: INamedNode = new NamedNode(type.id)
     this.showTypeCreate = false
 
-    return this.fibraService.dispatchAction(this.fibraService.itemProperty(this.node, [new PropertyAndValue(RDF.type, typeNode)], oldTypes)).then((state) => {
+    return this.itemProperty(this.sparqlItemService, this.node, [new PropertyAndValue(RDF.type, typeNode)], oldTypes).then(() => {
       // Update the type displayed in the construct interface if appropriate (duplicative)
-      let chosenTypes: TreeNode[] = this.fibraService.getState().construct.displayTypes
+      let chosenTypes: TreeNode[] = this.types.displayTypes
       if (!chosenTypes[0] && type) {
         return this.setOrderedTypes([type])
       } else if (!chosenTypes[1] && type && (chosenTypes[0] !== type)) {
@@ -158,11 +172,11 @@ export class PropertyPopoverComponentController {
 
   private labelChange(): void {
     let oldLabels: IPropertyAndValue[] = this.node.localProperties.filter((p) => { return p.value === SKOS.prefLabel.value })[0].values.map((n) => { return new PropertyAndValue(SKOS.prefLabel, n.value)})
-    this.fibraService.dispatchAction(this.fibraService.itemProperty(this.node, [new PropertyAndValue(SKOS.prefLabel, DataFactory.instance.literal(this.label))], oldLabels))
+    this.itemProperty(this.sparqlItemService, this.node, [new PropertyAndValue(SKOS.prefLabel, DataFactory.instance.literal(this.label))], oldLabels)
   }
 
   private deleteAndClose(): void {
-    this.fibraService.dispatchAction(this.fibraService.deleteItem(this.node))
+    this.deleteItem(this.$q, this.sparqlItemService, this.node)
       .then(() => {
         this.fibraService.dispatch('change')
         this.close()

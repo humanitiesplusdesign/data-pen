@@ -11,6 +11,7 @@ import * as angular from 'angular'
 import { INgRedux } from 'ng-redux'
 import * as VerifyActions from '../../actions/verify'
 import * as TypeActions from '../../actions/types'
+import * as ItemActions from '../../actions/items'
 
 interface IExploreComponentInterface extends angular.IComponentController {
 }
@@ -70,7 +71,12 @@ class ExploreComponentController {
   // Actions
   private unsubscribe: any
   private verifyItem: any
+  private displayItem: any
+  private displayItems: any
+  private itemProperty: any
+  private createDisplayItem: any
   private types: any
+  private items: any
 
   public $onChanges(chngsObj: any): void {
     if(this.svgSel) {
@@ -87,7 +93,10 @@ class ExploreComponentController {
       .on('click', () => {
         this.lastClickX = d3.event.offsetX
         this.lastClickY = d3.event.offsetY
-        this.fibraService.dispatchAction(this.fibraService.createDisplayItem())
+        this.createDisplayItem(this.$q, this.sparqlItemService).then(() => {
+          console.log("Here")
+          this.fibraService.dispatch('change')
+        })
       })
 
     // Create link g
@@ -149,12 +158,14 @@ class ExploreComponentController {
 
     let unsub1 = $ngRedux.connect(this.mapVerifyToThis, VerifyActions)(this)
     let unsub2 = $ngRedux.connect(this.mapTypesToThis, TypeActions)(this)
+    let unsub3 = $ngRedux.connect(this.mapItemsToThis, ItemActions)(this)
     this.unsubscribe = () => {
       unsub1()
       unsub2()
+      unsub3()
     }
 
-    this.sunburst = new Sunburst($element, $compile, $scope, sparqlItemService, fibraService)
+    this.sunburst = new Sunburst($element, $compile, $scope, sparqlItemService, fibraService, this.displayItem, this.displayItems)
     this.propertyPopover = new PropertyPopover($element, $scope, fibraService, $compile)
 
     this.fibraService.on('change', () => {
@@ -173,7 +184,7 @@ class ExploreComponentController {
   }
 
   public queryAndBuild(): angular.IPromise<string> {
-    let prom: angular.IPromise<string> = this.sparqlItemService.getItems(this.fibraService.getState().construct.items, false).then((items: Item[]) => {
+    let prom: angular.IPromise<string> = this.sparqlItemService.getItems(this.items.items, false).then((items: Item[]) => {
 
         // If we are showing property popovers, hide 'em.
         this.propertyPopover.hidePopover()
@@ -306,7 +317,7 @@ class ExploreComponentController {
                   .each((f: IExploreItem, j) => {
                     if (Math.abs(lineX - f.x) < this.radius && Math.abs(lineY - f.y) < this.radius) {
                       nodeDrop = true
-                      this.fibraService.dispatchAction(this.fibraService.itemProperty(f, [new PropertyAndValue(SKOS.related, DataFactory.instance.nodeFromNode(d))], []))
+                      this.itemProperty(f, [new PropertyAndValue(SKOS.related, DataFactory.instance.nodeFromNode(d))], [])
                         .then((state) => {
                           this.dragline.remove()
                           this.queryAndBuild()
@@ -470,12 +481,12 @@ class ExploreComponentController {
     // Also handle position getting set from a drop (pull position from state)
     let applyOldPosition = (datum: IExploreItem) => {
       // Get position from state if it was set there.
-      datum.x = this.fibraService.getState().construct.itemIndex[datum.value].x
-      datum.y = this.fibraService.getState().construct.itemIndex[datum.value].y
-      datum.fx = this.fibraService.getState().construct.itemIndex[datum.value].x
-      datum.fy = this.fibraService.getState().construct.itemIndex[datum.value].y
-      datum.gx = this.fibraService.getState().construct.itemIndex[datum.value].x
-      datum.gx = this.fibraService.getState().construct.itemIndex[datum.value].y
+      datum.x = this.items.itemIndex[datum.value].x
+      datum.y = this.items.itemIndex[datum.value].y
+      datum.fx = this.items.itemIndex[datum.value].x
+      datum.fy = this.items.itemIndex[datum.value].y
+      datum.gx = this.items.itemIndex[datum.value].x
+      datum.gx = this.items.itemIndex[datum.value].y
 
       // Or if node was already here, get position from old node
       let oldNode: IExploreItem = this.removedUntypedItems.filter((it) => { return it.value === datum.value })[0]
@@ -534,6 +545,12 @@ class ExploreComponentController {
   private mapTypesToThis(state) {
     return {
       types: state.types
+    }
+  }
+
+  private mapItemsToThis(state) {
+    return {
+      items: state.items
     }
   }
 

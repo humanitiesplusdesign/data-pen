@@ -2,10 +2,11 @@
 import * as angular from 'angular'
 import * as d3 from 'd3'
 import {FibraService, UIState} from '../../services/fibra-service'
-import {IPropertyAndValue, PropertyAndValue} from '../../services/sparql-item-service'
+import {IPropertyAndValue, PropertyAndValue, SparqlItemService} from '../../services/sparql-item-service'
 import {DataFactory, INode, OWL, NamedNode} from '../../models/rdf'
 import { INgRedux } from 'ng-redux'
 import * as TypeActions from '../../actions/types'
+import * as ItemActions from '../../actions/items'
 
 interface IUploadScope extends angular.IScope {
   registerFile
@@ -16,23 +17,37 @@ export class UploadComponentController implements angular.IComponentController {
   // Actions
   private unsubscribe: any
   private types: any
+  private createItems: any
+  private itemProperty: any
 
   private fileInput: any
   private classSelect: any = null
   private onUpload: any
 
   public constructor(private fibraService: FibraService,
+                     private sparqlItemService: SparqlItemService,
                      private $ngRedux: INgRedux,
                      private $q: angular.IQService,
                      private $scope: IUploadScope) {
-    this.unsubscribe = $ngRedux.connect(this.mapStateToThis, TypeActions)(this)
+    let unsub1 = $ngRedux.connect(this.mapTypesToThis, TypeActions)(this)
+    let unsub2 = $ngRedux.connect(this.mapItemsToThis, ItemActions)(this)
+    this.unsubscribe = () => {
+      unsub1()
+      unsub2()
+    }
     this.fibraService = fibraService
     $scope.registerFile = this.registerFile.bind(this)
   }
 
-  private mapStateToThis(state) {
+  private mapTypesToThis(state) {
     return {
       types: state.types
+    }
+  }
+
+  private mapItemsToThis(state) {
+    return {
+      items: state.items
     }
   }
 
@@ -63,7 +78,9 @@ export class UploadComponentController implements angular.IComponentController {
       console.log(parsedCSV, labelColumnKey)
       let proms: angular.IPromise<UIState>[] = [
         newRows.length > 0 ? this.fibraService.dispatchAction(
-          this.fibraService.createItems(
+          this.createItems(
+            this.$q,
+            this.sparqlItemService,
             newRows.map((row) => {
               let node: INode = DataFactory.instance.namedNode(row[labelColumnKey])
               return node
@@ -98,7 +115,8 @@ export class UploadComponentController implements angular.IComponentController {
             .filter((entry) => entry.key === OWL.sameAs.value && entry.value)
             .forEach((entry) => props.push(new PropertyAndValue(OWL.sameAs, DataFactory.instance.namedNode(entry.value))))
           return this.fibraService.dispatchAction(
-            this.fibraService.itemProperty(
+            this.itemProperty(
+              this.sparqlItemService,
               new NamedNode(row['FibraId']),
               props
             )

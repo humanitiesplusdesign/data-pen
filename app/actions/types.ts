@@ -10,7 +10,7 @@ export const ADD_TYPE: string = 'ADD_TYPE'
 export const CLEAR_TYPES: string = 'CLEAR_TYPES'
 export const SET_ORDERED_TYPES: string = 'SET_ORDERED_TYPES'
 
-export function addType(type: TreeNode):Action {
+export function addType(type: TreeNode): Action {
   return {
     type: ADD_TYPE,
     payload: type

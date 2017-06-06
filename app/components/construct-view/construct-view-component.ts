@@ -10,6 +10,7 @@ import {Project} from '../../services/project-service/project'
 import * as angular from 'angular'
 import { INgRedux } from 'ng-redux'
 import * as TypeActions from '../../actions/types'
+import * as ItemActions from '../../actions/items'
 
 // class TreeViewConfiguration {
 //   constructor(public endpoint: string, public queryTemplate: string) {}
@@ -26,6 +27,7 @@ export class ConstructViewComponentController {
 
   // Actions
   private unsubscribe: any
+  private displayItem: any
   private addType: any
   private setOrderedTypes: any
   private clearTypes: any
@@ -44,7 +46,7 @@ export class ConstructViewComponentController {
       this.setOrderedTypes(newTypes)
     }
 
-    return this.fibraService.dispatchAction(this.fibraService.displayItem(item.ids[0]))
+    return this.fibraService.dispatchAction(this.displayItem(item.ids[0]))
   }
 
   public downloadRDF() {
@@ -79,7 +81,12 @@ export class ConstructViewComponentController {
               private fibraService: FibraService,
               private $ngRedux: INgRedux,
               private $q: angular.IQService) {
-    this.unsubscribe = $ngRedux.connect(this.mapStateToThis, TypeActions)(this)
+    let unsub1 = $ngRedux.connect(this.mapTypesToThis, TypeActions)(this)
+    let unsub2 = $ngRedux.connect(this.mapItemsToThis, ItemActions)(this)
+    this.unsubscribe = () => {
+      unsub1()
+      unsub2()
+    }
 
     let currentProject: Project = projectService.getCurrentProject()
     this.currentProjectSource = projectService.getProjectSources().find(ps => ps.sparqlEndpoint === currentProject.source.sparqlEndpoint && ps.graph === currentProject.source.graph)
@@ -110,9 +117,15 @@ export class ConstructViewComponentController {
     this.state = fibraService.getState()
   }
 
-  private mapStateToThis(state) {
+  private mapTypesToThis(state) {
     return {
       types: state.types
+    }
+  }
+
+  private mapItemsToThis(state) {
+    return {
+      items: state.items
     }
   }
 

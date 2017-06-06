@@ -5,9 +5,6 @@ import * as angular from 'angular'
 import {Project} from './project-service/project'
 import {TreeNode} from '../components/tree/tree-component'
 import {IGridNode} from '../components/construct-view/explore-component'
-import {Item, IPropertyAndValue, PropertyAndValue} from '../services/sparql-item-service'
-import {ITerm, INamedNode} from '../models/rdfjs'
-import {INode, SKOS, DataFactory, RDF, OWL} from '../models/rdf'
 import {WorkerService} from './worker-service/worker-service'
 import {SparqlItemService} from '../services/sparql-item-service'
 import {SparqlTreeService} from './sparql-tree-service'
@@ -41,16 +38,6 @@ type Action = {
 }
 
 const PLACEHOLDER: string = 'PLACEHOLDER'
-// const CREATE_TYPE: string = 'CREATE_TYPE'
-const CREATE_ITEMS: string = 'CREATE_ITEMS'
-const CREATE_DISPLAY_ITEMS: string = 'CREATE_DISPLAY_ITEMS'
-const DELETE_ITEMS: string = 'DELETE_ITEMS'
-// const CLEAR_TYPES: string = 'CLEAR_TYPES'
-const DISPLAY_ITEMS: string = 'DISPLAY_ITEMS'
-const HIDE_ITEM: string = 'HIDE_ITEM'
-const CREATE_LOCAL_ITEM: string = 'CREATE_LOCAL_ITEM'
-const ITEM_PROPERTIES: string = 'ITEM_PROPERTIES'
-// const SET_ORDERED_TYPES: string = 'SET_ORDERED_TYPES'
 const SET_LANGUAGE: string = 'SET_LANGUAGE'
 const SET_PROJECT: string = 'SET_PROJECT'
 const INITIAL_STATE: UIState = new UIState()
@@ -108,180 +95,7 @@ export class FibraService {
 
   public setProject(project: Project): Action { return { type: SET_PROJECT, payload: project} }
 
-  public createLocalItem(item: ITerm): Action {
-    return {
-      type: CREATE_LOCAL_ITEM,
-      payload: item
-    }
-  }
-
-  public displayItem(item: ITerm, coordinates?: [number]): Action {
-    return {
-      type: DISPLAY_ITEMS,
-      payload: {
-        items: [item],
-        coordinates: [coordinates]
-      }
-    }
-  }
-
-  public displayItems(items: ITerm[], coordinates?: [number][]): Action {
-    return {
-      type: DISPLAY_ITEMS,
-      payload: {
-        items: items,
-        coordinates: coordinates
-      }
-    }
-  }
-
-  public hideItem(item: ITerm): Action {
-    return {
-      type: HIDE_ITEM,
-      payload: item
-    }
-  }
-
-  public itemProperty(item: INode, propertiesToAdd: IPropertyAndValue[], propertiesToRemove?: IPropertyAndValue[]) {
-    return {
-      type: ITEM_PROPERTIES,
-      payload: {
-        item: item,
-        propertiesToAdd: propertiesToAdd,
-        propertiesToRemove: propertiesToRemove
-      }
-    }
-  }
-
-  public createItem(item?: INode, typ?: string):Action {
-    return {
-      type: CREATE_ITEMS,
-      payload: {
-        items: [item],
-        type: typ
-      }
-    }
-  }
-
-  public createItems(items: INode[], typ?: string): Action {
-    return {
-      type: CREATE_ITEMS,
-      payload: {
-        items: items,
-        type: typ
-      }
-    }
-  }
-
-  public createDisplayItem(item?: INode, typ?: string): Action {
-    return {
-      type: CREATE_DISPLAY_ITEMS,
-      payload: {
-        items: [item],
-        type: typ
-      }
-    }
-  }
-
-  public createDisplayItems(items: INode[], typ?: string): Action {
-    return {
-      type: CREATE_DISPLAY_ITEMS,
-      payload: {
-        items: items,
-        type: typ
-      }
-    }
-  }
-
-  public deleteItem(item: INode): Action {
-    return {
-      type: DELETE_ITEMS,
-      payload: [item]
-    }
-  }
-
-  // public clearTypes(): Action {
-  //   return {
-  //     type: CLEAR_TYPES,
-  //     payload: undefined
-  //   }
-  // }
-
-  // public setOrderedTypes(types: TreeNode[]): Action {
-  //   return {
-  //     type: SET_ORDERED_TYPES,
-  //     payload: types
-  //   }
-  // }
-
-  // public createType(label: string): Action {
-  //   return {
-  //     type: CREATE_TYPE,
-  //     payload: label
-  //   }
-  // }
-
   // Reducers
-  private itemReducer(state: UIState = INITIAL_STATE, action: Action = DEFAULT_ACTION): angular.IPromise<UIState> {
-    switch(action.type) {
-
-    case DISPLAY_ITEMS:
-      action.payload.items.forEach((item, i) => {
-        if(!state.construct.itemIndex[item.value]) {
-          state.construct.items.push(item)
-          state.construct.itemIndex[item.value] = item
-
-          // If coordinates are provided, apply them
-          if(action.payload.coordinates && action.payload.coordinates[i] && action.payload.coordinates[i][0] && action.payload.coordinates[i][1]) {
-            state.construct.itemIndex[item.value].x = action.payload.coordinates[i][0]
-            state.construct.itemIndex[item.value].y = action.payload.coordinates[i][1]
-          }
-        }
-      })
-      this.dispatch('change')
-      return this.$q.resolve(state)
-
-    case HIDE_ITEM:
-      let it = state.construct.itemIndex[action.payload.value]
-      if(it) {
-        state.construct.items.splice(state.construct.items.indexOf(it), 1)
-        delete state.construct.itemIndex[action.payload.value]
-      }
-      this.dispatch('change')
-      return this.$q.resolve(state)
-
-    case CREATE_LOCAL_ITEM:
-      let item: IGridNode = action.payload
-      state.construct.localItems.push(item)
-      return this.$q.resolve(state)
-
-    case CREATE_ITEMS:
-      return this.createItemsInternal(action, state).then((nodes) => {
-        return state
-      })
-
-    case CREATE_DISPLAY_ITEMS:
-      return this.createItemsInternal(action, state).then((nodes) => {
-        return this.dispatchAction(this.displayItems(nodes))
-      })
-
-    case DELETE_ITEMS:
-      return this.$q.all(action.payload.map((item: INode) => {
-        return this.sparqlItemService.deleteItem(item)
-      })).then(() => {
-        this.dispatch('change')
-        return this.state
-      })
-
-    case ITEM_PROPERTIES:
-      return this.sparqlItemService.alterItem(action.payload.item, action.payload.propertiesToAdd, action.payload.propertiesToRemove).then((str) => {
-        return this.state
-      })
-
-    default:
-      return this.$q.resolve(state)
-    }
-  }
 
   private sessionReducer(state: UIState = INITIAL_STATE, action: Action = DEFAULT_ACTION): angular.IPromise<UIState> {
     switch (action.type) {
@@ -304,61 +118,8 @@ export class FibraService {
         return state
       })
 
-    // case CLEAR_TYPES:
-    //   state.construct.types = []
-    //   return this.$q.resolve(state)
-
-    // case SET_ORDERED_TYPES:
-    //   state.construct.displayTypes = action.payload
-    //   return this.$q.resolve(state)
-
-    // case CREATE_TYPE:
-    //   return this.sparqlItemService.createNewItem([new PropertyAndValue(SKOS.prefLabel, DataFactory.instance.literal(action.payload)), new PropertyAndValue(RDF.type, OWL.Class)]).then((node) => {
-    //     let tn: TreeNode = new TreeNode(node.value, action.payload)
-    //     this.state.construct.userTypes.push(tn)
-    //     return this.state
-    //   })
-
     default:
       return this.$q.resolve(state)
-    }
-  }
-
-  private createItemsInternal(action, state): angular.IPromise<INode[]> {
-    let items: Item[] = action.payload.items
-    let typeNode: INamedNode = action.payload.type ? DataFactory.instance.namedNode(action.payload.type) : OWL.Thing
-
-    if (items[0]) {
-      let proms = items.map((node) => {
-        if (node.value) {
-          return this.sparqlItemService.createNewItem([new PropertyAndValue(SKOS.prefLabel, DataFactory.instance.literal(node.value)), new PropertyAndValue(RDF.type, typeNode)])
-        } else {
-          return this.sparqlItemService.createNewItem([new PropertyAndValue(RDF.type, typeNode)])
-        }
-
-        // return this.sparqlItemService.getItem(node).then((item) => {
-        //   let prefLabelProp = item.localProperties.concat(item.remoteProperties).filter((pr) => {
-        //     return pr.value === 'http://www.w3.org/2004/02/skos/core#prefLabel'
-        //   })
-        //   let type: PropertyToValues<INode> = new PropertyToValues(RDF.type)
-        //   let typeProp = item.localProperties.concat(item.remoteProperties).filter((pr) => {
-        //     return pr.value === 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type'
-        //   })
-        //   if(typeProp[0]) {
-        //     let typeWithLabel: INodePlusLabel = new SourcedNodePlusLabel(typeProp[0])
-        //     type.values.push(typeWithLabel)
-        //   }
-        //   return this.sparqlItemService.createNewItem([item], [type, prefLabelProp[0]])
-        // }).then((node) => {
-        //   // Display the item
-        //   return this.dispatchAction(this.displayItem(node))
-        // })
-      })
-      return this.$q.all(proms)
-    } else {
-      return this.sparqlItemService.createNewItem([new PropertyAndValue(RDF.type, typeNode), new PropertyAndValue(SKOS.prefLabel, DataFactory.instance.literal(''))]).then((node) => {
-        return [node]
-      })
     }
   }
 
@@ -369,7 +130,6 @@ export class FibraService {
     this.dispatch('action')
     let oldCommonState: CommonState = this.state.toCommonState()
     return this.constructReducer(this.state, action)
-      .then((state) => this.itemReducer(state, action))
       .then((state) => this.sessionReducer(state, action))
       .then((state) => {
         if (state.language !== oldCommonState.language || state.project !== oldCommonState.project) {
