@@ -4,6 +4,8 @@ import {FibraSparqlService} from '../../services/fibra-sparql-service'
 
 declare var CodeMirror: any
 
+import 'angular-yasr-component'
+
 export class RdfstoreTestViewComponentController implements angular.IComponentController {
   public data: string
   public query: string

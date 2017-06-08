@@ -3,20 +3,12 @@ html(lang="en",ng-app="fibra",ng-hint)
   head
     meta(charset="utf-8")
     meta(name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, width=device-width")
-    // build:css(app) styles/vendor.css
-    // bower:css
-    link(rel='stylesheet', href='bower_components/bootstrap/dist/css/bootstrap.css')
+    script(src="https://code.jquery.com/jquery-3.2.1.min.js")
+    script(src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js")
+    script(src="https://d3js.org/d3.v4.min.js")
     link(rel='stylesheet', href='bower_components/font-awesome/css/font-awesome.css')
-    link(rel='stylesheet', href='bower_components/yasgui-yasqe/dist/yasqe.css')
-    link(rel='stylesheet', href='bower_components/yasgui-yasr/dist/yasr.css')
-    link(rel='stylesheet', href='bower_components/angular-toastr/dist/angular-toastr.css')
     link(rel='stylesheet', href='bower_components/codemirror/lib/codemirror.css')
-    // endbower
-    // endbuild
-    // build:css(.tmp) styles/main.css
     link(rel="stylesheet" href="styles.css")
-    // endbuild
-
     title Fibra - {{viewName}}
   body
     .pull-right
@@ -48,20 +40,9 @@ html(lang="en",ng-app="fibra",ng-hint)
     div(ui-view)
     // build:js(app) scripts/vendor.js
     // bower:js
-    script(src='bower_components/jquery/dist/jquery.js')
-    script(src='bower_components/angular/angular.js')
-    script(src='bower_components/angular-animate/angular-animate.js')
-    script(src='bower_components/angular-bootstrap/ui-bootstrap-tpls.js')
     script(src='bower_components/angular-sparql-service/dist/sparql-service.js')
-    script(src='bower_components/angular-ui-router/release/angular-ui-router.js')
-    script(src='bower_components/d3/d3.js')
     script(src='bower_components/ngstorage/ngStorage.js')
     script(src='bower_components/crypto-js/crypto-js.js')
-    script(src='bower_components/yasgui-yasqe/dist/yasqe.bundled.js')
-    script(src='bower_components/angular-yasqe-component/dist/yasqe-component.js')
-    script(src='bower_components/yasgui-yasr/dist/yasr.bundled.js')
-    script(src='bower_components/angular-yasr-component/dist/yasr-component.js')
-    script(src='bower_components/angular-toastr/dist/angular-toastr.tpls.js')
     script(src='bower_components/n3/n3-browser.js')
     script(src='bower_components/codemirror/lib/codemirror.js')
     script(src='bower_components/angular-ui-codemirror/ui-codemirror.js')

@@ -11,6 +11,7 @@ import {SparqlAutocompleteWorkerService} from './services/sparql-autocomplete-se
 import './services/worker-service/prototype-mapping-configuration'
 
 import 'angular-http-auth'
+import 'rdfstore'
 
 let m: angular.IModule = angular.module('fibra', ['fi.seco.sparql', 'http-auth-interceptor', 'fibra.services.worker-service-prototype-mapping-configuration'])
 

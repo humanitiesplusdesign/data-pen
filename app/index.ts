@@ -3,6 +3,10 @@ import * as uiConfig from './app/app-configuration-ui'
 import reduxConfig from './app/app-configuration-redux'
 
 import 'angular-http-auth'
+import 'angular-ui-router'
+import 'angular-animate'
+import 'angular-ui-bootstrap'
+import 'angular-toastr'
 
 import './styles/main.styl'
 // Register modules
@@ -12,6 +16,7 @@ import './filters'
 
 // Forces the build to include ng-redux from node_modules
 import 'ng-redux'
+import 'angular-yasqe-component'
 
 let m: angular.IModule = angular.module('fibra', [
   'fibra.services',
@@ -24,7 +29,6 @@ let m: angular.IModule = angular.module('fibra', [
   'ui.bootstrap.tpls',
   'ngAnimate',
   'fi.seco.yasqe',
-  'fi.seco.yasr',
   'toastr',
   'fi.seco.sparql',
   'ui.codemirror',
@@ -37,10 +41,8 @@ m.value('workerServiceConfiguration', {
   appName: 'fibra',
   workerThreads: 1,
   importScripts: [
-    'bower_components/angular/angular.js',
-//    'bower_components/angular-http-auth/src/http-auth-interceptor.js',
+    'https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js',
     'bower_components/angular-sparql-service/dist/sparql-service.js',
-    'bower_components/rdfstore/dist/rdfstore.js',
     'worker-bundle.js'
   ]
 })

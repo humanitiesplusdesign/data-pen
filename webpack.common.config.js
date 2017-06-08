@@ -8,6 +8,9 @@ var commonConf = {
   watch: true,
   devtool: 'cheap-module-inline-source-map',
   context: __dirname,
+  node: {
+    fs: 'empty'
+  },
   output: {
     filename: '[name]-bundle.js'
   },
@@ -50,6 +53,7 @@ var commonConf = {
     extensions: [".tsx", ".ts", ".js", ".styl", ".pug", ".css"]
   },
   externals: {
+    d3: 'd3',
     angular: 'angular',
     fi: 'angular-sparql-service'
   },
