@@ -7,6 +7,7 @@ import 'angular-ui-router'
 import 'angular-animate'
 import 'angular-ui-bootstrap'
 import 'angular-toastr'
+import 'angular-file-saver'
 
 import './styles/main.styl'
 // Register modules
