@@ -6,6 +6,7 @@ import {FibraSparqlService} from './fibra-sparql-service'
 
 export class SparqlUpdateService {
 
+  /* @ngInject */
   constructor(private workerService: WorkerService) {}
 
   public updateQuads(endpoint: string, quadsToAdd: Quad[], quadsToRemove: Quad[]): angular.IPromise<any> {
@@ -21,6 +22,7 @@ export class SparqlUpdateService {
 export class SparqlUpdateWorkerService {
   private static queryTemplate: string = `DELETE{<DELETE>}INSERT{<INSERT>}WHERE {}`
 
+  /* @ngInject */
   constructor(private fibraSparqlService: FibraSparqlService) {}
 
   public updateQuads(endpoint: string, quadsToAdd: Quad[] = [], quadsToRemove: Quad[] = []): angular.IPromise<any> {

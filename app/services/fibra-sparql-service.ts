@@ -36,6 +36,7 @@ export class FibraSparqlService {
   public post<T>(id: string, data: string, graphIRI?: string, params?: {}): angular.IPromise<T> {
     return this.services.goc(id).then(s => s.post(data, graphIRI, params))
   }
+  /* @ngInject */
   constructor(private sparqlService: s.SparqlService, private $q: angular.IQService) {}
 }
 

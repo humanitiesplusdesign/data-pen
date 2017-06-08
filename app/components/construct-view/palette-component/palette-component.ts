@@ -55,6 +55,7 @@ export class PaletteComponentController {
   private types: any
   private items: any
 
+  /* @ngInject */
   public constructor( private fibraService: FibraService,
                       private $element: angular.IAugmentedJQuery,
                       private sparqlItemService: SparqlItemService,

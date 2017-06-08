@@ -42,6 +42,7 @@ export class ExploreTableComponentController {
   private originalPropertiesMap: { [id: string] : PropertyToValues[] } = { }
   private editItem: Item
 
+  /* @ngInject */
   public constructor( private fibraService: FibraService,
                       private $ngRedux: INgRedux,
                       private $q: angular.IQService,

@@ -43,6 +43,7 @@ export class EditCitableComponentController<T extends ICitable> implements angul
     )
   }
 
+  /* @ngInject */
   constructor(sourceId: string, private projectService: ProjectService, private toastr: angular.toastr.IToastrService) {
     this.projectSources = projectService.getProjectSources()
     this.projectSource = this.projectSources.find(cs2 => cs2.id === sourceId)

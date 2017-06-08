@@ -8,6 +8,8 @@ export class LoginComponent implements angular.IComponentOptions {
 }
 
 export class LoginController implements angular.IComponentController {
+
+  /* @ngInject */
   constructor(
     $urlService: any,
     $scope: any,

@@ -17,10 +17,13 @@ interface IAuthenticationRootScopeService extends angular.IRootScopeService {
   socialAuthService: SocialAuthService
 }
 
+/* @ngInject */
 export function toastConfig(toastrConfig: angular.toastr.IToastConfig): void {
   'ngInject' // needed when directly exporting a class or function
   angular.extend(toastrConfig, { positionClass: 'toast-top-full-width'})
 }
+
+/* @ngInject */
 export function uiConfig(
   $stateProvider: angular.ui.IStateProvider,
   $urlServiceProvider: any,
@@ -114,11 +117,13 @@ export function uiConfig(
   })
 }
 
+/* @ngInject */
 export function localStorageConfig($localStorageProvider): void {
   'ngInject' // needed when directly exporting a class or function
   $localStorageProvider.setKeyPrefix('fibra-')
 }
 
+/* @ngInject */
 export function uiRun(
   $rootScope: IAuthenticationRootScopeService,
   $localStorage: any,

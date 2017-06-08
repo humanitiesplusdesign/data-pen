@@ -37,6 +37,7 @@ SELECT ?subClass ?superClass ?class ?classLabel ?instances {
 # ENDGRAPH
 }
 `
+  /* @ngInject */
   constructor(private workerService: WorkerService) {}
   public getTree(endpoint: string, query: string, canceller?: angular.IPromise<any>): angular.IPromise<TreeNode[]> {
     return this.workerService.call('sparqlTreeWorkerService', 'getTree', [endpoint, query], canceller)
@@ -44,6 +45,7 @@ SELECT ?subClass ?superClass ?class ?classLabel ?instances {
 }
 
 export class SparqlTreeWorkerService {
+  /* @ngInject */
   constructor(private fibraSparqlService: FibraSparqlService) {}
 
   public getTree(endpoint: string, query: string, canceller?: angular.IPromise<any>): angular.IPromise<TreeNode[]> {

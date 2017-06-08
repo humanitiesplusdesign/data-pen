@@ -13,6 +13,7 @@ export class ExploreTypeComponentController {
   private setOrderedTypes: any
   private types: any
 
+  /* @ngInject */
   public constructor(private fibraService: FibraService,
                      private $ngRedux: INgRedux) {
     this.unsubscribe = $ngRedux.connect(this.mapStateToThis, TypeActions)(this)

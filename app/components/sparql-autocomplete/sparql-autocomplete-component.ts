@@ -43,6 +43,8 @@ class SparqlAutocompleteComponentController {
       }
     )
   }
+
+  /* @ngInject */
   constructor(private $q: angular.IQService, private sparqlAutocompleteService: SparqlAutocompleteService) {
     this.canceller = $q.defer()
   }

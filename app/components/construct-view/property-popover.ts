@@ -15,6 +15,7 @@ export class PropertyPopover {
 
   private propertyPopover: d3.Selection<HTMLDivElement, {}, HTMLBodyElement, undefined>
 
+  /* @ngInject */
   public constructor(
       private $element: angular.IAugmentedJQuery,
       private $scope: angular.IScope,
@@ -82,6 +83,7 @@ export class PropertyPopoverComponentController {
     this.unsubscribe()
   }
 
+  /* @ngInject */
   public constructor(
     private fibraService: FibraService,
     private sparqlItemService: SparqlItemService,

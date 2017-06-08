@@ -7,6 +7,8 @@ export class CallbackComponent implements angular.IComponentOptions {
 }
 
 export class CallbackController implements angular.IComponentController {
+
+  /* @ngInject */
   constructor(
     // $urlService: any,
     $localStorage: any,

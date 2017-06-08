@@ -9,6 +9,7 @@ import * as angular from 'angular'
 
 export class EditRemoteEndpointConfigurationViewComponentController extends EditCitableComponentController<RemoteEndpointConfiguration> {
 
+  /* @ngInject */
   constructor($stateParams: any, fibraService: FibraService, projectService: ProjectService, toastr: angular.toastr.IToastrService) {
     super($stateParams.sourceId, projectService, toastr)
     if ($stateParams.id) projectService.loadRemoteEndpointConfiguration(this.projectSource, $stateParams.id).then(ps => this.c = ps)

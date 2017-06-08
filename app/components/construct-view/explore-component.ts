@@ -146,6 +146,7 @@ class ExploreComponentController {
     this.unsubscribe()
   }
 
+  /* @ngInject */
   constructor(private $element: angular.IAugmentedJQuery,
               private $compile: angular.ICompileService,
               private $window: angular.IWindowService,

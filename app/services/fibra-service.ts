@@ -151,6 +151,7 @@ export class FibraService {
 
   }
 
+  /* @ngInject */
   constructor(private $q: angular.IQService,
               private workerService: WorkerService,
               private sparqlItemService: SparqlItemService,

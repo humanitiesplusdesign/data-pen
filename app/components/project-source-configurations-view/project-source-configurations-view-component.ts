@@ -21,6 +21,7 @@ export class ProjectSourceConfigurationsViewComponentController implements angul
   public primaryEndpointConfigurations: PrimaryEndpointConfiguration[]
   public schemas: Schema[]
 
+  /* @ngInject */
   constructor($stateParams: ProjectSourceConfigurationsParams, projectService: ProjectService) {
     this.source = projectService.getProjectSources().find(ps => ps.id === $stateParams.sourceId)
     projectService.listProjects(this.source).then(projects => this.projects = projects)

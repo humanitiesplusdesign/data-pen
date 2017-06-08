@@ -76,6 +76,7 @@ export class ConstructViewComponentController {
     this.unsubscribe()
   }
 
+  /* @ngInject */
   constructor(private sparqlTreeService: SparqlTreeService,
               private projectService: ProjectService,
               private fibraService: FibraService,

@@ -19,6 +19,7 @@ export class ProjectsViewComponentController implements angular.IComponentContro
     this.projectService.deleteCitable(this.projectSources[sourceId].updateEndpoint, project)
   }
 
+  /* @ngInject */
   constructor(private projectService: ProjectService, socialAuthService: SocialAuthService, $localStorage: any) {
     let projectSources: ProjectSourceInfo[] = $localStorage['projectSources']
     if (!projectSources || projectSources.length === 0) {

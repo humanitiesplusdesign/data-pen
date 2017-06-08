@@ -23,6 +23,7 @@ export class ProjectSourcesViewComponentController implements angular.IComponent
     this.projectSources.push(new ProjectSourceInfo('', '' , '', '', '', ''))
   }
 
+  /* @ngInject */
   constructor(private $state: angular.ui.IStateService, $stateParams: ProjectSourceParams, projectService: ProjectService) {
     this.projectSources = projectService.getProjectSources()
     if ($stateParams.sourceId && $stateParams.sparqlEndpoint && $stateParams.type) {

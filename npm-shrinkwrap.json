@@ -1,0 +1,14 @@
+{
+  "dependencies": {
+    "gh-pages-webpack-plugin": {
+      "version": "1.0.1",
+      "from": "gh-pages-webpack-plugin@>=1.0.0 <2.0.0",
+      "dependencies": {
+        "gh-pages": {
+          "version": "1.0.0",
+          "from": "acorn@>=1.0.0 <2.0.0"
+        }
+      }
+    }
+  }
+}

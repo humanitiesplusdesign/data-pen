@@ -4,6 +4,7 @@ import thunkMiddleware from 'redux-thunk'
 import promiseMiddleware from 'redux-promise'
 import rootReducer from '../reducers'
 
+/* @ngInject */
 export default function reduxConfig($ngReduxProvider: INgReduxProvider) {
   $ngReduxProvider.createStoreWith(rootReducer, [thunkMiddleware, promiseMiddleware, createLogger()], [])
 }

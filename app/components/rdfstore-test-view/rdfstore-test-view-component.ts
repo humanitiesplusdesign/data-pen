@@ -47,6 +47,8 @@ export class RdfstoreTestViewComponentController implements angular.IComponentCo
         this.results = error
       })
   }
+
+  /* @ngInject */
   constructor(private fibraSparqlService: FibraSparqlService, private toastr: angular.toastr.IToastrService) {}
 }
 

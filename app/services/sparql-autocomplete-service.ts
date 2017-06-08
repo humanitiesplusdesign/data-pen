@@ -231,6 +231,7 @@ export class SparqlAutocompleteWorkerService {
     }))
   }
 
+  /* @ngInject */
   constructor(private $q: angular.IQService, private fibraSparqlService: FibraSparqlService, private stateWorkerService: StateWorkerService) {
   }
 

@@ -9,6 +9,7 @@ import * as angular from 'angular'
 
 export class EditSchemaViewComponentController extends EditCitableComponentController<Schema> {
 
+  /* @ngInject */
   constructor($stateParams: any, fibraService: FibraService, projectService: ProjectService, toastr: angular.toastr.IToastrService) {
     super($stateParams.sourceId, projectService, toastr)
     if ($stateParams.id) projectService.loadSchema(this.projectSource, $stateParams.id).then(ps => this.c = ps)
@@ -28,4 +29,3 @@ export class EditSchemaViewComponent implements angular.IComponentOptions {
 
 angular.module('fibra.components.edit-schema-view', ['fibra.services'])
   .component('editSchemaView', new EditSchemaViewComponent())
-

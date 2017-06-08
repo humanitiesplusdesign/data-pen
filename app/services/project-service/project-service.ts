@@ -35,6 +35,7 @@ WHERE {
     citables.forEach(rh => delete rh['order'])
   }
 
+  /* @ngInject */
   constructor(private workerService: WorkerService, private fibraService: FibraService, private fibraSparqlService: FibraSparqlService, private $localStorage: any) {
     if (!$localStorage.projectSources)
       $localStorage.projectSources = []

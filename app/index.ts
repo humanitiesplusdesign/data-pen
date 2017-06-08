@@ -11,8 +11,7 @@ import './components'
 import './filters'
 
 // Forces the build to include ng-redux from node_modules
-// tslint:disable-next-line:no-var-requires
-require('../node_modules/ng-redux/dist/ng-redux')
+import 'ng-redux'
 
 let m: angular.IModule = angular.module('fibra', [
   'fibra.services',

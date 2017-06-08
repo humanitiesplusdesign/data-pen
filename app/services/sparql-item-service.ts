@@ -158,6 +158,7 @@ WHERE {
 }
 `
 
+/* @ngInject */
   constructor(private workerService: WorkerService) {}
 
   /**
@@ -217,6 +218,7 @@ export class SparqlItemWorkerService {
     }
   }
 
+  /* @ngInject */
   constructor(private fibraSparqlService: FibraSparqlService, private $q: angular.IQService, private sparqlUpdateWorkerService: SparqlUpdateWorkerService, private stateWorkerService: StateWorkerService) {}
 
   public getItems(ids: string[] | boolean, queryRemote: boolean = false, canceller?: angular.IPromise<any>): angular.IPromise<Item[]> {

@@ -18,6 +18,6 @@ export function getPrefLangString(literals: ILiteral[], prefLang: string): strin
 }
 
 angular.module('fibra.filters.pref-lang', [])
-  .filter('prefLang', (fibraService: FibraService) => (literals: ILiteral[]) => {
+  .filter('prefLang', /* @ngInject */ (fibraService: FibraService) => (literals: ILiteral[]) => {
     return getPrefLangString(literals, fibraService.getState().language)
   })

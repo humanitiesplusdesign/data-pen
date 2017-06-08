@@ -24,6 +24,7 @@ export class UploadComponentController implements angular.IComponentController {
   private classSelect: any = null
   private onUpload: any
 
+  /* @ngInject */
   public constructor(private fibraService: FibraService,
                      private sparqlItemService: SparqlItemService,
                      private $ngRedux: INgRedux,

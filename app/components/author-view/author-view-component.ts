@@ -5,6 +5,8 @@ import * as angular from 'angular'
 
 export class AuthorViewComponentController implements angular.IComponentController {
   public items: Item[] = []
+
+  /* @ngInject */
   constructor(private sparqlItemService: SparqlItemService) {
 
   }

@@ -24,6 +24,7 @@ export class ExploreVerifyComponentController {
   private verifyItem: any
   private itemProperty: any
 
+  /* @ngInject */
   public constructor( private fibraService: FibraService,
                       private $ngRedux: INgRedux,
                       private $q: angular.IQService,

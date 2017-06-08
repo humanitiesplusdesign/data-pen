@@ -93,6 +93,7 @@ export class WorkerService {
     }
   }
 
+  /* @ngInject */
   constructor(workerServiceConfiguration: WorkerServiceConfiguration, private workerServicePrototypeMappingConfiguration: {[className: string]: Object}, $rootScope: angular.IRootScopeService, $window: angular.IWindowService, private $q: angular.IQService) {
     let path: string = $window.location.protocol + '//' + $window.location.host
     let importScripts: string[] = workerServiceConfiguration.importScripts.map(s =>
@@ -223,6 +224,7 @@ export class WorkerWorkerService {
       throw e
     }
   }
+  /* @ngInject */
   constructor(private workerServicePrototypeMappingConfiguration:  {[className: string]: Object}, private $injector: angular.auto.IInjectorService, private $q: angular.IQService, private $rootScope: angular.IRootScopeService) {
   }
   public onMessage(message: IMessage): void {

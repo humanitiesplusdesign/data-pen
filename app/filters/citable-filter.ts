@@ -6,7 +6,7 @@ import {getPrefLangString} from './preferred-language-filter'
 import * as angular from 'angular'
 
 angular.module('fibra.filters.citable', [])
-  .filter('citable', (fibraService: FibraService) => (obj: ICitable) => {
+  .filter('citable', /* @ngInject */ (fibraService: FibraService) => (obj: ICitable) => {
     let prefLang: string = fibraService.getState().language
     let ret: string = getPrefLangString(obj.labels, prefLang)
     if (obj.rightsHolders.length > 0) {

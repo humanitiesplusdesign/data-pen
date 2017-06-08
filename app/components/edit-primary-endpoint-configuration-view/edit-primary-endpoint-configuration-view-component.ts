@@ -16,6 +16,7 @@ export class EditPrimaryEndpointConfigurationViewComponentController  extends Ed
     this.c.compatibleEndpoints.splice(index, 1)
   }
 
+  /* @ngInject */
   constructor($stateParams: any, fibraService: FibraService, projectService: ProjectService, toastr: angular.toastr.IToastrService) {
     super($stateParams.sourceId, projectService, toastr)
     if ($stateParams.id) projectService.loadPrimaryEndpointConfiguration(this.projectSource, $stateParams.id).then(ps => this.c = ps)

@@ -3,6 +3,7 @@ import * as angular from 'angular'
 
 export class SocialAuthService {
 
+  /* @ngInject */
   public constructor(private $localStorage: any, private $state: angular.ui.IStateService) {
   }
 

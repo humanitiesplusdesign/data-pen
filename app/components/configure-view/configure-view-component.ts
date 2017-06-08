@@ -42,6 +42,7 @@ export class ConfigureViewComponentController implements angular.IComponentContr
     if (this.project) this.selectedTemplate.copyToProject(this.project)
   }
 
+  /* @ngInject */
   constructor(private $q: angular.IQService, private projectService: ProjectService, fibraService: FibraService, private sparqlTreeService: SparqlTreeService, $stateParams: any, private $state: angular.ui.IStateService) {
     this.projectSources = projectService.getProjectSources()
     this.projectSource = this.projectSources.find(ps => ps.id === $stateParams.sourceId)

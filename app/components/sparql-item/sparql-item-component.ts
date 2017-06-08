@@ -25,6 +25,7 @@ class SparqlItemComponentController extends SparqlItemComponentBindings {
     this.fibraService.dispatchAction(this.fibraService.displayItem(this.item))
   }
 
+  /* @ngInject */
   constructor(private sparqlItemService: SparqlItemService,
               private fibraService: FibraService) {
     super()
