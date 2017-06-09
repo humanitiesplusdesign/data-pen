@@ -1,13 +1,12 @@
 'use strict'
 
-import {Citable} from '../../models/citable'
-import {INode, FIBRA, VOID, RDF} from '../../models/rdf'
-import {SparqlAutocompleteService} from '../sparql-autocomplete-service'
-import {DataModel} from './data-model'
-import {SparqlItemService} from '../sparql-item-service'
-import {SparqlTreeService} from '../../services/sparql-tree-service'
-
-import s = fi.seco.sparql.SparqlService
+import {Citable} from 'models/citable'
+import {INode, FIBRA, VOID, RDF} from 'models/rdf'
+import {SparqlAutocompleteService} from 'services/sparql-autocomplete-service'
+import {DataModel} from 'services/project-service/data-model'
+import {SparqlItemService} from 'services/sparql-item-service'
+import {SparqlTreeService} from 'services/sparql-tree-service'
+import {SparqlService} from 'angular-sparql-service'
 
 export class RemoteEndpointConfiguration extends Citable {
   public static listAuthorityEndpointConfigurationsQuery: string = `PREFIX fibra: <http://hdlab.stanford.edu/fibra/ontology#>
@@ -113,11 +112,11 @@ SELECT ?types ?labels ?descriptions ?rightsHolders ?rightsHolders_labels ?rights
       f  = fragmentsById.get(this.id)
       f = f + `
 void:sparqlEndpoint <${this.endpoint}> ;
-fibra:autocompletionQuery ${s.stringToSPARQLString(this.autocompletionQuery)} ;
-fibra:itemQuery ${s.stringToSPARQLString(this.itemQuery)} ;
-fibra:treeQuery ${s.stringToSPARQLString(this.treeQuery)} ;
-fibra:propertyQuery ${s.stringToSPARQLString(this.propertyQuery)} ;
-fibra:classQuery ${s.stringToSPARQLString(this.classQuery)} .`
+fibra:autocompletionQuery ${SparqlService.stringToSPARQLString(this.autocompletionQuery)} ;
+fibra:itemQuery ${SparqlService.stringToSPARQLString(this.itemQuery)} ;
+fibra:treeQuery ${SparqlService.stringToSPARQLString(this.treeQuery)} ;
+fibra:propertyQuery ${SparqlService.stringToSPARQLString(this.propertyQuery)} ;
+fibra:classQuery ${SparqlService.stringToSPARQLString(this.classQuery)} .`
       fragmentsById.set(this.id, f)
     }
   }

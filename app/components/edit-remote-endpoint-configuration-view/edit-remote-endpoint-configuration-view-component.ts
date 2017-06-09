@@ -22,8 +22,8 @@ export class EditRemoteEndpointConfigurationViewComponentController extends Edit
 }
 
 export class EditRemoteEndpointConfigurationViewComponent implements angular.IComponentOptions {
-    public controller = EditRemoteEndpointConfigurationViewComponentController
-    public template = require('./edit-remote-endpoint-configuration-view.pug')()
+    public controller: (new (...args: any[]) => angular.IController) = EditRemoteEndpointConfigurationViewComponentController
+    public template: string = require('./edit-remote-endpoint-configuration-view.pug')()
 }
 
 angular.module('fibra.components.edit-remote-endpoint-configuration', ['fibra.services'])

@@ -1,9 +1,0 @@
-{
-  "name": "fibra",
-  "version": "0.0.0",
-  "dependencies": {
-    "angular-sparql-service": "1.4.0",
-    "ngstorage": "0.3.11",
-    "angular-ui-codemirror": "0.3.0"
-  }
-}

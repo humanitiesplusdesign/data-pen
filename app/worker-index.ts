@@ -1,14 +1,14 @@
 import * as angular from 'angular'
 
 // Register modules
-import {WorkerWorkerService, StateWorkerService} from './services/worker-service/worker-service'
-import {ProjectWorkerService} from './services/project-service/project-service'
-import {FibraSparqlService} from './services/fibra-sparql-service'
-import {SparqlTreeWorkerService} from './services/sparql-tree-service'
-import {SparqlItemWorkerService} from './services/sparql-item-service'
-import {SparqlUpdateWorkerService} from './services/sparql-update-service'
-import {SparqlAutocompleteWorkerService} from './services/sparql-autocomplete-service'
-import './services/worker-service/prototype-mapping-configuration'
+import {WorkerWorkerService, StateWorkerService} from 'services/worker-service/worker-service'
+import {ProjectWorkerService} from 'services/project-service/project-service'
+import {FibraSparqlService} from 'services/fibra-sparql-service'
+import {SparqlTreeWorkerService} from 'services/sparql-tree-service'
+import {SparqlItemWorkerService} from 'services/sparql-item-service'
+import {SparqlUpdateWorkerService} from 'services/sparql-update-service'
+import {SparqlAutocompleteWorkerService} from 'services/sparql-autocomplete-service'
+import 'services/worker-service/prototype-mapping-configuration'
 
 import 'angular-http-auth'
 import 'rdfstore'

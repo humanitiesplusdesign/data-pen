@@ -6,7 +6,7 @@ import {EMap, StringSet} from '../components/collection-utils'
 import {FibraSparqlService} from './fibra-sparql-service'
 import {StateWorkerService} from './worker-service/worker-service'
 import {DataModel} from './project-service/data-model'
-import s = fi.seco.sparql
+import {SparqlService, ISparqlBindingResult} from 'angular-sparql-service'
 import * as angular from 'angular'
 
 export class AutocompletionResults {
@@ -137,7 +137,7 @@ class ProcessingData {
 
 export class SparqlAutocompleteWorkerService {
 
-  private static processBindings(pd: ProcessingData, endpoint: string, result: s.ISparqlBindingResult<{[id: string]: s.ISparqlBinding}>): void {
+  private static processBindings(pd: ProcessingData, endpoint: string, result: ISparqlBindingResult<{[id: string]: ISparqlBinding}>): void {
     result.results.bindings.forEach(binding => {
       let id: string = binding['id'].value
       pd.idToIdSet.goc(id).add(id)
@@ -239,7 +239,7 @@ export class SparqlAutocompleteWorkerService {
     let d: angular.IDeferred<AutocompletionResults> = this.$q.defer()
     let results: AutocompletionResults = new AutocompletionResults()
     let queryTemplate: string = this.stateWorkerService.state.project.autocompletionQuery
-    queryTemplate = queryTemplate.replace(/<QUERY>/g, s.SparqlService.stringToSPARQLString(query))
+    queryTemplate = queryTemplate.replace(/<QUERY>/g, SparqlService.stringToSPARQLString(query))
     queryTemplate = queryTemplate.replace(/<LIMIT>/g, '' + limit)
     queryTemplate = queryTemplate.replace(/# CONSTRAINTS/g, limits)
     queryTemplate = queryTemplate.replace(/<PREFLANG>/g, this.stateWorkerService.state.language)
@@ -258,7 +258,7 @@ export class SparqlAutocompleteWorkerService {
       let remoteGroupIdToGroup: EMap<ResultGroup> = new EMap<ResultGroup>()
       this.$q.all(this.stateWorkerService.state.project.remoteEndpoints().map(endpointConfiguration => {
         queryTemplate = endpointConfiguration.autocompletionQuery
-        queryTemplate = queryTemplate.replace(/<QUERY>/g, s.SparqlService.stringToSPARQLString(query))
+        queryTemplate = queryTemplate.replace(/<QUERY>/g, SparqlService.stringToSPARQLString(query))
         queryTemplate = queryTemplate.replace(/<LIMIT>/g, '' + limit)
         queryTemplate = queryTemplate.replace(/<PREFLANG>/g, this.stateWorkerService.state.language)
         return this.fibraSparqlService.query(endpointConfiguration.endpoint, queryTemplate, {timeout: canceller}).then(

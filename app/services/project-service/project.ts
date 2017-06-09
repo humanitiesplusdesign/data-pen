@@ -1,15 +1,15 @@
 'use strict'
 
-import {Citable} from '../../models/citable'
-import {DataModel} from './data-model'
-import {SparqlAutocompleteService} from '../sparql-autocomplete-service'
-import {SparqlTreeService} from '../../services/sparql-tree-service'
-import {SparqlItemService} from '../sparql-item-service'
-import {RemoteEndpointConfiguration} from './remote-endpoint-configuration'
-import {PrimaryEndpointConfiguration} from './primary-endpoint-configuration'
-import {Schema} from './schema'
-import {FIBRA, VOID} from '../../models/rdf'
-import s = fi.seco.sparql.SparqlService
+import {Citable} from 'models/citable'
+import {DataModel} from 'services/project-service/data-model'
+import {SparqlService} from 'angular-sparql-service'
+import {SparqlAutocompleteService} from 'services/sparql-autocomplete-service'
+import {SparqlTreeService} from 'services/sparql-tree-service'
+import {SparqlItemService} from 'services/sparql-item-service'
+import {RemoteEndpointConfiguration} from 'services/project-service/remote-endpoint-configuration'
+import {PrimaryEndpointConfiguration} from 'services/project-service/primary-endpoint-configuration'
+import {Schema} from 'services/project-service/schema'
+import {FIBRA, VOID} from 'models/rdf'
 
 export class Project extends Citable {
 
@@ -245,17 +245,17 @@ fibra:archiveEndpointReference [
       if (this.graph) f = f + `
 fibra:graph <${this.graph}> ;`
       f = f + `
-fibra:autocompletionQuery ${s.stringToSPARQLString(this.autocompletionQuery)} ;
-fibra:treeQuery ${s.stringToSPARQLString(this.treeQuery)} ;
-fibra:itemQuery ${s.stringToSPARQLString(this.itemQuery)} ;
-fibra:deleteItemQuery ${s.stringToSPARQLString(this.deleteItemQuery)} ;
-fibra:classQuery ${s.stringToSPARQLString(this.classQuery)} ;
-fibra:propertyQuery ${s.stringToSPARQLString(this.propertyQuery)} ;
+fibra:autocompletionQuery ${SparqlService.stringToSPARQLString(this.autocompletionQuery)} ;
+fibra:treeQuery ${SparqlService.stringToSPARQLString(this.treeQuery)} ;
+fibra:itemQuery ${SparqlService.stringToSPARQLString(this.itemQuery)} ;
+fibra:deleteItemQuery ${SparqlService.stringToSPARQLString(this.deleteItemQuery)} ;
+fibra:classQuery ${SparqlService.stringToSPARQLString(this.classQuery)} ;
+fibra:propertyQuery ${SparqlService.stringToSPARQLString(this.propertyQuery)} ;
 void:sparqlEndpoint <${this.endpoint}> ;
 fibra:updateEndpoint <${this.updateEndpoint}> ;
 fibra:graphStoreEndpoint <${this.graphStoreEndpoint}> ;
-fibra:schemaNS ${s.stringToSPARQLString(this.schemaNS)} ;
-fibra:instanceNS ${s.stringToSPARQLString(this.instanceNS)} .`
+fibra:schemaNS ${SparqlService.stringToSPARQLString(this.schemaNS)} ;
+fibra:instanceNS ${SparqlService.stringToSPARQLString(this.instanceNS)} .`
       fragmentsById.set(this.id, f)
     }
   }

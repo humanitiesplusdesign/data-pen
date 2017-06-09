@@ -1,9 +1,8 @@
-var glob = require("glob");
-var webpack = require("webpack");
-var HtmlWebpackPlugin = require('html-webpack-plugin');
-var ExtractTextPlugin = require('extract-text-webpack-plugin');
+const webpack = require("webpack");
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const ExtractTextPlugin = require('extract-text-webpack-plugin');
 
-var commonConf = {
+const commonConf = {
   cache: true,
   watch: true,
   devtool: 'cheap-module-inline-source-map',
@@ -48,14 +47,13 @@ var commonConf = {
     ]
   },
   resolve: {
-    modules: ["node_modules", "app/bower_components"],
-    descriptionFiles: ["package.json", "bower.json"],
+    modules: [__dirname + "/app", "node_modules"],
+    descriptionFiles: ["package.json"],
     extensions: [".tsx", ".ts", ".js", ".styl", ".pug", ".css"]
   },
   externals: {
     d3: 'd3',
-    angular: 'angular',
-    fi: 'angular-sparql-service'
+    angular: 'angular'
   },
   devServer: {
     hot: true,

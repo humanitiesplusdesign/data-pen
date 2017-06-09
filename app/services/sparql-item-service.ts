@@ -1,17 +1,16 @@
 'use strict'
 
 import * as angular from 'angular'
-import {IRichNode, PrunedRichNodeFromNode, RichNodeFromRichNode, FullRichNodeFromNode} from '../models/richnode'
-import {INode, DataFactory, DefaultGraph, ENodeMap, OWL, Triple, Graph, NamedNode} from '../models/rdf'
-import {IQuad, ITriple} from '../models/rdfjs'
-import {WorkerService, WorkerWorkerService} from '../services/worker-service/worker-service'
-import {EMap} from '../components/collection-utils'
-import {FibraSparqlService} from './fibra-sparql-service'
-import {SparqlUpdateWorkerService} from './sparql-update-service'
-import {StateWorkerService} from './worker-service/worker-service'
-import {UUID, flatten} from '../components/misc-utils'
-
-import s = fi.seco.sparql
+import {IRichNode, PrunedRichNodeFromNode, RichNodeFromRichNode, FullRichNodeFromNode} from 'models/richnode'
+import {INode, DataFactory, DefaultGraph, ENodeMap, OWL, Triple, Graph, NamedNode} from 'models/rdf'
+import {IQuad, ITriple} from 'models/rdfjs'
+import {WorkerService, WorkerWorkerService} from 'services/worker-service/worker-service'
+import {EMap} from 'components/collection-utils'
+import {FibraSparqlService} from 'services/fibra-sparql-service'
+import {ISparqlBinding} from 'angular-sparql-service'
+import {SparqlUpdateWorkerService} from 'services/sparql-update-service'
+import {StateWorkerService} from 'services/worker-service/worker-service'
+import {UUID, flatten} from 'components/misc-utils'
 
 export interface IPropertyToValues extends IRichNode {
   values: IRichPropertyValue[]
@@ -198,7 +197,7 @@ WHERE {
 
 export class SparqlItemWorkerService {
 
-  private static processItemResult(properties: PropertyToValues[], propertyMap: EMap<PropertyToValues>, propertyValueMap: EMap<EMap<IRichNode>>, sameAses: INode[], endpoint: string, b: {[varId: string]: s.ISparqlBinding}): void {
+  private static processItemResult(properties: PropertyToValues[], propertyMap: EMap<PropertyToValues>, propertyValueMap: EMap<EMap<IRichNode>>, sameAses: INode[], endpoint: string, b: {[varId: string]: ISparqlBinding}): void {
     if (b['property']) {
       let n: IRichNode = propertyValueMap.goc(b['property'].value).goc(b['object'].value, () => {
         let propertyToValues: PropertyToValues = propertyMap.goc(b['property'].value, () => {

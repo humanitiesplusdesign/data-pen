@@ -6,6 +6,7 @@ import {WorkerService} from '../../services/worker-service/worker-service'
 import {FibraService, UIState} from '../../services/fibra-service'
 import {Project} from './project'
 import {ProjectSourceInfo} from '../../components/project-sources-view/project-sources-view-component'
+import {SparqlService, IBindingsToObjectConfiguration, UniqueObjectTracker} from 'angular-sparql-service'
 import {FibraSparqlService} from '../../services/fibra-sparql-service'
 import {PrimaryEndpointConfiguration} from './primary-endpoint-configuration'
 import {RemoteEndpointConfiguration} from './remote-endpoint-configuration'
@@ -14,8 +15,6 @@ import {Map, IEMap, EMap} from '../../components/collection-utils'
 import {toTurtle} from '../../components/misc-utils'
 import {DataFactory} from '../../models/rdf'
 import {DataModel, Class, Property} from './data-model'
-
-import s = fi.seco.sparql
 
 export class ProjectService {
 
@@ -169,7 +168,7 @@ export class ProjectWorkerService {
     let promises: angular.IPromise<void>[] = []
     schemas.forEach(schema => {
       promises.push(this.fibraSparqlService.query(schema.endpoint, schema.classQuery).then(response => {
-        let conf: s.IBindingsToObjectConfiguration = {
+        let conf: IBindingsToObjectConfiguration = {
           bindingTypes: { types: 'uniqueArray' },
           bindingConverters: {
             superClasses: (binding) => classes.goc(binding.value),
@@ -179,11 +178,11 @@ export class ProjectWorkerService {
             descriptions: (binding) => DataFactory.nodeFromBinding(binding),
           }
         }
-        let tracker: s.UniqueObjectTracker = new s.UniqueObjectTracker()
-        response.results.bindings.forEach(binding => s.SparqlService.bindingsToObject(binding, classes.goc(binding['id'].value), conf, tracker))
+        let tracker: UniqueObjectTracker = new UniqueObjectTracker()
+        response.results.bindings.forEach(binding => SparqlService.bindingsToObject(binding, classes.goc(binding['id'].value), conf, tracker))
       }))
       promises.push(this.fibraSparqlService.query(schema.endpoint, schema.propertyQuery).then(response => {
-        let conf: s.IBindingsToObjectConfiguration = {
+        let conf: IBindingsToObjectConfiguration = {
           bindingTypes: { types: 'uniqueArray' },
           bindingConverters: {
             superProperties: (binding) => properties.goc(binding.value),
@@ -196,8 +195,8 @@ export class ProjectWorkerService {
             descriptions: (binding) => DataFactory.nodeFromBinding(binding),
           }
         }
-        let tracker: s.UniqueObjectTracker = new s.UniqueObjectTracker()
-        response.results.bindings.forEach(binding => s.SparqlService.bindingsToObject(binding, properties.goc(binding['id'].value), conf, tracker))
+        let tracker: UniqueObjectTracker = new UniqueObjectTracker()
+        response.results.bindings.forEach(binding => SparqlService.bindingsToObject(binding, properties.goc(binding['id'].value), conf, tracker))
       }))
     })
     return this.$q.all(promises).then(() => {
@@ -249,7 +248,7 @@ export class ProjectWorkerService {
     tq = tq.replace(/<ID>/g, '<' + id + '>')
     let deferred: angular.IDeferred<T> = this.$q.defer()
     this.fibraSparqlService.query(source.sparqlEndpoint, tq).then(response => {
-      let conf: s.IBindingsToObjectConfiguration = {
+      let conf: IBindingsToObjectConfiguration = {
         bindingTypes: { rightsHolders: 'uniqueArray', schemas: 'uniqueArray', authorityEndpoints: 'uniqueArray', archiveEndpoints: 'uniqueArray'},
         bindingConverters: {
           types: (binding) => DataFactory.nodeFromBinding(binding),
@@ -263,8 +262,8 @@ export class ProjectWorkerService {
           rightsHolders: (binding) => new Citable(binding.value, source)
         }
       }
-      let tracker: s.UniqueObjectTracker = new s.UniqueObjectTracker()
-      response.results.bindings.forEach(b => s.SparqlService.bindingsToObject(b, ps, conf, tracker))
+      let tracker: UniqueObjectTracker = new UniqueObjectTracker()
+      response.results.bindings.forEach(b => SparqlService.bindingsToObject(b, ps, conf, tracker))
       ProjectService.orderCitables(ps.rightsHolders)
       deferred.resolve(ps)
     })
@@ -276,7 +275,7 @@ export class ProjectWorkerService {
     return this.fibraSparqlService.query(source.sparqlEndpoint, lq).then(
       response => {
         let projects: EMap<T> = new EMap<T>(oc)
-        let conf: s.IBindingsToObjectConfiguration = {
+        let conf: IBindingsToObjectConfiguration = {
           bindingTypes: { rightsHolders: 'uniqueArray', schemas: 'uniqueArray', authorityEndpoints: 'uniqueArray', archiveEndpoints: 'uniqueArray'},
           bindingConverters: {
             types: (binding) => DataFactory.nodeFromBinding(binding),
@@ -290,8 +289,8 @@ export class ProjectWorkerService {
             rightsHolders: (binding) => new Citable(binding.value, source)
           }
         }
-        let tracker: s.UniqueObjectTracker = new s.UniqueObjectTracker()
-        response.results.bindings.forEach(binding => s.SparqlService.bindingsToObject(binding, projects.goc(binding['id'].value), conf, tracker))
+        let tracker: UniqueObjectTracker = new UniqueObjectTracker()
+        response.results.bindings.forEach(binding => SparqlService.bindingsToObject(binding, projects.goc(binding['id'].value), conf, tracker))
         projects.values().forEach(p => ProjectService.orderCitables(p.rightsHolders))
         return projects.values()
       })

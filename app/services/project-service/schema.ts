@@ -3,8 +3,7 @@
 import {Citable} from '../../models/citable'
 import {DataModel} from './data-model'
 import {FIBRA, VOID} from '../../models/rdf'
-
-import s = fi.seco.sparql.SparqlService
+import {SparqlService} from 'angular-sparql-service'
 
 export class Schema extends Citable {
   public static listSchemasQuery: string = `PREFIX fibra: <http://hdlab.stanford.edu/fibra/ontology#>
@@ -93,8 +92,8 @@ SELECT ?labels ?descriptions ?rightsHolders ?rightsHolders_labels ?rightsHolders
       let f: string = fragmentsById.get(this.id)
       f = f + `
 void:sparqlEndpoint <${this.endpoint}> ;
-fibra:classQuery ${s.stringToSPARQLString(this.classQuery)} ;
-fibra:propertyQuery ${s.stringToSPARQLString(this.propertyQuery)} .`
+fibra:classQuery ${SparqlService.stringToSPARQLString(this.classQuery)} ;
+fibra:propertyQuery ${SparqlService.stringToSPARQLString(this.propertyQuery)} .`
       fragmentsById.set(this.id, f)
     }
   }

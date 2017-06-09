@@ -1,7 +1,8 @@
 'use strict'
 
 import * as angular from 'angular'
-import s = fi.seco.sparql
+import {Store} from 'rdfstore'
+import {SparqlService, ISparqlBindingResult, ISparqlBinding} from 'angular-sparql-service'
 import {EMap, StringSet} from '../components/collection-utils'
 
 export class SparqlServiceDefinition {
@@ -14,14 +15,14 @@ export class FibraSparqlService {
   private services: EMap<angular.IPromise<IInternalSparqlService>> = new EMap<angular.IPromise<IInternalSparqlService>>((id) => {
     if (id.indexOf('local:') === 0) {
       let r: angular.IDeferred<IInternalSparqlService> = this.$q.defer()
-      new rdfstore.Store({name: id, persistent: true}, (err, rdfStore) => {
+      new Store({name: id, persistent: true}, (err, rdfStore) => {
         if (err) r.reject(err)
         else r.resolve(new RDFStoreInternalSparqlService(rdfStore, this.$q))
       })
       return r.promise
     } else return this.$q.resolve(new RemoteInternalSparqlService(this.sparqlService, id))
   })
-  public query<T extends {[id: string]: s.ISparqlBinding}>(id: string, query: string, params?: {}): angular.IPromise<s.ISparqlBindingResult<T>> {
+  public query<T extends {[id: string]: ISparqlBinding}>(id: string, query: string, params?: {}): angular.IPromise<ISparqlBindingResult<T>> {
     return this.services.goc(id).then(s => s.query(query, params))
   }
   public update<T>(id: string, query: string, params?: {}): angular.IPromise<T> {
@@ -37,11 +38,11 @@ export class FibraSparqlService {
     return this.services.goc(id).then(s => s.post(data, graphIRI, params))
   }
   /* @ngInject */
-  constructor(private sparqlService: s.SparqlService, private $q: angular.IQService) {}
+  constructor(private sparqlService: SparqlService, private $q: angular.IQService) {}
 }
 
 interface IInternalSparqlService {
-  query<T extends {[id: string]: s.ISparqlBinding}>(query: string, params?: {}): angular.IPromise<s.ISparqlBindingResult<T>>
+  query<T extends {[id: string]: ISparqlBinding}>(query: string, params?: {}): angular.IPromise<ISparqlBindingResult<T>>
   update<T>(query: string, params?: {}): angular.IPromise<T>
   get<T>(graphIRI?: string, params?: {}): angular.IPromise<T>
   put<T>(data: string, graphIRI?: string, params?: {}): angular.IPromise<T>
@@ -49,8 +50,8 @@ interface IInternalSparqlService {
 }
 
 class RemoteInternalSparqlService implements IInternalSparqlService {
-  constructor(private s: s.SparqlService, private endpoint: string) {}
-  public query<T extends {[id: string]: s.ISparqlBinding}>(query: string, params?: {}): angular.IPromise<s.ISparqlBindingResult<T>> {
+  constructor(private s: SparqlService, private endpoint: string) {}
+  public query<T extends {[id: string]: ISparqlBinding}>(query: string, params?: {}): angular.IPromise<ISparqlBindingResult<T>> {
     return this.s.query(this.endpoint, query, params).then(s => s.data)
   }
   public update<T>(query: string, params?: {}): angular.IPromise<T> {
@@ -85,7 +86,7 @@ interface IRDFStore {
 }
 
 export class RDFStoreInternalSparqlService implements IInternalSparqlService {
-  private static convertBinding(binding: IRDFStoreSparqlBinding): s.ISparqlBinding {
+  private static convertBinding(binding: IRDFStoreSparqlBinding): ISparqlBinding {
     switch (binding.token) {
       case 'uri': return {
         type: 'uri',
@@ -105,15 +106,15 @@ export class RDFStoreInternalSparqlService implements IInternalSparqlService {
     }
   }
   constructor(private s: IRDFStore, private $q: angular.IQService) {}
-  public query<T extends {[id: string]: s.ISparqlBinding}>(query: string, params?: {}): angular.IPromise<s.ISparqlBindingResult<T>> {
-    let deferred: angular.IDeferred<s.ISparqlBindingResult<T>> = this.$q.defer()
+  public query<T extends {[id: string]: ISparqlBinding}>(query: string, params?: {}): angular.IPromise<ISparqlBindingResult<T>> {
+    let deferred: angular.IDeferred<ISparqlBindingResult<T>> = this.$q.defer()
     try {
       this.s.execute(query, (err: any, results: {[id: string]: IRDFStoreSparqlBinding}[]) => {
         if (err) {
           console.log('Error executing', this.s, query, err)
           deferred.reject(err)
         } else {
-          let ret: s.ISparqlBindingResult<T> = {
+          let ret: ISparqlBindingResult<T> = {
             head: {
               vars: []
             },

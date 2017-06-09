@@ -1,6 +1,6 @@
-var GhPagesWebpackPlugin = require('gh-pages-webpack-plugin');
+const GhPagesWebpackPlugin = require('gh-pages-webpack-plugin');
 
-var confs = require('./webpack.dist.config.js');
+const confs = require('./webpack.dist.config.js');
 confs[0].plugins.push(new GhPagesWebpackPlugin({
    path: './dist',
    options: { dest: 'test' }

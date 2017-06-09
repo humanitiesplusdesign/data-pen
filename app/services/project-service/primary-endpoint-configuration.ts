@@ -7,8 +7,7 @@ import {SparqlTreeService} from '../../services/sparql-tree-service'
 import {DataModel} from './data-model'
 import {FIBRA} from '../../models/rdf'
 import {Project} from '../project-service/project'
-
-import s = fi.seco.sparql.SparqlService
+import {SparqlService} from 'angular-sparql-service'
 
 export class PrimaryEndpointConfiguration extends Citable {
   public static listPrimaryEndpointConfigurationsQuery: string = `PREFIX fibra: <http://hdlab.stanford.edu/fibra/ontology#>
@@ -113,12 +112,12 @@ fibra:compatibleEndpoint `
         f = f.substring(0, f.length - 2) + ' ;'
       }
       f = f + `
-fibra:autocompletionQuery ${s.stringToSPARQLString(this.autocompletionQuery)} ;
-fibra:treeQuery ${s.stringToSPARQLString(this.treeQuery)} ;
-fibra:propertyQuery ${s.stringToSPARQLString(this.propertyQuery)} ;
-fibra:classQuery ${s.stringToSPARQLString(this.classQuery)} ;
-fibra:itemQuery ${s.stringToSPARQLString(this.itemQuery)} ;
-fibra:deleteItemQuery ${s.stringToSPARQLString(this.deleteItemQuery)} .`
+fibra:autocompletionQuery ${SparqlService.stringToSPARQLString(this.autocompletionQuery)} ;
+fibra:treeQuery ${SparqlService.stringToSPARQLString(this.treeQuery)} ;
+fibra:propertyQuery ${SparqlService.stringToSPARQLString(this.propertyQuery)} ;
+fibra:classQuery ${SparqlService.stringToSPARQLString(this.classQuery)} ;
+fibra:itemQuery ${SparqlService.stringToSPARQLString(this.itemQuery)} ;
+fibra:deleteItemQuery ${SparqlService.stringToSPARQLString(this.deleteItemQuery)} .`
       fragmentsById.set(this.id, f)
     }
   }

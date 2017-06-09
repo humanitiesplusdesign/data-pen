@@ -1,8 +1,8 @@
 'use strict'
 
-import s = fi.seco.sparql
-import { ITerm, INamedNode, ILiteral, IDefaultGraph, IUNDEF, IVariable, IBlankNode, IQuad, ITriple, IDataFactory} from './rdfjs'
-import { IEMap, EMap, EOMap } from '../components/collection-utils'
+import { ISparqlBinding, SparqlService } from 'angular-sparql-service'
+import { ITerm, INamedNode, ILiteral, IDefaultGraph, IUNDEF, IVariable, IBlankNode, IQuad, ITriple, IDataFactory} from 'models/rdfjs'
+import { IEMap, EMap, EOMap } from 'components/collection-utils'
 
 export interface INode extends ITerm {
   language?: string
@@ -15,7 +15,7 @@ export class Node implements INode {
     switch (this.termType) {
       case 'NamedNode': return '<' + this.value + '>'
       case 'BlankNode': return '_:' + this.value
-      case 'Literal': return s.SparqlService.stringToSPARQLString(this.value) + (this.language ? '@' + this.language : (!this.datatype || RDF.langString.equals(this.datatype!) || XMLSchema.string.equals(this.datatype!) ? '' : '^^' + this.datatype!.toCanonical()))
+      case 'Literal': return SparqlService.stringToSPARQLString(this.value) + (this.language ? '@' + this.language : (!this.datatype || RDF.langString.equals(this.datatype!) || XMLSchema.string.equals(this.datatype!) ? '' : '^^' + this.datatype!.toCanonical()))
       case 'Variable': return '?' + this.value
       case 'DefaultGraph': return ''
       case 'UNDEF': return 'UNDEF'
@@ -27,7 +27,7 @@ export class Node implements INode {
   }
 }
 
-  export class NodeFromNode extends Node {
+export class NodeFromNode extends Node {
   constructor(other: INode) {
     super(other.value, other.termType, other.language, other.datatype)
   }
@@ -120,7 +120,7 @@ export class DataFactory implements IDataFactory {
 
   private nextBlankNodeId: number = 0
 
-  public static nodeFromBinding(binding: s.ISparqlBinding): INode {
+  public static nodeFromBinding(binding: ISparqlBinding): INode {
     return DataFactory.instance.nodeFromBinding(binding)
   }
 
@@ -146,7 +146,7 @@ export class DataFactory implements IDataFactory {
     return DataFactory.instance.quad(subject, predicate, object, graph)
   }
 
-  public nodeFromBinding(binding: s.ISparqlBinding): INode {
+  public nodeFromBinding(binding: ISparqlBinding): INode {
     let n: Node = new Node(binding.value, binding.type === 'literal' ? 'Literal' : (binding.type === 'uri' ? 'NamedNode' : 'BlankNode'))
     if (binding.type === 'literal') {
       n.language = binding['xml:lang'] ? binding['xml:lang'] : ''

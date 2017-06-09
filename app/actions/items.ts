@@ -1,7 +1,7 @@
-import {Action} from '../models/action'
-import {INode, DataFactory, OWL, SKOS, RDF} from '../models/rdf'
-import {INamedNode, ITerm} from '../models/rdfjs'
-import {IPropertyAndValue, SparqlItemService, PropertyAndValue} from '../services/sparql-item-service'
+import {Action} from 'models/action'
+import {INode, DataFactory, OWL, SKOS, RDF} from 'models/rdf'
+import {INamedNode, ITerm} from 'models/rdfjs'
+import {IPropertyAndValue, SparqlItemService, PropertyAndValue} from 'services/sparql-item-service'
 
 export const CREATE_TYPE: string = 'CREATE_TYPE'
 export const ITEMS_CREATED: string = 'ITEMS_CREATED'

@@ -15,9 +15,10 @@ import './services'
 import './components'
 import './filters'
 
-// Forces the build to include ng-redux from node_modules
 import 'ng-redux'
 import 'angular-yasqe-component'
+import 'ngstorage'
+import 'angular-ui-codemirror'
 
 let m: angular.IModule = angular.module('fibra', [
   'fibra.services',
@@ -43,7 +44,6 @@ m.value('workerServiceConfiguration', {
   workerThreads: 1,
   importScripts: [
     'https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js',
-    'bower_components/angular-sparql-service/dist/sparql-service.js',
     'worker-bundle.js'
   ]
 })

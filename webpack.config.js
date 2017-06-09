@@ -1,10 +1,10 @@
-var path = require("path");
-var webpack = require("webpack");
-var CopyWebpackPlugin = require('copy-webpack-plugin');
-var HtmlWebpackPlugin = require('html-webpack-plugin');
-var ExtractTextPlugin = require('extract-text-webpack-plugin');
+const path = require("path");
+const webpack = require("webpack");
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const ExtractTextPlugin = require('extract-text-webpack-plugin');
+const WebpackBuildNotifierPlugin = require("webpack-build-notifier");
 
-var commonConf = require('./webpack.common.config.js');
+const commonConf = require('./webpack.common.config.js');
 commonConf.output.path = path.join(__dirname + '/dist-dev')
 commonConf.module.rules[0].use.unshift({
   loader: 'angular-hot-loader',
@@ -22,15 +22,16 @@ module.exports = [ Object.assign({
   plugins: [
     new webpack.HotModuleReplacementPlugin(),
     new webpack.NamedModulesPlugin(),
-    new CopyWebpackPlugin([
-            { from: 'app/bower_components', to: 'bower_components' }]),
     new HtmlWebpackPlugin({
       chunks: ['ui'],
       filename: 'index.html',
       favicon: 'app/favicon.ico',
       template: 'app/index.pug'
     }),
-    new ExtractTextPlugin('styles.css')
+    new ExtractTextPlugin('styles.css'),
+    new WebpackBuildNotifierPlugin({
+      title: "Fibra UI Webpack Build"
+    })
   ]
 }, commonConf), Object.assign({
   name: 'worker',
@@ -41,6 +42,9 @@ module.exports = [ Object.assign({
   target: 'webworker',
   plugins: [
     new webpack.HotModuleReplacementPlugin(),
-    new webpack.NamedModulesPlugin()
+    new webpack.NamedModulesPlugin(),
+    new WebpackBuildNotifierPlugin({
+      title: "Fibra WebWorker Webpack Build"
+    })
   ]
 }, commonConf)];

@@ -5,7 +5,6 @@
 ### Prequisites
 
  1. Make sure you have [Node.js](https://nodejs.org/en/) installed (for example using [nvm](https://github.com/creationix/nvm)).
- 1. Make sure you have [Bower](http://bower.io/) installed (`npm install -g bower`)
  1. Make sure you have [Webpack](https://webpack.js.org/) installed (`npm install -g webpack`)
 
 ### Setting up the build environment
@@ -20,11 +19,11 @@ npm install -g webpack-dev-server
 webpack-dev-server
 ```
 
-Running `npm install` (or `yarn` if you have it) should also automatically run `bower install`, but if it doesn't, run that yourself.
+(you can also use `yarn` instead of `npm install` if you have it)
 
 ### Building
 
-To simply build the project, run `webpack`. However, when actually working, you probably want to use `webpack-dev-server` (which you need to install by `npm install -g webpack-dev-server` as mentioned above), which spawns the app on localhost:3000, and stays to watch for changes in the project files, automatically recompiling them. At the moment you still need to reload the browser to see changes, but we will eventually enable hot module loading so that they will be automatically updated with changes.
+To simply build the project, run `webpack`. However, when actually working, you probably want to use `webpack-dev-server` (which you need to install by `npm install -g webpack-dev-server` as mentioned above), which spawns the app on localhost:3000, and stays to watch for changes in the project files, automatically recompiling them and intelligently refreshing the browser.
 
 ### Running completely against a local SPARQL endpoint
 

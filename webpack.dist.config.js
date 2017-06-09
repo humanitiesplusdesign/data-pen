@@ -1,11 +1,11 @@
-var path = require("path");
-var webpack = require("webpack");
-var HtmlWebpackPlugin = require('html-webpack-plugin');
-var ExtractTextPlugin = require('extract-text-webpack-plugin');
-var GhPagesWebpackPlugin = require('gh-pages-webpack-plugin');
-var CopyWebpackPlugin = require('copy-webpack-plugin');
+const path = require("path");
+const webpack = require("webpack");
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const ExtractTextPlugin = require('extract-text-webpack-plugin');
+const GhPagesWebpackPlugin = require('gh-pages-webpack-plugin');
+const WebpackBuildNotifierPlugin = require("webpack-build-notifier");
 
-var commonConf = require('./webpack.common.config.js');
+const commonConf = require('./webpack.common.config.js');
 commonConf.watch = false
 commonConf.output.path = path.join(__dirname + '/dist')
 
@@ -15,8 +15,6 @@ module.exports = [ Object.assign({
     ui: './app/index.ts'
   },
   plugins: [
-    new CopyWebpackPlugin([
-            { from: 'app/bower_components', to: 'bower_components' }]),
     new HtmlWebpackPlugin({
       chunks: ['ui'],
       filename: 'index.html',
@@ -26,7 +24,10 @@ module.exports = [ Object.assign({
     new ExtractTextPlugin('styles.css'),
     new webpack.optimize.UglifyJsPlugin(),
     new webpack.DefinePlugin({'process.env.NODE_ENV':  '"production"'}),
-    new webpack.NoEmitOnErrorsPlugin()
+    new webpack.NoEmitOnErrorsPlugin(),
+    new WebpackBuildNotifierPlugin({
+      title: "Fibra UI Webpack Distribution Build"
+    })
   ]
 }, commonConf), Object.assign({
   name: 'worker',
@@ -37,6 +38,9 @@ module.exports = [ Object.assign({
   plugins: [
     new webpack.optimize.UglifyJsPlugin(),
     new webpack.DefinePlugin({'process.env.NODE_ENV': '"production"'}),
-    new webpack.NoEmitOnErrorsPlugin()
+    new webpack.NoEmitOnErrorsPlugin(),
+    new WebpackBuildNotifierPlugin({
+      title: "Fibra WebWorker Webpack Distribution Build"
+    })
   ]}, commonConf)
 ];

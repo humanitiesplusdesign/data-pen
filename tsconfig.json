@@ -3,19 +3,11 @@
         "module": "es6",
         "moduleResolution": "node",
         "target": "es6",
+        "baseUrl": "./app",
         "strictNullChecks": false
     },
     "include": [
-        "app/components/*.ts",
-        "app/services/*.ts",
-        "app/models/*.ts",
-        "app/filters/*.ts",
-        "app/*.ts",
-        "app/bower_components/**/*.d.ts",
-        "node_modules/@types/**/*.d.ts"
-    ],
-    "exclude": [
-        "app/bower_components/*/node_modules/**/*.ts",
-        "app/bower_components/*/typings/**/*.ts"
+        "app/**/*.ts",
+        "node_modules/@types/*/*.d.ts"
     ]
 }
