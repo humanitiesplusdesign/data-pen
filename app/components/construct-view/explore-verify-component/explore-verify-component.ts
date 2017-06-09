@@ -31,8 +31,8 @@ export class ExploreVerifyComponentController {
                       private sparqlAutocompleteService: SparqlAutocompleteService) {
     this.fibraService = fibraService
     this.canceller = $q.defer()
-    let unsub1 = $ngRedux.connect(this.mapVerifyToThis, VerifyActions)(this)
-    let unsub2 = $ngRedux.connect(this.mapItemsToThis, VerifyActions)(this)
+    let unsub1: () => void = $ngRedux.connect(this.mapVerifyToThis, VerifyActions)(this)
+    let unsub2: () => void = $ngRedux.connect(this.mapItemsToThis, VerifyActions)(this)
     this.unsubscribe = () => {
       unsub1()
       unsub2()
@@ -50,13 +50,13 @@ export class ExploreVerifyComponentController {
     }
   }
 
-  private mapVerifyToThis(state) {
+  private mapVerifyToThis(state): {} {
     return {
       verify: state.verify
     }
   }
 
-  private mapItemsToThis(state) {
+  private mapItemsToThis(state): {} {
     return {
       items: state.items
     }
@@ -71,33 +71,34 @@ export class ExploreVerifyComponentController {
     this.canceller = this.$q.defer()
     let nodeTypes: PropertyToValues = this.node.localProperties.filter((p) => p.value === 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type')[0]
     this.relevantTypes = nodeTypes ? nodeTypes.values.map(v => v.value) : []
-    this.relevantTypes.forEach((t) => { if (t) this.limitFilter += '<' + t.value + '>' + ',' })
+    // this.relevantTypes.forEach((t) => { if (t) this.limitFilter += '<' + t.value + '>' + ',' })
     if (this.limitFilter.length !== 0) this.limitFilter = 'FILTER (?groupId IN (' + this.limitFilter.substring(0, this.limitFilter.length - 1) + '))'
+    console.log('Query info', this.queryString, this.limitFilter)
     this.sparqlAutocompleteService.autocomplete(this.queryString, 6, true, this.limitFilter, this.canceller.promise).then(
       (results: AutocompletionResults) => {
-        console.log("Results in verify: ", results)
+        console.log('Results in verify: ', results)
         this.queryRunning = false
         this.updateResults(results)
       },
       () => {
-        console.log("Error in verify")
+        console.log('Error in verify')
         this.queryRunning = false
         this.error = true
       },
       (update: {error?: any, results?: AutocompletionResults}) => {
-        console.log("Update in verify: ", update)
+        console.log('Update in verify: ', update)
         if (update.error) this.error = true
         else this.updateResults(update.results)
       }
     )
   }
 
-  private updateResults(results: AutocompletionResults) {
-    console.log(this.relevantTypes)
+  private updateResults(results: AutocompletionResults): void {
+    console.log('Relevant types', this.relevantTypes)
     let typeLabels: string[] = this.relevantTypes.map((t) => { return t.label })
     // this.matchingResults = results.remoteResults.filter((r) => typeLabels.indexOf(r.label) !== -1)
     this.matchingResults = results.remoteResults
-    console.log(this.matchingResults)
+    console.log('Matches', this.matchingResults)
   }
 
   private sourcesFromResult(result: Result): string {

@@ -10,5 +10,5 @@
       .verify-result-group-header {{grp.label}}
       .verify-result(ng-repeat="rslt in grp.results" ng-click="$ctrl.verify(rslt)")
         button.btn.btn-sm(ng-click="$ctrl.verify(rslt)") Verify
-        span {{ rslt.prefLabel.value }}
+        span {{ rslt.matchedLabel.value }}
         span {{ $ctrl.sourcesFromResult(rslt) }}
