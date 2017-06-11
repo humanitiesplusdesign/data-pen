@@ -8,3 +8,4 @@ app/bower_components
 bundle.js
 ui-bundle.js
 worker-bundle.js
+dist-dev
