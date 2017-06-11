@@ -1,0 +1,11 @@
+{
+  "name": "redux-logger",
+  "version": "2.4.0",
+  "description": "Logger middleware for redux",
+  "license": "MIT",
+  "main": "./redux-logger.js",
+  "ignore": [],
+  "dependencies": {
+    "redux": "https://cdnjs.cloudflare.com/ajax/libs/redux/3.0.5/redux.js"
+  }
+}
