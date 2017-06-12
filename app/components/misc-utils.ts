@@ -1,6 +1,6 @@
 'use strict'
 import {ICitable} from '../models/citable'
-import {Map} from './collection-utils'
+import {FMap} from './collection-utils'
 
 export function toTurtle(prefixes: {}, m: d3.Map<string>): string {
   let s: string = ''
@@ -11,7 +11,7 @@ export function toTurtle(prefixes: {}, m: d3.Map<string>): string {
 
 export function citableToTurtle(c: ICitable): string {
   let prefixes: {} = {}
-  let m: d3.Map<string> = new Map<string>()
+  let m: d3.Map<string> = new FMap<string>()
   c.toTurtle(m, prefixes)
   return toTurtle(prefixes, m)
 }

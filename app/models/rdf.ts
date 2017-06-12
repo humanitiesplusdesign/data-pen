@@ -9,7 +9,7 @@ export interface INode extends ITerm {
   datatype?: INamedNode
 }
 
-export class Node implements INode {
+export class CNode implements INode {
   constructor(public value: string, public termType: 'NamedNode' | 'BlankNode' | 'Literal' | 'Variable' | 'DefaultGraph' | 'UNDEF', public language: string | undefined = undefined, public datatype: INamedNode | undefined = undefined) {}
   public toCanonical(): string {
     switch (this.termType) {
@@ -27,13 +27,13 @@ export class Node implements INode {
   }
 }
 
-export class NodeFromNode extends Node {
+export class NodeFromNode extends CNode {
   constructor(other: INode) {
     super(other.value, other.termType, other.language, other.datatype)
   }
 }
 
-export class DefaultGraph extends Node implements IDefaultGraph {
+export class DefaultGraph extends CNode implements IDefaultGraph {
   public static instance: IDefaultGraph = new DefaultGraph()
   public termType: 'DefaultGraph'
   public toCanonical(): string { return '' }
@@ -41,7 +41,7 @@ export class DefaultGraph extends Node implements IDefaultGraph {
   constructor() { super('', 'DefaultGraph') }
 }
 
-export class UNDEF extends Node implements IUNDEF {
+export class UNDEF extends CNode implements IUNDEF {
   public static instance: IUNDEF = new UNDEF()
   public termType: 'UNDEF'
   public toCanonical(): string { return '' }
@@ -49,25 +49,25 @@ export class UNDEF extends Node implements IUNDEF {
   constructor() { super('', 'UNDEF') }
 }
 
-export class Variable extends Node implements IVariable {
+export class Variable extends CNode implements IVariable {
   public termType: 'Variable'
   constructor(value: string) { super(value, 'Variable') }
   public toCanonical(): string { return '?' + this.value }
 }
 
-export class NamedNode extends Node implements INamedNode {
+export class NamedNode extends CNode implements INamedNode {
   public termType: 'NamedNode'
   constructor(value: string) { super(value, 'NamedNode') }
   public toCanonical(): string { return '<' + this.value + '>' }
 }
 
-export class BlankNode extends Node implements IBlankNode {
+export class BlankNode extends CNode implements IBlankNode {
   public termType: 'BlankNode'
   constructor(value: string) { super(value, 'BlankNode') }
   public toCanonical(): string { return '?' + this.value }
 }
 
-export class Literal extends Node implements ILiteral {
+export class Literal extends CNode implements ILiteral {
   public termType: 'Literal'
   public language: string
   public datatype: INamedNode
@@ -147,7 +147,7 @@ export class DataFactory implements IDataFactory {
   }
 
   public nodeFromBinding(binding: ISparqlBinding): INode {
-    let n: Node = new Node(binding.value, binding.type === 'literal' ? 'Literal' : (binding.type === 'uri' ? 'NamedNode' : 'BlankNode'))
+    let n: CNode = new CNode(binding.value, binding.type === 'literal' ? 'Literal' : (binding.type === 'uri' ? 'NamedNode' : 'BlankNode'))
     if (binding.type === 'literal') {
       n.language = binding['xml:lang'] ? binding['xml:lang'] : ''
       n.datatype = binding.datatype ? new NamedNode(binding.datatype) : (n.language !== '' ? RDF.langString : XMLSchema.string)
@@ -157,7 +157,7 @@ export class DataFactory implements IDataFactory {
 
   public nodeFromNode(other: ITerm): INode {
     if (other.termType === 'Literal') return new Literal(other.value, (<ILiteral>other).language, (<ILiteral>other).datatype)
-    else return new Node(other.value, other.termType)
+    else return new CNode(other.value, other.termType)
   }
 
   public nodeFromCanonicalRepresentation(id: string): INode {

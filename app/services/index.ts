@@ -1,14 +1,14 @@
 'use strict'
 import * as angular from 'angular'
 
-import './social-auth-service'
-import './worker-service/worker-service'
-import './project-service/project-service'
-import './fibra-service'
-import './fibra-sparql-service'
-import './sparql-item-service'
-import './sparql-tree-service'
-import './sparql-autocomplete-service'
+import 'services/social-auth-service'
+import 'services/worker-service/worker-service'
+import 'services/project-service/project-service'
+import 'services/fibra-service'
+import 'services/fibra-sparql-service'
+import 'services/sparql-item-service'
+import 'services/sparql-tree-service'
+import 'services/sparql-autocomplete-service'
 
 angular.module('fibra.services', [
   'fibra.services.social-auth-service',

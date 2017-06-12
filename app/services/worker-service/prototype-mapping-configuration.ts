@@ -1,13 +1,16 @@
 'use strict'
 
-import {Project} from '../project-service/project'
-import {PrimaryEndpointConfiguration} from '../project-service/primary-endpoint-configuration'
-import {Class, Property} from '../project-service/data-model'
-import {Node} from '../../models/rdf'
-import {Citable} from '../../models/citable'
-import {Map} from '../../components/collection-utils'
-import {TreeNode} from '../../components/tree/tree-component'
-import {PropertyAndValue} from '../sparql-item-service'
+import {Project} from 'services/project-service/project'
+import {PrimaryEndpointConfiguration} from 'services/project-service/primary-endpoint-configuration'
+import {RemoteEndpointConfiguration} from 'services/project-service/remote-endpoint-configuration'
+import {Schema} from 'services/project-service/schema'
+import {Class, Property} from 'services/project-service/data-model'
+import {CNode} from 'models/rdf'
+import {NamedNode} from 'models/rdf'
+import {Citable} from 'models/citable'
+import {FMap} from 'components/collection-utils'
+import {TreeNode} from 'components/tree/tree-component'
+import {PropertyAndValue} from 'services/sparql-item-service'
 import * as angular from 'angular'
 
 angular.module('fibra.services.worker-service-prototype-mapping-configuration', [])
@@ -15,21 +18,18 @@ angular.module('fibra.services.worker-service-prototype-mapping-configuration', 
     $provide.service('workerServicePrototypeMappingConfiguration', function(): {[className: string]: {}} {
       let mappings: {[className: string]: {}} = {
         'Object': Object.prototype,
-      }
-      let fibra: {[className: string]: any} = {
-        'Project': Project,
-        'Node': Node,
-        'Citable': Citable,
-        'Map': Map,
-        'Class': Class,
-        'Property': Property,
-        'TreeNode': TreeNode,
-        'PrimaryEndpointConfiguration': PrimaryEndpointConfiguration,
-        'PropertyAndValue': PropertyAndValue
-      } // List out classes here
-      for (let prop of Object.getOwnPropertyNames(fibra)) {
-        mappings[prop] = fibra[prop].prototype
-        fibra[prop].__name = prop
+        'Project': Project.prototype,
+        'CNode': CNode.prototype,
+        'NamedNode': NamedNode.prototype,
+        'Citable': Citable.prototype,
+        'FMap': FMap.prototype,
+        'Class': Class.prototype,
+        'Property': Property.prototype,
+        'TreeNode': TreeNode.prototype,
+        'PrimaryEndpointConfiguration': PrimaryEndpointConfiguration.prototype,
+        'RemoteEndpointConfiguration': RemoteEndpointConfiguration.prototype,
+        'Schema': Schema.prototype,
+        'PropertyAndValue': PropertyAndValue.prototype
       }
       return mappings
     })

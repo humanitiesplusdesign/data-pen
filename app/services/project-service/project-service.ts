@@ -11,7 +11,7 @@ import {FibraSparqlService} from '../../services/fibra-sparql-service'
 import {PrimaryEndpointConfiguration} from './primary-endpoint-configuration'
 import {RemoteEndpointConfiguration} from './remote-endpoint-configuration'
 import {Schema} from './schema'
-import {Map, IEMap, EMap} from '../../components/collection-utils'
+import {FMap, IEMap, EMap} from '../../components/collection-utils'
 import {toTurtle} from '../../components/misc-utils'
 import {DataFactory} from '../../models/rdf'
 import {DataModel, Class, Property} from './data-model'
@@ -110,9 +110,10 @@ WHERE {
   }
 
   public saveCitable(updateEndpoint: string, graphStoreEndpoint: string, ps: ICitable): angular.IPromise<{}> {
-    let m: d3.Map<string> = new Map<string>()
+    let m: d3.Map<string> = new FMap<string>()
     let prefixes: {} = {}
     ps.toTurtle(m, prefixes)
+    console.log(ps, m, prefixes)
     return this.deleteObjects(updateEndpoint, m.keys(), ps.source.graph).then(() => this.fibraSparqlService.post(graphStoreEndpoint, toTurtle(prefixes, m), ps.source.graph))
   }
 

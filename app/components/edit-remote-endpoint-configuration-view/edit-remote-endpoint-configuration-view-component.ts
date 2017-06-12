@@ -9,6 +9,13 @@ import * as angular from 'angular'
 
 export class EditRemoteEndpointConfigurationViewComponentController extends EditCitableComponentController<RemoteEndpointConfiguration> {
 
+  public addType(): void {
+    this.c.types.push(DataFactory.namedNode(''))
+  }
+  public removeType(index: number): void {
+    this.c.types.splice(index, 1)
+  }
+
   /* @ngInject */
   constructor($stateParams: any, fibraService: FibraService, projectService: ProjectService, toastr: angular.toastr.IToastrService) {
     super($stateParams.sourceId, projectService, toastr)
@@ -17,6 +24,7 @@ export class EditRemoteEndpointConfigurationViewComponentController extends Edit
       this.c = new RemoteEndpointConfiguration()
       this.c.labels = [ DataFactory.literal('', fibraService.getState().language)]
       this.c.descriptions = [ DataFactory.literal('', fibraService.getState().language)]
+      this.c.types = [ DataFactory.namedNode('') ]
     }
   }
 }
