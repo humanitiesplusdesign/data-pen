@@ -10,7 +10,8 @@ import {NamedNode} from 'models/rdf'
 import {Citable} from 'models/citable'
 import {FMap} from 'components/collection-utils'
 import {TreeNode} from 'components/tree/tree-component'
-import {PropertyAndValue} from 'services/sparql-item-service'
+import {PropertyAndValue, Item, PropertyToValues} from 'services/sparql-item-service'
+import {FullRichNodeFromNode} from 'models/richnode'
 import * as angular from 'angular'
 
 angular.module('fibra.services.worker-service-prototype-mapping-configuration', [])
@@ -29,7 +30,10 @@ angular.module('fibra.services.worker-service-prototype-mapping-configuration', 
         'PrimaryEndpointConfiguration': PrimaryEndpointConfiguration.prototype,
         'RemoteEndpointConfiguration': RemoteEndpointConfiguration.prototype,
         'Schema': Schema.prototype,
-        'PropertyAndValue': PropertyAndValue.prototype
+        'PropertyAndValue': PropertyAndValue.prototype,
+        'Item': Item.prototype,
+        'PropertyToValues': PropertyToValues.prototype,
+        'FullRichNodeFromNode': FullRichNodeFromNode.prototype
       }
       return mappings
     })
