@@ -1,6 +1,6 @@
-.inner-palette-container
+svg.palette-node-drag
+.inner-palette-container(ng-class="{'expanded': $ctrl.expanded}")
   div.palette
-  svg.palette-node-drag
   .palette-upload(ng-show="displayUpload")
     upload(on-upload="displayUpload=false")
   input.palette-filter(type="text" placeholder="filter by label" ng-model="$ctrl.labelFilter" ng-change="$ctrl.update()")

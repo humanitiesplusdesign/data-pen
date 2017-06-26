@@ -31,6 +31,7 @@ type ItemTree = d3.Map<ItemLeaf>
 export class PaletteComponentController {
 
   private divSel: d3.Selection<HTMLDivElement, {}, null, undefined>
+  private containerDiv: d3.Selection<HTMLDivElement, {}, null, undefined>
   private nodeDrag: d3.Selection<SVGSVGElement, {}, null, undefined>
   private circles: d3.Selection<d3.BaseType, IPaletteItem, SVGSVGElement, {}>
   private typesD3: d3.Selection<d3.BaseType, ItemBranch, HTMLDivElement, {}>
@@ -38,12 +39,15 @@ export class PaletteComponentController {
   private paletteItems: IPaletteItem[]
   private paletteWidth: number
   private paletteHeight: number
+  private paletteOffsetTop: number
+  private paletteOffsetLeft: number
   private paletteSearchHeight: number = 40
   private typeColorScale: d3.ScaleOrdinal<string, string> = d3.scaleOrdinal(d3.schemeCategory20c)
   private labelFilter: string = ''
   private typeItemTreePromise: angular.IPromise<ItemTree>
   private typeItemTree: ItemTree = d3.map<ItemLeaf>()
   private typeForCreation: string
+  private expanded: boolean = true
 
   // Actions
   private unsubscribe: any
@@ -62,10 +66,11 @@ export class PaletteComponentController {
                       private sparqlTreeService: SparqlTreeService,
                       private $q: angular.IQService,
                       private $ngRedux: INgRedux,
+                      private $scope: angular.IRootScopeService,
                       private FileSaver: any) {
 
-    let unsub1 = $ngRedux.connect(this.mapTypesToThis, TypeActions)(this)
-    let unsub2 = $ngRedux.connect(this.mapItemsToThis, ItemActions)(this)
+    let unsub1: () => void = $ngRedux.connect(this.mapTypesToThis, TypeActions)(this)
+    let unsub2: () => void = $ngRedux.connect(this.mapItemsToThis, ItemActions)(this)
     this.unsubscribe = () => {
       unsub1()
       unsub2()
@@ -90,10 +95,15 @@ export class PaletteComponentController {
   }
 
   public $postLink(): void {
+    this.containerDiv = d3.select(this.$element[0]).select<HTMLDivElement>('div.inner-palette-container')
     this.divSel = d3.select(this.$element[0]).select<HTMLDivElement>('div.palette')
     this.nodeDrag = d3.select(this.$element[0]).select<SVGSVGElement>('.palette-node-drag')
     this.nodeDrag.style('display', 'none')
     this.nodeDrag.append('circle')
+
+    this.containerDiv
+      .style('height', '100%')
+      .style('width', '100%')
 
     this.divSel
       .style('height', '100%')
@@ -108,7 +118,7 @@ export class PaletteComponentController {
       .style('border-radius', '2px')
       .style('visibility', 'hidden')
 
-    let onChangeFunction = () => {
+    let onChangeFunction: () => angular.IPromise<String> = () => {
       return this.query().then(this.build.bind(this)).then(() => { return 'Done' })
     }
 
@@ -119,7 +129,7 @@ export class PaletteComponentController {
     })
   }
 
-  public addItem(item: IPaletteItem, coordinates?: [number]) {
+  public addItem(item: IPaletteItem, coordinates?: [number]): angular.IPromise<void> {
     let itemTypeKey: string = item.typeValue
     let itemType: TreeNode = this.types.types.filter((t) => { return t.id === itemTypeKey })[0]
     let chosenTypes: TreeNode[] = this.types.displayTypes
@@ -161,6 +171,7 @@ export class PaletteComponentController {
   }
 
   public build(itemTree: ItemTree) {
+    let ctrl: any = this
     this.updateSizing()
     let itemTreeFiltered = itemTree.entries().filter((d) => d.key !== '')
     let items: IPaletteItem[] = itemTreeFiltered.reduce(
@@ -248,6 +259,9 @@ export class PaletteComponentController {
         })
         .call(d3.drag<SVGElement, IPaletteItem, SVGCircleElement>()
           .on('start', function(d) {
+            ctrl.expanded = false
+            ctrl.$scope.$digest()
+
             let thisCircle: d3.Selection<SVGElement, {}, null, undefined> = d3.select(this)
             nodeDrag
               .style('display', 'block')
@@ -257,15 +271,17 @@ export class PaletteComponentController {
               .attr('fill', thisCircle.attr('fill'))
               .attr('transform', 'translate(8,8)')
             nodeDrag
-              .style('left', d3.event.sourceEvent.clientX - 8)
-              .style('top', d3.event.sourceEvent.clientY - 8)
+              .style('left', d3.event.sourceEvent.clientX - ctrl.paletteOffsetLeft - 14)
+              .style('top', d3.event.sourceEvent.clientY - ctrl.paletteOffsetTop - 10)
           })
           .on('drag', function(d) {
             nodeDrag
-              .style('left', d3.event.sourceEvent.clientX - 8)
-              .style('top', d3.event.sourceEvent.clientY - 8)
+              .style('left', d3.event.sourceEvent.clientX - ctrl.paletteOffsetLeft - 14)
+              .style('top', d3.event.sourceEvent.clientY - ctrl.paletteOffsetTop - 10)
           })
           .on('end', function(d) {
+            ctrl.expanded = true
+            ctrl.$scope.$digest()
             // If the cursor is on the canvas, display
             let exploreContainer: Element = d3.select<Element, any>('#explorecontainer').node()
             if (
@@ -317,8 +333,11 @@ export class PaletteComponentController {
 
   private updateSizing(): void {
     this.paletteWidth = Math.round(window.innerWidth * 0.15) // this.svgSel.node().clientWidth
-    this.paletteHeight = Math.round(window.innerHeight) - this.paletteSearchHeight
+    this.paletteHeight = Math.round(window.innerHeight * 0.95) - this.paletteSearchHeight
+    this.paletteOffsetLeft = Math.round(window.innerHeight * 0.01)
+    this.paletteOffsetTop = Math.round(window.innerHeight * 0.04)
     this.divSel.style('height', this.paletteHeight + 'px')
+    this.containerDiv.style('height', Math.round(window.innerHeight * 0.95) + 'px')
   }
 
   private mergeItems(oldItems, newItems: IPaletteItem[]) {

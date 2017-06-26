@@ -122,10 +122,36 @@ construct-view {
     border-radius: 6px
   }
 
+  #tablecontainer {
+    width: 100%
+    position: absolute
+    top: 100%
+    padding: 20px
+  }
+
+  #enrichcontainer-outer {
+    width: 100%
+    height: 100%
+
+    .hide {
+      display: none
+    }
+  }
+
+  #explorecontainer-outer {
+    height: 100%
+    width: 100%
+
+    .hide {
+      display: none
+    }
+  }
+
   #explorecontainer {
     background-color: #f2f2f2
     border-bottom: 3px solid #d2d2d2
     width: 100%
+    height: 100%
   }
 
   .exploretable {
@@ -137,9 +163,9 @@ construct-view {
     margin-top: -250px
   }
 
-  .palette-offset {
-    margin-left: 15%
-  }
+  // .palette-offset {
+  //   margin-left: 15%
+  // }
 
   .palette-relevant {
     transition: 0.15s linear all;
@@ -205,8 +231,12 @@ construct-view {
   }
 
   .inner-palette-container {
+    transition: 0.25s linear all;
     height: 100%
     text-align: center
+    opacity: 0
+    border-radius: 4px
+    background-color: darken(gray, 30%)
 
     .palette-filter {
       padding: 3px
@@ -218,44 +248,53 @@ construct-view {
     }
   }
 
-  #palette-container.ng-hide {
-    transition: 0.15s linear all;
-    width: 0%;
-    display: initial
+  .inner-palette-container.expanded {
+    display: block
+    opacity: 1
   }
+
+  // #palette-container.ng-hide {
+  //   transition: 0.15s linear all;
+  //   width: 0%;
+  //   display: initial
+  // }
 
   #palette-container {
-    transition: 0.15s linear all;
+    transition: 0.25s linear all;
     opacity: 1;
     width: 15%
-    height: 100%
-    background-color: darken(gray, 30%)
+    height: 95%
     position: fixed
-    top: 0px
-    left: 0px
+    top: 4%
+    left: 1%
     z-index: 3
   }
 
-  #palette-tab {
-    transition: 0.15s linear all;
-    position: fixed
-    top: 40%
-    left: 15%
-    z-index: 3
-    height: 10%
-    width: 20px
-    border-top-right-radius: 5px
-    border-bottom-right-radius: 5px
-    background-color: darken(gray, 30%)
+  #palette-container.enrich {
+    left: 84%
   }
 
-  #palette-tab.closed {
-    transition: 0.15s linear all;
-    display: initial
-    left: 0px
-  }
+  // #palette-tab {
+  //   transition: 0.15s linear all;
+  //   position: fixed
+  //   top: 40%
+  //   left: 16%
+  //   z-index: 3
+  //   height: 10%
+  //   width: 20px
+  //   border-top-right-radius: 5px
+  //   border-bottom-right-radius: 5px
+  //   background-color: darken(gray, 30%)
+  // }
+
+  // #palette-tab.closed {
+  //   transition: 0.15s linear all;
+  //   display: initial
+  //   left: 0px
+  // }
 
   .palette {
+
     circle.item {
       cursor: grab
     }

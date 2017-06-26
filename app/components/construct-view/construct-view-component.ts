@@ -22,7 +22,7 @@ export class ConstructViewComponentController {
   public types: any
   public state: UIState
   public currentProjectSource: ProjectSourceInfo
-  public paletteDisplay: boolean = false
+  public paletteDisplay: boolean = true
   private limitFilter: string = ''
 
   // Actions
