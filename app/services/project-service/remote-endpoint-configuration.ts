@@ -100,6 +100,7 @@ SELECT ?types ?labels ?descriptions ?rightsHolders ?rightsHolders_labels ?rights
   public treeQuery: string = SparqlTreeService.getClassTreeQuery
   public endpoint: string
   public toTurtle(fragmentsById: d3.Map<string>, prefixes: {[id: string]: string}): void {
+    console.log(fragmentsById)
     if (!fragmentsById.has(this.id)) {
       prefixes['fibra'] = FIBRA.ns
       prefixes['void'] = VOID.ns

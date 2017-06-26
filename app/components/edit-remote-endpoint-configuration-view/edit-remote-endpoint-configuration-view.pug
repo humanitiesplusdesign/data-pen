@@ -2,6 +2,14 @@
   h1 Fibra
   h2 Edit remote configuration
   citable-editor(citable="$ctrl.c")
+  h4 Endpoint types
+  .form-inline
+    .form-group(ng-repeat="type in $ctrl.c.types track by $index")
+      button.pull-right.btn.btn-xs(ng-click="$ctrl.removeType($index)"): span.glyphicon.glyphicon-remove
+      select(ng-model="type.id")
+        option(value="http://hdlab.stanford.edu/fibra/ontology#AuthorityEndpointConfiguration") Authority
+        option(value="http://hdlab.stanford.edu/fibra/ontology#ArchiveEndpointConfiguration") Archive
+    button.btn.btn-xs(ng-click="$ctrl.addType()"): span.glyphicon.glyphicon-plus
   .form-group
     label Project storage
     select.form-control(ng-model="$ctrl.projectSource",ng-options="ps as ps.id for ps in $ctrl.projectSources")

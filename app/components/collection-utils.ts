@@ -1,6 +1,6 @@
 'use strict'
 
-export class Map<V> implements d3.Map<V> {
+export class FMap<V> implements d3.Map<V> {
 
   public s: {[id: string]: V} = {}
 
@@ -47,7 +47,7 @@ export class Map<V> implements d3.Map<V> {
     for (let key in this.s) ret.push({ key, value: this.s[key] })
     return ret
   }
-  public each(func: (value: V, key: string, map: Map<V>) => void): undefined {
+  public each(func: (value: V, key: string, map: FMap<V>) => void): undefined {
     for (let key in this.s)
       func(this.s[key], key, this)
     return undefined
@@ -68,7 +68,7 @@ export interface IEMap<V> extends d3.Map<V> {
   goc(key: string, create?: (key?: string) => V): V
 }
 
-export class EMap<V> extends Map<V> implements IEMap<V> {
+export class EMap<V> extends FMap<V> implements IEMap<V> {
 
   constructor(protected create: (key?: string) => V = () => { return <V>{} }) { super() }
 
@@ -171,7 +171,7 @@ export class StringSet implements d3.Set {
   }
 }
 
-export class OMap<V> extends Map<V> {
+export class OMap<V> extends FMap<V> {
   public a: V[] = []
 
   public set(key: string, value: V): this {

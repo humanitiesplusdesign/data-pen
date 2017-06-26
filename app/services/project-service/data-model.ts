@@ -3,7 +3,7 @@
 import {ILiteral} from '../../models/rdfjs'
 import {INode} from '../../models/rdf'
 import {IRichNode, FullRichNodeFromNode} from '../../models/richnode'
-import {StringSet, Map} from '../../components/collection-utils'
+import {StringSet, FMap} from '../../components/collection-utils'
 
 class AsNodes {
   public labels: ILiteral[] = []
@@ -25,9 +25,9 @@ class AsNodes {
     if (!this.asNodes) {
       this.asNodes = {}
       let langs: StringSet = new StringSet()
-      let llMap: Map<string> = new Map<string>()
-      let ldMap: Map<string> = new Map<string>()
-      let tlMap: Map<Map<string>> = new Map<Map<string>>()
+      let llMap: FMap<string> = new FMap<string>()
+      let ldMap: FMap<string> = new FMap<string>()
+      let tlMap: FMap<FMap<string>> = new FMap<FMap<string>>()
       this.labels.forEach(l => {
         llMap.set(l.language, l.value)
         if (!llMap.has('')) llMap.set('', l.value)
@@ -40,7 +40,7 @@ class AsNodes {
       })
       this.types.forEach(t => {
         t.buildAsNodes()
-        let tlMap2: Map<string> = new Map<string>()
+        let tlMap2: FMap<string> = new FMap<string>()
         tlMap.set(t.id.value, tlMap2)
         t.labels.forEach(tl => {
           tlMap2.set(tl.language, tl.value)
@@ -131,8 +131,8 @@ SELECT ?id ?types ?labels ?descriptions ?superClasses ?subClasses {
   }
 # ENDGRAPH
 }`
-  public classMap: d3.Map<Class> = new Map<Class>()
-  public propertyMap: d3.Map<Property> = new Map<Property>()
+  public classMap: d3.Map<Class> = new FMap<Class>()
+  public propertyMap: d3.Map<Property> = new FMap<Property>()
   public rootClasses: Class[] = []
   public rootProperties: Property[] = []
   public static getFilter(types: INode[]): string {
