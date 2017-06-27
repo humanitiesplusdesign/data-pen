@@ -18,7 +18,6 @@ angular.module('fibra.services.worker-service-prototype-mapping-configuration', 
   .config(($provide) => {
     $provide.service('workerServicePrototypeMappingConfiguration', function(): {[className: string]: {}} {
       let mappings: {[className: string]: {}} = {
-        'Object': Object.prototype,
         'Project': Project.prototype,
         'CNode': CNode.prototype,
         'NamedNode': NamedNode.prototype,
@@ -37,6 +36,7 @@ angular.module('fibra.services.worker-service-prototype-mapping-configuration', 
       }
       for (let className in mappings)
         mappings[className]['__name'] = className
+      mappings['Object'] = Object.prototype // it's bad to have __name in Object.prototype, but it does need to be registered
       return mappings
     })
   })
