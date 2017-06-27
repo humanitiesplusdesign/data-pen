@@ -1,5 +1,6 @@
 'use strict'
 import * as angular from 'angular'
+import * as $ from 'jQuery'
 
 export class CallbackComponent implements angular.IComponentOptions {
     public controller = CallbackController // (new (...args: any[]) => angular.IController) = SelectViewComponentController

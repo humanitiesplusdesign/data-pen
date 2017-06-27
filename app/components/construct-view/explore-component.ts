@@ -53,8 +53,8 @@ class ExploreComponentController {
   private radiusInitial: number = 1
   private radius: number = 8
   private radiusBounce: number = 15
-  private tooltip: d3.Selection<HTMLDivElement, {}, HTMLBodyElement, undefined>
-  private edittip: d3.Selection<HTMLDivElement, {}, HTMLBodyElement, undefined>
+  private tooltip: d3.Selection<HTMLDivElement, {}, HTMLElement, undefined>
+  private edittip: d3.Selection<HTMLDivElement, {}, HTMLElement, undefined>
   private dragline: d3.Selection<SVGLineElement, {}, null, undefined>
   private exploreWidth: number
   private exploreHeight: number
@@ -221,7 +221,7 @@ class ExploreComponentController {
     return prom
   }
 
-  private lockExisting(nodes: IGridNode[]) {
+  private lockExisting(nodes: IExploreItem[]) {
     nodes.forEach((node) => {
       node.fx = node.gx
       node.fy = node.gy

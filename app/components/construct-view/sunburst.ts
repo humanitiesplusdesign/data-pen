@@ -16,9 +16,9 @@ export class Sunburst {
       .outerRadius((d: d3.HierarchyRectangularNode<any>) => { return Math.sqrt(d.y1 - this.lessRadius) });
   private sbPart = d3.partition()
       .size([2 * Math.PI, this.sbRadius * this.sbRadius])
-  private sbTooltip: d3.Selection<HTMLDivElement, {}, HTMLBodyElement, undefined>
+  private sbTooltip: d3.Selection<HTMLDivElement, {}, HTMLElement, undefined>
   private selectedItem: INode
-  private item_info_tip: d3.Selection<HTMLDivElement, {}, HTMLBodyElement, undefined>
+  private item_info_tip: d3.Selection<HTMLDivElement, {}, HTMLElement, undefined>
   private sel: d3.Selection<SVGSVGElement, {}, null, undefined>
   private item_info_tip_displayed: boolean = false
   private original_data: IGridNode

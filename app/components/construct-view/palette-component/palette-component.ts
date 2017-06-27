@@ -33,9 +33,9 @@ export class PaletteComponentController {
   private divSel: d3.Selection<HTMLDivElement, {}, null, undefined>
   private containerDiv: d3.Selection<HTMLDivElement, {}, null, undefined>
   private nodeDrag: d3.Selection<SVGSVGElement, {}, null, undefined>
-  private circles: d3.Selection<d3.BaseType, IPaletteItem, SVGSVGElement, {}>
+  private circles: d3.Selection<d3.BaseType, IPaletteItem, d3.BaseType, {}>
   private typesD3: d3.Selection<d3.BaseType, ItemBranch, HTMLDivElement, {}>
-  private tooltip: d3.Selection<HTMLDivElement, {}, HTMLBodyElement, undefined>
+  private tooltip: d3.Selection<HTMLDivElement, {}, HTMLElement, undefined>
   private paletteItems: IPaletteItem[]
   private paletteWidth: number
   private paletteHeight: number
@@ -118,7 +118,7 @@ export class PaletteComponentController {
       .style('border-radius', '2px')
       .style('visibility', 'hidden')
 
-    let onChangeFunction: () => angular.IPromise<String> = () => {
+    let onChangeFunction: () => angular.IPromise<string> = () => {
       return this.query().then(this.build.bind(this)).then(() => { return 'Done' })
     }
 
@@ -313,7 +313,7 @@ export class PaletteComponentController {
   }
 
   public update(circles: d3.Selection<d3.BaseType, IPaletteItem, SVGSVGElement, {}>) {
-    let c: d3.Selection<d3.BaseType, IPaletteItem, SVGSVGElement, {}> = circles ? circles : this.circles
+    let c: d3.Selection<d3.BaseType, IPaletteItem, d3.BaseType, {}> = circles ? circles : this.circles
 
     c .classed('displayed', (d: IPaletteItem) => this.items.itemIndex[d.value] ? true : false)
       .classed('filtered', (d: IPaletteItem) => this.labelFilter && !(d.label.toUpperCase().indexOf(this.labelFilter.toUpperCase()) !== -1))
