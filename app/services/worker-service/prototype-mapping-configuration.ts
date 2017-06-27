@@ -35,6 +35,8 @@ angular.module('fibra.services.worker-service-prototype-mapping-configuration', 
         'PropertyToValues': PropertyToValues.prototype,
         'FullRichNodeFromNode': FullRichNodeFromNode.prototype
       }
+      for (let className in mappings)
+        mappings[className]['__name'] = className
       return mappings
     })
   })
