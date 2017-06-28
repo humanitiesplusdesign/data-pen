@@ -17,26 +17,29 @@ import * as angular from 'angular'
 angular.module('fibra.services.worker-service-prototype-mapping-configuration', [])
   .config(($provide) => {
     $provide.service('workerServicePrototypeMappingConfiguration', function(): {[className: string]: {}} {
-      let mappings: {[className: string]: {}} = {
-        'Project': Project.prototype,
-        'CNode': CNode.prototype,
-        'NamedNode': NamedNode.prototype,
-        'Citable': Citable.prototype,
-        'FMap': FMap.prototype,
-        'Class': Class.prototype,
-        'Property': Property.prototype,
-        'TreeNode': TreeNode.prototype,
-        'PrimaryEndpointConfiguration': PrimaryEndpointConfiguration.prototype,
-        'RemoteEndpointConfiguration': RemoteEndpointConfiguration.prototype,
-        'Schema': Schema.prototype,
-        'PropertyAndValue': PropertyAndValue.prototype,
-        'Item': Item.prototype,
-        'PropertyToValues': PropertyToValues.prototype,
-        'FullRichNodeFromNode': FullRichNodeFromNode.prototype
+      let mappings: {[className: string]: any} = {
+        'Project': Project,
+        'CNode': CNode,
+        'NamedNode': NamedNode,
+        'Citable': Citable,
+        'FMap': FMap,
+        'Class': Class,
+        'Property': Property,
+        'TreeNode': TreeNode,
+        'PrimaryEndpointConfiguration': PrimaryEndpointConfiguration,
+        'RemoteEndpointConfiguration': RemoteEndpointConfiguration,
+        'Schema': Schema,
+        'PropertyAndValue': PropertyAndValue,
+        'Item': Item,
+        'PropertyToValues': PropertyToValues,
+        'FullRichNodeFromNode': FullRichNodeFromNode
       }
       for (let className in mappings)
         mappings[className]['__name'] = className
-      mappings['Object'] = Object.prototype // it's bad to have __name in Object.prototype, but it does need to be registered
-      return mappings
+      mappings['Object'] = Object // it's bad to have __name in Object.prototype, but it does need to be registered
+      let prototypeMappings: {[className: string]: {}} = {}
+      for (let className in mappings)
+        prototypeMappings[className] = mappings[className].prototype
+      return prototypeMappings
     })
   })
