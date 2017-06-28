@@ -1,3 +1,0 @@
-We provide two versions of YASQE:
-- Bundled with all dependencies (bundled)
-- Lightweight without dependencies. In this case, make sure you have CodeMirror, jQuery and the jQuery DataTables plugin included in your page
