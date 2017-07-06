@@ -1,7 +1,7 @@
 import {Action} from 'models/action'
 import {INode, DataFactory, OWL, SKOS, RDF} from 'models/rdf'
 import {INamedNode, ITerm} from 'models/rdfjs'
-import {IPropertyAndValue, SparqlItemService, PropertyAndValue} from 'services/sparql-item-service'
+import {IPropertyAndValue, SparqlItemService, PropertyAndValue, Item} from 'services/sparql-item-service'
 
 export const CREATE_TYPE: string = 'CREATE_TYPE'
 export const ITEMS_CREATED: string = 'ITEMS_CREATED'
@@ -13,6 +13,25 @@ export const HIDE_ITEM: string = 'HIDE_ITEM'
 export const CREATE_LOCAL_ITEM: string = 'CREATE_LOCAL_ITEM'
 export const ITEM_PROPERTIES: string = 'ITEM_PROPERTIES'
 export const SET_ORDERED_TYPES: string = 'SET_ORDERED_TYPES'
+export const LOAD_ALL_ITEMS: string = 'LOAD_ALL_ITEMS'
+export const ALL_ITEMS_LOADED: string = 'ALL_ITEMS_LOADED'
+
+export function loadAllItems(sparqlItemService: SparqlItemService): any {
+  return dispatch => {
+    return sparqlItemService.getAllItems().then((items: Item[]) => {
+      dispatch(allItemsLoaded(items))
+    })
+  }
+}
+
+export function allItemsLoaded(items: Item[]): Action {
+  return {
+    type: ALL_ITEMS_LOADED,
+    payload: {
+      items: items
+    }
+  }
+}
 
 export function displayItem(item: ITerm, coordinates?: [number]): Action {
   return {

@@ -4,7 +4,7 @@ import * as angular from 'angular'
 
 import {Project} from './project-service/project'
 import {TreeNode} from '../components/tree/tree-component'
-import {IGridNode} from '../components/construct-view/explore-component'
+import {IGridNode} from '../models/iexplore-item'
 import {WorkerService} from './worker-service/worker-service'
 import {SparqlItemService} from '../services/sparql-item-service'
 import {SparqlTreeService} from './sparql-tree-service'

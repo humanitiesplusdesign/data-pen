@@ -1,7 +1,7 @@
 'use strict'
 import * as d3 from 'd3'
 import {INode} from '../../models/rdf'
-import {IGridNode, IExploreItem} from './explore-component'
+import {IGridNode, IExploreItem} from '../../models/iexplore-item'
 import {SparqlItemService} from '../../services/sparql-item-service'
 import {FibraService} from '../../services/fibra-service'
 

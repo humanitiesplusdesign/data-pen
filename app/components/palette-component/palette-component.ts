@@ -3,15 +3,15 @@
 import {Item, SparqlItemService, PropertyToValues} from '../../services/sparql-item-service'
 import * as d3 from 'd3'
 import {FibraService} from '../../services/fibra-service'
-import {SparqlTreeService} from '../../services/sparql-tree-service'
 import {TreeNode} from '../tree/tree-component'
 import {DataFactory, INode, SKOS, OWL, RDF, NamedNode} from '../../models/rdf'
 import {INamedNode} from '../../models/rdfjs'
-import {IExploreItem} from '../construct-view/explore-component'
+import {IExploreItem} from '../../models/iexplore-item'
 import * as angular from 'angular'
 import { INgRedux } from 'ng-redux'
 import * as TypeActions from '../../actions/types'
 import * as ItemActions from '../../actions/items'
+import { ItemState } from '../../reducers/items'
 
 interface IPaletteItem extends Item {
   groupValue: string
@@ -66,13 +66,13 @@ export class PaletteComponentController {
   private setOrderedTypes: any
   private clearTypes: any
   private types: any
-  private items: any
+  private items: ItemState
+  private loadAllItems: any
 
   /* @ngInject */
   public constructor( private fibraService: FibraService,
                       private $element: angular.IAugmentedJQuery,
                       private sparqlItemService: SparqlItemService,
-                      private sparqlTreeService: SparqlTreeService,
                       private $q: angular.IQService,
                       private $ngRedux: INgRedux,
                       private $scope: angular.IRootScopeService,
@@ -98,9 +98,8 @@ export class PaletteComponentController {
   }
 
   public query(): angular.IPromise<ItemTree> {
-    return this.typeItemTreePromise = this.sparqlItemService.getAllItems().then((items: IPaletteItem[]) => {
-      let itemTree: ItemTree = this.mergeItems(this.paletteItems, items)
-      this.paletteItems = items
+    return this.typeItemTreePromise = this.loadAllItems(this.sparqlItemService).then(() => {
+      let itemTree: ItemTree = this.mergeItems(this.paletteItems, this.items.allItems)
       return itemTree
     })
   }
@@ -156,7 +155,7 @@ export class PaletteComponentController {
       newTypes.push(itemType)
       this.setOrderedTypes(newTypes)
     }
-    this.displayItem(item, coordinates)
+    this.displayItem(new NamedNode(item.value), coordinates)
     this.fibraService.dispatch('change')
     return this.$q.resolve()
   }
@@ -377,9 +376,10 @@ export class PaletteComponentController {
     this.containerDiv.style('height', Math.round(window.innerHeight * 0.95) + 'px')
   }
 
-  private mergeItems(oldItems, newItems: IPaletteItem[]): d3.Map<ItemLeaf> {
+  private mergeItems(oldItems: IPaletteItem[], newItems: Item[]): d3.Map<ItemLeaf> {
     // Wipe old items (bad, but temporary)
     this.typeItemTree = d3.map<ItemLeaf>()
+    this.paletteItems = []
 
     // Wipe old grouping properties
     let groupingValues: string[] = []
@@ -388,26 +388,29 @@ export class PaletteComponentController {
     newItems.forEach((item) => {
       let groupProp: PropertyToValues = item.localProperties.filter((p) => p.value === this.groupingProp.value)[0]
       let typeProp: PropertyToValues = item.localProperties.filter((p) => p.value === RDF.type.value)[0]
+      let paletteItem: IPaletteItem = <IPaletteItem>Object.assign({}, item)
       if (groupProp && groupProp.values[0] && typeProp && typeProp.values[0]) {
-        item.groupValue = groupProp.values[0].value.value
-        item.groupLabel = groupProp.values[0].value.label
-        item.typeValue = typeProp.values[0].value.value
+        paletteItem.groupValue = groupProp.values[0].value.value
+        paletteItem.groupLabel = groupProp.values[0].value.label
+        paletteItem.typeValue = typeProp.values[0].value.value
 
         // Add type to the type map
-        if (!this.typeItemTree.has(item.groupValue)) {
-          this.typeItemTree.set(item.groupValue, {
-            label: item.groupLabel,
-            items: [item],
+        if (!this.typeItemTree.has(paletteItem.groupValue)) {
+          this.typeItemTree.set(paletteItem.groupValue, {
+            label: paletteItem.groupLabel,
+            items: [paletteItem],
             expanded: true
           })
         } else {
-          this.typeItemTree.get(item.groupValue).items.push(item)
+          this.typeItemTree.get(paletteItem.groupValue).items.push(paletteItem)
         }
       } else {
-        item.groupValue = ''
-        item.groupLabel = 'No type defined'
-        item.typeValue = ''
+        paletteItem.groupValue = ''
+        paletteItem.groupLabel = 'No type defined'
+        paletteItem.typeValue = ''
       }
+
+      this.paletteItems.push(paletteItem)
 
       // Extract properties
       item.localProperties.forEach((p) => {

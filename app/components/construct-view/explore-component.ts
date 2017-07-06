@@ -12,23 +12,13 @@ import { INgRedux } from 'ng-redux'
 import * as VerifyActions from '../../actions/verify'
 import * as TypeActions from '../../actions/types'
 import * as ItemActions from '../../actions/items'
+import { IExploreItem } from '../../models/iexplore-item'
 
 interface IExploreComponentInterface extends angular.IComponentController {
 }
 
 interface IExploreScope extends angular.IScope {
   layout: { choice: string, links: string }
-}
-
-export interface IGridNode extends d3.SimulationNodeDatum {
-  gx?: number
-  gy?: number
-  fx?: number
-  fy?: number
-  selected?: boolean
-}
-
-export interface IExploreItem extends Item, IGridNode {
 }
 
 interface IExploreItemLink extends d3.SimulationLinkDatum<IExploreItem> {
@@ -59,8 +49,8 @@ class ExploreComponentController {
   private exploreWidth: number
   private exploreHeight: number
   private gridOffset: number = 50 // Should be even
-  private chargeForce: d3.ForceCollide<IExploreItem> = d3.forceCollide<IExploreItem>(this.gridOffset/1.5)
-  private chargeForce2: d3.ForceCollide<IExploreItem> = d3.forceCollide<IExploreItem>(this.gridOffset/1.5)
+  private chargeForce: d3.ForceCollide<IExploreItem> = d3.forceCollide<IExploreItem>(this.gridOffset / 1.5)
+  private chargeForce2: d3.ForceCollide<IExploreItem> = d3.forceCollide<IExploreItem>(this.gridOffset / 1.5)
   private svgBackgroundColor: string = '#EEE'
   private lastClickX: number = 0
   private lastClickY: number = 0
@@ -79,7 +69,7 @@ class ExploreComponentController {
   private items: any
 
   public $onChanges(chngsObj: any): void {
-    if(this.svgSel) {
+    if (this.svgSel) {
       this.updateExplore(false, false)
     }
   }
@@ -94,7 +84,6 @@ class ExploreComponentController {
         this.lastClickX = d3.event.offsetX
         this.lastClickY = d3.event.offsetY
         this.createDisplayItem(this.$q, this.sparqlItemService).then(() => {
-          console.log("Here")
           this.fibraService.dispatch('change')
         })
       })
@@ -157,9 +146,9 @@ class ExploreComponentController {
               private $ngRedux: INgRedux,
               private $q: angular.IQService) {
 
-    let unsub1 = $ngRedux.connect(this.mapVerifyToThis, VerifyActions)(this)
-    let unsub2 = $ngRedux.connect(this.mapTypesToThis, TypeActions)(this)
-    let unsub3 = $ngRedux.connect(this.mapItemsToThis, ItemActions)(this)
+    let unsub1: () => void = $ngRedux.connect(this.mapVerifyToThis, VerifyActions)(this)
+    let unsub2: () => void = $ngRedux.connect(this.mapTypesToThis, TypeActions)(this)
+    let unsub3: () => void = $ngRedux.connect(this.mapItemsToThis, ItemActions)(this)
     this.unsubscribe = () => {
       unsub1()
       unsub2()
@@ -221,7 +210,7 @@ class ExploreComponentController {
     return prom
   }
 
-  private lockExisting(nodes: IExploreItem[]) {
+  private lockExisting(nodes: IExploreItem[]): void {
     nodes.forEach((node) => {
       node.fx = node.gx
       node.fy = node.gy
@@ -230,10 +219,10 @@ class ExploreComponentController {
 
   private filterItemsByType(items: Item[], type: string): IExploreItem[] {
     return items.filter((it) => {
-      let typeProp = it.localProperties.concat(it.remoteProperties).filter((pr) => {
+      let typeProp: PropertyToValues[] = it.localProperties.concat(it.remoteProperties).filter((pr) => {
         return pr.value === 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type'
       })
-      if(typeProp[0]) {
+      if (typeProp[0]) {
         return typeProp[0].values.map((v) => { return v.value.value; }).indexOf(type) !== -1
       } else {
         return false;
@@ -268,9 +257,9 @@ class ExploreComponentController {
     let svg_height: number = +this.svgSel.style('height').replace('px', '')
   }
 
-  private appendNodes(enterSelection: d3.Selection<d3.BaseType, {}, SVGSVGElement, {}>, className: string) {
+  private appendNodes(enterSelection: d3.Selection<d3.BaseType, {}, SVGSVGElement, {}>, className: string): d3.Selection<d3.BaseType, {}, SVGSVGElement, {}> {
 
-    let appendSelection = enterSelection.append('g')
+    let appendSelection: d3.Selection<d3.BaseType, {}, SVGSVGElement, {}> = enterSelection.append('g')
         .attr('id', (d, i: number) => 'node-' + i + '-' + className)
         .attr('class', 'node')
         .classed(className, true)
@@ -344,14 +333,14 @@ class ExploreComponentController {
           this.tooltip.style('visibility', 'hidden')
         })
         .on('click', (d: IExploreItem, i, group) => {
-          let localSelected = d.selected
+          let localSelected: boolean = d.selected
           // Unselect everything
           this.svgSel.selectAll('.node')
             .each((n: IExploreItem) => { n.selected = false })
           // Flip this one
           d.selected = !localSelected
           this.updateExplore(false)
-          if(d.selected) {
+          if (d.selected) {
             this.svgSel.select('g.sunburst-overlay')
               .datum(d)
               .each(this.sunburst.buildSunburst.bind(this))
@@ -374,26 +363,26 @@ class ExploreComponentController {
   private snapToGrid(x: number, y: number, primary: boolean = true): number[] {
     let sx: number, sy: number
     // Snap to gridOffset with further offset for multiples
-    if(primary) {
+    if (primary) {
       sx = Math.round(x / this.gridOffset) * this.gridOffset
       sy = Math.round(y / this.gridOffset) * this.gridOffset
     } else {
-      sx = Math.round(x / this.gridOffset) * this.gridOffset - this.gridOffset/2
-      sy = Math.round(y / this.gridOffset) * this.gridOffset - this.gridOffset/2
+      sx = Math.round(x / this.gridOffset) * this.gridOffset - this.gridOffset / 2
+      sy = Math.round(y / this.gridOffset) * this.gridOffset - this.gridOffset / 2
     }
-    return [sx,sy]
+    return [sx, sy]
   }
 
-  private tickTransformNodes(sel: d3.Selection<d3.BaseType, {}, SVGSVGElement, {}>|d3.Transition<d3.BaseType, {}, SVGSVGElement, {}>,
-                              primary: boolean = true ) {
+  private tickTransformNodes( sel: d3.Selection<d3.BaseType, {}, SVGSVGElement, {}>|d3.Transition<d3.BaseType, {}, SVGSVGElement, {}>,
+                              primary: boolean = true ): void {
     sel.attr('transform', (d: IExploreItem, i) => {
       let x: number = d.x!, y: number = d.y!
       if (d.x < this.radius) x = this.radius
       if (d.y < this.radius) y = this.radius
 
-      let [gx,gy] = [x,y]
-      if(this.$scope.layout.choice === 'forcegrid') {
-        [gx,gy] = this.snapToGrid(x,y,primary)
+      let [gx, gy] = [x, y]
+      if (this.$scope.layout.choice === 'forcegrid') {
+        [gx, gy] = this.snapToGrid(x, y, primary)
       }
       d.gx = gx
       d.gy = gy
@@ -401,11 +390,11 @@ class ExploreComponentController {
       return 'translate(' + gx + ', ' + gy + ')'
     })
 
-    if(sel.filter((d: IExploreItem) => { return d.selected }).node()) {
-      let sbFunc = this.sunburst.buildSunburst
-      let svgSel = this.svgSel
+    if (sel.filter((d: IExploreItem) => { return d.selected }).node()) {
+      let sbFunc: (d: any, i: any, g: any) => void = this.sunburst.buildSunburst
+      let svgSel: d3.Selection<SVGSVGElement, {}, null, undefined> = this.svgSel
 
-      let tickSunburst = function(this, d, i, g) {
+      let tickSunburst: (this: any, d: any, i: any, g: any) => void = function(this: any, d: any, i: any, g: any): void {
         svgSel.select('g.sunburst-overlay').datum(d).each(sbFunc.bind(this))
       }
 
@@ -418,7 +407,7 @@ class ExploreComponentController {
                       secondaryNodes: d3.Selection<d3.BaseType, {}, SVGSVGElement, {}>,
                       untypedNodes: d3.Selection<d3.BaseType, {}, SVGSVGElement, {}>,
                       linkLines: d3.Selection<SVGLineElement, IExploreItemLink, SVGGElement, {}>,
-                      transition: boolean = false) {
+                      transition: boolean = false): void {
 
     let lPrimaryNodes: d3.Selection<d3.BaseType, {}, SVGSVGElement, {}>|d3.Transition<d3.BaseType, {}, SVGSVGElement, {}> = primaryNodes
     let lSecondaryNodes: d3.Selection<d3.BaseType, {}, SVGSVGElement, {}>|d3.Transition<d3.BaseType, {}, SVGSVGElement, {}> = secondaryNodes
@@ -480,7 +469,7 @@ class ExploreComponentController {
 
     // If a node went from being untyped to being primary or secondary, bring along its position
     // Also handle position getting set from a drop (pull position from state)
-    let applyOldPosition = (datum: IExploreItem) => {
+    let applyOldPosition: (datum: IExploreItem) => void = (datum: IExploreItem) => {
       // Get position from state if it was set there.
       datum.x = this.items.itemIndex[datum.value].x
       datum.y = this.items.itemIndex[datum.value].y
@@ -537,19 +526,19 @@ class ExploreComponentController {
     return this.$q.resolve('ok')
   }
 
-  private mapVerifyToThis(state) {
+  private mapVerifyToThis(state: any): any {
     return {
       verify: state.verify
     }
   }
 
-  private mapTypesToThis(state) {
+  private mapTypesToThis(state: any): any {
     return {
       types: state.types
     }
   }
 
-  private mapItemsToThis(state) {
+  private mapItemsToThis(state: any): any {
     return {
       items: state.items
     }
@@ -559,9 +548,9 @@ class ExploreComponentController {
     let newNodes: Item[] = []
 
     // Check if old nodes are still in the mix
-    for(var i = 0; i < oldNodes.length; i++) {
-      for(var j = 0; j < nodes.length; j++) {
-        if(oldNodes[i].toCanonical() === nodes[j].toCanonical()) {
+    for (let i: number = 0; i < oldNodes.length; i++) {
+      for (let j: number = 0; j < nodes.length; j++) {
+        if (oldNodes[i].toCanonical() === nodes[j].toCanonical()) {
           newNodes.push(oldNodes[i])
 
           // We need to grab new node information like labels and props in case it's changed
@@ -572,12 +561,12 @@ class ExploreComponentController {
     }
 
     // Add the new nodes
-    for(var i=0; i < nodes.length; i++) {
-      let check = false
-      for(var j = 0; j < newNodes.length; j++) {
-        if(newNodes[j].toCanonical() === nodes[i].toCanonical()) check = true
+    for (let i: number = 0; i < nodes.length; i++) {
+      let check: boolean = false
+      for (let j: number = 0; j < newNodes.length; j++) {
+        if (newNodes[j].toCanonical() === nodes[i].toCanonical()) check = true
       }
-      if(!check) {
+      if (!check) {
         newNodes.push(nodes[i])
       }
     }
@@ -587,7 +576,7 @@ class ExploreComponentController {
 
   private mergeLinks(oldLinks: IExploreItemLink[]): IExploreItemLink[] {
     let newLinks: IExploreItemLink[] = []
-    let items = this.primaryItems.concat(this.secondaryItems)
+    let items: Item[] = this.primaryItems.concat(this.secondaryItems)
 
     let sameAs: ENodeMap<Item> = new ENodeMap<Item>()
     for (let item of items) {
@@ -622,7 +611,7 @@ export class ExploreComponent implements angular.IComponentOptions {
   public bindings: {[id: string]: string} = {
     linkMode: '<',
   }
-  public controller = ExploreComponentController // (new (...args: any[]) => angular.IController) = ExploreComponentController
+  public controller: any = ExploreComponentController // (new (...args: any[]) => angular.IController) = ExploreComponentController
   public template: string = require('./explore.pug')()
 }
 
