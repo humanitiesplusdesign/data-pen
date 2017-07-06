@@ -1,16 +1,17 @@
 'use strict'
 
-import {Item, SparqlItemService} from '../../../services/sparql-item-service'
+import {Item, SparqlItemService, PropertyToValues} from '../../services/sparql-item-service'
 import * as d3 from 'd3'
-import {FibraService} from '../../../services/fibra-service'
-import {SparqlTreeService} from '../../../services/sparql-tree-service'
-import {TreeNode} from '../../tree/tree-component'
-import {DataFactory, INode, SKOS, OWL, RDF} from '../../../models/rdf'
-import {IExploreItem} from '../explore-component'
+import {FibraService} from '../../services/fibra-service'
+import {SparqlTreeService} from '../../services/sparql-tree-service'
+import {TreeNode} from '../tree/tree-component'
+import {DataFactory, INode, SKOS, OWL, RDF, NamedNode} from '../../models/rdf'
+import {INamedNode} from '../../models/rdfjs'
+import {IExploreItem} from '../construct-view/explore-component'
 import * as angular from 'angular'
 import { INgRedux } from 'ng-redux'
-import * as TypeActions from '../../../actions/types'
-import * as ItemActions from '../../../actions/items'
+import * as TypeActions from '../../actions/types'
+import * as ItemActions from '../../actions/items'
 
 interface IPaletteItem extends Item {
   typeValue: string
@@ -27,6 +28,10 @@ type ItemBranch = {
   'value': ItemLeaf
 }
 type ItemTree = d3.Map<ItemLeaf>
+type GroupingProp = {
+  'value': string,
+  'label': string
+}
 
 export class PaletteComponentController {
 
@@ -36,7 +41,7 @@ export class PaletteComponentController {
   private circles: d3.Selection<d3.BaseType, IPaletteItem, d3.BaseType, {}>
   private typesD3: d3.Selection<d3.BaseType, ItemBranch, HTMLDivElement, {}>
   private tooltip: d3.Selection<HTMLDivElement, {}, HTMLElement, undefined>
-  private paletteItems: IPaletteItem[]
+  private paletteItems: IPaletteItem[] = []
   private paletteWidth: number
   private paletteHeight: number
   private paletteOffsetTop: number
@@ -48,6 +53,9 @@ export class PaletteComponentController {
   private typeItemTree: ItemTree = d3.map<ItemLeaf>()
   private typeForCreation: string
   private expanded: boolean = true
+  private typeGroupingProp: GroupingProp = { value: RDF.type.value, label: 'Type' }
+  private groupingProp: GroupingProp = this.typeGroupingProp
+  private groupingProps: GroupingProp[] = []
 
   // Actions
   private unsubscribe: any
@@ -90,8 +98,15 @@ export class PaletteComponentController {
 
   public query(): angular.IPromise<ItemTree> {
     return this.typeItemTreePromise = this.sparqlItemService.getAllItems().then((items: IPaletteItem[]) => {
-      return this.mergeItems(this.paletteItems, items)
+      let itemTree: ItemTree = this.mergeItems(this.paletteItems, items)
+      this.paletteItems = items
+      return itemTree
     })
+  }
+
+  public rebuild(): void {
+    this.typeItemTree = this.mergeItems(this.paletteItems, this.paletteItems)
+    this.build(this.typeItemTree)
   }
 
   public $postLink(): void {
@@ -154,8 +169,8 @@ export class PaletteComponentController {
     let blob: Blob = new Blob(
       [ d3.csvFormat(
         datum.value.items.map((d) => {
-          let sameAs = d.localProperties.filter((p) => p.value === OWL.sameAs.value)[0]
-          let prefLabel = d.localProperties.filter((p) => p.value === SKOS.prefLabel.value)[0]
+          let sameAs: PropertyToValues = d.localProperties.filter((p) => p.value === OWL.sameAs.value)[0]
+          let prefLabel: PropertyToValues = d.localProperties.filter((p) => p.value === SKOS.prefLabel.value)[0]
           return {
             [SKOS.prefLabel.value]: prefLabel ? prefLabel.values[0].value.value : '',
             FibraId: d.value,
@@ -170,10 +185,10 @@ export class PaletteComponentController {
     this.FileSaver.saveAs(blob, filename)
   }
 
-  public build(itemTree: ItemTree) {
+  public build(itemTree: ItemTree): void {
     let ctrl: any = this
     this.updateSizing()
-    let itemTreeFiltered = itemTree.entries().filter((d) => d.key !== '')
+    let itemTreeFiltered: ItemBranch[] = itemTree.entries().filter((d) => d.key !== '')
     let items: IPaletteItem[] = itemTreeFiltered.reduce(
       (a: IPaletteItem[], b: ItemBranch) => {
         return a.concat(b.value.items)
@@ -181,7 +196,7 @@ export class PaletteComponentController {
       []
     )
     let padding: number = items.length > 300 ? items.length > 2000 ? 1 : 2 : 4
-    let paletteHeightLessTypes = this.paletteHeight - (itemTreeFiltered.length * 25)
+    let paletteHeightLessTypes: number = this.paletteHeight - (itemTreeFiltered.length * 25)
     let rawRadius: number = (Math.sqrt(this.paletteWidth * paletteHeightLessTypes / items.length) - padding) / 2
     let radius: number = rawRadius > 8 ? 8 : rawRadius
     let xOffset: number = radius * 2 + padding / 2
@@ -189,15 +204,15 @@ export class PaletteComponentController {
     let xDots: number = Math.floor((this.paletteWidth) / xOffset) - 1
 
     // Bring the node drag SVG and the addItem function local
-    let nodeDrag = this.nodeDrag
-    let addItem = this.addItem.bind(this)
-    let paletteWidth = this.paletteWidth
+    let nodeDrag: d3.Selection<SVGSVGElement, {}, null, undefined> = this.nodeDrag
+    let addItem: any = this.addItem.bind(this)
+    let paletteWidth: number = this.paletteWidth
 
     this.typesD3 = this.divSel
       .selectAll('div.type')
         .data(itemTreeFiltered, (d: ItemBranch) => d.key )
     this.typesD3.exit().remove()
-    let typesDivsEnter = this.typesD3.enter()
+    let typesDivsEnter: d3.Selection<d3.BaseType, ItemBranch, HTMLDivElement, {}> = this.typesD3.enter()
       .append('div')
         .classed('type', true)
         .classed('inverse-icon', true)
@@ -232,7 +247,7 @@ export class PaletteComponentController {
     this.typesD3.selectAll('svg')
       .style('display', (d: ItemBranch) => d.value.expanded ? 'block' : 'none')
 
-    let typeSvgs = this.typesD3.select('svg')
+    let typeSvgs: d3.Selection<d3.BaseType, ItemBranch, HTMLDivElement, {}> = this.typesD3.select('svg')
         .attr('height', (d) => {
           return (Math.ceil(d.value.items.length / xDots) + 1) * yOffset
         })
@@ -258,7 +273,7 @@ export class PaletteComponentController {
           this.tooltip.style('visibility', 'hidden')
         })
         .call(d3.drag<SVGElement, IPaletteItem, SVGCircleElement>()
-          .on('start', function(d) {
+          .on('start', function(d: IPaletteItem): void {
             ctrl.expanded = false
             ctrl.$scope.$digest()
 
@@ -274,12 +289,12 @@ export class PaletteComponentController {
               .style('left', d3.event.sourceEvent.clientX - ctrl.paletteOffsetLeft - 14)
               .style('top', d3.event.sourceEvent.clientY - ctrl.paletteOffsetTop - 10)
           })
-          .on('drag', function(d) {
+          .on('drag', function(d: IPaletteItem): void {
             nodeDrag
               .style('left', d3.event.sourceEvent.clientX - ctrl.paletteOffsetLeft - 14)
               .style('top', d3.event.sourceEvent.clientY - ctrl.paletteOffsetTop - 10)
           })
-          .on('end', function(d) {
+          .on('end', function(d: IPaletteItem): void {
             ctrl.expanded = true
             ctrl.$scope.$digest()
             // If the cursor is on the canvas, display
@@ -312,20 +327,20 @@ export class PaletteComponentController {
         .attr('transform', (d, i) => { return 'translate(' + ((i % xDots) + 1) * xOffset + ',' + (Math.floor(i / xDots) + 1) * yOffset + ')'})
   }
 
-  public update(circles: d3.Selection<d3.BaseType, IPaletteItem, SVGSVGElement, {}>) {
+  public update(circles: d3.Selection<d3.BaseType, IPaletteItem, SVGSVGElement, {}>): void {
     let c: d3.Selection<d3.BaseType, IPaletteItem, d3.BaseType, {}> = circles ? circles : this.circles
 
     c .classed('displayed', (d: IPaletteItem) => this.items.itemIndex[d.value] ? true : false)
       .classed('filtered', (d: IPaletteItem) => this.labelFilter && !(d.label.toUpperCase().indexOf(this.labelFilter.toUpperCase()) !== -1))
   }
 
-  private mapTypesToThis(state) {
+  private mapTypesToThis(state): any {
     return {
       types: state.types
     }
   }
 
-  private mapItemsToThis(state) {
+  private mapItemsToThis(state): any {
     return {
       items: state.items
     }
@@ -340,14 +355,16 @@ export class PaletteComponentController {
     this.containerDiv.style('height', Math.round(window.innerHeight * 0.95) + 'px')
   }
 
-  private mergeItems(oldItems, newItems: IPaletteItem[]) {
+  private mergeItems(oldItems, newItems: IPaletteItem[]): d3.Map<ItemLeaf> {
     // Wipe old items (bad, but temporary)
-    this.typeItemTree.values().forEach((v) => {
-      v.items = []
-    })
+    this.typeItemTree = d3.map<ItemLeaf>()
+
+    // Wipe old grouping properties
+    let groupingValues: string[] = []
+    this.groupingProps = []
 
     newItems.forEach((item) => {
-      let typeProp = item.localProperties.filter((p) => p.value === RDF.type.value)[0]
+      let typeProp: PropertyToValues = item.localProperties.filter((p) => p.value === this.groupingProp.value)[0]
       if (typeProp && typeProp.values[0]) {
         item.typeValue = typeProp.values[0].value.value
         item.typeLabel = typeProp.values[0].value.label
@@ -366,6 +383,14 @@ export class PaletteComponentController {
         item.typeValue = ''
         item.typeLabel = 'No type defined'
       }
+
+      // Extract properties
+      item.localProperties.forEach((p) => {
+        if (groupingValues.indexOf(p.value) === -1) {
+          groupingValues.push(p.value)
+          this.groupingProps.push({ value: p.value, label: p.label })
+        }
+      })
     })
     // Sort by label
     this.typeItemTree.values().forEach((v) => {
@@ -376,8 +401,8 @@ export class PaletteComponentController {
 }
 
 export class PaletteComponent implements angular.IComponentOptions {
-  public template = require('./palette-component.pug')()
-  public controller = PaletteComponentController
+  public template: any = require('./palette-component.pug')()
+  public controller: any = PaletteComponentController
 }
 
 angular.module('fibra.components.palette', ['fibra.services'])

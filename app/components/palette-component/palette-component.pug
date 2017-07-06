@@ -1,0 +1,18 @@
+svg.palette-node-drag
+.inner-palette-container(ng-class="{'expanded': $ctrl.expanded}")
+  div.btn-group
+    button.btn.btn-default(ng-class="{'active': $ctrl.groupingProp === $ctrl.typeGroupingProp}" ng-click="$ctrl.groupingProp = $ctrl.typeGroupingProp; $ctrl.rebuild()") Types
+    div.btn-group(uib-dropdown)
+      button.btn.btn-default(type="button" uib-dropdown-toggle) Group&nbsp;
+        span.caret
+      ul.dropdown-menu(uib-dropdown-menu role="menu")
+        li(role="menuitem" ng-repeat="prop in $ctrl.groupingProps")
+          a(ng-class="{'active': $ctrl.groupingProp !== $ctrl.typeGroupingProp}" ng-click="$ctrl.groupingProp = prop; $ctrl.rebuild()") {{prop.label}}
+  div.palette
+  .palette-upload(ng-show="displayUpload")
+    upload(on-upload="displayUpload=false")
+  input.palette-filter(type="text" placeholder="filter by label" ng-model="$ctrl.labelFilter" ng-change="$ctrl.update()")
+  span(ng-click="$ctrl.createItemLocal($ctrl.labelFilter)")
+    span.glyphicon.glyphicon-plus.inverse-icon
+  span(ng-default="displayUpload=false", ng-click="displayUpload = true")
+    span.glyphicon.glyphicon-upload.inverse-icon

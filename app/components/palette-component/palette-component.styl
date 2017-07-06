@@ -1,0 +1,91 @@
+palette {
+  .palette-upload {
+    margin-top: -250px
+  }
+
+  .palette-relevant {
+    transition: 0.15s linear all;
+  }
+
+  .inner-palette-container {
+    transition: 0.25s linear all;
+    height: 100%
+    text-align: center
+    opacity: 0
+    border-radius: 4px
+    background-color: darken(gray, 30%)
+
+    .palette-filter {
+      padding: 3px
+      font-size: 12px
+      border: 0px
+      border-radius: 0px
+      font-weight: normal
+      margin-right: 0.5em
+    }
+  }
+
+  .inner-palette-container.expanded {
+    display: block
+    opacity: 1
+  }
+
+  // #palette-container.ng-hide {
+  //   transition: 0.15s linear all;
+  //   width: 0%;
+  //   display: initial
+  // }
+
+  // #palette-tab {
+  //   transition: 0.15s linear all;
+  //   position: fixed
+  //   top: 40%
+  //   left: 16%
+  //   z-index: 3
+  //   height: 10%
+  //   width: 20px
+  //   border-top-right-radius: 5px
+  //   border-bottom-right-radius: 5px
+  //   background-color: darken(gray, 30%)
+  // }
+
+  // #palette-tab.closed {
+  //   transition: 0.15s linear all;
+  //   display: initial
+  //   left: 0px
+  // }
+
+  .palette {
+
+    circle.item {
+      cursor: grab
+    }
+
+    circle.item.displayed {
+      opacity: 0.3
+    }
+    circle.item.filtered {
+      opacity: 0.1
+    }
+
+    .type {
+      .glyphicon {
+        margin-left: 0.25em
+      }
+    }
+  }
+
+  .palette-node-drag {
+    position: absolute
+    height: 16px
+    width: 16px
+  }
+
+  .palette-node-drag {
+    cursor: grabbing
+  }
+
+  .inverse-icon {
+    color: white
+  }
+}
