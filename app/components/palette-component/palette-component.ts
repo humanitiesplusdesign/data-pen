@@ -14,8 +14,9 @@ import * as TypeActions from '../../actions/types'
 import * as ItemActions from '../../actions/items'
 
 interface IPaletteItem extends Item {
+  groupValue: string
+  groupLabel: string
   typeValue: string
-  typeLabel: string
 }
 
 type ItemLeaf = {
@@ -46,7 +47,7 @@ export class PaletteComponentController {
   private paletteHeight: number
   private paletteOffsetTop: number
   private paletteOffsetLeft: number
-  private paletteSearchHeight: number = 40
+  private paletteSearchHeight: number = 40 + 34
   private typeColorScale: d3.ScaleOrdinal<string, string> = d3.scaleOrdinal(d3.schemeCategory20c)
   private labelFilter: string = ''
   private typeItemTreePromise: angular.IPromise<ItemTree>
@@ -267,7 +268,7 @@ export class PaletteComponentController {
           this.tooltip.style('top', (d3.event.pageY - 10) + 'px')
             .style('left', (d3.event.pageX + 10) + 'px')
             .style('visibility', 'visible')
-            .text(d.label + ' (' + d.typeLabel + ')')
+            .text(d.label + ' (' + d.groupLabel + ')')
         })
         .on('mouseout', (d: IExploreItem, i: number) => {
           this.tooltip.style('visibility', 'hidden')
@@ -364,24 +365,27 @@ export class PaletteComponentController {
     this.groupingProps = []
 
     newItems.forEach((item) => {
-      let typeProp: PropertyToValues = item.localProperties.filter((p) => p.value === this.groupingProp.value)[0]
-      if (typeProp && typeProp.values[0]) {
+      let groupProp: PropertyToValues = item.localProperties.filter((p) => p.value === this.groupingProp.value)[0]
+      let typeProp: PropertyToValues = item.localProperties.filter((p) => p.value === RDF.type.value)[0]
+      if (groupProp && groupProp.values[0] && typeProp && typeProp.values[0]) {
+        item.groupValue = groupProp.values[0].value.value
+        item.groupLabel = groupProp.values[0].value.label
         item.typeValue = typeProp.values[0].value.value
-        item.typeLabel = typeProp.values[0].value.label
 
         // Add type to the type map
-        if (!this.typeItemTree.has(item.typeValue)) {
-          this.typeItemTree.set(item.typeValue, {
-            label: item.typeLabel,
+        if (!this.typeItemTree.has(item.groupValue)) {
+          this.typeItemTree.set(item.groupValue, {
+            label: item.groupLabel,
             items: [item],
             expanded: true
           })
         } else {
-          this.typeItemTree.get(item.typeValue).items.push(item)
+          this.typeItemTree.get(item.groupValue).items.push(item)
         }
       } else {
+        item.groupValue = ''
+        item.groupLabel = 'No type defined'
         item.typeValue = ''
-        item.typeLabel = 'No type defined'
       }
 
       // Extract properties
