@@ -322,6 +322,27 @@ export class PaletteComponentController {
       .merge(this.circles)
         .call(this.update.bind(this))
 
+    let circleText: d3.Selection<d3.BaseType, IPaletteItem, d3.BaseType, {}> = typeSvgs
+        .selectAll('text')
+          .data((d) => d.value.items, (d: IPaletteItem) => d.value )
+
+    circleText = circleText.enter()
+      .append('text')
+        .style('pointer-events', 'none')
+      .merge(circleText)
+
+    circleText
+      .text((d: IPaletteItem) => {
+        if (d.label.split(' ').length > 1) {
+          return (d.label.split(' ')[0][0] + d.label.split(' ')[1][0]).toUpperCase()
+        } else {
+          return (d.label[0] + d.label[1])
+        }
+      })
+      .attr('font-family', 'Ludica Console, monospace')
+      .attr('font-size', radius * 1.25 + 'px')
+      .attr('transform', (d, i) => { return 'translate(' + (((i % xDots) + 1) * xOffset - 0.7 * radius) + ',' + ((Math.floor(i / xDots) + 1) * yOffset + 0.4 * radius) + ')'})
+
     this.circles
       .transition()
         .attr('fill', (d: IPaletteItem) => this.typeColorScale(d.typeValue))
