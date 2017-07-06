@@ -9565,12 +9565,6 @@ construct-view .exploretable {
   width: initial;
   max-width: initial;
 }
-construct-view .palette-upload {
-  margin-top: -250px;
-}
-construct-view .palette-relevant {
-  transition: 0.15s linear all;
-}
 construct-view .property-popover {
   position: absolute;
   z-index: 20;
@@ -9623,26 +9617,6 @@ construct-view .property-popover .control-label .label-input {
   height: 25px;
   font-variant: normal;
 }
-construct-view .inner-palette-container {
-  transition: 0.25s linear all;
-  height: 100%;
-  text-align: center;
-  opacity: 0;
-  border-radius: 4px;
-  background-color: #5a5a5a;
-}
-construct-view .inner-palette-container .palette-filter {
-  padding: 3px;
-  font-size: 12px;
-  border: 0px;
-  border-radius: 0px;
-  font-weight: normal;
-  margin-right: 0.5em;
-}
-construct-view .inner-palette-container.expanded {
-  display: block;
-  opacity: 1;
-}
 construct-view #palette-container {
   transition: 0.25s linear all;
   opacity: 1;
@@ -9655,29 +9629,6 @@ construct-view #palette-container {
 }
 construct-view #palette-container.enrich {
   left: 84%;
-}
-construct-view .palette circle.item {
-  cursor: grab;
-}
-construct-view .palette circle.item.displayed {
-  opacity: 0.3;
-}
-construct-view .palette circle.item.filtered {
-  opacity: 0.1;
-}
-construct-view .palette .type .glyphicon {
-  margin-left: 0.25em;
-}
-construct-view .palette-node-drag {
-  position: absolute;
-  height: 16px;
-  width: 16px;
-}
-construct-view .palette-node-drag {
-  cursor: grabbing;
-}
-construct-view .inverse-icon {
-  color: #fff;
 }
 construct-view #verifycontainer.ng-hide {
   transition: 0.15s linear all;
@@ -9744,6 +9695,55 @@ construct-view #verifycontainer .verify-result button {
 upload .info {
   font-size: smaller;
   text-align: left;
+}
+palette .palette-upload {
+  margin-top: -250px;
+}
+palette .palette-relevant {
+  transition: 0.15s linear all;
+}
+palette .inner-palette-container {
+  transition: 0.25s linear all;
+  height: 100%;
+  text-align: center;
+  opacity: 0;
+  border-radius: 4px;
+  background-color: #5a5a5a;
+}
+palette .inner-palette-container .palette-filter {
+  padding: 3px;
+  font-size: 12px;
+  border: 0px;
+  border-radius: 0px;
+  font-weight: normal;
+  margin-right: 0.5em;
+}
+palette .inner-palette-container.expanded {
+  display: block;
+  opacity: 1;
+}
+palette .palette circle.item {
+  cursor: grab;
+}
+palette .palette circle.item.displayed {
+  opacity: 0.3;
+}
+palette .palette circle.item.filtered {
+  opacity: 0.1;
+}
+palette .palette .type .glyphicon {
+  margin-left: 0.25em;
+}
+palette .palette-node-drag {
+  position: absolute;
+  height: 16px;
+  width: 16px;
+}
+palette .palette-node-drag {
+  cursor: grabbing;
+}
+palette .inverse-icon {
+  color: #fff;
 }
 html {
   height: 100%;
