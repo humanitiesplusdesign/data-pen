@@ -21,6 +21,7 @@ import './project-source-configurations-view/project-source-configurations-view-
 import './project-sources-view/project-sources-view-component'
 import './type-select/type-select-component'
 import './upload/upload-component'
+import './project/project-component'
 
 angular.module('fibra.components', [
   'fibra.components.construct-view',
@@ -42,5 +43,6 @@ angular.module('fibra.components', [
   'fibra.components.project-source-configurations-view',
   'fibra.components.project-sources-view',
   'fibra.components.type-select',
-  'fibra.components.upload'
+  'fibra.components.upload',
+  'fibra.components.project'
 ])

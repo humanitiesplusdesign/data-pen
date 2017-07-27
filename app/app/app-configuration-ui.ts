@@ -115,6 +115,10 @@ export function uiConfig(
       }
     }
   })
+  $stateProvider.state('project', {
+    url: '/project',
+    template: '<project></project>'
+  })
 }
 
 /* @ngInject */

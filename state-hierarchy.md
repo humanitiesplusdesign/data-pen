@@ -1,0 +1,36 @@
+  - root
+    - verify
+    - types
+      - userTypes
+      - types
+      - displayTypes
+    - items
+      - items
+      - itemIndex
+      - allItems
+      - localItems
+
+Proposed new structure
+
+  - root
+    - models
+      - types
+      - items
+      - configurations
+      - projects
+    - frontend
+      - projects
+      - project
+        - source
+          - bibliography
+          - main
+          - table
+        - filter
+          - bibliography
+          - main
+          - table
+        - active
+          - bibliography
+          - main
+          - table
+    - existing stuff...
