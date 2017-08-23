@@ -117,6 +117,23 @@ export function uiConfig(
   })
   $stateProvider.state('project', {
     url: '/project',
+    params: {
+      id: {
+        type: 'string',
+        array: false,
+        value: ''
+      },
+      sparqlEndpoint: {
+        type: 'string',
+        array: false,
+        value: ''
+      },
+      graph: {
+        type: 'string',
+        array: false,
+        value: ''
+      }
+    },
     template: '<project></project>'
   })
 }
