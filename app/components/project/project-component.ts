@@ -7,6 +7,7 @@ import { INgRedux } from 'ng-redux'
 export class ProjectComponentController {
 
   private actions: any = {}
+  private currentView: string = 'sources'
 
   /* @ngInject */
   constructor(private projectService: ProjectService,
@@ -25,7 +26,7 @@ export class ProjectComponentController {
 
   private mapProjectToActions(state: any): any {
     return {
-      verify: state.frontend.project
+      project: state.frontend.project
     }
   }
 }

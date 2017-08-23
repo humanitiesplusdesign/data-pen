@@ -1,4 +1,4 @@
-.main-area
+.main-area(ng-show="$ctrl.currentView==='active'")
   .control-area
     button.btn.btn-circle.btn-default
       i.glyphicon.glyphicon-plus
@@ -7,15 +7,17 @@
     button.btn.btn-circle.btn-default
       i.glyphicon.glyphicon-pencil
   .table-tab Table View
+.main-area(ng-show="$ctrl.currentView==='filter'")
+.main-area(ng-show="$ctrl.currentView==='sources'")
 .top-nav
   .nav-element.return-button
     i.glyphicon.glyphicon-arrow-left
-  .nav-element.project-description Physiocrats Project
+  .nav-element.project-description {{ $ctrl.actions.project.description }}
   .nav-element.vertical-divider.muted |
   span.nav-links
-    .nav-element.nav-link.muted Sources
-    .nav-element.nav-link.muted Filter
-    .nav-element.nav-link.active Active
+    .nav-element.nav-link(ng-class="{muted: $ctrl.currentView !== 'sources', active: $ctrl.currentView === 'sources'}", ng-click="$ctrl.currentView = 'sources'") Sources
+    .nav-element.nav-link(ng-class="{muted: $ctrl.currentView !== 'filter', active: $ctrl.currentView === 'filter'}", ng-click="$ctrl.currentView = 'filter'") Filter
+    .nav-element.nav-link(ng-class="{muted: $ctrl.currentView !== 'active', active: $ctrl.currentView === 'active'}", ng-click="$ctrl.currentView = 'active'") Active
   .nav-element.bibliography-link Bibliography
   span.usage
     .nav-element.usage-chart
