@@ -1,17 +1,11 @@
 .main-area(ng-show="$ctrl.currentView==='active'")
-  .control-area
-    button.btn.btn-circle.btn-default
-      i.glyphicon.glyphicon-plus
-    button.btn.btn-circle.btn-default
-      i.glyphicon.glyphicon-link
-    button.btn.btn-circle.btn-default
-      i.glyphicon.glyphicon-pencil
-  .table-tab Table View
+  active
 .main-area(ng-show="$ctrl.currentView==='filter'")
 .main-area(ng-show="$ctrl.currentView==='sources'")
+  sources
 .top-nav
   .nav-element.return-button
-    i.glyphicon.glyphicon-arrow-left
+    i.glyphicon.glyphicon-arrow-left(ui-sref="projects")
   .nav-element.project-description {{ $ctrl.actions.project.description }}
   .nav-element.vertical-divider.muted |
   span.nav-links
