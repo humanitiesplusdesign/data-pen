@@ -21,16 +21,16 @@ Proposed new structure
     - frontend
       - projects
       - project
-        - source
-          - bibliography
-          - main
-          - table
-        - filter
-          - bibliography
-          - main
-          - table
-        - active
-          - bibliography
-          - main
-          - table
+      - source
+        - bibliography
+        - main
+        - table
+      - filter
+        - bibliography
+        - main
+        - table
+      - active
+        - bibliography
+        - main
+        - table
     - existing stuff...
