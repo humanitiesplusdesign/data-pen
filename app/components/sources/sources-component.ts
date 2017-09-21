@@ -7,6 +7,7 @@ import { INgRedux } from 'ng-redux'
 export class SourcesComponentController {
 
   private actions: any = {}
+  private projectsOpen: { [id: string]: boolean } = {}
 
   /* @ngInject */
   constructor(private projectService: ProjectService,

@@ -4,34 +4,15 @@
       h3.pull-left Sources
       span.pull-right add
     .sources-list
-      h4
-        i.glyphicon.glyphicon-triangle-right
-        span BnF
-      h4
-        i.glyphicon.glyphicon-triangle-bottom
-        span VIAF
-      .source-list
-        label 
-          input(type="checkbox")
-          span Concept
-        label 
-          input(type="checkbox")
-          span Document
-        label 
-          input(type="checkbox")
-          span Person
-        label 
-          input(type="checkbox")
-          span Organization
-        label 
-          input(type="checkbox")
-          span CorporateBody
-        label 
-          input(type="checkbox")
-          span Place
-      h4
-        i.glyphicon.glyphicon-triangle-right
-        span Electronic Enlightenment
+      span(ng-repeat="source in $ctrl.actions.project.sources")
+        h4(ng-click="$ctrl.projectsOpen[source.id] = !$ctrl.projectsOpen[source.id]")
+          i.glyphicon.glyphicon-triangle-right(ng-show="!$ctrl.projectsOpen[source.id]")
+          i.glyphicon.glyphicon-triangle-bottom(ng-show="$ctrl.projectsOpen[source.id]")
+          span {{source.description}}
+        .class-list(ng-show="$ctrl.projectsOpen[source.id] ? true : false")
+          label(ng-repeat="clss in source.classList") 
+            input(type="checkbox")
+            span {{clss.description}}
       h4  
         i.glyphicon.glyphicon-triangle-right
         span Physiocrats.csv
