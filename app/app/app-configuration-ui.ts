@@ -116,7 +116,7 @@ export function uiConfig(
     }
   })
   $stateProvider.state('project', {
-    url: '/project',
+    url: '/project/:view?id&sparqlEndpoint&graph',
     params: {
       id: {
         type: 'string',
@@ -132,6 +132,11 @@ export function uiConfig(
         type: 'string',
         array: false,
         value: ''
+      },
+      view: {
+        type: 'string',
+        array: false,
+        value: 'sources'
       }
     },
     template: '<project></project>'
