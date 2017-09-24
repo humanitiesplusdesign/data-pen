@@ -34,9 +34,7 @@ export class ProjectComponentController {
   }
 
   private setView(newView: string): void {
-    let currentState: any = this.$stateParams
-    currentState.view = newView
-    this.$state.go('project', currentState)
+    this.$state.go('project', { view: newView })
   }
 
   private mapProjectToActions(state: any): any {
