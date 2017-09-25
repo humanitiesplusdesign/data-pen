@@ -4,14 +4,26 @@ import { ProjectService } from '../../services/project-service/project-service'
 import * as ProjectActions from '../../actions/project'
 import { INgRedux } from 'ng-redux'
 import * as d3 from 'd3'
+import { SearchService } from '../../services/search-service'
 
 export class ActiveComponentController {
 
   private actions: any = {}
 
+  private radiusInitial: number = 1
+  private radius: number = 8
+  private radiusBounce: number = 15
+  private currentlyAdding: boolean = false
+
+  private nodeSearch: d3.Selection<Element, {}, HTMLElement, any>
+  private nodeSearchSelected: string|{}
+
   /* @ngInject */
   constructor(private projectService: ProjectService,
-              private $ngRedux: INgRedux) {
+              private $scope: angular.IScope,
+              private $q: angular.IQService,
+              private $ngRedux: INgRedux,
+              private searchService: SearchService) {
     let unsub1: () => void = $ngRedux.connect(this.mapProjectToActions, ProjectActions)(this.actions)
     this.actions.unsubscribe = () => {
       unsub1()
@@ -26,6 +38,8 @@ export class ActiveComponentController {
 
   private $postLink(): void {
     this.buildCanvas()
+
+    this.nodeSearch = d3.select('.node-search')
   }
 
   private buildCanvas(): void {
@@ -39,13 +53,59 @@ export class ActiveComponentController {
 
     let r: d3.Selection<SVGRectElement, {}, HTMLElement, any> = g.append<SVGRectElement>('rect')
       .classed('main-background', true)
-      .on('click', () => {
-        console.log(d3.event)
-        console.log(this.actions)
-      })
+      .on('click', this.canvasClick.bind(this, g))
 
     this.updateCanvasSize()
 
+  }
+
+  private canvasClick(sel: d3.Selection<SVGGElement, {}, HTMLElement, any>): void {
+    this.$scope.$apply(() => {
+      if (!this.currentlyAdding) {
+        this.appendNode(sel, d3.event.offsetX, d3.event.offsetY)
+        this.nodeSearch
+          .style('top', d3.event.offsetY + 25 + 'px')
+        if (this.getCanvasSize().width - d3.event.offsetX > 350 + 30) {
+          this.nodeSearch.style('left', d3.event.offsetX + 30 + 'px')
+        } else {
+          this.nodeSearch.style('left', d3.event.offsetX - 30 - 350 + 'px')
+        }
+      }
+
+      this.currentlyAdding = true
+    })
+  }
+
+  private nodeSearchRemove(): void {
+    d3.select('.addition-node').remove()
+    this.currentlyAdding = false
+    this.nodeSearchSelected = ''
+  }
+
+  private nodeSearchResults(searchValue: string): angular.IPromise<{}[]> {
+    return this.searchService.searchSources(searchValue)
+  }
+
+  private nodeSearchSelect($item, $model, $label, $event): void {
+    console.log($item, $model, $label, $event)
+  }
+
+  private appendNode(sel: d3.Selection<SVGGElement, {}, HTMLElement, any>, top: number, left: number): d3.Selection<SVGGElement, {}, HTMLElement, any> {
+    let g: d3.Selection<SVGGElement, {}, HTMLElement, any> = sel.append<SVGGElement>('g')
+      .classed('node', true)
+      .classed('addition-node', true)
+      .attr('transform', 'translate(' + top + ',' + left + ')')
+
+    let c: d3.Selection<SVGCircleElement, {}, HTMLElement, any> = g.append<SVGCircleElement>('circle')
+      .classed('node-circle', true)
+      .attr('r', this.radiusInitial + 'px')
+
+    c.transition()
+        .attr('r', this.radiusBounce + 'px')
+      .transition()
+      .attr('r', this.radius + 'px')
+
+    return g
   }
 
   private updateCanvas(): void {
@@ -76,5 +136,5 @@ export class ActiveComponent implements angular.IComponentOptions {
     public controller: any = ActiveComponentController
 }
 
-angular.module('fibra.components.active', [])
+angular.module('fibra.components.active', ['ui.bootstrap', 'fibra.services.search-service'])
   .component('active', new ActiveComponent())

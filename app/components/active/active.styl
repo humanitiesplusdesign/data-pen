@@ -60,5 +60,49 @@
     .main-background {
       fill: #f4f4f4
     }
+
+    .node {
+      .node-circle {
+        stroke: #7E7E7E
+        fill: #aaaaaa
+      }
+    }
+  }
+}
+
+.node-search {
+  position: absolute
+  top: 100px
+  left: 100px
+  width: 350px
+
+  .input-group {
+    width: 350px
+  }
+
+  .custom-popup-wrapper {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    z-index: 1000;
+    display: none;
+    background-color: #f9f9f9;
+  }
+
+  .custom-popup-wrapper > .message {
+    padding: 10px 20px;
+    border-bottom: 1px solid #ddd;
+    color: #868686;
+  }
+
+  .custom-popup-wrapper > .dropdown-menu {
+    position: static;
+    float: none;
+    display: block;
+    min-width: 160px;
+    background-color: transparent;
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
   }
 }

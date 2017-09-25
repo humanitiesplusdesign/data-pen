@@ -9,3 +9,13 @@
 .main-canvas
   svg.main-svg
     g.main-g
+.node-search(ng-show="$ctrl.currentlyAdding")
+  .input-group
+    .input-group-addon
+      i.glyphicon.glyphicon-search
+    input.form-control(type="text" ng-model="$ctrl.nodeSearchSelected" placeholder="Search" uib-typeahead="result.description for result in $ctrl.nodeSearchResults($viewValue)" typeahead-loading="loadingSearchResults" typeahead-no-results="noResults" typeahead-on-select="$ctrl.nodeSearchSelect($item, $model, $label, $event)" typeahead-wait-ms="200")
+    .input-group-addon(ng-click="$ctrl.nodeSearchRemove()")
+      i.glyphicon.glyphicon-remove
+  i.glyphicon.glyphicon-refresh(ng-show="loadingSearchResults")
+  div(ng-show="noResults")
+    i.glyphicon.glyphicon-remove No Results Found
