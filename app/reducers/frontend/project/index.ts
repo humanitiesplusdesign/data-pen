@@ -22,7 +22,7 @@ export type ProjectState = {
 let defaultState: ProjectState = {
 }
 
-export default function models(state: ProjectState = {}, action): ProjectState {
+export default function models(state: ProjectState = defaultState, action): ProjectState {
   switch (action.type) {
     case PROJECT_LOADED:
 
