@@ -19,7 +19,13 @@ export class SearchService {
 
   public searchSources(query: string): angular.IPromise<{}[]> {
 
-    return this.$q.resolve(this.testData.filter((d) => d.description.indexOf(query) >= 0 ))
+    let activeItemIds = this.$ngRedux.getState().frontend.active.activeLayout.items.map(d => d.id)
+
+    return this.$q.resolve(
+      this.testData
+        .filter((d) => d.description.indexOf(query) >= 0 )
+        .filter((d) => activeItemIds.indexOf(d.id) === -1)
+    )
   }
 }
 

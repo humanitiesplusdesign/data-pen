@@ -3,8 +3,8 @@ import { ADD_ITEM_TO_CURRENT_LAYOUT } from '../../../actions/active'
 export type ItemState = {
   id: string,
   description: string,
-  xpos: number,
-  ypos: number
+  topOffset: number,
+  leftOffset: number
 }
 
 export type LayoutState = {

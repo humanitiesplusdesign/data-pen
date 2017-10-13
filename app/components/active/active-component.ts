@@ -19,8 +19,8 @@ export class ActiveComponentController {
 
   private nodeSearch: d3.Selection<Element, {}, HTMLElement, any>
   private nodeSearchSelected: string|{}
-  private nodeSearchOffsetX: number
-  private nodeSearchOffsetY: number
+  private nodeSearchOffsetTop: number
+  private nodeSearchOffsetLeft: number
 
   /* @ngInject */
   constructor(private projectService: ProjectService,
@@ -55,15 +55,9 @@ export class ActiveComponentController {
 
   private buildCanvas(): void {
     let s: d3.Selection<Element, {}, HTMLElement, any> = d3.select('.main-svg')
-
-    // let canvasSize: {height: number, width: number} = this.getCanvasSize()
-    // let h: number = canvasSize.height
-    // let w: number = canvasSize.width
-
     let g: d3.Selection<Element, {}, HTMLElement, any> = s.select('.main-g')
 
-    let r: d3.Selection<SVGRectElement, {}, HTMLElement, any> = g.append<SVGRectElement>('rect')
-      .classed('main-background', true)
+    let r: d3.Selection<SVGRectElement, {}, HTMLElement, any> = g.select<SVGRectElement>('rect')
       .on('click', this.canvasClick.bind(this, g))
 
     this.updateCanvasSize()
@@ -73,9 +67,9 @@ export class ActiveComponentController {
   private canvasClick(sel: d3.Selection<SVGGElement, {}, HTMLElement, any>): void {
     this.$scope.$apply(() => {
       if (!this.currentlyAdding) {
-        this.nodeSearchOffsetX = d3.event.offsetX
-        this.nodeSearchOffsetY = d3.event.offsetY
-        this.appendNode(sel, d3.event.offsetX, d3.event.offsetY, 'addition-node')
+        this.nodeSearchOffsetTop = d3.event.offsetY
+        this.nodeSearchOffsetLeft = d3.event.offsetX
+        this.appendNode(sel, this.nodeSearchOffsetTop, this.nodeSearchOffsetLeft, 'addition-node')
         this.nodeSearch
           .style('top', d3.event.offsetY + 25 + 'px')
         if (this.getCanvasSize().width - d3.event.offsetX > 350 + 30) {
@@ -103,25 +97,24 @@ export class ActiveComponentController {
     let item: ItemState = {
       id: $item.id,
       description: $item.description,
-      xpos: this.nodeSearchOffsetX,
-      ypos: this.nodeSearchOffsetX
+      topOffset: this.nodeSearchOffsetTop,
+      leftOffset: this.nodeSearchOffsetLeft
     }
 
     this.actions.addItemToCurrentLayout(item).then(() => {
-        console.log('Added'),
         this.updateCanvas()
-        this.$scope.$apply(this.nodeSearchRemove)
+        this.$scope.$apply(this.nodeSearchRemove.bind(this))
       }
     )
   }
 
-  private appendNode(sel: d3.Selection<SVGGElement, {}, HTMLElement, any>, top: number, left: number, clss: string): d3.Selection<SVGGElement, {}, HTMLElement, any> {
-    let g: d3.Selection<SVGGElement, {}, HTMLElement, any> = sel.append<SVGGElement>('g')
+  private appendNode(sel: d3.Selection<SVGGElement, any, HTMLElement, any>, top: number, left: number, clss: string): d3.Selection<SVGGElement, ItemState, Element, {}> {
+    let g: d3.Selection<SVGGElement, ItemState, Element, {}> = sel.append<SVGGElement>('g')
       .classed('node', true)
       .classed(clss, true)
-      .attr('transform', 'translate(' + top + ',' + left + ')')
+      .attr('transform', 'translate(' + left + ',' + top + ')')
 
-    let c: d3.Selection<SVGCircleElement, {}, HTMLElement, any> = g.append<SVGCircleElement>('circle')
+    let c: d3.Selection<SVGGElement, ItemState, Element, {}> = g.append<SVGCircleElement>('circle')
       .classed('node-circle', true)
       .attr('r', this.radiusInitial + 'px')
 
@@ -133,8 +126,44 @@ export class ActiveComponentController {
     return g
   }
 
+  private maintainNode(sel: d3.Selection<SVGGElement, ItemState, Element, {}>, top: number, left: number): d3.Selection<SVGGElement, ItemState, Element, {}> {
+    console.log(sel)
+    sel.attr('transform', 'translate(' + top + ',' + left + ')')
+    sel.select('circle').transition().attr('r', this.radius + 'px')
+    return sel
+  }
+
   private updateCanvas(): void {
-    let a: number = 1;
+    let s: d3.Selection<Element, {}, HTMLElement, any> = d3.select('.main-svg')
+    let g: d3.Selection<Element, {}, HTMLElement, any> = s.select('.main-g')
+    let itemG: d3.Selection<SVGGElement, {}, HTMLElement, any> = g.select('.main-g-items')
+    let ctrl: this = this
+
+    let itemSelection: d3.Selection<SVGGElement, ItemState, Element, {}> = itemG.selectAll<SVGGElement, {}>('.item-node')
+      .data(this.actions.project.activeLayout.items, (it: ItemState) => {
+        return it.id;
+      })
+
+    let enterSel: d3.Selection<SVGGElement, ItemState, Element, {}> = itemSelection.enter()
+      .append<SVGGElement>('g')
+      .classed('node', true)
+      .classed('item-node', true)
+      .attr('transform', (d) => { return 'translate(' + d.leftOffset + ',' + d.topOffset + ')' })
+
+    enterSel.append<SVGCircleElement>('circle')
+      .classed('node-circle', true)
+
+    itemSelection = itemSelection.merge(enterSel)
+
+    itemSelection.each((datum, i) => {
+      ctrl.maintainNode(d3.select(itemSelection.nodes()[i]), datum.leftOffset, datum.topOffset)
+    })
+
+    // itemSelection
+    //   .attr('transform', d => 'translate(' + d.xpos + ',' + d.ypos + ')')
+
+    // itemSelection.selectAll('circle')
+    //   .attr('r', '5px')
   }
 
   private updateCanvasSize(): void {
