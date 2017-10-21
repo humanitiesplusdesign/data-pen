@@ -1,4 +1,5 @@
 'use strict'
+import { Event } from 'typedoc/dist/lib/utils';
 import { ItemState } from '../../reducers/frontend/active';
 import * as angular from 'angular';
 import { ProjectService } from '../../services/project-service/project-service'
@@ -7,6 +8,7 @@ import * as ActiveActions from '../../actions/active';
 import { INgRedux } from 'ng-redux'
 import * as d3 from 'd3';
 import { SearchService } from '../../services/search-service'
+import * as angularDragDrop from 'angular-drag-drop';
 
 export class ActiveComponentController {
 
@@ -21,6 +23,8 @@ export class ActiveComponentController {
   private nodeSearchSelected: string|{}
   private nodeSearchOffsetTop: number
   private nodeSearchOffsetLeft: number
+
+  private tablePercent: number = 0
 
   /* @ngInject */
   constructor(private projectService: ProjectService,
@@ -183,6 +187,23 @@ export class ActiveComponentController {
       width: s.node().clientWidth
     }
   }
+
+  private dragDivider(evt: DragEvent): void {
+    console.log(evt)
+    this.tablePercent = 100 * evt.clientX / window.innerWidth
+  }
+
+  private tableWidthStyle(): {} {
+    return { 'width': this.tablePercent + '%' }
+  }
+
+  private canvasWidthStyle(): {} {
+    return { 'width': (100 - this.tablePercent) + '%' }
+  }
+
+  private dragTabLeftStyle(): {} {
+    return { 'left': this.tablePercent + '%' }
+  }
 }
 
 export class ActiveComponent implements angular.IComponentOptions {
@@ -190,5 +211,5 @@ export class ActiveComponent implements angular.IComponentOptions {
     public controller: any = ActiveComponentController
 }
 
-angular.module('fibra.components.active', ['ui.bootstrap', 'fibra.services.search-service'])
+angular.module('fibra.components.active', ['ui.bootstrap', 'fibra.services.search-service', angularDragDrop])
   .component('active', new ActiveComponent())

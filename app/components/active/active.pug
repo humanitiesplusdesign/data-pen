@@ -5,8 +5,10 @@
     i.glyphicon.glyphicon-eye-open
   button.btn.btn-circle.btn-default
     i.glyphicon.glyphicon-camera
-.table-tab Table View
-.main-canvas
+.drag-tab(ng-style="$ctrl.dragTabLeftStyle()")
+.draggable-divider(drag-container="true" on-drag-start="$ctrl.dragDivider($event)" ng-style="$ctrl.dragTabLeftStyle()")
+.main-table(drop-container on-drag-over="$ctrl.dragDivider($event)" ng-style="$ctrl.tableWidthStyle()")
+.main-canvas(drop-container on-drag-over="$ctrl.dragDivider($event)" ng-style="$ctrl.canvasWidthStyle()")
   svg.main-svg
     g.main-g
       rect.main-background

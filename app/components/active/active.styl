@@ -37,21 +37,44 @@
   }
 }
 
-.table-tab {
+.draggable-divider {
   top: 47%
-  left: -2.25em
+  left: 0%
+  margin-left: -2.25em
+  width: 100px
+  height: 200px
+  background-color: blue
+  opacity: 0.5
   padding: 0.5em 1em 0.5em 1em
-  position: fixed
+  position: absolute
+}
+
+.drag-tab {
+  top: 47%
+  left: 0%
+  margin-left: -2.25em
+  padding: 0.5em 1em 0.5em 1em
+  width: 100px
+  height: 100px
+  background-color: red
+  position: absolute
   border-style: none solid solid solid
   border-width: 1px
   border-color: #bbb
   border-radius: 0px 0px 3px 3px
-  transform: rotate(270deg)
+}
+
+.main-table {
+  height: 100%
+  width: 0%
+  display: inline-block
+  background-color: green
 }
 
 .main-canvas {
   height: 100%
   width: 100%
+  display: inline-block
 
   .main-svg {
     height: 100%
