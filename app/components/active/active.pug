@@ -5,14 +5,15 @@
     i.glyphicon.glyphicon-eye-open
   button.btn.btn-circle.btn-default
     i.glyphicon.glyphicon-camera
-.draggable-divider(drag-container="true" on-drag-start="$ctrl.dragDivider($event)" ng-style="$ctrl.dragTabLeftStyle()")
-  .drag-tab
-.main-table(drop-container on-drag-over="$ctrl.dragDivider($event)" ng-style="$ctrl.tableWidthStyle()")
-.main-canvas(drop-container on-drag-over="$ctrl.dragDivider($event)" ng-style="$ctrl.canvasWidthStyle()")
+.main-table(ng-style="$ctrl.tableWidthStyle()")
+  .main-grid(ui-grid="{ data: $ctrl.actions.project.activeLayout.items }" ng-hide="$ctrl.tablePercent < 2" ui-grid-auto-resize)
+.main-canvas(ng-style="$ctrl.canvasWidthStyle()")
   svg.main-svg
     g.main-g
       rect.main-background
       g.main-g-items
+.draggable-divider(drag-container="true" on-drag-end="dragging = false; $ctrl.dragDivider($event)" ng-style="$ctrl.dragTabLeftStyle()")
+  .drag-tab
 .node-search(ng-show="$ctrl.currentlyAdding")
   .input-group
     .input-group-addon

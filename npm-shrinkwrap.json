@@ -537,6 +537,23 @@
       "integrity": "sha1-5ChvxQ85PypuaXwb8xcEJOEsu2A=",
       "dev": true
     },
+    "angular-ui-grid": {
+      "version": "4.0.7",
+      "resolved": "https://registry.npmjs.org/angular-ui-grid/-/angular-ui-grid-4.0.7.tgz",
+      "integrity": "sha1-TzWjCU5ANPQUq7DcMrpQi6Lati0=",
+      "dev": true,
+      "requires": {
+        "angular": "1.5.11"
+      },
+      "dependencies": {
+        "angular": {
+          "version": "1.5.11",
+          "resolved": "https://registry.npmjs.org/angular/-/angular-1.5.11.tgz",
+          "integrity": "sha1-jFunOG8VllyazzQp9ogVU6raMNY=",
+          "dev": true
+        }
+      }
+    },
     "angular-ui-router": {
       "version": "1.0.3",
       "resolved": "https://registry.npmjs.org/angular-ui-router/-/angular-ui-router-1.0.3.tgz",

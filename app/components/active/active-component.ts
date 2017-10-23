@@ -9,6 +9,7 @@ import { INgRedux } from 'ng-redux'
 import * as d3 from 'd3';
 import { SearchService } from '../../services/search-service'
 import * as angularDragDrop from 'angular-drag-drop';
+import * as angularUIGrid from 'angular-ui-grid';
 
 export class ActiveComponentController {
 
@@ -131,7 +132,6 @@ export class ActiveComponentController {
   }
 
   private maintainNode(sel: d3.Selection<SVGGElement, ItemState, Element, {}>, top: number, left: number): d3.Selection<SVGGElement, ItemState, Element, {}> {
-    console.log(sel)
     sel.attr('transform', 'translate(' + top + ',' + left + ')')
     sel.select('circle').transition().attr('r', this.radius + 'px')
     return sel
@@ -189,7 +189,6 @@ export class ActiveComponentController {
   }
 
   private dragDivider(evt: DragEvent): void {
-    console.log(evt)
     let nativePercent: number = 100 * evt.clientX / window.innerWidth
     this.tablePercent = nativePercent > 98 ? 100 : nativePercent < 2 ? 0 : nativePercent
   }
@@ -199,7 +198,7 @@ export class ActiveComponentController {
   }
 
   private canvasWidthStyle(): {} {
-    return { 'width': (100 - this.tablePercent) + '%' }
+    return { 'width': (100 - this.tablePercent) + '%', 'left': this.tablePercent + '%' }
   }
 
   private dragTabLeftStyle(): {} {
@@ -212,5 +211,5 @@ export class ActiveComponent implements angular.IComponentOptions {
     public controller: any = ActiveComponentController
 }
 
-angular.module('fibra.components.active', ['ui.bootstrap', 'fibra.services.search-service', angularDragDrop])
+angular.module('fibra.components.active', ['ui.bootstrap', 'fibra.services.search-service', angularDragDrop, angularUIGrid, 'ui.grid.autoResize'])
   .component('active', new ActiveComponent())

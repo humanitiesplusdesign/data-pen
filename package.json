@@ -17,6 +17,7 @@
     "angular-toastr": "^2.1.1",
     "angular-ui-bootstrap": "^2.5.0",
     "angular-ui-codemirror": "0.3.0",
+    "angular-ui-grid": "^4.0.7",
     "angular-ui-router": "^1.0.3",
     "angular-yasqe-component": "^1.0.6",
     "angular-yasr-component": "^1.0.7",
