@@ -56,6 +56,8 @@ export class ActiveComponentController {
     this.buildCanvas()
 
     this.nodeSearch = d3.select('.node-search')
+
+    this.updateCanvas()
   }
 
   private buildCanvas(): void {
