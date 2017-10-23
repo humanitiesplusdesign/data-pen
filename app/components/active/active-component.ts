@@ -190,7 +190,8 @@ export class ActiveComponentController {
 
   private dragDivider(evt: DragEvent): void {
     console.log(evt)
-    this.tablePercent = 100 * evt.clientX / window.innerWidth
+    let nativePercent: number = 100 * evt.clientX / window.innerWidth
+    this.tablePercent = nativePercent > 98 ? 100 : nativePercent < 2 ? 0 : nativePercent
   }
 
   private tableWidthStyle(): {} {
