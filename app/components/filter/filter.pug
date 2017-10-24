@@ -1,0 +1,5 @@
+.main-table(ng-style="$ctrl.tableWidthStyle()")
+  .main-grid(ui-grid="{ data: $ctrl.actions.project.activeLayout.items }" ng-hide="$ctrl.actions.filter.dividerPercent < 2" ui-grid-auto-resize)
+.main-canvas(ng-style="$ctrl.canvasWidthStyle()")
+.draggable-divider(drag-container="true" on-drag-end="dragging = false; $ctrl.dragDivider($event)" ng-style="$ctrl.dragTabLeftStyle()")
+  .drag-tab

@@ -1,4 +1,4 @@
-import { ADD_ITEM_TO_CURRENT_LAYOUT } from '../../../actions/active'
+import { ADD_ITEM_TO_CURRENT_LAYOUT, SET_ACTIVE_DIVIDER_PERCENTAGE } from '../../../actions/active'
 
 export type ItemState = {
   id: string,
@@ -12,13 +12,15 @@ export type LayoutState = {
 }
 
 export type ActiveState = {
-  activeLayout: LayoutState
+  activeLayout: LayoutState,
+  dividerPercent: number
 }
 
 let defaultState: ActiveState = {
   activeLayout: {
     items: []
-  }
+  },
+  dividerPercent: 0
 }
 
 export default function models(state: ActiveState = defaultState, action): ActiveState {
@@ -32,6 +34,11 @@ export default function models(state: ActiveState = defaultState, action): Activ
         activeLayout: Object.assign({}, state.activeLayout, {
           items: newItems
         })
+      })
+
+    case SET_ACTIVE_DIVIDER_PERCENTAGE:
+      return Object.assign({}, state, {
+        dividerPercent: action.payload
       })
 
     default:

@@ -6,7 +6,7 @@
   button.btn.btn-circle.btn-default
     i.glyphicon.glyphicon-camera
 .main-table(ng-style="$ctrl.tableWidthStyle()")
-  .main-grid(ui-grid="{ data: $ctrl.actions.project.activeLayout.items }" ng-hide="$ctrl.tablePercent < 2" ui-grid-auto-resize)
+  .main-grid(ui-grid="{ data: $ctrl.actions.active.activeLayout.items }" ng-hide="$ctrl.actions.active.dividerPercent < 2" ui-grid-auto-resize)
 .main-canvas(ng-style="$ctrl.canvasWidthStyle()")
   svg.main-svg
     g.main-g

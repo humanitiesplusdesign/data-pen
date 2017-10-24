@@ -25,8 +25,6 @@ export class ActiveComponentController {
   private nodeSearchOffsetTop: number
   private nodeSearchOffsetLeft: number
 
-  private tablePercent: number = 0
-
   /* @ngInject */
   constructor(private projectService: ProjectService,
               private $scope: angular.IScope,
@@ -37,6 +35,7 @@ export class ActiveComponentController {
     let unsub2: () => void = $ngRedux.connect(this.mapActiveToActions, ActiveActions)(this.actions)
     this.actions.unsubscribe = () => {
       unsub1()
+      unsub2()
     }
   }
 
@@ -48,7 +47,7 @@ export class ActiveComponentController {
 
   private mapActiveToActions(state: any): any {
     return {
-      project: state.frontend.active
+      active: state.frontend.active
     }
   }
 
@@ -79,10 +78,10 @@ export class ActiveComponentController {
         this.appendNode(sel, this.nodeSearchOffsetTop, this.nodeSearchOffsetLeft, 'addition-node')
         this.nodeSearch
           .style('top', d3.event.offsetY + 25 + 'px')
-        if (this.getCanvasSize().width - (d3.event.offsetX + (this.tablePercent / 100 * window.innerWidth)) > 350 + 30) {
-          this.nodeSearch.style('left', d3.event.offsetX + (this.tablePercent / 100 * window.innerWidth) + 30 + 'px')
+        if (this.getCanvasSize().width - (d3.event.offsetX + (this.actions.active.dividerPercent / 100 * window.innerWidth)) > 350 + 30) {
+          this.nodeSearch.style('left', d3.event.offsetX + (this.actions.active.dividerPercent / 100 * window.innerWidth) + 30 + 'px')
         } else {
-          this.nodeSearch.style('left', d3.event.offsetX + (this.tablePercent / 100 * window.innerWidth) - 30 - 350 + 'px')
+          this.nodeSearch.style('left', d3.event.offsetX + (this.actions.active.dividerPercent / 100 * window.innerWidth) - 30 - 350 + 'px')
         }
       }
 
@@ -146,7 +145,7 @@ export class ActiveComponentController {
     let ctrl: this = this
 
     let itemSelection: d3.Selection<SVGGElement, ItemState, Element, {}> = itemG.selectAll<SVGGElement, {}>('.item-node')
-      .data(this.actions.project.activeLayout.items, (it: ItemState) => {
+      .data(this.actions.active.activeLayout.items, (it: ItemState) => {
         return it.id;
       })
 
@@ -192,19 +191,19 @@ export class ActiveComponentController {
 
   private dragDivider(evt: DragEvent): void {
     let nativePercent: number = 100 * evt.clientX / window.innerWidth
-    this.tablePercent = nativePercent > 98 ? 100 : nativePercent < 2 ? 0 : nativePercent
+    this.actions.setActiveDividerPercentage(nativePercent > 98 ? 100 : nativePercent < 2 ? 0 : nativePercent)
   }
 
   private tableWidthStyle(): {} {
-    return { 'width': this.tablePercent + '%' }
+    return { 'width': this.actions.active.dividerPercent + '%' }
   }
 
   private canvasWidthStyle(): {} {
-    return { 'width': (100 - this.tablePercent) + '%', 'left': this.tablePercent + '%' }
+    return { 'width': (100 - this.actions.active.dividerPercent) + '%', 'left': this.actions.active.dividerPercent + '%' }
   }
 
   private dragTabLeftStyle(): {} {
-    return { 'left': this.tablePercent + '%' }
+    return { 'left': this.actions.active.dividerPercent + '%' }
   }
 }
 
