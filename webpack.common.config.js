@@ -21,7 +21,7 @@ const commonConf = {
           loader: 'babel-loader',
           query: {
             cacheDirectory: true,
-            presets: [['es2015', { "modules": false, "loose": true }], 'stage-0'],
+            presets: ['env'],
             plugins: ['angularjs-annotate','transform-runtime']
           }
         }, 'ts-loader' ],
