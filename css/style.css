@@ -1,0 +1,400 @@
+@charset "UTF-8";
+/* http://meyerweb.com/eric/tools/css/reset/
+v2.0 | 20110126
+License: none (public domain)
+ */
+
+html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, abbr, acronym, address, big, cite, code, del, dfn, em, img, ins, kbd, q, s, samp, small, strike, strong, sub, sup, tt, var, b, u, i, center, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, thead, tr, th, td, article, aside, canvas, details, embed, figure, figcaption, footer, header, hgroup, menu, nav, output, ruby, section, summary, time, mark, audio, video {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-size: 100%;
+  font: inherit;
+  vertical-align: baseline;
+}
+
+/* HTML5 display-role reset for older browsers */
+
+article, aside, details, figcaption, figure, footer, header, hgroup, menu, nav, section {
+  display: block;
+}
+
+body {
+  line-height: 1;
+}
+
+ol, ul {
+  list-style: none;
+}
+
+blockquote, q {
+  quotes: none;
+}
+
+blockquote:before, blockquote:after, q:before, q:after {
+  content: '';
+  content: none;
+}
+
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+/* -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_ */
+
+body {
+  background-color: #FFFFFF;
+}
+
+h1, h2, h3, h4, h5, h6, p, button {
+  font-family: 'Roboto Mono', monospace;
+  font-weight: normal;
+  font-style: normal;
+  color: rgb(55, 55, 55);
+}
+
+h1 {
+  font-size: 4em;
+  line-height: 1em;
+}
+
+h2 {
+  font-size: 3em;
+  line-height: 1.2em;
+}
+
+h3 {
+  font-size: 1.6em;
+  line-height: 1.3em;
+}
+
+h4 {
+  font-size: 4em;
+  line-height: 1.2em;
+}
+
+h5 {
+  font-size: 4em;
+  line-height: 1.2em;
+}
+
+h6 {
+  font-size: 1.2em;
+  line-height: 1.5em;
+}
+
+p {
+  font-weight: normal;
+  font-style: normal;
+  font-size: 0.8em;
+  line-height: 1.5em;
+}
+
+a {
+  color: rgb(55, 55, 55);
+  text-decoration: underline;
+  transition: .2s;
+}
+
+a:hover {
+  opacity: .6;
+}
+
+p.break {
+  text-indent: 0em;
+  margin-top: 10px;
+}
+
+h6.section-title {}
+
+#sketch-container {
+  position: absolute;
+  width: 100%;
+  height: 760px;
+  background-color: rgb(245, 245, 245);
+}
+
+#head {
+  position: relative;
+  margin-top: 250px;
+}
+
+#title {
+  position: relative;
+  top: -3px;
+  text-align: center;
+  color: rgb(50, 50, 50);
+  line-height: 0.9em;
+  /* 	text-shadow: 0px 0px 2px rgb(245, 245, 245);	*/
+}
+
+#tagline-row {
+  position: relative;
+  margin-top: 30px;
+}
+
+#tagline {
+  text-align: center;
+  color: rgb(50, 50, 50);
+  font-size: 1em;
+}
+
+#button-row {
+  padding-bottom: 250px;
+}
+
+/*
+dark
+#login-button {
+  position: relative;
+  width: 270px;
+  height: 55px;
+	margin-left: 50%;
+	transform: translateX(-50%);
+	margin-top: 80px;
+  padding: 0 0 0 40px;
+  border: 2px solid rgba(0, 0, 0, 0.5);
+  border-radius: 6px;
+  background-color: rgb(60, 60, 60);
+  background-image: url('../img/github_mark.svg');
+  background-position: 18px 11px;
+  background-size: 30px;
+  background-repeat: no-repeat;
+  font-size: 1.1em;
+  color: white;
+  box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.1);
+  outline: 0;
+  transition: .2s;
+}
+
+#login-button:hover {
+  background-color: rgb(70, 70, 70);
+}*/
+
+#login-button {
+  position: relative;
+  width: 280px;
+  height: 55px;
+  margin-left: 50%;
+  transform: translateX(-50%);
+  margin-top: 80px;
+  padding: 0 0 0 40px;
+  border: 1px solid rgba(245, 245, 245, 0);
+  border-radius: 6px;
+  background-color: rgb(250, 250, 250);
+  background-image: url('../img/github_mark_dark.svg');
+  background-position: 18px 11px;
+  background-size: 30px;
+  background-repeat: no-repeat;
+  font-size: 1em;
+  color: rgb(50, 50, 50);
+  box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.1);
+  outline: 0;
+  transition: .2s;
+}
+
+#login-button:hover {
+  background-color: rgb(255, 255, 255);
+  box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+#about-section {
+  position: relative;
+  margin-top: 0px;
+}
+
+#about-this-proj {
+  margin-top: 170px;
+  margin-bottom: 150px;
+}
+
+#about-text {
+  text-align: center;
+  font-size: 1.2em;
+  line-height: 1.7em;
+}
+
+.keyline {
+  width: 100%;
+  height: 1px;
+  background-color: rgba(0, 0, 0, 0.2);
+  margin-bottom: 150px;
+}
+
+.section-title {
+  margin-bottom: 20px;
+}
+
+.feature-title {
+  font-size: 1.1em;
+  line-height: 1.4em;
+  font-weight: 700;
+  margin-bottom: 25px;
+}
+
+.feature-block {
+  margin-bottom: 80px;
+}
+
+.feature-row {
+  margin-top: 180px;
+}
+
+.feature-image {
+  width: 100%;
+  height: auto;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  box-shadow: 0px 2px 3px rgba(0, 0, 0, 0.05);
+}
+
+#features-gap {
+  margin-top: 100px;
+}
+
+#people-section {
+  position: relative;
+  width: 100%;
+}
+
+#core-team {
+  margin-top: 10px;
+}
+
+#consultants {
+  margin-top: 100px;
+  margin-bottom: 100px;
+}
+
+.name {
+  font-size: 1em;
+  font-weight: 500;
+}
+
+.institute {
+  text-transform: uppercase;
+  font-size: 0.75em;
+  margin-left: 0px;
+}
+
+#core-team p, #consultants p {
+  line-height: 1.1em;
+  margin-bottom: 10px;
+}
+
+#logos {
+  width: 80%;
+  height: auto;
+  margin-top: 50px;
+  margin-bottom: 200px;
+}
+
+/* footer ––––––––––––––––––––––––––––––––––––– */
+
+html, body {
+  height: 100%;
+}
+
+.page-wrap {
+  min-height: 100%;
+  /* equal to footer height */
+  margin-bottom: -100px;
+}
+
+.page-wrap:after {
+  content: "";
+  display: block;
+}
+
+#footer, .page-wrap:after {
+  height: 100px;
+}
+
+#footer {
+  background-color: rgb(245, 245, 245);
+  padding-top: 30px;
+}
+
+.border {
+  /*   border: 1px solid rgba(0, 0, 255, 0.1);  */
+}
+
+@media only screen and (min-width: 768px) and (max-width: 992px) {
+  #about-this-proj {
+    margin-top: 100px;
+    margin-bottom: 80px;
+  }
+  .keyline {
+    margin-bottom: 60px;
+  }
+  .feature-row {
+    margin-top: 100px;
+  }
+  .feature-image {
+    margin-top: -30px;
+  }
+}
+
+/*   Adjustments for button size   */
+
+@media only screen and (min-width: 450px) and (max-width: 767px) {
+  #login-button {
+    position: relative;
+    width: 350px;
+    margin-left: 50%;
+    transform: translateX(-50%);
+  }
+}
+
+@media only screen and (max-width: 449px) {
+  #login-button {
+    position: relative;
+    width: 80%;
+    height: 55px;
+    margin: 80px 0 0 10%;
+    transform: translateX(0);
+  }
+}
+
+@media only screen and (max-width: 767px) {
+  #about-text {
+    font-size: 1em;
+    text-align: left;
+  }
+  #about-this-proj {
+    margin-top: 100px;
+    margin-bottom: 80px;
+  }
+  .keyline {
+    margin-bottom: 80px;
+  }
+  .feature-row {
+    margin-top: 100px;
+  }
+  .feature-image {
+    margin-top: -30px;
+  }
+  #core-team {
+    margin-top: -20px;
+  }
+  #consultants {
+    margin-top: 40px;
+  }
+  #logos {
+    width: 100%;
+    padding: 0 20px 0 20px;
+    margin-bottom: 60px;
+  }
+  .page-wrap {
+    min-height: 100%;
+    /* equal to footer height */
+    margin-bottom: 0px;
+  }
+  #footer, .page-wrap:after {
+    height: 100px;
+  }
+  #footer {
+    background-color: rgb(245, 245, 245);
+    padding-top: 30px;
+  }
+}

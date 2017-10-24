@@ -1,64 +1,302 @@
----
----
 <!DOCTYPE html>
-<html dir="ltr" lang="en">
+<html lang="en">
+
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>{{ site.title }}</title>
-	<meta name="keywords" content="{{ site.keywords }}">
-	<meta name="description" content="{{ site.description }}">
-  <link rel="stylesheet" href="combo.css">
-  <link href='http://fonts.googleapis.com/css?family=Raleway:400,300,700' rel='stylesheet' type='text/css'>
-  <link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css">
-  {% if site.favicon %}<link rel="shortcut icon" href="{{ site.favicon }}" type="image/x-icon">{% endif %}
-	{% if site.touch_icon %}<link rel="apple-touch-icon" href="{{ site.touch_icon }}">{% endif %}
+	<meta charset="utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, maximum-scale=1.0" />
+	<meta name="description" content="Fibra &mdash Draw on the world's knowledge. Draw graphs of your own.">
+	<title>Fibra</title>
+	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/typed.js/2.0.6/typed.min.js"></script>
+	<script type="text/javascript" src="js/jquery.visible.min.js"></script>
+	<link rel="stylesheet" type="text/css" href="css/normalize.css">
+	<link rel="stylesheet" type="text/css" href="css/bootstrap.css">
+	<link rel="stylesheet" type="text/css" href="css/style.css">
+	<link href="https://fonts.googleapis.com/css?family=Roboto+Mono:400,700" rel="stylesheet">
+	<link rel="icon" type="image/png" href="favicon-32x32.png" sizes="32x32" />
+	<link rel="icon" type="image/png" href="favicon-16x16.png" sizes="16x16" />
 </head>
 <body>
-  <div id="main">
-
-    <nav><ul>
-      {% for node in site.splash %}
-        {% capture id %}{{ node.title | remove:'-' | remove:' ' | downcase }}{% endcapture %}
-        <li class="p-{{id}}"><a href="#{{id}}">{{node.title}}</a></li>
-      {% endfor %}
-    </ul></nav>
-
-
-    {% for page in site.splash %}
-      {% capture id %}{{ page.title | remove:'-' | remove:' ' | downcase }}{% endcapture %}
-      <div id="{{id}}" class="section p-{{id}}">
-        {% if page.icon %}
-        <div class="subtlecircle sectiondivider imaged">
-          <img src="{{page.icon}}" alt="section icon" />
-          <h5 class="icon-title">{{ page.title }}</h5>
-        </div>
-        {% elsif page.fa-icon %}
-        <div class="subtlecircle sectiondivider faicon">
-          <span class="fa-stack">
-            <i class="fa fa-circle fa-stack-2x"></i>
-            <i class="fa fa-{{ page.fa-icon }} fa-stack-1x"></i>
-          </span>
-          <h5 class="icon-title">{{ page.title }}</h5>
-        </div>
-        {% endif %}
-        <div class="container {{ page.style }}">
-          {{ page.content }}
-        </div>
-      </div>
-    {% endfor %}
-
-
-    <div id="footer" class="section text-white">
-      <div class="container">
-        {% capture foottext %} {% include footer.md %} {% endcapture %}
-        {{ foottext | markdownify }}
-      </div>
-    </div>
-  </div>
-
-{% include analytics.html %}
+	<div class="page-wrap">
+		<div id="sketch-container"></div>
+		<section id="intro-section">
+			<div class="container">
+				<div id="head" class="row">
+					<div class="col-md-4 col-md-offset-4 border">
+						<h2 id="title">fibra</h2>
+					</div>
+				</div>
+				<div id="tagline-row" class="row">
+					<div class="col-md-6 col-md-offset-3 border">
+						<h6 id="tagline">
+						Draw on <span id="ani-type"></span> knowledge.<br />Draw graphs of your own.
+					</h6>
+					</div>
+				</div>
+				<div id="button-row" class="row">
+					<button id="login-button" onclick="window.location.href = 'http://hdlab.stanford.edu/fibra/test/#login';">Login with GitHub</button>
+				</div>
+			</div>
+		</section>
+		<section id="about-section">
+			<div class="container">
+				<div id="about-this-proj" class="row">
+					<div class="col-md-8 col-md-offset-2 border">
+						<h6 id="about-text">
+						Fibra is a prototype research tool for humanities data. Connecting linked data sources to filtering and graphing tools, Fibra provides a framework for humanities researchers to access, explore, and manipulate multidimensional historical data.
+					</h6>
+					</div>
+				</div>
+				<div class="keyline"></div>
+			</div>
+		</section>
+		<section id="features-section">
+			<div class="container">
+				<div class="row">
+					<div class="feature-block col-md-4">
+						<h6 class="feature-title">
+						Pull in data from established sources.
+					</h6>
+						<p>
+							By connecting to authorities and archives like VIAF, the Library of Congress, Geonames, and Wikidata, Fibra empowers researchers with the interconnected knowledge of the scholarly community and the larger linked data ecosystem.
+						</p>
+						<p class="break">
+							Import data en masse from sources as a starting point, or use them as a reference to enrich datasets built one entity at a time. Either way, a node labelled “John Locke” can be identified as a person with already defined relationships to other people,
+							places, and objects in the data set.
+						</p>
+					</div>
+					<div class="col-md-7 col-md-offset-1">
+						<img class="feature-image" src="img/splash_sources.jpg" alt="Screenshot of the sources level of Fibra.">
+					</div>
+				</div>
+				<div class="feature-row  row">
+					<div class="feature-block col-md-4 col-md-push-8">
+						<h6 class="feature-title">
+						Filter and investigate your dataset.
+					</h6>
+						<p>
+							Having access to multiple archives’ worth of data means needing a way to navigate that data. Fibra’s filtering tools provide a variety of ways to explore the rich web of linked data available to researchers, and to focus on what’s important.
+						</p>
+						<p class="break">
+							Make your dataset more manageable with visual filters like timelines and facet filters, as well as tabular filtering tools. Use those same tools to investigate large and small datasets, in both tabular and visualised forms, to develop a contextual understanding
+							of the data that’s available.
+						</p>
+					</div>
+					<div class="col-md-7 col-md-offset-1 col-md-pull-5">
+						<img class="feature-image" src="img/splash_filter.jpg" alt="Screenshot of the sources level of Fibra.">
+					</div>
+				</div>
+				<div class="feature-row row">
+					<div class="feature-block col-md-4">
+						<h6 class="feature-title">
+						Draw with data.
+					</h6>
+						<p>
+							Fibra leverages linked data to aid researchers, not to replace them. Use the canvas as a blank slate to think visually, accompanied by a tabular view to keep the data close at hand. Add, remove, and edit nodes as your research shifts, and construct graphs
+							that are meaningful to you.
+						</p>
+						<p class="break">
+							Create, arrange, group, and annotate nodes by hand, or utilise the underlying data to help you. Select an entity on the canvas, and pull in any people or places associated with them. Save snapshots of your canvas to return to later, or to share with colleagues.
+							Nothing moves unless you want it to.
+						</p>
+					</div>
+					<div class="col-md-7 col-md-offset-1">
+						<img class="feature-image" src="img/splash_active.jpg" alt="Screenshot of the sources level of Fibra.">
+					</div>
+				</div>
+				<div id="features-gap" class="keyline"></div>
+			</div>
+		</section>
+		<section id="people-funding">
+			<div class="container">
+				<div id="core-team" class="row">
+					<div class="col-md-3">
+						<h6 class="section-title">Core team</h6>
+					</div>
+					<div class="col-md-7 col-md-offset-2 border">
+						<p>
+							<span class="name">Dan Edelstein</span>
+							<span class="institute">Stanford University</span>
+						</p>
+						<p>
+							<span class="name">Nicole Coleman</span>
+							<span class="institute">Stanford University Libraries</span>
+						</p>
+						<p>
+							<span class="name">Eetu M&auml;kel&auml;</span>
+							<span class="institute">Semantic Computing Research Group, &nbsp;Aalto University</span>
+						</p>
+						<p>
+							<span class="name">Ethan Jewett</span>
+							<span class="institute">Coredatra</span>
+						</p>
+						<p>
+							<span class="name">Alex Sherman</span>
+							<span class="institute">Center for Spatial and Textual Analysis</span>
+						</p>
+						<p>
+							<span class="name">Tim Busuttil</span>
+							<span class="institute">University of Technology, Sydney</span>
+						</p>
+						<p>
+							<span class="name">Thomas Ricciardiello</span>
+							<span class="institute">University of Technology, Sydney</span>
+						</p>
+					</div>
+				</div>
+				<div id="consultants" class="row">
+					<div class="col-md-3">
+						<h6 class="section-title">Consultants and participants</h6>
+					</div>
+					<div class="col-md-3 col-md-offset-2 border">
+						<p>
+							<span class="name">Ruth Ahnert</span>
+							<span class="institute">Queen Mary University of London</span>
+						</p>
+						<p>
+							<span class="name">Sebastian Ahnert</span>
+							<span class="institute">University of Cambridge</span>
+						</p>
+						<p>
+							<span class="name">Arno Bosse</span>
+							<span class="institute">Oxford University</span>
+						</p>
+						<p>
+							<span class="name">Simon Burrows</span>
+							<span class="institute">University of Western Sydney</span>
+						</p>
+						<p>
+							<span class="name">Paolo Ciuccarelli</span>
+							<span class="institute">Politecnico di Milano</span>
+						</p>
+						<p>
+							<span class="name">Marten D&uuml;ring</span>
+							<span class="institute">University of Luxembourg</span>
+						</p>
+						<p>
+							<span class="name">Paula Findlen</span>
+							<span class="institute">Stanford University</span>
+						</p>
+						<p>
+							<span class="name">Mauricio Giraldo</span>
+							<span class="institute">New York Public Library</span>
+						</p>
+						<p>
+							<span class="name">Jo Guldi</span>
+							<span class="institute">Brown University</span>
+						</p>
+						<p>
+							<span class="name">Howard Hotson</span>
+							<span class="institute">Oxford University</span>
+						</p>
+						<p>
+							<span class="name">Eero Hyvonen</span>
+							<span class="institute">Aalto University</span>
+						</p>
+						<p>
+							<span class="name">Matthew Jones</span>
+							<span class="institute">Columbia</span>
+						</p>
+						<p>
+							<span class="name">Christoph Kudella</span>
+							<span class="institute">University College Cork</span>
+						</p>
+						<p>
+							<span class="name">Miranda Lewis</span>
+							<span class="institute">Oxford University</span>
+						</p>
+					</div>
+					<div class="col-md-3 border">
+						<p>
+							<span class="name">Matthew Lincoln</span>
+							<span class="institute">Getty Research Institute</span>
+						</p>
+						<p>
+							<span class="name">Jacqueline Lorber Kasunic</span>
+							<span class="institute">University of Technology, Sydney</span>
+						</p>
+						<p>
+							<span class="name">Sarah Ogilvie</span>
+							<span class="institute">Stanford University</span>
+						</p>
+						<p>
+							<span class="name">Ir&eacute;ne Passeron</span>
+							<span class="institute">CNRS Paris</span>
+						</p>
+						<p>
+							<span class="name">Miriam Posner</span>
+							<span class="institute">UCLA</span>
+						</p>
+						<p>
+							<span class="name">Rob Sanderson</span>
+							<span class="institute">J. Paul Getty Trust</span>
+						</p>
+						<p>
+							<span class="name">Philip Schreur</span>
+							<span class="institute">Stanford University Libraries</span>
+						</p>
+						<p>
+							<span class="name">Daniel Shore</span>
+							<span class="institute">Georgetown University</span>
+						</p>
+						<p>
+							<span class="name">Sarah Sussman</span>
+							<span class="institute">Stanford University Libraries</span>
+						</p>
+						<p>
+							<span class="name">Kate Sweetapple</span>
+							<span class="institute">University of Technology, Sydney</span>
+						</p>
+						<p>
+							<span class="name">Thomas Wallnig</span>
+							<span class="institute">University of Vienna</span>
+						</p>
+						<p>
+							<span class="name">Chris Warren</span>
+							<span class="institute">Carnegie Mellon University</span>
+						</p>
+						<p>
+							<span class="name">Scott Weingart</span>
+							<span class="institute">Carnegie Mellon University</span>
+						</p>
+						<p>
+							<span class="name">Caroline Winterer</span>
+							<span class="institute">Stanford University</span>
+						</p>
+					</div>
+				</div>
+				<div id="funding-support" class="row">
+					<div class="col-md-3">
+						<h6 class="section-title">Funding and support</h6>
+					</div>
+					<div class="col-md-7 col-md-offset-2 border">
+						<p>
+							The Fibra Project became real thanks to an ACLS Digital Extension grant.
+						</p>
+						<p class="break">
+							We are also very fortunate for our affiliation with <a href="https://cesta.stanford.edu/" target="_blank">CESTA</a>, the hub of all of our activities. The researchers and staff there are crucial to the success of the project. We also rely heavily
+							on our partnership with the Stanford University Libraries for technical expertise and sharing ideas to create research tools that make the most of the digital library.
+						</p>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-md-7 col-md-offset-5 border">
+						<img id="logos" src="img/logos.jpg" alt="Logos for the American Council of Learned Societies, Stanford University Center for Spatial and Textual Analysis and Stanford Libraries.">
+					</div>
+				</div>
+			</div>
+		</section>
+	</div>
+	<footer id="footer">
+		<div class="container">
+			<div class="col-md-6 col-md-offset-5">
+				<p>An <a href="https://github.com/humanitiesplusdesign/fibra" target="_blank">open source</a> <a href="http://hdlab.stanford.edu/" target="_blank">Humanities &#43; Design</a> research lab project.</p>
+			</div>
+		</div>
+	</footer>
+	<script type="text/javascript" src="js/retina.min.js"></script>
+	<script type="text/javascript" src="js/index_type.js"></script>
 </body>
-<script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
-<script src="site.js"></script>
+
 </html>
