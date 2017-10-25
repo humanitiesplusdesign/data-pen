@@ -5,8 +5,8 @@ import { ProjectService } from '../../services/project-service/project-service'
 import * as ProjectActions from '../../actions/project';
 import * as FilterActions from '../../actions/filter';
 import { INgRedux } from 'ng-redux'
-import * as angularDragDrop from 'angular-drag-drop';
-import * as angularUIGrid from 'angular-ui-grid';
+import 'angular-drag-drop';
+import 'angular-ui-grid';
 
 export class FilterComponentController {
 
@@ -61,5 +61,5 @@ export class FilterComponent implements angular.IComponentOptions {
     public controller: any = FilterComponentController
 }
 
-angular.module('fibra.components.filter', ['ui.bootstrap', angularDragDrop, angularUIGrid, 'ui.grid.autoResize'])
+angular.module('fibra.components.filter', ['ui.bootstrap', 'filearts.dragDrop', 'ui.grid', 'ui.grid.autoResize'])
   .component('filter', new FilterComponent())

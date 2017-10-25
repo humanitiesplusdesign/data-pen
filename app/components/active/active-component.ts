@@ -8,8 +8,8 @@ import * as ActiveActions from '../../actions/active';
 import { INgRedux } from 'ng-redux'
 import * as d3 from 'd3';
 import { SearchService } from '../../services/search-service'
-import * as angularDragDrop from 'angular-drag-drop';
-import * as angularUIGrid from 'angular-ui-grid';
+import 'angular-drag-drop';
+import 'angular-ui-grid';
 
 export class ActiveComponentController {
 
@@ -212,5 +212,5 @@ export class ActiveComponent implements angular.IComponentOptions {
     public controller: any = ActiveComponentController
 }
 
-angular.module('fibra.components.active', ['ui.bootstrap', 'fibra.services.search-service', angularDragDrop, angularUIGrid, 'ui.grid.autoResize'])
+angular.module('fibra.components.active', ['ui.bootstrap', 'fibra.services.search-service', 'filearts.dragDrop', 'ui.grid', 'ui.grid.autoResize'])
   .component('active', new ActiveComponent())
