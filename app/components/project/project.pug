@@ -13,9 +13,8 @@
     .nav-element.nav-link(ng-class="{muted: $ctrl.currentView !== 'sources', active: $ctrl.currentView === 'sources'}", ng-click="$ctrl.setView('sources')") Sources
     .nav-element.nav-link(ng-class="{muted: $ctrl.currentView !== 'filter', active: $ctrl.currentView === 'filter'}", ng-click="$ctrl.setView('filter')") Filter
     .nav-element.nav-link(ng-class="{muted: $ctrl.currentView !== 'active', active: $ctrl.currentView === 'active'}", ng-click="$ctrl.setView('active')") Active
-  .nav-element.bibliography-link Bibliography
+  .nav-element.bibliography-link Biblio Icon
   span.usage
     .nav-element.usage-chart
       .progress
         .progress-bar(style="width: 20%")
-    .nav-element.usage-text Using 20% of filtered data
