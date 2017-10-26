@@ -28,6 +28,18 @@ export class ItemsService {
       })
     )
   }
+
+  public getFilteredItems(): angular.IPromise<{}[]> {
+    return this.getAllItems()
+  }
+
+  public getAllItemsCount(): angular.IPromise<number> {
+    return this.getAllItems().then((items) => items.length)
+  }
+
+  public getFilteredItemsCount(): angular.IPromise<number> {
+    return this.getFilteredItems().then((items) => items.length)
+  }
 }
 
 

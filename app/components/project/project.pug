@@ -17,4 +17,4 @@
   span.usage
     .nav-element.usage-chart
       .progress
-        .progress-bar(style="width: 20%")
+        .progress-bar(ng-style="{ 'width': $ctrl.dataUsedProportion() +'%' }")
