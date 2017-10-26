@@ -1,36 +1,41 @@
 projects-view {
-
-	.projects-category {
-		border: 1px solid red;
+  .header-title {
+		margin-top: 50px;
 	}
-
-  .projects-list {
-    margin: 80px auto 50px auto;
-    text-align: center;
-		list-style: none;
+  .projects-category {
+    border: 1px solid red;
   }
-
+	.projects-category-title {
+		font-weight: 400;
+		font-size: 1.2em;
+    margin: 100px 0 20px 0;
+	}
+	.load-icon {
+		margin-left: 10px;
+		font-size: 0.9em;
+	}
+  .projects-list {
+    margin: 60px -15px 50px -30px;
+    text-align: center;
+    list-style: none;
+  }
   .project-box {
     display: inline-block;
-		vertical-align: top;
-		text-align: left;
-		font-family: 'Roboto', sans-serif;
-		height: 220px;
-		padding: 10px 15px 0 15px;
-		background-color: rgba(0, 0, 0, 0);
-		border: 1px solid rgba(0, 0, 255, 1);
+    vertical-align: top;
+    text-align: left;
+    font-family: 'Roboto', sans-serif;
+    height: 220px;
+    padding: 10px 15px 0 15px;
+    background-color: rgba(0, 0, 0, 0);
   }
-
-	@media screen only and (max-width: 768px) {
-		.project-box {
-			width: 30px !important;
-		}
-	}
-
-	a.project-title {
-		color: #3c3c3c;
-		font-size: 1.4em;
-		font-weight: 500;
-	}
-
+  @media screen only and (max-width: 768px) {
+    .project-box {
+      width: 30px !important;
+    }
+  }
+  a.project-title {
+    color: #3c3c3c;
+    font-size: 1.4em;
+    font-weight: 500;
+  }
 }

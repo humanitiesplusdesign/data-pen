@@ -9,7 +9,7 @@ html(lang="en",ng-app="fibra",ng-hint)
     link(rel="stylesheet" href="styles.css")
     title Fibra - {{viewName}}
   body
-    .pull-right
+    .auth-text
       span(ng-bind="socialAuthService.loginState()")
       a(ng-if="!socialAuthService.isLoggedIn()" ui-sref="login") &nbsp;Login
       a(ng-if="socialAuthService.isLoggedIn()" ng-click="socialAuthService.logout()") &nbsp;Log out
