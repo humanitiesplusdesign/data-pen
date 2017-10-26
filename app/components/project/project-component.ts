@@ -1,7 +1,8 @@
 'use strict'
-import * as angular from 'angular'
+import { ItemsService } from '../../services/items-service';
+import * as angular from 'angular';
 import { ProjectService } from '../../services/project-service/project-service'
-import * as ProjectActions from '../../actions/project'
+import * as ProjectActions from '../../actions/project';
 import { INgRedux } from 'ng-redux'
 
 export class ProjectComponentController {
@@ -11,6 +12,7 @@ export class ProjectComponentController {
 
   /* @ngInject */
   constructor(private projectService: ProjectService,
+              private itemsService: ItemsService,
               private $stateParams: any,
               private $state: any,
               private $ngRedux: INgRedux) {
@@ -31,10 +33,21 @@ export class ProjectComponentController {
         this.currentView = $stateParams.view
       }
     }
+
+    itemsService.getAllItemsCount().then((count) => this.actions.setAllItemCount(count))
+    itemsService.getFilteredItemsCount().then((count) => this.actions.setFilteredItemCount(count))
   }
 
   private setView(newView: string): void {
     this.$state.go('project', { view: newView })
+  }
+
+  private dataUsedProportion(): number {
+    return this.currentView === 'filter' ?
+        this.actions.project.filteredItemsCount / this.actions.project.allItemsCount * 100 :
+      this.currentView === 'active' ?
+        this.actions.project.activeItemsCount / this.actions.project.filteredItemsCount * 100 :
+        0
   }
 
   private mapProjectToActions(state: any): any {

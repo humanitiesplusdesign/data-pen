@@ -1,139 +1,148 @@
-.control-area {
-  position: fixed
-  top: 50px
-  right: 0px
-  width: 4em
-  padding: 1em
+active {
 
-  .btn {
-    margin-bottom: 1em
-    box-shadow: 1px 1px 1px #CCC
-  }
-  
-  .btn-circle {
-    width: 30px;
-    height: 30px;
-    text-align: center;
-    padding: 6px 0;
-    font-size: 12px;
-    line-height: 1.428571429;
-    border-radius: 15px;
-  }
-  .btn-circle.btn-lg {
-    width: 50px;
-    height: 50px;
-    padding: 10px 16px;
-    font-size: 18px;
-    line-height: 1.33;
-    border-radius: 25px;
-  }
-  .btn-circle.btn-xl {
-    width: 70px;
-    height: 70px;
-    padding: 10px 16px;
-    font-size: 24px;
-    line-height: 1.33;
-    border-radius: 35px;
-  }
-}
-
-.draggable-divider {
-  top: 0%
-  left: 0%
-  margin-left: -3px
-  width: 6px
-  height: 100%
-  opacity: 0.5
-  background-color: gray
-  position: absolute
-}
-
-.drag-tab {
-  top: 45%
-  left: 0%
-  padding: 0.5em 1em 0.5em 1em
-  width: 30px
-  margin-left: -12px
-  height: 100px
-  background-color: gray
-  position: absolute
-  border-style: solid solid solid solid
-  border-width: 1px
-  border-color: black
-  border-radius: 3px 3px 3px 3px
-}
-
-.ui-grid {
-  border-width: 0px
-  border-style: none
-}
-
-.main-table {
-  height: 100%
-  width: 0%
-  position: absolute
-
-  .main-grid {
-    height: 100%
-    width: 100%
-  }
-}
-
-.main-canvas {
+  display: inline-block
   height: 100%
   width: 100%
-  position: absolute
 
-  .main-svg {
+  .control-area {
+    position: fixed
+    top: 50px
+    right: 0px
+    width: 4em
+    padding: 1em
+
+    .btn {
+      margin-bottom: 1em
+      box-shadow: 1px 1px 1px #CCC
+    }
+    
+    .btn-circle {
+      width: 30px;
+      height: 30px;
+      text-align: center;
+      padding: 6px 0;
+      font-size: 12px;
+      line-height: 1.428571429;
+      border-radius: 15px;
+    }
+    .btn-circle.btn-lg {
+      width: 50px;
+      height: 50px;
+      padding: 10px 16px;
+      font-size: 18px;
+      line-height: 1.33;
+      border-radius: 25px;
+    }
+    .btn-circle.btn-xl {
+      width: 70px;
+      height: 70px;
+      padding: 10px 16px;
+      font-size: 24px;
+      line-height: 1.33;
+      border-radius: 35px;
+    }
+  }
+
+  .draggable-divider {
+    top: 0%
+    left: 0%
+    margin-left: -3px
+    width: 6px
+    height: 100%
+    opacity: 0.5
+    background-color: gray
+    position: absolute
+  }
+
+  .drag-tab {
+    top: 45%
+    left: 0%
+    padding: 0.5em 1em 0.5em 1em
+    width: 30px
+    margin-left: -12px
+    height: 100px
+    background-color: gray
+    position: absolute
+    border-style: solid solid solid solid
+    border-width: 1px
+    border-color: black
+    border-radius: 3px 3px 3px 3px
+  }
+
+  .ui-grid {
+    border-width: 0px
+    border-style: none
+  }
+
+  .main-table {
+    height: 100%
+    width: 0%
+    position: absolute
+    padding-bottom: 3em
+
+    .main-grid {
+      height: 100%
+      width: 100%
+    }
+  }
+
+  .main-canvas {
     height: 100%
     width: 100%
+    position: absolute
+    padding-bottom: 3em
 
-    .main-background {
-      fill: #f4f4f4
-    }
+    .main-svg {
+      height: 100%
+      width: 100%
 
-    .node {
-      .node-circle {
-        stroke: #7E7E7E
-        fill: #aaaaaa
+      .main-background {
+        fill: #f4f4f4
+      }
+
+      .node {
+        .node-circle {
+          stroke: #7E7E7E
+          fill: #aaaaaa
+        }
       }
     }
   }
-}
 
-.node-search {
-  position: absolute
-  top: 100px
-  left: 100px
-  width: 350px
-
-  .input-group {
+  .node-search {
+    position: absolute
+    top: 100px
+    left: 100px
     width: 350px
-  }
 
-  .custom-popup-wrapper {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    z-index: 1000;
-    display: none;
-    background-color: #f9f9f9;
-  }
+    .input-group {
+      width: 350px
+    }
 
-  .custom-popup-wrapper > .message {
-    padding: 10px 20px;
-    border-bottom: 1px solid #ddd;
-    color: #868686;
-  }
+    .custom-popup-wrapper {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      z-index: 1000;
+      display: none;
+      background-color: #f9f9f9;
+    }
 
-  .custom-popup-wrapper > .dropdown-menu {
-    position: static;
-    float: none;
-    display: block;
-    min-width: 160px;
-    background-color: transparent;
-    border: none;
-    border-radius: 0;
-    box-shadow: none;
+    .custom-popup-wrapper > .message {
+      padding: 10px 20px;
+      border-bottom: 1px solid #ddd;
+      color: #868686;
+    }
+
+    .custom-popup-wrapper > .dropdown-menu {
+      position: static;
+      float: none;
+      display: block;
+      min-width: 160px;
+      background-color: transparent;
+      border: none;
+      border-radius: 0;
+      box-shadow: none;
+    }
   }
 }

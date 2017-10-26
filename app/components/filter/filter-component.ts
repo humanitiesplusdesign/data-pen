@@ -1,4 +1,5 @@
 'use strict'
+import { ItemsService } from '../../services/items-service';
 import { $stateChangeCancel } from 'angular-ui-router/lib-esm/legacy/stateEvents';
 import * as angular from 'angular';
 import { ProjectService } from '../../services/project-service/project-service'
@@ -11,9 +12,11 @@ import 'angular-ui-grid';
 export class FilterComponentController {
 
   private actions: any = {}
+  private allItems: {}[] = []
 
   /* @ngInject */
   constructor(private projectService: ProjectService,
+              private itemsService: ItemsService,
               private $scope: angular.IScope,
               private $q: angular.IQService,
               private $ngRedux: INgRedux) {
@@ -23,6 +26,10 @@ export class FilterComponentController {
       unsub1()
       unsub2()
     }
+
+    this.itemsService.getAllItems().then((items) => {
+      this.allItems = items
+    })
   }
 
   private mapProjectToActions(state: any): any {
@@ -47,7 +54,6 @@ export class FilterComponentController {
   }
 
   private canvasWidthStyle(): {} {
-    console.log(this.actions.filter)
     return { 'width': (100 - this.actions.filter.dividerPercent) + '%', 'left': this.actions.filter.dividerPercent + '%' }
   }
 

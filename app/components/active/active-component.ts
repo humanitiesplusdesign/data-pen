@@ -112,6 +112,8 @@ export class ActiveComponentController {
         this.$scope.$apply(this.nodeSearchRemove.bind(this))
       }
     )
+
+    this.actions.setActiveItemCount(this.actions.active.activeLayout.items.length)
   }
 
   private appendNode(sel: d3.Selection<SVGGElement, any, HTMLElement, any>, top: number, left: number, clss: string): d3.Selection<SVGGElement, ItemState, Element, {}> {
