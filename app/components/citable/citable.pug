@@ -1,5 +1,7 @@
 a(ng-if="$ctrl.citable.url && !$ctrl.noLink",href="{{$ctrl.citable.url}}",title="{{$ctrl.citable.descriptions | prefLang}}") {{$ctrl.citable.labels | prefLang}}
-span(ng-if="!$ctrl.citable.url",title="{{$ctrl.citable.descriptions | prefLang}}") {{$ctrl.citable.labels | prefLang}}
+span.citable-label(ng-if="!$ctrl.citable.url",title="{{$ctrl.citable.labels | prefLang}}") {{$ctrl.citable.labels | prefLang}}
+span.citable-break &nbsp;-&nbsp;
+span.citable-description(ng-if="!$ctrl.citable.url",title="{{$ctrl.citable.descriptions | prefLang}}") {{$ctrl.citable.descriptions | prefLang}}
 span(ng-repeat="rightsHolder in $ctrl.citable.rightsHolders")
   span(ng-if="$first") &nbsp;(
   a(ng-if="rightsHolder.url",href="{{rightsHolder.url}}",title="{{rightsHolder.descriptions | prefLang}}") {{rightsHolder.labels | prefLang}}
