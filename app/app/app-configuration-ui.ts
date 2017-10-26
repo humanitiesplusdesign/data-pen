@@ -207,5 +207,5 @@ export function uiRun(
   $transitions.onBefore(requiresAuthCriteria, redirectToLogin, {priority: 10});
 
   // add info on which view we're in to the page title (currently just the raw view name)
-  $transitions.onSuccess({}, transition => $rootScope.viewName = transition._targetState.name())
+  // $transitions.onSuccess({}, transition => $rootScope.viewName = transition._targetState.name())
 }
