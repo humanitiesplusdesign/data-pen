@@ -1,47 +1,56 @@
-.draggable-divider {
-  top: 0%
-  left: 0%
-  margin-left: -3px
-  width: 6px
-  height: 100%
-  opacity: 0.5
-  background-color: gray
-  position: absolute
-}
+filter {
 
-.drag-tab {
-  top: 45%
-  left: 0%
-  padding: 0.5em 1em 0.5em 1em
-  width: 30px
-  margin-left: -12px
-  height: 100px
-  background-color: gray
-  position: absolute
-  border-style: solid solid solid solid
-  border-width: 1px
-  border-color: black
-  border-radius: 3px 3px 3px 3px
-}
-
-.ui-grid {
-  border-width: 0px
-  border-style: none
-}
-
-.main-table {
-  height: 100%
-  width: 0%
-  position: absolute
-
-  .main-grid {
-    height: 100%
-    width: 100%
-  }
-}
-
-.main-canvas {
+  display: inline-block
   height: 100%
   width: 100%
-  position: absolute
+
+  .draggable-divider {
+    top: 0%
+    left: 0%
+    margin-left: -3px
+    width: 6px
+    height: 100%
+    opacity: 0.5
+    background-color: gray
+    position: absolute
+  }
+
+  .drag-tab {
+    top: 45%
+    left: 0%
+    padding: 0.5em 1em 0.5em 1em
+    width: 30px
+    margin-left: -12px
+    height: 100px
+    background-color: gray
+    position: absolute
+    border-style: solid solid solid solid
+    border-width: 1px
+    border-color: black
+    border-radius: 3px 3px 3px 3px
+  }
+
+  .ui-grid {
+    border-width: 0px
+    border-style: none
+  }
+
+  .main-table {
+    height: 100%
+    width: 0%
+    position: absolute
+    padding-bottom: 3em
+
+    .main-grid {
+      height: 100%
+      width: 100%
+    }
+  }
+
+  .main-canvas {
+    height: 100%
+    width: 100%
+    position: absolute
+    padding-bottom: 3em
+  }
 }
