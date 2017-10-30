@@ -20,4 +20,4 @@
   span.usage(ng-hide="$ctrl.currentView==='sources'")
     .nav-element.usage-chart
       .progress
-        .progress-bar(style="width: 20%")
+        .progress-bar(ng-style="{ 'width': $ctrl.dataUsedProportion() +'%' }")
