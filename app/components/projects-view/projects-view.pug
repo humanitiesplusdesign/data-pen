@@ -1,16 +1,25 @@
 .container
-  h3.header-title fibra
-  //- h2 Your projects
+  h3.header-title D&auml;ta Pen
+    span.header-subtitle Projects
+    //- h2 Your projects
+  a
+    .new-project(ui-sref="configure({sourceId:id})")
+      img.plus-icon(src="http://thomasricci.com/icons/plus.svg")
+      span.new-project-text Start new project
+  //-.sort-container Sort by date
   div(ng-repeat="(id,projectSource) in $ctrl.projectSources track by $index")
     .row
-    h3.projects-category-title {{id}}&nbsp;
-      span.load-icon.glyphicon.glyphicon-repeat.fa-spin(ng-if="$ctrl.projectSourceState[id]=='loading'")
+    //- h3.projects-category-title {{id}}&nbsp;
+      //- span.load-icon.glyphicon.glyphicon-repeat.fa-spin(ng-if="$ctrl.projectSourceState[id]=='loading'")
+    .spinner(ng-if="$ctrl.projectSourceState[id]=='loading'")
     .alert.alert-danger(ng-if="$ctrl.projectSourceState[id]=='error'") Error loading: {{projects}}
-    hr.keyline
+    
+    
+    //- hr.keyline
     ul.projects-list
-      li.project-box.col-md-4(ng-if="$ctrl.projectSourceState[id]=='ready'",ng-repeat="project in $ctrl.projects[id] track by $index")
-        a.project-title(ui-sref="project({id:project.id,sparqlEndpoint:project.source.sparqlEndpoint,graph:project.source.graph})"): citable(citable="project",no-link)
+      li.project-cell(ng-if="$ctrl.projectSourceState[id]=='ready'",ng-repeat="project in $ctrl.projects[id] track by $index")
+        a(ui-sref="project({id:project.id,sparqlEndpoint:project.source.sparqlEndpoint,graph:project.source.graph})"): citable(citable="project",no-link)
         //- a(ui-sref="project({id:project.id,sparqlEndpoint:project.source.sparqlEndpoint,graph:project.source.graph})") &nbsp;(Open in new project view)
         //- button.btn.btn-xs.btn-danger(ng-click="$ctrl.deleteProject(id, $index, project)"): span.glyphicon.glyphicon-remove
-      li.new-project: a(ui-sref="configure({sourceId:id})") new project
-  //-button.btn.btn-xs(ui-sref="projectSources()",title="Configure project sources"): span.glyphicon.glyphicon-cog
+      
+        //-button.btn.btn-xs(ui-sref="projectSources()",title="Configure project sources"): span.glyphicon.glyphicon-cog

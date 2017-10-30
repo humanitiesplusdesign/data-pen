@@ -1,10 +1,13 @@
 a(ng-if="$ctrl.citable.url && !$ctrl.noLink",href="{{$ctrl.citable.url}}",title="{{$ctrl.citable.descriptions | prefLang}}") {{$ctrl.citable.labels | prefLang}}
-span.citable-label(ng-if="!$ctrl.citable.url",title="{{$ctrl.citable.labels | prefLang}}") {{$ctrl.citable.labels | prefLang}}
-span.citable-break &nbsp;-&nbsp;
-span.citable-description(ng-if="!$ctrl.citable.url",title="{{$ctrl.citable.descriptions | prefLang}}") {{$ctrl.citable.descriptions | prefLang}}
-span(ng-repeat="rightsHolder in $ctrl.citable.rightsHolders")
-  span(ng-if="$first") &nbsp;(
-  a(ng-if="rightsHolder.url",href="{{rightsHolder.url}}",title="{{rightsHolder.descriptions | prefLang}}") {{rightsHolder.labels | prefLang}}
-  span(ng-if="!rightsHolder.url",title="{{rightsHolder.descriptions | prefLang}}") {{rightsHolder.labels | prefLang}}
-  span(ng-if="$middle") ,&nbsp;
-  span(ng-if="$last") )
+.row
+  span.citable-label.col-md-4(ng-if="!$ctrl.citable.url",title="{{$ctrl.citable.labels | prefLang}}") {{$ctrl.citable.labels | prefLang}}
+  //- span.citable-break &nbsp;-&nbsp;
+  span.citable-description.col-md-5(ng-if="!$ctrl.citable.url",title="{{$ctrl.citable.descriptions | prefLang}}") {{$ctrl.citable.descriptions | prefLang}}
+  span.citable-date.col-md-3 26 October 2017
+    span.edit-project-icon.glyphicon.glyphicon-cog
+  span(ng-repeat="rightsHolder in $ctrl.citable.rightsHolders")
+    span(ng-if="$first") &nbsp;(
+    a(ng-if="rightsHolder.url",href="{{rightsHolder.url}}",title="{{rightsHolder.descriptions | prefLang}}") {{rightsHolder.labels | prefLang}}
+    span(ng-if="!rightsHolder.url",title="{{rightsHolder.descriptions | prefLang}}") {{rightsHolder.labels | prefLang}}
+    span(ng-if="$middle") ,&nbsp;
+    span(ng-if="$last") )
