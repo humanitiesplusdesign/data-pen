@@ -6,15 +6,18 @@
   sources
 .top-nav
   .nav-element.return-button
-    i.glyphicon.glyphicon-arrow-left(ui-sref="projects")
-  .nav-element.project-description {{ $ctrl.actions.project.description }}
+    img.back-icon(src="http://thomasricci.com/icons/back2.png" ui-sref="projects")
+  .nav-element.project-description.push-down {{ $ctrl.actions.project.description.length > 30 ? $ctrl.actions.project.description.substr(0, 27) + '...' : $ctrl.actions.project.description }}
   .nav-element.vertical-divider.muted |
   span.nav-links
-    .nav-element.nav-link(ng-class="{muted: $ctrl.currentView !== 'sources', active: $ctrl.currentView === 'sources'}", ng-click="$ctrl.setView('sources')") Sources
-    .nav-element.nav-link(ng-class="{muted: $ctrl.currentView !== 'filter', active: $ctrl.currentView === 'filter'}", ng-click="$ctrl.setView('filter')") Filter
-    .nav-element.nav-link(ng-class="{muted: $ctrl.currentView !== 'active', active: $ctrl.currentView === 'active'}", ng-click="$ctrl.setView('active')") Active
-  .nav-element.bibliography-link Biblio Icon
-  span.usage
+    .nav-element.nav-link.push-down(ng-class="{muted: $ctrl.currentView !== 'sources', active: $ctrl.currentView === 'sources'}", ng-click="$ctrl.setView('sources')") Sources
+    .nav-element.nav-link.push-down(ng-class="{muted: $ctrl.currentView !== 'filter', active: $ctrl.currentView === 'filter'}", ng-click="$ctrl.setView('filter')") Filter
+    .nav-element.nav-link.push-down(ng-class="{muted: $ctrl.currentView !== 'active', active: $ctrl.currentView === 'active'}", ng-click="$ctrl.setView('active')") Active
+  .nav-element.search(ng-hide="$ctrl.currentView==='sources'")
+    input.search-bar
+  .nav-element.bibliography-link
+    img.bib-icon(src="http://thomasricci.com/icons/bibliography.png")
+  span.usage(ng-hide="$ctrl.currentView==='sources'")
     .nav-element.usage-chart
       .progress
         .progress-bar(style="width: 20%")
