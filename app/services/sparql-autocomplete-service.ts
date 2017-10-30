@@ -27,40 +27,6 @@ export class Result {
 
 export class SparqlAutocompleteService {
 
-  public static naiveMatchQueryTemplate: string = `PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
-PREFIX mads: <http://www.loc.gov/mads/rdf/v1#>
-PREFIX owl: <http://www.w3.org/2002/07/owl#>
-PREFIX dcterms: <http://purl.org/dc/terms/>
-SELECT ?groupId ?id ?prefLabel ?matchedLabel ?sameAs ?altLabel { # ADDITIONALVARIABLES
-GRAPH <GRAPH> {
-  {
-    SELECT ?groupId ?id {
-      {
-        ?id skos:prefLabel|rdfs:label|skos:altLabel|mads:authoritativeLabel|mads:variantLabel <QUERY> .
-      } UNION {
-        ?id skos:prefLabel|rdfs:label|skos:altLabel|mads:authoritativeLabel|mads:variantLabel <QUERY>@<PREFLANG> .
-      }
-      ?id a ?groupId .
-    }
-    GROUP BY ?groupId ?id
-    HAVING(BOUND(?id))
-    LIMIT <LIMIT>
-  }
-  ?id skos:prefLabel|rdfs:label|skos:altLabel|mads:authoritativeLabel|mads:variantLabel ?matchedLabel .
-  FILTER (REGEX(LCASE(?matchedLabel),CONCAT("\\\\b",LCASE(<QUERY>))))
-  BIND(COALESCE(?groupLabelP,REPLACE(REPLACE(REPLACE(REPLACE(STR(?groupId),".*/",""),".*#",""),"_"," "),"([A-ZÅÄÖ])"," $1")) AS ?groupLabel)
-  {
-    ?id  rdfs:label|skos:prefLabel|mads:authoritativeLabel ?prefLabel .
-  } UNION {
-    ?id owl:sameAs ?sameAs .
-  } UNION {
-    ?id skos:altLabel|mads:variantLabel ?altLabel .
-  }
-  # ADDITIONALSELECT
-}
-}`
-
   public static defaultMatchQuery: string = `
 PREFIX text: <http://jena.apache.org/text#>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>

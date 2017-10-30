@@ -9,11 +9,12 @@ import 'angular-ui-bootstrap'
 import 'angular-toastr'
 import 'angular-file-saver'
 
-import './styles/main.styl'
+import 'styles/main.styl'
 // Register modules
-import './services'
-import './components'
-import './filters'
+import 'actions'
+import 'services'
+import 'components'
+import 'filters'
 
 import 'ng-redux'
 import 'angular-yasqe-component'
@@ -22,6 +23,7 @@ import 'angular-ui-codemirror'
 
 let m: angular.IModule = angular.module('fibra', [
   'fibra.services',
+  'fibra.actions',
   'fibra.components',
   'fibra.filters',
   'http-auth-interceptor',

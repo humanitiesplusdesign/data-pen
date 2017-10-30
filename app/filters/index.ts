@@ -1,8 +1,8 @@
 'use strict'
 import * as angular from 'angular'
 
-import './preferred-language-filter'
-import './citable-filter'
+import 'filters/preferred-language-filter'
+import 'filters/citable-filter'
 
 angular.module('fibra.filters', [
   'fibra.filters.pref-lang',

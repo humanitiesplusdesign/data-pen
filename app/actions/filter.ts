@@ -1,4 +1,3 @@
-import { ItemState } from '../reducers/frontend/active';
 import {Action} from '../models/action'
 
 export const SET_FILTER_DIVIDER_PERCENTAGE: string = 'SET_FILTER_DIVIDER_PERCENTAGE'

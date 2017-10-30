@@ -1,8 +1,8 @@
 'use strict'
-import { ItemsService } from '../../services/items-service';
-import * as angular from 'angular';
-import { ProjectService } from '../../services/project-service/project-service'
-import * as ProjectActions from '../../actions/project';
+import { ItemsService } from 'services/items-service'
+import * as angular from 'angular'
+import { ProjectService } from 'services/project-service/project-service'
+import { ProjectActionService } from 'actions/project'
 import { INgRedux } from 'ng-redux'
 
 export class ProjectComponentController {
@@ -11,22 +11,20 @@ export class ProjectComponentController {
   private currentView: string = 'sources'
 
   /* @ngInject */
-  constructor(private projectService: ProjectService,
+  constructor(private projectActionService: ProjectActionService,
               private itemsService: ItemsService,
               private $stateParams: any,
               private $state: any,
               private $ngRedux: INgRedux) {
-    let unsub1: () => void = $ngRedux.connect(this.mapProjectToActions, ProjectActions)(this.actions)
+    let unsub1: () => void = $ngRedux.connect(this.mapProjectToActions, null)(this.actions)
     this.actions.unsubscribe = () => {
       unsub1()
     }
 
     // Put the project from $stateParams onto the state
-    if ($stateParams.id && $stateParams.sparqlEndpoint && $stateParams.graph) {
-      if (this.actions.project.id !== $stateParams.id) {
-        this.actions.setProject($stateParams.id, $stateParams.sparqlEndpoint, $stateParams.graph, projectService)
-      }
-    }
+    if ($stateParams.id && $stateParams.sparqlEndpoint && $stateParams.graph)
+      if (this.actions.project.id !== $stateParams.id)
+        this.projectActionService.setProject($stateParams.id, $stateParams.sparqlEndpoint, $stateParams.graph)
 
     if ($stateParams.view) {
       if (['sources', 'filter', 'active'].indexOf($stateParams.view) !== -1) {
@@ -34,8 +32,8 @@ export class ProjectComponentController {
       }
     }
 
-    itemsService.getAllItemsCount().then((count) => this.actions.setAllItemCount(count))
-    itemsService.getFilteredItemsCount().then((count) => this.actions.setFilteredItemCount(count))
+    itemsService.getAllItemsCount().then((count) => this.projectActionService.setAllItemCount(count))
+    itemsService.getFilteredItemsCount().then((count) => this.projectActionService.setFilteredItemCount(count))
   }
 
   private setView(newView: string): void {

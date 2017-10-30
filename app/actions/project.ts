@@ -1,46 +1,69 @@
-import {Action} from '../models/action'
-import {ProjectService} from '../services/project-service/project-service'
-import {Project} from '../services/project-service/project'
+import { Action } from 'redux'
+import {ProjectService} from 'services/project-service/project-service'
+import {Project} from 'services/project-service/project'
+import { IRootState } from 'reducers'
+import { INgRedux } from 'ng-redux'
+import * as angular from 'angular'
 
 export const SET_PROJECT: string = 'SET_PROJECT'
-export const PROJECT_LOADED: string = 'PROJECT_LOADED'
 export const SET_ALL_ITEM_COUNT: string = 'SET_ALL_ITEM_COUNT'
 export const SET_FILTERED_ITEM_COUNT: string = 'SET_FILTERED_ITEM_COUNT'
 export const SET_ACTIVE_ITEM_COUNT: string = 'SET_ACTIVE_ITEM_COUNT'
 
-export function setProject(id: string, sparqlEndpoint: string, graph: string, projectService: ProjectService): any {
-  return dispatch => { projectService.loadProject({ sparqlEndpoint: sparqlEndpoint, graph: graph }, id, true).then(
-      project => {
-        return dispatch(projectLoaded(project))
-      }
+export interface IProjectLoadedAction extends Action {
+  payload: Project
+}
+
+export interface ISetAllItemCountAction extends Action {
+  payload: number
+}
+
+export interface ISetFilteredItemCountAction extends Action {
+  payload: number
+}
+
+export interface ISetActiveItemCountAction extends Action {
+  payload: number
+}
+
+export class ProjectActionService {
+  /* @ngInject */
+  constructor(private $ngRedux: INgRedux, private projectService: ProjectService) {
+  }
+  public setProject(id: string, sparqlEndpoint: string, graph: string): angular.IPromise<IProjectLoadedAction> {
+    return this.projectService.loadProject({ sparqlEndpoint: sparqlEndpoint, graph: graph }, id, true).then(
+        project => {
+          return this.$ngRedux.dispatch({
+            type: SET_PROJECT,
+            payload: project
+          })
+        }
     )
   }
-}
 
-function projectLoaded(project: Project): Action {
-  return {
-    type: PROJECT_LOADED,
-    payload: project
+  public setAllItemCount(count: number): ISetAllItemCountAction {
+    return this.$ngRedux.dispatch({
+      type: SET_ALL_ITEM_COUNT,
+      payload: count
+    })
+  }
+
+  public setFilteredItemCount(count: number): ISetFilteredItemCountAction {
+    return this.$ngRedux.dispatch({
+      type: SET_FILTERED_ITEM_COUNT,
+      payload: count
+    })
+  }
+
+  public setActiveItemCount(count: number): ISetActiveItemCountAction {
+    return this.$ngRedux.dispatch({
+      type: SET_ACTIVE_ITEM_COUNT,
+      payload: count
+    })
   }
 }
 
-export function setAllItemCount(count: number): Action {
-  return {
-    type: SET_ALL_ITEM_COUNT,
-    payload: count
-  }
-}
-
-export function setFilteredItemCount(count: number): Action {
-  return {
-    type: SET_FILTERED_ITEM_COUNT,
-    payload: count
-  }
-}
-
-export function setActiveItemCount(count: number): Action {
-  return {
-    type: SET_ACTIVE_ITEM_COUNT,
-    payload: count
-  }
-}
+angular.module('fibra.actions.project', [])
+.config(($provide) => {
+  $provide.service('projectActionService', ProjectActionService)
+})

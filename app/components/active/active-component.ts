@@ -1,19 +1,28 @@
 'use strict'
-import { Event } from 'typedoc/dist/lib/utils';
-import { ItemState } from '../../reducers/frontend/active';
+import { IItemState } from 'reducers/frontend/active';
 import * as angular from 'angular';
-import { ProjectService } from '../../services/project-service/project-service'
-import * as ProjectActions from '../../actions/project';
-import * as ActiveActions from '../../actions/active';
+import { ProjectService } from 'services/project-service/project-service'
+import { ProjectActionService } from 'actions/project';
+import ActiveActions from 'actions/active';
 import { INgRedux } from 'ng-redux'
+import { Dispatch } from 'redux'
 import * as d3 from 'd3';
-import { SearchService } from '../../services/search-service'
+import { SearchService, AutocompletionResult } from 'services/search-service'
+import { IActiveActions } from 'actions/active'
+import { ProjectState } from 'reducers/frontend/project'
+import { IRootState } from 'reducers'
+import { IActiveState } from 'reducers/frontend/active'
 import 'angular-drag-drop';
 import 'angular-ui-grid';
 
+interface IActiveComponentControllerState extends IActiveActions {
+  project: ProjectState
+  active: IActiveState
+}
+
 export class ActiveComponentController {
 
-  private actions: any = {}
+  private state: IActiveComponentControllerState = <IActiveComponentControllerState>{}
 
   private radiusInitial: number = 1
   private radius: number = 8
@@ -24,31 +33,26 @@ export class ActiveComponentController {
   private nodeSearchSelected: string|{}
   private nodeSearchOffsetTop: number
   private nodeSearchOffsetLeft: number
+  private unsubscribe: () => void
 
   /* @ngInject */
-  constructor(private projectService: ProjectService,
+  constructor(private projectActionService: ProjectActionService,
               private $scope: angular.IScope,
               private $q: angular.IQService,
               private $ngRedux: INgRedux,
               private searchService: SearchService) {
-    let unsub1: () => void = $ngRedux.connect(this.mapProjectToActions, ProjectActions)(this.actions)
-    let unsub2: () => void = $ngRedux.connect(this.mapActiveToActions, ActiveActions)(this.actions)
-    this.actions.unsubscribe = () => {
-      unsub1()
-      unsub2()
-    }
+    this.unsubscribe = $ngRedux.connect(
+      (state: IRootState) => {
+        return {
+          project: state.frontend.project,
+          active: state.frontend.active
+        }
+      },
+      ActiveActions)(this.state)
   }
 
-  private mapProjectToActions(state: any): any {
-    return {
-      project: state.frontend.project
-    }
-  }
-
-  private mapActiveToActions(state: any): any {
-    return {
-      active: state.frontend.active
-    }
+  public $onDestroy(): void {
+    this.unsubscribe()
   }
 
   private $postLink(): void {
@@ -78,10 +82,10 @@ export class ActiveComponentController {
         this.appendNode(sel, this.nodeSearchOffsetTop, this.nodeSearchOffsetLeft, 'addition-node')
         this.nodeSearch
           .style('top', d3.event.offsetY + 25 + 'px')
-        if (this.getCanvasSize().width - (d3.event.offsetX + (this.actions.active.dividerPercent / 100 * window.innerWidth)) > 350 + 30) {
-          this.nodeSearch.style('left', d3.event.offsetX + (this.actions.active.dividerPercent / 100 * window.innerWidth) + 30 + 'px')
+        if (this.getCanvasSize().width - (d3.event.offsetX + (this.state.active.dividerPercent / 100 * window.innerWidth)) > 350 + 30) {
+          this.nodeSearch.style('left', d3.event.offsetX + (this.state.active.dividerPercent / 100 * window.innerWidth) + 30 + 'px')
         } else {
-          this.nodeSearch.style('left', d3.event.offsetX + (this.actions.active.dividerPercent / 100 * window.innerWidth) - 30 - 350 + 'px')
+          this.nodeSearch.style('left', d3.event.offsetX + (this.state.active.dividerPercent / 100 * window.innerWidth) - 30 - 350 + 'px')
         }
       }
 
@@ -95,34 +99,34 @@ export class ActiveComponentController {
     this.nodeSearchSelected = ''
   }
 
-  private nodeSearchResults(searchValue: string): angular.IPromise<{}[]> {
+  private nodeSearchResults(searchValue: string): angular.IPromise<AutocompletionResult[]> {
     return this.searchService.searchSources(searchValue)
   }
 
   private nodeSearchSelect($item, $model, $label, $event): void {
-    let item: ItemState = {
+    let item: IItemState = {
       id: $item.id,
       description: $item.description,
       topOffset: this.nodeSearchOffsetTop,
       leftOffset: this.nodeSearchOffsetLeft
     }
 
-    this.actions.addItemToCurrentLayout(item).then(() => {
+    this.state.addItemToCurrentLayout(item).then(() => {
         this.updateCanvas()
         this.$scope.$apply(this.nodeSearchRemove.bind(this))
       }
     )
 
-    this.actions.setActiveItemCount(this.actions.active.activeLayout.items.length)
+    this.projectActionService.setActiveItemCount(this.state.active.activeLayout.items.length)
   }
 
-  private appendNode(sel: d3.Selection<SVGGElement, any, HTMLElement, any>, top: number, left: number, clss: string): d3.Selection<SVGGElement, ItemState, Element, {}> {
-    let g: d3.Selection<SVGGElement, ItemState, Element, {}> = sel.append<SVGGElement>('g')
+  private appendNode(sel: d3.Selection<SVGGElement, any, HTMLElement, any>, top: number, left: number, clss: string): d3.Selection<SVGGElement, IItemState, Element, {}> {
+    let g: d3.Selection<SVGGElement, IItemState, Element, {}> = sel.append<SVGGElement>('g')
       .classed('node', true)
       .classed(clss, true)
       .attr('transform', 'translate(' + left + ',' + top + ')')
 
-    let c: d3.Selection<SVGGElement, ItemState, Element, {}> = g.append<SVGCircleElement>('circle')
+    let c: d3.Selection<SVGGElement, IItemState, Element, {}> = g.append<SVGCircleElement>('circle')
       .classed('node-circle', true)
       .attr('r', this.radiusInitial + 'px')
 
@@ -134,7 +138,7 @@ export class ActiveComponentController {
     return g
   }
 
-  private maintainNode(sel: d3.Selection<SVGGElement, ItemState, Element, {}>, top: number, left: number): d3.Selection<SVGGElement, ItemState, Element, {}> {
+  private maintainNode(sel: d3.Selection<SVGGElement, IItemState, Element, {}>, top: number, left: number): d3.Selection<SVGGElement, IItemState, Element, {}> {
     sel.attr('transform', 'translate(' + top + ',' + left + ')')
     sel.select('circle').transition().attr('r', this.radius + 'px')
     return sel
@@ -146,12 +150,12 @@ export class ActiveComponentController {
     let itemG: d3.Selection<SVGGElement, {}, HTMLElement, any> = g.select('.main-g-items')
     let ctrl: this = this
 
-    let itemSelection: d3.Selection<SVGGElement, ItemState, Element, {}> = itemG.selectAll<SVGGElement, {}>('.item-node')
-      .data(this.actions.active.activeLayout.items, (it: ItemState) => {
+    let itemSelection: d3.Selection<SVGGElement, IItemState, Element, {}> = itemG.selectAll<SVGGElement, {}>('.item-node')
+      .data(this.state.active.activeLayout.items, (it: IItemState) => {
         return it.id;
       })
 
-    let enterSel: d3.Selection<SVGGElement, ItemState, Element, {}> = itemSelection.enter()
+    let enterSel: d3.Selection<SVGGElement, IItemState, Element, {}> = itemSelection.enter()
       .append<SVGGElement>('g')
       .classed('node', true)
       .classed('item-node', true)
@@ -193,19 +197,19 @@ export class ActiveComponentController {
 
   private dragDivider(evt: DragEvent): void {
     let nativePercent: number = 100 * evt.clientX / window.innerWidth
-    this.actions.setActiveDividerPercentage(nativePercent > 98 ? 100 : nativePercent < 2 ? 0 : nativePercent)
+    this.state.setActiveDividerPercentage(nativePercent > 98 ? 100 : nativePercent < 2 ? 0 : nativePercent)
   }
 
   private tableWidthStyle(): {} {
-    return { 'width': this.actions.active.dividerPercent + '%' }
+    return { 'width': this.state.active.dividerPercent + '%' }
   }
 
   private canvasWidthStyle(): {} {
-    return { 'width': (100 - this.actions.active.dividerPercent) + '%', 'left': this.actions.active.dividerPercent + '%' }
+    return { 'width': (100 - this.state.active.dividerPercent) + '%', 'left': this.state.active.dividerPercent + '%' }
   }
 
   private dragTabLeftStyle(): {} {
-    return { 'left': this.actions.active.dividerPercent + '%' }
+    return { 'left': this.state.active.dividerPercent + '%' }
   }
 }
 
@@ -214,5 +218,5 @@ export class ActiveComponent implements angular.IComponentOptions {
     public controller: any = ActiveComponentController
 }
 
-angular.module('fibra.components.active', ['ui.bootstrap', 'fibra.services.search-service', 'filearts.dragDrop', 'ui.grid', 'ui.grid.autoResize'])
+angular.module('fibra.components.active', ['ui.bootstrap', 'fibra.actions.project', 'fibra.services.search-service', 'filearts.dragDrop', 'ui.grid', 'ui.grid.autoResize'])
   .component('active', new ActiveComponent())

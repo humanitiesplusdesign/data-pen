@@ -2,7 +2,8 @@
 
 import * as angular from 'angular'
 import './prototype-mapping-configuration'
-import {CommonState} from '../fibra-service'
+import {BackendRootState, convertToBackendState} from 'reducers'
+import {INgRedux} from 'ng-redux'
 
 export class WorkerServiceConfiguration {
   constructor(public appName: string, public workerThreads: number, public importScripts: string[]) {}
@@ -45,6 +46,7 @@ export class WorkerService {
   private workers: Worker[]
   private currentWorker: number = 0
   private deferreds: angular.IDeferred<any>[] = []
+  private oldState: BackendRootState = new BackendRootState()
 
   public static stripMarks(args: any): void {
     if (!args || !args.__mark || typeof args !== 'object') return
@@ -94,7 +96,15 @@ export class WorkerService {
   }
 
   /* @ngInject */
-  constructor(workerServiceConfiguration: WorkerServiceConfiguration, private workerServicePrototypeMappingConfiguration: {[className: string]: Object}, $rootScope: angular.IRootScopeService, $window: angular.IWindowService, private $q: angular.IQService) {
+  constructor(workerServiceConfiguration: WorkerServiceConfiguration, private workerServicePrototypeMappingConfiguration: {[className: string]: Object}, $rootScope: angular.IRootScopeService, $window: angular.IWindowService, private $q: angular.IQService, private $ngRedux: INgRedux) {
+    $ngRedux.subscribe(() => {
+      let newState: BackendRootState = convertToBackendState(this.$ngRedux.getState(), this.oldState)
+      if (newState !== null) {
+        this.oldState = newState
+        WorkerService.savePrototypes(newState)
+        this.callAll('stateWorkerService', 'setState', [newState])
+      }
+    })
     let path: string = $window.location.protocol + '//' + $window.location.host
     let importScripts: string[] = workerServiceConfiguration.importScripts.map(s =>
       s.indexOf('http') !== 0 ? path + (s.indexOf('/') !== 0 ? $window.location.pathname : '') + s : s
@@ -288,8 +298,8 @@ export class WorkerWorkerService {
 }
 
 export class StateWorkerService {
-  public state: CommonState
-  public setState(state: CommonState): void {
+  public state: BackendRootState
+  public setState(state: BackendRootState): void {
     this.state = state
   }
 }

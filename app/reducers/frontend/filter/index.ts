@@ -1,14 +1,14 @@
 import { SET_FILTER_DIVIDER_PERCENTAGE } from '../../../actions/filter'
 
-export type FilterState = {
+export interface IFilterState {
   dividerPercent: number
-}|{}
+}
 
-let defaultState: FilterState = {
+let defaultState: IFilterState = {
   dividerPercent: 0
 }
 
-export default function models(state: FilterState = defaultState, action): FilterState {
+export default function models(state: IFilterState = defaultState, action): IFilterState {
   switch (action.type) {
 
     case SET_FILTER_DIVIDER_PERCENTAGE:
