@@ -10,9 +10,9 @@
           i.glyphicon.glyphicon-triangle-bottom(ng-show="$ctrl.projectsOpen[source.id]")
           span {{source.description}}
         .class-list(ng-show="$ctrl.projectsOpen[source.id] ? true : false")
-          label(ng-repeat="clss in source.classList") 
+          label(ng-repeat="(key, value) in $ctrl.actions.project.project.dataModel.classMap.s") 
             input(type="checkbox")
-            span {{clss.description}}
+            span {{value.labels | prefLang}}
       //- h4  
       //-   i.glyphicon.glyphicon-triangle-right
       //-   span Physiocrats.csv
