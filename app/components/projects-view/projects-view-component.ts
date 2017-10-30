@@ -28,13 +28,15 @@ export class ProjectsViewComponentController implements angular.IComponentContro
       // http://localhost:3000/#!/project-sources?sourceId=Private projects in local browser storage&sparqlEndpoint=local:projects&type=http://ldf.fi/fibra/rdfstoreJSEndpoint
       //projectSources.push(new ProjectSourceInfo('Projects in local Fuseki SPARQL server', 'http://localhost:3030/fibra/sparql', 'http://localhost:3030/fibra/update', 'http://localhost:3030/fibra/data', '', 'http://ldf.fi/fibra/fusekiEndpoint'))
       // http://localhost:3000/#!/project-sources?sourceId=Projects in local Fuseki SPARQL server&sparqlEndpoint=http://localhost:3030/fibra/sparql&updateEndpoint=http://localhost:3030/fibra/update&graphStoreEndpoint=http://localhost:3030/fibra/data&type=http://ldf.fi/fibra/fusekiEndpoint
-      projectSources.push(new ProjectSourceInfo('Shared projects on the public LDF.fi endpoint', 'http://ldf.fi/fibra/sparql', 'http://ldf.fi/fibra/update', 'http://ldf.fi/fibra/data', 'http://ldf.fi/fibra/shared-projects/', 'http://ldf.fi/fibra/fusekiEndpointWithTextIndexAndSecoFunctions'))
+      // projectSources.push(new ProjectSourceInfo('Shared projects', 'http://ldf.fi/fibra/sparql', 'http://ldf.fi/fibra/update', 'http://ldf.fi/fibra/data', 'http://ldf.fi/fibra/shared-projects/', 'http://ldf.fi/fibra/fusekiEndpointWithTextIndexAndSecoFunctions'))
       $localStorage['projectSources'] = projectSources
     }
-    if (socialAuthService.isLoggedIn() && !projectSources.some(s => s.id === 'Personal projects on the public LDF.fi endpoint')) {
+
+    if (socialAuthService.isLoggedIn() && !projectSources.some(s => s.id === 'Personal projects')) {
       let uid: string = CryptoJS.SHA256(socialAuthService.loginState())
-      projectSources.push(new ProjectSourceInfo('Personal projects on the public LDF.fi endpoint', 'http://ldf.fi/fibra/sparql', 'http://ldf.fi/fibra/sparql', 'http://ldf.fi/fibra/sparql', 'http://ldf.fi/fibra/user/' + uid + '/projects/', 'http://ldf.fi/fibra/fusekiEndpointWithTextIndexAndSecoFunctions'))
+      projectSources.unshift(new ProjectSourceInfo('Projects', 'http://ldf.fi/fibra/sparql', 'http://ldf.fi/fibra/sparql', 'http://ldf.fi/fibra/sparql', 'http://ldf.fi/fibra/user/' + uid + '/projects/', 'http://ldf.fi/fibra/fusekiEndpointWithTextIndexAndSecoFunctions'))
     }
+
     projectSources.forEach(source => {
       this.projectSources[source.id] = source
       this.projects[source.id] = []

@@ -3,21 +3,21 @@
 
   citable-editor(citable="$ctrl.project",no-id)
 
-  h4 Schemas
-  .form-group
+  //- h4 Schemas
+  //- .form-group
     .form-group
       label.checkbox-inline(ng-repeat="schema in $ctrl.schemas")
         input(type="checkbox",ng-model="$ctrl.selectedSchemas[schema.id]")
         citable(citable="schema")
 
-  h4 Authorities
-  .form-group
+  //- h4 Authorities
+  //- .form-group
     label.checkbox-inline(ng-repeat="authority in $ctrl.authorities")
       input(type="checkbox",ng-model="$ctrl.selectedAuthorities[authority.id]")
       citable(citable="authority")
 
-  h4 Archives
-  .form-group
+  //- h4 Archives
+  //- .form-group
     label.checkbox-inline(ng-repeat="archive in $ctrl.archives")
       input(type="checkbox",ng-model="$ctrl.selectedArchives[archive.id]")
       citable(citable="archive")
@@ -25,9 +25,9 @@
   button.btn.btn-success(ng-click="$ctrl.saveAndOpen()") Save and open
   button.btn.btn-danger(ng-click="$ctrl.delete()") Delete
 
-  div(ng-show="!details")
+  //- div(ng-show="!details")
     span.glyphicon.glyphicon-chevron-down(title="details",ng-click="details=true")
-  div(ng-show="details")
+  //- div(ng-show="details")
     span.glyphicon.glyphicon-chevron-up(title="details",ng-click="details=false")
     .form-group
       label Project ID

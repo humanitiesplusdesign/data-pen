@@ -1,17 +1,20 @@
-.form-group(ng-show="!$ctrl.noId")
+//- .form-group(ng-show="!$ctrl.noId")
   label ID
   input.form-control(type="text",ng-model="$ctrl.citable.id")
+		
 h4 Names
 .form-inline
   .form-group(ng-repeat="label in $ctrl.citable.labels")
-    button.pull-right.btn.btn-xs(ng-click="$ctrl.removeLabel($index)"): span.glyphicon.glyphicon-remove
-    label Language
-    input.form-control(style="width:4em",type="text",ng-model="label.language")
-    label Name
-    input.form-control(type="text",ng-model="label.value")
-  button.btn.btn-xs(ng-click="$ctrl.addLabel()"): span.glyphicon.glyphicon-plus
+    //- button.pull-right.btn.btn-xs(ng-click="$ctrl.removeLabel($index)"): span.glyphicon.glyphicon-remove
+    //- label Language
+    //- input.form-control(style="width:4em",type="text",ng-model="label.language")
+    //- label Name
+    input(type="text",ng-model="label.value")
+  //- button.btn.btn-xs(ng-click="$ctrl.addLabel()"): span.glyphicon.glyphicon-plus
+		
+
 h4 Descriptions
-.form-inline
+ .form-inline
   .form-group(ng-repeat="descr in $ctrl.citable.descriptions")
     button.pull-right.btn.btn-xs(ng-click="$ctrl.removeDescription($index)"): span.glyphicon.glyphicon-remove
     label Language
@@ -19,10 +22,11 @@ h4 Descriptions
     label Description
     textarea.form-control(ng-model="descr.value")
   button.btn.btn-xs(ng-click="$ctrl.addDescription()"): span.glyphicon.glyphicon-plus
-.form-group
+		
+//- .form-group
   label Homepage URL
   input.form-control(type="text",ng-model="$ctrl.citable.url")
-div(ng-if="!$ctrl.noRightsHolders")
+//- div(ng-if="!$ctrl.noRightsHolders")
   h4 Rights holders
   div.well(ng-repeat="rightsHolder in $ctrl.citable.rightsHolders")
     button.pull-right.btn.btn-xs.btn-dange(ng-click="$ctrl.citable.rightsHolders.splice($index, 1)"): span.glyphicon.glyphicon-remove

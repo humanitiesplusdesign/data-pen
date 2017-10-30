@@ -3,6 +3,8 @@
 @import '~codemirror/lib/codemirror.css'
 @import '../components/components.styl'
 @import '~angular-ui-grid/ui-grid.css'
+@import url('https://fonts.googleapis.com/css?family=Roboto:400,500')
+@import url('https://fonts.googleapis.com/css?family=Roboto+Mono')
 
 html {
   height:100%
@@ -11,6 +13,32 @@ html {
 body {
   height:100%
   overflow-y: scroll
+	background-color: rgb(245, 245, 245)
+	font-family: 'Roboto', sans-serif
+}
+
+h1, h2, h3, h4, h5, h6, p {
+	font-family: 'Roboto', sans-serif
+  font-weight: normal
+}
+
+a {
+  color: #1581e6;
+}
+
+a:hover {
+  text-decoration: none
+  color: #1581e6;
+}
+
+.keyline {
+  border-color: rgba(0, 0, 0, 0.2)
+  margin: 0 -15px 0 -15px
+}
+
+#test-input {
+	width: 50px
+	height: 30px
 }
 
 .links line {
@@ -127,4 +155,14 @@ position: absolute
 
 .sunburst-cell:hover {
   fill: #999
+}
+
+/* Authentication text */
+
+.auth-text {
+  float: right
+  margin: 55px 0 -70px 0
+  font-family: 'Roboto Mono', monospace
+  color: rgba(0, 0, 0, 0.7)
+  font-size: 0.9em;
 }
