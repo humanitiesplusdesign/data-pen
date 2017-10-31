@@ -42,7 +42,11 @@ export class SearchService {
       if (activeItemIds.indexOf(r.ids[0].value) === -1) ret.push(new AutocompletionResult(r.ids[0].value, r.matchedLabel.value))
     }))
     res.remoteResults.forEach(l => l.results.forEach(r => {
-      if (activeItemIds.indexOf(r.ids[0].value) === -1) ret.push(new AutocompletionResult(r.ids[0].value, r.matchedLabel.value))
+      if (activeItemIds.indexOf(r.ids[0].value) === -1
+        && r.additionalInformation.type && r.additionalInformation.type[0]
+        && r.datasources.reduce((p, c) => this.$ngRedux.getState().frontend.sources.sourceClassToggle[c] && this.$ngRedux.getState().frontend.sources.sourceClassToggle[c][r.additionalInformation.type[0].value], false)) {
+          ret.push(new AutocompletionResult(r.ids[0].value, r.matchedLabel.value))
+        }
     }))
     return ret
   }

@@ -10,8 +10,8 @@
           i.glyphicon.glyphicon-triangle-bottom(ng-show="$ctrl.projectsOpen[source.id]")
           span {{source.description}}
         .class-list(ng-show="$ctrl.projectsOpen[source.id] ? true : false")
-          label(ng-repeat="(key, value) in $ctrl.actions.project.project.dataModel.classMap.s") 
-            input(type="checkbox")
+          label(ng-repeat="(key, value) in $ctrl.actions.project.project.dataModel.classMap.s" ng-hide="value.labels.length === 0") 
+            input(type="checkbox", ng-model="$ctrl.localSourceClassTree[source.id][key]" ng-click="$ctrl.state.setSourceClassActive(source.id, key, !$ctrl.getSourceClassStatus(source.id, key))")
             span {{value.labels | prefLang}}
       //- h4  
       //-   i.glyphicon.glyphicon-triangle-right
