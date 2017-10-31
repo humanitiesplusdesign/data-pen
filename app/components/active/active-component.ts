@@ -81,7 +81,7 @@ export class ActiveComponentController {
         this.nodeSearchOffsetLeft = d3.event.offsetX
         this.appendNode(sel, this.nodeSearchOffsetTop, this.nodeSearchOffsetLeft, 'addition-node')
         this.nodeSearch
-          .style('top', d3.event.offsetY + 25 + 'px')
+          .style('top', d3.event.offsetY + 39 + 'px')
         if (this.getCanvasSize().width - (d3.event.offsetX + (this.state.active.dividerPercent / 100 * window.innerWidth)) > 350 + 30) {
           this.nodeSearch.style('left', d3.event.offsetX + (this.state.active.dividerPercent / 100 * window.innerWidth) + 30 + 'px')
         } else {
