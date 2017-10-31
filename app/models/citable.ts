@@ -1,7 +1,7 @@
 'use strict'
 
-import {ILiteral} from './rdfjs'
-import {SKOS, DCTerms, FOAF, FIBRA, RDF} from './rdf'
+import {ILiteral} from 'models/rdfjs'
+import {SKOS, DCTerms, FOAF, FIBRA, RDF, XMLSchema} from 'models/rdf'
 
 export interface ICitableSource {
   sparqlEndpoint: string
@@ -21,6 +21,7 @@ export interface ICitable {
   url?: string
   rightsHolders: ICitable[]
   source: ICitableSource
+  dateCreated: Date
   toTurtle(fragmentsById: d3.Map<string>, prefixes: {[id: string]: string}): void
 }
 
@@ -35,9 +36,12 @@ export class Citable implements ICitable {
     prefixes['foaf'] = FOAF.ns
     prefixes['fibra'] = FIBRA.ns
     prefixes['rdf'] = RDF.ns
+    prefixes['xsd'] = XMLSchema.ns
     let f: string = fragmentsById.get(c.id)
     c.labels.forEach(label => { if (label.value) f = f + `
 skos:prefLabel ${label.toCanonical()} ;` })
+    f = f + `
+dcterms:created "${c.dateCreated.toISOString()}"^^xsd:dateTime ;`
     c.descriptions.forEach(descr => { if (descr.value) f = f + `
 dcterms:description ${descr.toCanonical()} ;` })
     if (c.url) f = f + `
@@ -65,7 +69,7 @@ fibra:qualifiedAssertion [
     }
     fragmentsById.set(c.id, f)
   }
-  constructor(id?: string, source?: ICitableSource, public labels: ILiteral[] = [], public url?: string, public descriptions: ILiteral[] = [], public rightsHolders: ICitable[] = []) {
+  constructor(id?: string, source?: ICitableSource, public labels: ILiteral[] = [], public url?: string, public descriptions: ILiteral[] = [], public rightsHolders: ICitable[] = [], public dateCreated: Date = new Date()) {
     this.id = id
     this.source = source
   }

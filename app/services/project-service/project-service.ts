@@ -239,6 +239,7 @@ export class ProjectWorkerService {
       return this.$q.all(promises).then(() => {
         p.archiveEndpoints = narche
         p.authorityEndpoints = nauthe
+        console.log(p)
         return p
       })
     })
@@ -252,6 +253,7 @@ export class ProjectWorkerService {
       let conf: IBindingsToObjectConfiguration = {
         bindingTypes: { rightsHolders: 'uniqueArray', schemas: 'uniqueArray', authorityEndpoints: 'uniqueArray', archiveEndpoints: 'uniqueArray'},
         bindingConverters: {
+          dateCreated: (binding) => new Date(binding.value),
           types: (binding) => DataFactory.nodeFromBinding(binding),
           labels: (binding) => DataFactory.nodeFromBinding(binding),
           descriptions: (binding) => DataFactory.nodeFromBinding(binding),
@@ -279,6 +281,7 @@ export class ProjectWorkerService {
         let conf: IBindingsToObjectConfiguration = {
           bindingTypes: { rightsHolders: 'uniqueArray', schemas: 'uniqueArray', authorityEndpoints: 'uniqueArray', archiveEndpoints: 'uniqueArray'},
           bindingConverters: {
+            dateCreated: (binding) => new Date(binding.value),
             types: (binding) => DataFactory.nodeFromBinding(binding),
             labels: (binding) => DataFactory.nodeFromBinding(binding),
             descriptions: (binding) => DataFactory.nodeFromBinding(binding),
