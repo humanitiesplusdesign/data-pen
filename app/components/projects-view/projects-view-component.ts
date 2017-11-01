@@ -81,11 +81,11 @@ angular.module('fibra.components.projects-view', [])
 		{
 			"id": "1",
 			"description": "Alphabetical.",
-			"name": "A-Z"
+			"name": "A to Z"
 		},
 		{
 			"id": "2",
 			"description": "Alphabetical (reversed).",
-			"name": "Z-A"
+			"name": "Z to A"
 		}];
 	});
