@@ -35,7 +35,7 @@ export default function models(state: IFilterState = defaultState, action): IFil
     case SET_FILTER_FOR_CLASS_AND_PROP:
       return Object.assign({}, state, {
         filtersByClass: Object.assign({}, state.filtersByClass, {
-          [action.payload.clss.id.value]: Object.assign({}, state.filtersByClass[action.payload.clss.id], {
+          [action.payload.clss.id.value]: Object.assign({}, state.filtersByClass[action.payload.clss.id.value], {
             [action.payload.property.id.value]: {
               type: 'TIMELINE',
               description: 'Timeline',
