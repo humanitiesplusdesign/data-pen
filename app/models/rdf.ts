@@ -268,6 +268,7 @@ export class RDF {
 export class XMLSchema {
   public static ns: string = 'http://www.w3.org/2001/XMLSchema#'
   public static string: INamedNode = new NamedNode(XMLSchema.ns + 'string')
+  public static dateTime: INamedNode = new NamedNode(XMLSchema.ns + 'dateTime')
 }
 
 export class CIDOC {

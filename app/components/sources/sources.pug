@@ -4,15 +4,15 @@
       h3.pull-left Sources
       span.pull-right add
     .sources-list
-      span(ng-repeat="source in $ctrl.actions.project.sources")
+      span(ng-repeat="source in $ctrl.state.sources.sources")
         h4(ng-click="$ctrl.projectsOpen[source.id] = !$ctrl.projectsOpen[source.id]")
           i.glyphicon.glyphicon-triangle-right(ng-show="!$ctrl.projectsOpen[source.id]")
           i.glyphicon.glyphicon-triangle-bottom(ng-show="$ctrl.projectsOpen[source.id]")
-          span {{source.description}}
+          span {{source.labels | prefLang}}
         .class-list(ng-show="$ctrl.projectsOpen[source.id] ? true : false")
-          label(ng-repeat="(key, value) in $ctrl.actions.project.project.dataModel.classMap.s") 
-            input(type="checkbox")
-            span {{value.labels | prefLang}}
+          label(ng-repeat="clss in source.classes" ng-hide="clss.labels.length === 0") 
+            input(type="checkbox", ng-model="$ctrl.localSourceClassTree[source.id][clss.id.value]" ng-click="$ctrl.state.setSourceClassActive(source.id, clss.id.value, !$ctrl.getSourceClassStatus(source.id, clss.id.value))")
+            span {{clss.labels | prefLang}}
       //- h4  
       //-   i.glyphicon.glyphicon-triangle-right
       //-   span Physiocrats.csv

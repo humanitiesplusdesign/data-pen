@@ -19,7 +19,7 @@ PREFIX dcterms: <http://purl.org/dc/terms/>
 PREFIX foaf: <http://xmlns.com/foaf/0.1/>
 PREFIX void: <http://rdfs.org/ns/void#>
 PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
-SELECT ?id ?labels ?descriptions ?url ?rightsHolders ?rightsHolders_labels ?rightsHolders_descriptions ?rightsHolder_surl ?rightsHolders_order ?instanceNS ?schemaNS ?endpoint ?graphStoreEndpoint ?updateEndpoint ?graph ?autocompletionQuery ?treeQuery ?itemQuery ?deleteItemQuery ?authorityEndpoints ?authorityEndpoints_source_graph ?authorityEndpoints_source_sparqlEndpoint ?archiveEndpoints ?archiveEndpoints_source_graph ?archiveEndpoints_source_sparqlEndpoint ?schemas ?schemas_source_graph ?schemas_source_sparqlEndpoint {
+SELECT ?id ?labels ?descriptions ?url ?dateCreated ?rightsHolders ?rightsHolders_labels ?rightsHolders_descriptions ?rightsHolder_surl ?rightsHolders_order ?instanceNS ?schemaNS ?endpoint ?graphStoreEndpoint ?updateEndpoint ?graph ?autocompletionQuery ?treeQuery ?itemQuery ?deleteItemQuery ?authorityEndpoints ?authorityEndpoints_source_graph ?authorityEndpoints_source_sparqlEndpoint ?archiveEndpoints ?archiveEndpoints_source_graph ?archiveEndpoints_source_sparqlEndpoint ?schemas ?schemas_source_graph ?schemas_source_sparqlEndpoint {
 # STARTGRAPH
   ?id a fibra:Project .
   {
@@ -35,8 +35,8 @@ SELECT ?id ?labels ?descriptions ?url ?rightsHolders ?rightsHolders_labels ?righ
     ?id fibra:itemQuery ?itemQuery .
     ?id fibra:deleteItemQuery ?deleteItemQuery .
     OPTIONAL { ?id fibra:graph ?graph }
-  } UNION {
-    ?id foaf:homepage ?url .
+    OPTIONAL { ?id dcterms:created ?dateCreated }
+    OPTIONAL { ?id foaf:homepage ?url }
   } UNION {
     ?id fibra:schema ?schemas
   } UNION {
@@ -86,7 +86,7 @@ PREFIX dcterms: <http://purl.org/dc/terms/>
 PREFIX foaf: <http://xmlns.com/foaf/0.1/>
 PREFIX void: <http://rdfs.org/ns/void#>
 PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
-SELECT ?labels ?descriptions ?url ?rightsHolders ?rightsHolders_labels ?rightsHolders_descriptions ?rightsHolder_surl ?rightsHolders_order ?instanceNS ?schemaNS ?endpoint ?graphStoreEndpoint ?updateEndpoint ?graph ?autocompletionQuery ?treeQuery ?itemQuery ?deleteItemQuery ?authorityEndpoints ?authorityEndpoints_source_graph ?authorityEndpoints_source_sparqlEndpoint ?archiveEndpoints ?archiveEndpoints_source_graph ?archiveEndpoints_source_sparqlEndpoint ?schemas ?schemas_source_graph ?schemas_source_sparqlEndpoint {
+SELECT ?labels ?descriptions ?url ?dateCreated ?rightsHolders ?rightsHolders_labels ?rightsHolders_descriptions ?rightsHolder_surl ?rightsHolders_order ?instanceNS ?schemaNS ?endpoint ?graphStoreEndpoint ?updateEndpoint ?graph ?autocompletionQuery ?treeQuery ?itemQuery ?deleteItemQuery ?authorityEndpoints ?authorityEndpoints_source_graph ?authorityEndpoints_source_sparqlEndpoint ?archiveEndpoints ?archiveEndpoints_source_graph ?archiveEndpoints_source_sparqlEndpoint ?schemas ?schemas_source_graph ?schemas_source_sparqlEndpoint {
 # STARTGRAPH
   {
     <ID> skos:prefLabel ?labels
@@ -101,8 +101,8 @@ SELECT ?labels ?descriptions ?url ?rightsHolders ?rightsHolders_labels ?rightsHo
     <ID> fibra:itemQuery ?itemQuery .
     <ID> fibra:deleteItemQuery ?deleteItemQuery .
     OPTIONAL { <ID> fibra:graph ?graph }
-  } UNION {
-    <ID> foaf:homepage ?url .
+    OPTIONAL { <ID> foaf:homepage ?url }
+    OPTIONAL { <ID> dcterms:created ?dateCreated }
   } UNION {
     <ID> fibra:schema ?schemas
   } UNION {
