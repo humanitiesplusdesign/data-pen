@@ -3,7 +3,8 @@ a(ng-if="$ctrl.citable.url && !$ctrl.noLink",href="{{$ctrl.citable.url}}",title=
   span.citable-label.col-md-4(ng-if="!$ctrl.citable.url",title="{{$ctrl.citable.labels | prefLang}}") {{$ctrl.citable.labels | prefLang}}
     span.edit-project-icon.glyphicon.glyphicon-cog(ng-class="cogStatus")
   span.citable-description.col-md-5(ng-if="!$ctrl.citable.url",title="{{$ctrl.citable.descriptions | prefLang}}") {{$ctrl.citable.descriptions | prefLang}}
-  span.citable-date.col-md-3(ng-if="!$ctrl.citable.url",title="{{$ctrl.citable.dateCreated | prefLang}}") {{$ctrl.citable.dateCreated | prefLang}}
+  //- span.citable-date.col-md-3(ng-if="!$ctrl.citable.url",title="{{$ctrl.citable.dateCreated ? $ctrl.citable.dateCreated : '' | prefLang}}") {{$ctrl.citable.dateCreated | prefLang}}
+  span.citable-date.col-md-3 01 January 1970
   span(ng-repeat="rightsHolder in $ctrl.citable.rightsHolders")
     span(ng-if="$first") &nbsp;(
     a(ng-if="rightsHolder.url",href="{{rightsHolder.url}}",title="{{rightsHolder.descriptions | prefLang}}") {{rightsHolder.labels | prefLang}}

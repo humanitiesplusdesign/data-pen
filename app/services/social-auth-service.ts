@@ -9,9 +9,9 @@ export class SocialAuthService {
 
   public loginState(): string {
     if (this.$localStorage.user_email)
-      return this.$localStorage.user_email + ' (' + this.$localStorage.login_provider + ')'
+      return this.$localStorage.user_email + ' (via ' + this.$localStorage.login_provider + ')'
       else
-        return ''
+        return 'Not logged in'
   }
 
   public isLoggedIn(): boolean {
