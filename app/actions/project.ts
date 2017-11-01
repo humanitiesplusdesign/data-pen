@@ -1,9 +1,11 @@
-import { Action } from 'redux'
+import { Action, Dispatch } from 'redux'
 import {ProjectService} from 'services/project-service/project-service'
 import {Project} from 'services/project-service/project'
 import { IRootState } from 'reducers'
 import { INgRedux } from 'ng-redux'
+import SourceActions from './sources'
 import * as angular from 'angular'
+import { ADD_SOURCE } from './sources'
 
 export const SET_PROJECT: string = 'SET_PROJECT'
 export const SET_ALL_ITEM_COUNT: string = 'SET_ALL_ITEM_COUNT'
@@ -33,6 +35,27 @@ export class ProjectActionService {
   public setProject(id: string, sparqlEndpoint: string, graph: string): angular.IPromise<IProjectLoadedAction> {
     return this.projectService.loadProject({ sparqlEndpoint: sparqlEndpoint, graph: graph }, id, true).then(
         project => {
+          // TODO: Get the actual sources associated with each endpoint
+          project.archiveEndpoints.forEach((ae) => {
+            this.$ngRedux.dispatch({
+              type: ADD_SOURCE,
+              payload: {
+                id: ae.id,
+                labels: ae.labels,
+                classes: project.dataModel.classMap.values()
+              }
+            })
+          })
+          project.authorityEndpoints.forEach((ae) => {
+            this.$ngRedux.dispatch({
+              type: ADD_SOURCE,
+              payload: {
+                id: ae.id,
+                labels: ae.labels,
+                classes: project.dataModel.classMap.values()
+              }
+            })
+          })
           return this.$ngRedux.dispatch({
             type: SET_PROJECT,
             payload: project

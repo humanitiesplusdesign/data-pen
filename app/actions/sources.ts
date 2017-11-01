@@ -1,8 +1,10 @@
+import { ISource } from '../reducers/frontend/sources';
 import { Dispatch } from 'redux';
 import { IRootState } from '../reducers';
 import {Action} from '../models/action'
 
 export const SET_SOURCE_CLASS_ACTIVE: string = 'SET_SOURCE_CLASS_ACTIVE'
+export const ADD_SOURCE: string = 'ADD_SOURCE'
 
 export interface ISetSourceClassActiveAction extends Action {
   payload: {
@@ -12,8 +14,13 @@ export interface ISetSourceClassActiveAction extends Action {
   }
 }
 
+export interface IAddSourceAction extends Action {
+  payload: ISource
+}
+
 export interface ISourcesActions {
   setSourceClassActive(source: string, clss: string, status: boolean): Promise<ISetSourceClassActiveAction>
+  addSource(source: ISource): Promise<IAddSourceAction>
 }
 
 export default {
@@ -26,6 +33,14 @@ export default {
           clss: clss,
           status: status
         }
+      }))
+    }
+  },
+  addSource: function(source: ISource): (dispatch: Dispatch<IRootState>) => Promise<IAddSourceAction> {
+    return dispatch => {
+      return Promise.resolve(dispatch({
+        type: ADD_SOURCE,
+        payload: source
       }))
     }
   }
