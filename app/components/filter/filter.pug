@@ -1,5 +1,24 @@
 .main-table(ng-style="$ctrl.tableWidthStyle()")
   .main-grid(ui-grid="{ data: $ctrl.allItems, enableFiltering: true }" ng-hide="$ctrl.actions.filter.dividerPercent < 2" ui-grid-auto-resize)
 .main-canvas(ng-style="$ctrl.canvasWidthStyle()")
+  ul.nav.nav-tabs.class-nav
+    li(ng-repeat="clss in $ctrl.getActiveClasses()" ng-class="{ active: $ctrl.selectedClass === clss }")
+      a(ng-click="$ctrl.selectedClass = clss") {{ clss.labels | prefLang }}
+  .filter-area(ng-repeat="clss in $ctrl.getActiveClasses()" ng-show="$ctrl.selectedClass === clss")
+    h3.filter-heading Add filter on {{ clss.labels | prefLang }}
+    button.btn.btn-default.add-by-type.disabled Map
+    button.btn.btn-default.add-by-type.disabled Timeline
+    button.btn.btn-default.add-by-type.disabled Timespan
+    .btn-group.add-by-property(uib-dropdown)
+      button.btn.btn-default.dropdown-toggle(uib-dropdown-toggle) on property&nbsp;
+        span.caret
+      ul.dropdown-menu(uib-dropdown-menu)
+        li(ng-repeat="prop in clss.properties")
+          a(ng-click="$ctrl.addFilter(clss, prop)") {{ prop.labels | prefLang }}
+    hr
+    .filter(ng-repeat="(propId, filter) in $ctrl.state.filter.filtersByClass[clss.id.value]" ng-init="slideMin = filter.domain[0]; slideMax=filter.domain[1]; slideOptions={ floor: filter.selection[0], ceil: filter.selection[1] }")
+      .filter-title {{ filter.description }}: {{ $ctrl.state.project.project.dataModel.propertyMap.s[propId].labels | prefLang }}
+      div
+        rzslider(rz-slider-model="slideMin", rz-slider-high="slideMax", rz-slider-options="slideOptions")
 .draggable-divider(drag-container="true" on-drag-end="dragging = false; $ctrl.dragDivider($event)" ng-style="$ctrl.dragTabLeftStyle()")
   .drag-tab

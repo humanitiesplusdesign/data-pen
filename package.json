@@ -21,6 +21,7 @@
     "angular-ui-router": "^1.0.3",
     "angular-yasqe-component": "^1.0.6",
     "angular-yasr-component": "^1.0.7",
+    "angularjs-slider": "^6.4.0",
     "babel-core": "^6.26.0",
     "babel-loader": "^7.1.2",
     "babel-plugin-angularjs-annotate": "^0.8.2",
