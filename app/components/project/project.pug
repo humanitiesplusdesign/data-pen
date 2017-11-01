@@ -6,7 +6,7 @@
   sources
 .top-nav
   .nav-element.return-button
-    img.back-icon(src="http://thomasricci.com/icons/back@2x.png" ui-sref="projects")
+    img.back-icon(src="./app/images/back@2x.png" ui-sref="projects")
   .nav-element.project-description.push-down {{ $ctrl.actions.project.description.length > 30 ? $ctrl.actions.project.description.substr(0, 27) + '...' : $ctrl.actions.project.description }}
   .nav-element.vertical-divider.muted |
   span.nav-links
@@ -16,7 +16,7 @@
   .nav-element.search(ng-hide="$ctrl.currentView==='sources'")
     input.search-bar
   .nav-element.bibliography-link
-    img.bib-icon(src="http://thomasricci.com/icons/bibliography@2x.png")
+    img.bib-icon(src="./app/images/bibliography@2x.png")
   span.usage(ng-hide="$ctrl.currentView==='sources'")
     .nav-element.usage-chart
       .progress

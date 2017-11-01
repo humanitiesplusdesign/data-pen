@@ -10,12 +10,26 @@ export class ProjectComponentController {
   private actions: any = {}
   private currentView: string = 'sources'
 
+  public $postLink(): void {
+    let setView = this.setView.bind(this)
+    this.$document.bind('keydown', function (e) {
+      if (e.ctrlKey && e.keyCode === 49) {
+        setView('sources')
+      } else if (e.ctrlKey && e.keyCode === 50) {
+        setView('filter')
+      } else if (e.ctrlKey && e.keyCode === 51) {
+        setView('active')
+      }
+    });
+  }
+
   /* @ngInject */
   constructor(private projectActionService: ProjectActionService,
               private itemsService: ItemsService,
               private $stateParams: any,
               private $state: any,
-              private $ngRedux: INgRedux) {
+              private $ngRedux: INgRedux,
+              private $document: angular.IDocumentService) {
     let unsub1: () => void = $ngRedux.connect(this.mapProjectToActions, null)(this.actions)
     this.actions.unsubscribe = () => {
       unsub1()
