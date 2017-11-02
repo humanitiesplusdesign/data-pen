@@ -7,15 +7,25 @@ active {
   .control-area {
     position: fixed
     top: 50px
-    right: 0px
+    right: 10px
     width: 4em
-    padding: 1em
+    padding-top: 2em
+    padding-right: 3em
 
     .btn {
       margin-bottom: 1em
       box-shadow: 1px 1px 1px #CCC
+      outline: none
     }
-    
+
+    .btn-icon {
+      width: 23px
+      height: auto
+      margin-top: -5px
+      margin-left: -3px
+      //margin-left: 1em
+    }
+
     .btn-circle {
       width: 30px;
       height: 30px;
@@ -29,9 +39,11 @@ active {
       width: 50px;
       height: 50px;
       padding: 10px 16px;
+      text-align: center;
       font-size: 18px;
       line-height: 1.33;
       border-radius: 25px;
+      outline: none;
     }
     .btn-circle.btn-xl {
       width: 70px;
@@ -44,18 +56,18 @@ active {
   }
 
   .draggable-divider {
-    top: 0%
+    top: -100%
     left: 0%
     margin-left: -3px
     width: 6px
-    height: 100%
+    height: 300%
     opacity: 0.5
     background-color: gray
     position: absolute
   }
 
   .drag-tab {
-    top: 45%
+    top: 49%
     left: 0%
     padding: 0.5em 1em 0.5em 1em
     width: 30px

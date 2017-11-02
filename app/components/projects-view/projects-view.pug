@@ -1,30 +1,32 @@
 .container
   h3.header-title Data Pen
     span.header-subtitle Projects
-    //- h2 Your projects
-  
+
   .head
     .sort-container(ng-controller="projectsSortController")
       select(ng-model="item.id" ng-selected="0" ng-options="option.id as option.name for option in options")
         option(ng-repeat="option in data.availableOptions" value="{{option.id}}") {{option.name}}
-      
-  //-.sort-container Sort by date
-  div(ng-repeat="(id,projectSource) in $ctrl.projectSources track by $index")
-    a.col-md-3
-      .new-project(ui-sref="configure({sourceId:id})")
-        img.plus-icon(src="./app/images/plus.svg")
-        label.new-project-text Start new project
+
+  div(ng-repeat="(id,projectSource) in $ctrl.projectSources track by $index")   
+    a(ui-sref="configure({sourceId:id})") 
+      button.new-project-button(type="button" data-toggle="modal" data-target="#newProjectDialog") Start new project
+      .modal#newProjectDialog(tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="false")
+        .modal-dialog(role="document")
+          .modal-content
+            .modal-header
+              h5.modal-title Modal title
+              .button.close(type="button" data-dismiss="modal" aria-label="Close")
+                .span(aria-hidden="true") &times;
+            .modal-body stuff here
+            .modal-footer
+              .button.btn.btn-secondary(type="button" data-dismiss="modal") Close
+              .button.btn.btn-primary(type="button") Save changes
+
+    //- original button, links to external page
+    //- button.new-project-button(ui-sref="configure({sourceId:id})") Start new project
     .row
-    //- h3.projects-category-title {{id}}&nbsp;
-      //- span.load-icon.glyphicon.glyphicon-repeat.fa-spin(ng-if="$ctrl.projectSourceState[id]=='loading'")
     .spinner(ng-if="$ctrl.projectSourceState[id]=='loading'")
     .alert.alert-danger(ng-if="$ctrl.projectSourceState[id]=='error'") Error loading: {{projects}}
-    
-    //- hr.keyline
     ul.projects-list
       li(ng-if="$ctrl.projectSourceState[id]=='ready'",ng-repeat="project in $ctrl.projects[id] track by $index")
         a(ui-sref="project({id:project.id,sparqlEndpoint:project.source.sparqlEndpoint,graph:project.source.graph})"): citable(citable="project",no-link)
-        //- a(ui-sref="project({id:project.id,sparqlEndpoint:project.source.sparqlEndpoint,graph:project.source.graph})") &nbsp;(Open in new project view)
-        //- button.btn.btn-xs.btn-danger(ng-click="$ctrl.deleteProject(id, $index, project)"): span.glyphicon.glyphicon-remove
-      
-        //-button.btn.btn-xs(ui-sref="projectSources()",title="Configure project sources"): span.glyphicon.glyphicon-cog

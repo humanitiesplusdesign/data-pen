@@ -1,0 +1,138 @@
+configure-view {
+  .project-setup-container {
+    position: relative
+    margin-top: 100px
+    height: 500px
+    background-color: #ffffff
+    border-radius: 5px
+    box-shadow: 0 1px 6px rgba(#000, 0.1)
+
+    .header {
+      margin-top: 50px
+    }
+
+    .left-side {
+      margin-top: 30px
+    }
+
+    .right-side {
+      margin-top: 30px
+
+      h5 {
+        font-size: 1.1em
+        line-height: 1.8em
+      }
+
+      p {
+        font-size: 0.9em
+      }
+
+      .project-selection {
+        margin-top: 30px
+      }
+
+      .project-dropdown-container {
+        position: relative
+        display: block
+        width: 180px
+        height: 30px
+        line-height: 1.8
+        background: none
+        overflow: hidden
+
+        select {
+          width: 100%
+          height: 100%
+          margin: 0
+          padding: 0 30px 0 10px
+          font-size: 1em
+          color: #3c3c3c
+          cursor: pointer
+          border: 1px solid rgba(#000, 0.3)
+          border-radius: 3px
+          box-shadow: 0 1px 1px rgba(#000, 0.05)
+
+          &::-ms-expand {
+            display: none
+          }
+
+          &:focus {
+            border: 1px solid rgba(#466bd3, 1)
+          }
+
+        }
+
+        &::after {
+          content: '\25be'
+          position: absolute
+          top: 0
+          right: 10px
+          bottom: 0
+          font-size: 1.2em
+          color: #3c3c3c
+          background: none
+          pointer-events: none
+        }
+      }
+
+      .project-pull-options {
+        margin-top: 30px
+
+        label {
+          display: block;
+          margin-top: -3px
+
+          input {
+            box-shadow: none
+            width: 13px;
+            height: 13px;
+            padding: 0;
+            margin: 0 8px 0 0
+            vertical-align: bottom;
+            position: relative;
+            top: 2px
+            float: left
+          }
+        }
+      }
+    }
+
+    .action-items {
+      position: absolute
+      display: inline-block
+      right: 40px
+      bottom: 40px
+
+      button {
+        position: relative
+        appearance: none
+        border: none
+        width: 110px
+        height: 30px
+        margin-left: -10px
+        float: right
+        background: none
+        outline: none
+        transition: .2s
+        -webkit-transition: .2s
+        -moz-transition: .2s
+        -o-transition: .2s
+
+        &:hover {
+          opacity: .4;
+        }
+      }
+
+      .save-project {
+        color: #1571ee
+      }
+    }
+
+    label {
+      font-family: 'Roboto Mono', monospace
+      font-size: 0.85em
+      color: #838383
+      margin-bottom: 10px
+    }
+  }
+}
