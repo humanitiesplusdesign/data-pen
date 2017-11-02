@@ -65,8 +65,6 @@ export class ActiveComponentController {
 
     this.nodeSearch = d3.select('.node-search')
 
-    console.log(cmenu)
-
     this.menu = cmenu('#circle-menu')
       .config({
         background: '#FFFFFF',

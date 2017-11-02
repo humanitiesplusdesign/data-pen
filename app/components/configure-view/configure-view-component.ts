@@ -19,9 +19,14 @@ export class ConfigureViewComponentController implements angular.IComponentContr
   public projectSource: ProjectSourceInfo
   public primaryEndpointConfigurations: PrimaryEndpointConfiguration[] = []
   public statistics: {[id: string]: TreeNode[]} = {}
-  public selectedAuthorities: {[id: string]: boolean} = {}
+  public selectedAuthorities: {[id: string]: boolean} = {
+    'http://ldf.fi/fibra/geonamesCidocLiteEndpointConfiguration': true,
+    'http://ldf.fi/fibra/viafCidocLiteEndpointConfiguration': true
+  }
   public selectedArchives: {[id: string]: boolean} = {}
-  public selectedSchemas: {[id: string]: boolean} = {}
+  public selectedSchemas: {[id: string]: boolean} = {
+    'http://ldf.fi/fibra/cidocCRMSchema': true
+  }
   public selectedTemplate: PrimaryEndpointConfiguration
   public schemas: Schema[] = []
   public authorities: RemoteEndpointConfiguration[] = []
@@ -31,7 +36,9 @@ export class ConfigureViewComponentController implements angular.IComponentContr
     this.project.authorityEndpoints = this.authorities.filter(a => this.selectedAuthorities[a.id])
     this.project.archiveEndpoints = this.archives.filter(a => this.selectedArchives[a.id])
     this.project.schemas = this.schemas.filter(a => this.selectedSchemas[a.id])
-    this.projectService.saveCitable(this.projectSource.updateEndpoint, this.projectSource.graphStoreEndpoint, this.project).then(() => this.$state.go('construct', { id: this.project.id, sparqlEndpoint: this.project.source.sparqlEndpoint, graph: this.project.source.graph}))
+
+    console.log(this.project)
+    this.projectService.saveCitable(this.projectSource.updateEndpoint, this.projectSource.graphStoreEndpoint, this.project).then(() => this.$state.go('project', { id: this.project.id, sparqlEndpoint: this.project.source.sparqlEndpoint, graph: this.project.source.graph}))
   }
 
   public delete(): void {
@@ -62,7 +69,9 @@ export class ConfigureViewComponentController implements angular.IComponentContr
       this.project.graphStoreEndpoint = this.projectSource.graphStoreEndpoint
       this.project.graph = pid
     }
-    this.projectSources.forEach(ps => {
+    // Hackety hackety hack
+    [new ProjectSourceInfo('Shared projects', 'http://ldf.fi/fibra/sparql', 'http://ldf.fi/fibra/update', 'http://ldf.fi/fibra/data', 'http://ldf.fi/fibra/shared-projects/', 'http://ldf.fi/fibra/fusekiEndpointWithTextIndexAndSecoFunctions')]
+      .concat(this.projectSources).forEach(ps => {
       projectService.listPrimaryEndpointConfigurations(ps).then(pt => {
         if (!this.selectedTemplate) {
           let matchingEC: PrimaryEndpointConfiguration = pt.find(ec => ec.compatibleEndpoints.find(et => et === this.projectSource.type) !== undefined)
