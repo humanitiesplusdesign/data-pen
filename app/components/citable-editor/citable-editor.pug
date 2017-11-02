@@ -5,12 +5,12 @@
 h4 Names
 .form-inline
   .form-group(ng-repeat="label in $ctrl.citable.labels")
-    //- button.pull-right.btn.btn-xs(ng-click="$ctrl.removeLabel($index)"): span.glyphicon.glyphicon-remove
-    //- label Language
-    //- input.form-control(style="width:4em",type="text",ng-model="label.language")
-    //- label Name
-    //-input(type="text",ng-model="label.value")
-  //- button.btn.btn-xs(ng-click="$ctrl.addLabel()"): span.glyphicon.glyphicon-plus
+    button.pull-right.btn.btn-xs(ng-click="$ctrl.removeLabel($index)"): span.glyphicon.glyphicon-remove
+    label Language
+    input.form-control(style="width:4em",type="text",ng-model="label.language")
+    label Name
+    input(type="text",ng-model="label.value")
+    button.btn.btn-xs(ng-click="$ctrl.addLabel()"): span.glyphicon.glyphicon-plus
 		
 
 h4 Descriptions
