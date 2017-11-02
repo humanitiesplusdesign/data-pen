@@ -6,24 +6,34 @@ citable-editor {
     border: 1px solid rgba(#000, 0.3)
     border-radius: 3px
     box-shadow: 0 1px 1px rgba(#000, 0.05)
-
-    &:focus {
-      border: 1px solid rgba(#466bd3, 1)
-    }
   }
 
   .title {
+
     input {
       height: 38px
+
+      &:focus {
+        border: 1px solid rgba(#466bd3, 1)
+      }
     }
   }
 
   .description {
     margin-top: 30px
+
     textarea {
       height: 145px
       padding: 10px
       resize: none
+      outline: 0
+      border: 1px solid rgba(#000, 0.3)
+      box-shadow: 0 1px 1px rgba(#000, 0.05)
+
+      &:focus {
+        border: 1px solid rgba(#466bd3, 1)
+        box-shadow: 0 1px 1px rgba(#000, 0.05)
+      }
     }
   }
 }
