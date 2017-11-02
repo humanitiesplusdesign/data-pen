@@ -14,6 +14,7 @@ import { IRootState } from 'reducers'
 import { IActiveState } from 'reducers/frontend/active'
 import 'angular-drag-drop';
 import 'angular-ui-grid';
+import cmenu from 'circular-menu';
 
 interface IActiveComponentControllerState extends IActiveActions {
   project: ProjectState
@@ -27,7 +28,11 @@ export class ActiveComponentController {
   private radiusInitial: number = 1
   private radius: number = 8
   private radiusBounce: number = 15
+  private nodeSearchTopOffset: number = 39
+  private circularMenuTopOffset: number = 55
   private currentlyAdding: boolean = false
+
+  private menu: any
 
   private nodeSearch: d3.Selection<Element, {}, HTMLElement, any>
   private nodeSearchSelected: string|{}
@@ -60,6 +65,26 @@ export class ActiveComponentController {
 
     this.nodeSearch = d3.select('.node-search')
 
+    console.log(cmenu)
+
+    this.menu = cmenu('#circle-menu')
+      .config({
+        background: '#FFFFFF',
+        backgroundHover: '#DDDDDD',
+        diameter: 150,
+        menus: [{
+          title: 'E'
+        }, {
+          title: 'C'
+        }, {
+          title: 'D'
+        }, {
+          title: '?'
+        }, {
+          title: 'T'
+        }]
+      });
+
     this.updateCanvas()
   }
 
@@ -81,7 +106,7 @@ export class ActiveComponentController {
         this.nodeSearchOffsetLeft = d3.event.offsetX
         this.appendNode(sel, this.nodeSearchOffsetTop, this.nodeSearchOffsetLeft, 'addition-node')
         this.nodeSearch
-          .style('top', d3.event.offsetY + 39 + 'px')
+          .style('top', d3.event.offsetY + this.nodeSearchTopOffset + 'px')
         if (this.getCanvasSize().width - (d3.event.offsetX + (this.state.active.dividerPercent / 100 * window.innerWidth)) > 350 + 30) {
           this.nodeSearch.style('left', d3.event.offsetX + (this.state.active.dividerPercent / 100 * window.innerWidth) + 30 + 'px')
         } else {
@@ -120,13 +145,18 @@ export class ActiveComponentController {
     this.projectActionService.setActiveItemCount(this.state.active.activeLayout.items.length)
   }
 
+  private nodeClick(d: IItemState, groups: SVGCircleElement[]): void {
+    this.menu.show([d.leftOffset, d.topOffset + this.circularMenuTopOffset])
+    console.log(d3.event)
+  }
+
   private appendNode(sel: d3.Selection<SVGGElement, any, HTMLElement, any>, top: number, left: number, clss: string): d3.Selection<SVGGElement, IItemState, Element, {}> {
     let g: d3.Selection<SVGGElement, IItemState, Element, {}> = sel.append<SVGGElement>('g')
       .classed('node', true)
       .classed(clss, true)
       .attr('transform', 'translate(' + left + ',' + top + ')')
 
-    let c: d3.Selection<SVGGElement, IItemState, Element, {}> = g.append<SVGCircleElement>('circle')
+    let c: d3.Selection<SVGCircleElement, IItemState, Element, {}> = g.append<SVGCircleElement>('circle')
       .classed('node-circle', true)
       .attr('r', this.radiusInitial + 'px')
 
@@ -163,6 +193,9 @@ export class ActiveComponentController {
 
     enterSel.append<SVGCircleElement>('circle')
       .classed('node-circle', true)
+      .on('click', (d: IItemState, i: number, groups: SVGCircleElement[]) => {
+        this.nodeClick(d, groups)
+      })
 
     itemSelection = itemSelection.merge(enterSel)
 
