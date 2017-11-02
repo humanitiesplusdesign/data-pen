@@ -35,6 +35,42 @@ filter {
     border-style: none
   }
 
+  .rzslider {
+    .rz-bar {
+      background: rgba(0, 99, 255, 0.05)
+      height: 100px
+    }
+
+    .rz-selection {
+      background: rgba(0, 99, 255, 0.3)
+    }
+
+    .rz-pointer {
+      width: 8px
+      height: 100px
+      top: 0
+      background-color: #2d7efc
+      border-radius: 0px
+      outline: none
+    }
+
+    .rz-pointer:after {
+      display: none
+    }
+
+    .rz-tick {
+      width: 2px
+      height: 10px
+      margin-left: 4px
+      border-radius: 0
+      background: rgba(0, 99, 255, 0.05)
+      top: 102px
+    }
+    .rz-tick.rz-selected {
+      background: #2d7efc
+    }
+  }
+
   .main-table {
     height: 100%
     width: 0%
@@ -55,7 +91,7 @@ filter {
 
     .class-nav {
       margin-top: 2em
-      
+
       li:first-child {
         margin-left: 2em
       }
