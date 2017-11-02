@@ -10,7 +10,7 @@ import * as ProjectActions from '../../actions/project';
 import { INgRedux } from 'ng-redux'
 import SourcesActions from '../../actions/sources'
 
-interface ISourcesComponentControllerState extends IActiveActions {
+interface ISourcesComponentControllerState extends ISourcesActions {
   project: ProjectState
   sources: ISourcesState
 }
