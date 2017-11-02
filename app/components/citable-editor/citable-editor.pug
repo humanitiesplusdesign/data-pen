@@ -2,24 +2,15 @@
   label ID
   input.form-control(type="text",ng-model="$ctrl.citable.id")
 		
-h4 Names
+h4 Name
 .form-inline
   .form-group(ng-repeat="label in $ctrl.citable.labels")
-    button.pull-right.btn.btn-xs(ng-click="$ctrl.removeLabel($index)"): span.glyphicon.glyphicon-remove
-    label Language
-    input.form-control(style="width:4em",type="text",ng-model="label.language")
-    label Name
     input(type="text",ng-model="label.value")
-    button.btn.btn-xs(ng-click="$ctrl.addLabel()"): span.glyphicon.glyphicon-plus
 		
 
-h4 Descriptions
+h4 Description
  .form-inline
   .form-group(ng-repeat="descr in $ctrl.citable.descriptions")
-    button.pull-right.btn.btn-xs(ng-click="$ctrl.removeDescription($index)"): span.glyphicon.glyphicon-remove
-    label Language
-    input.form-control(style="width:4em",type="text",ng-model="descr.language")
-    label Description
     textarea.form-control(ng-model="descr.value")
   //-button.btn.btn-xs(ng-click="$ctrl.addDescription()"): span.glyphicon.glyphicon-plus
 		
