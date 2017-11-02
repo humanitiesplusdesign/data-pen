@@ -1,25 +1,12 @@
-//- .form-group(ng-show="!$ctrl.noId")
-  label ID
-  input.form-control(type="text",ng-model="$ctrl.citable.id")
-		
-h4 Name
-.form-inline
-  .form-group(ng-repeat="label in $ctrl.citable.labels")
-    input(type="text",ng-model="label.value")
-		
-
-h4 Description
- .form-inline
-  .form-group(ng-repeat="descr in $ctrl.citable.descriptions")
-    textarea.form-control(ng-model="descr.value")
-  //-button.btn.btn-xs(ng-click="$ctrl.addDescription()"): span.glyphicon.glyphicon-plus
-		
-//- .form-group
-  label Homepage URL
-  input.form-control(type="text",ng-model="$ctrl.citable.url")
-//- div(ng-if="!$ctrl.noRightsHolders")
-  h4 Rights holders
-  div.well(ng-repeat="rightsHolder in $ctrl.citable.rightsHolders")
-    button.pull-right.btn.btn-xs.btn-dange(ng-click="$ctrl.citable.rightsHolders.splice($index, 1)"): span.glyphicon.glyphicon-remove
-    citable-editor(citable="rightsHolder",no-rights-holders,no-id="$ctrl.noRightsHolderIds")
-  button.btn.btn-xs(ng-click="$ctrl.addRightsHolder()"): span.glyphicon.glyphicon-plus
+.title
+  .row
+    label Title
+  .row
+    .form-group(ng-repeat="label in $ctrl.citable.labels")
+      input.title-input(type="text",ng-model="label.value")
+.description
+  .row
+    label Description
+  .row
+    .form-group(ng-repeat="descr in $ctrl.citable.descriptions")
+      textarea.description-input.form-control(ng-model="descr.value")

@@ -1,79 +1,27 @@
 .container
-  h1 Fibra
-
-  citable-editor(citable="$ctrl.project",no-id)
-
-  //- h4 Schemas
-  //- .form-group
-    .form-group
-      label.checkbox-inline(ng-repeat="schema in $ctrl.schemas")
-        input(type="checkbox",ng-model="$ctrl.selectedSchemas[schema.id]")
-        citable(citable="schema")
-
-  //- h4 Authorities
-  //- .form-group
-    label.checkbox-inline(ng-repeat="authority in $ctrl.authorities")
-      input(type="checkbox",ng-model="$ctrl.selectedAuthorities[authority.id]")
-      citable(citable="authority")
-
-  //- h4 Archives
-  //- .form-group
-    label.checkbox-inline(ng-repeat="archive in $ctrl.archives")
-      input(type="checkbox",ng-model="$ctrl.selectedArchives[archive.id]")
-      citable(citable="archive")
-
-  button.btn.btn-success(ng-click="$ctrl.saveAndOpen()") Save and open
-  button.btn.btn-danger(ng-click="$ctrl.delete()") Delete
-
-  //- div(ng-show="!details")
-    span.glyphicon.glyphicon-chevron-down(title="details",ng-click="details=true")
-  //- div(ng-show="details")
-    span.glyphicon.glyphicon-chevron-up(title="details",ng-click="details=false")
-    .form-group
-      label Project ID
-      input.form-control(type="text",ng-model="$ctrl.project.id")
-    .form-group
-      label Project storage
-      select.form-control(ng-model="$ctrl.projectSource",ng-options="ps as ps.id for ps in $ctrl.projectSources",ng-change="$ctrl.onUpdatedProjectSource()")
-    .form-group
-      label Schema namespace
-      input.form-control(type="text",ng-model="$ctrl.project.schemaNS")
-    .form-group
-      label Instance namespace
-      input.form-control(type="text",ng-model="$ctrl.project.instanceNS")
-    .form-group
-      label Project Query Endpoint
-      input.form-control(type="text",ng-model="$ctrl.project.endpoint")
-    .form-group
-      label Project Update Endpoint
-      input.form-control(type="text",ng-model="$ctrl.project.updateEndpoint")
-    .form-group
-      label Project Graph Store Endpoint
-      input.form-control(type="text",ng-model="$ctrl.project.graphStoreEndpoint")
-    .form-group
-      label Project Graph
-      input.form-control(type="text",ng-model="$ctrl.project.graph")
-    .form-group
-      label Template
-      .radio(ng-repeat="template in $ctrl.primaryEndpointConfigurations")
-        label
-          input(type="radio",name="selectedTemplate",ng-value="template",ng-model="$ctrl.selectedTemplate",ng-change="$ctrl.changeTemplate()")
-          citable(citable="template")
-    .form-group
-      label Autocompletion Query
-      yasqe(content="$ctrl.project.autocompletionQuery",on-content-changed="$ctrl.project.autocompletionQuery=content")
-    .form-group
-      label Item Query
-      yasqe(content="$ctrl.project.itemQuery",on-content-changed="$ctrl.project.itemQuery=content")
-    .form-group
-      label Delete Item Query
-      yasqe(content="$ctrl.project.deleteItemQuery",on-content-changed="$ctrl.project.deleteItemQuery=content")
-    .form-group
-      label Tree Query
-      yasqe(content="$ctrl.project.treeQuery",on-content-changed="$ctrl.project.treeQuery=content")
-    .form-group
-      label Class Query
-      yasqe(content="$ctrl.project.classQuery",on-content-changed="$ctrl.project.classQuery=content")
-    .form-group
-      label Property Query
-      yasqe(content="$ctrl.project.propertyQuery",on-content-changed="$ctrl.project.propertyQuery=content")
+  h3.header-title Data Pen
+    span.header-subtitle New project
+  .project-setup-container.col-md-10.col-md-offset-1
+    .row
+      .header
+        h4.col-md-3.col-md-offset-1 Start a new project.
+    .left-side.col-md-4.col-md-offset-1
+      citable-editor(citable="$ctrl.project",no-id)
+    .right-side.col-md-4.col-md-offset-1
+      h5 Pull from an existing project
+      p Start with an existing sources and/or filter configuration from another project (optional).
+      .project-selection
+        label Project:  
+        .project-dropdown-container(ng-controller="projectsListController")
+          select(ng-model="item.id" ng-selected="0" ng-options="option.id as option.name for option in options")
+            option(ng-repeat="option in data.availableOptions" value="{{option.id}}") {{option.name}}
+        .project-pull-options
+          .label-checkbox-container
+            label Sources
+              input(type="checkbox")
+          .label-checkbox-container
+            label Filters
+              input(type="checkbox")
+    .action-items
+      button.save-project(ng-click="$ctrl.saveAndOpen()") Save and open
+      button.cancel-project(ng-click="$ctrl.delete()") Cancel

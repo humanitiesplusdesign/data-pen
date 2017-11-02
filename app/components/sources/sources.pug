@@ -1,16 +1,16 @@
 .sources-main
   .sources-left
     .sources-head
-      h3.pull-left Sources
+      h3.pull-left Project sources
       span.pull-right add
     .sources-list
       span(ng-repeat="source in $ctrl.state.sources.sources")
         h4(ng-click="$ctrl.projectsOpen[source.id] = !$ctrl.projectsOpen[source.id]")
           i.glyphicon.glyphicon-triangle-right(ng-show="!$ctrl.projectsOpen[source.id]")
           i.glyphicon.glyphicon-triangle-bottom(ng-show="$ctrl.projectsOpen[source.id]")
-          span {{source.labels | prefLang}}
+          span.source-name {{source.labels | prefLang}}
         .class-list(ng-show="$ctrl.projectsOpen[source.id] ? true : false")
-          label(ng-repeat="clss in source.classes" ng-hide="clss.labels.length === 0") 
+          label.checkbox-container(ng-repeat="clss in source.classes" ng-hide="clss.labels.length === 0") 
             input(type="checkbox", ng-model="$ctrl.localSourceClassTree[source.id][clss.id.value]" ng-click="$ctrl.state.setSourceClassActive(source.id, clss.id.value, !$ctrl.getSourceClassStatus(source.id, clss.id.value))")
             span {{clss.labels | prefLang}}
       //- h4  

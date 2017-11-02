@@ -1,16 +1,5 @@
 projects-view {
 
-  .header-title {
-    margin-top: 50px
-
-    .header-subtitle {
-      font-family: 'Roboto Mono', monospace
-      font-size: 0.5em
-      color: #466bd3
-      margin-left: 20px
-    }
-  }
-
   .head {
     margin-top: 150px
 
@@ -45,18 +34,18 @@ projects-view {
       select::-ms-expand {
         display: none
       }
-    }
 
-    .sort-container::after {
-      content: '\25be'
-      position: absolute
-      top: 0
-      right: 10px
-      bottom: 0
-      font-size: 1.2em
-      color: #3c3c3c
-      background: none
-      pointer-events: none
+      &::after {
+        content: '\25be'
+        position: absolute
+        top: 0
+        right: 10px
+        bottom: 0
+        font-size: 1.2em
+        color: #3c3c3c
+        background: none
+        pointer-events: none
+      }
     }
   }
 
