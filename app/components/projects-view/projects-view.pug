@@ -9,7 +9,8 @@
       
   div(ng-repeat="(id,projectSource) in $ctrl.projectSources track by $index")    
     button.new-project-button(type="button" data-toggle="modal" data-target="#newProjectDialog") Start new project
-    .modal.fade#newProjectDialog(tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true")
+    //-.modal#newProjectDialog(tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="false")
+    .modal#newProjectDialog
       .modal-dialog(role="document")
         .modal-content
           .modal-header
