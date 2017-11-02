@@ -1,13 +1,11 @@
-.control-area
-  button.btn.btn-circle.btn-default
-    i.glyphicon.glyphicon-search
-  button.btn.btn-circle.btn-default
-    i.glyphicon.glyphicon-eye-open
-  button.btn.btn-circle.btn-default
-    i.glyphicon.glyphicon-camera
 .main-table(ng-style="$ctrl.tableWidthStyle()")
   .main-grid(ui-grid="{ data: $ctrl.state.active.activeLayout.items }" ng-hide="$ctrl.state.active.dividerPercent < 2" ui-grid-auto-resize)
 .main-canvas(ng-style="$ctrl.canvasWidthStyle()")
+  .control-area
+    button.btn.btn-circle.btn-lg
+      img.btn-icon(src="./app/images/view-options@2x.png")
+    button.btn.btn-circle.btn-lg
+      img.btn-icon(src="./app/images/snapshot@2x.png")
   svg.main-svg
     g.main-g
       rect.main-background
