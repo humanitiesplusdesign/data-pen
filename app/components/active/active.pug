@@ -3,9 +3,9 @@
 .main-canvas(ng-style="$ctrl.canvasWidthStyle()")
   .control-area
     button.btn.btn-circle.btn-lg
-      img.btn-icon(src="./app/images/view-options@2x.png")
+      img.btn-icon(src="./app/images/active/view-options.svg")
     button.btn.btn-circle.btn-lg
-      img.btn-icon(src="./app/images/snapshot@2x.png")
+      img.btn-icon(src="./app/images/active/snapshot.svg")
   svg.main-svg
     g.main-g
       rect.main-background
@@ -14,12 +14,12 @@
   .drag-tab
 .node-search(ng-show="$ctrl.currentlyAdding")
   .input-group
-    .input-group-addon
-      i.glyphicon.glyphicon-search
+    .input-group-addon.addon-left
+      i.glyphicon.glyphicon-search(ng-hide="loadingSearchResults")
+      .spinner(ng-if="loadingSearchResults")
     input.form-control(type="text" ng-model="$ctrl.nodeSearchSelected" placeholder="Search" uib-typeahead="result.description for result in $ctrl.nodeSearchResults($viewValue)" typeahead-loading="loadingSearchResults" typeahead-no-results="noResults" typeahead-on-select="$ctrl.nodeSearchSelect($item, $model, $label, $event)" typeahead-wait-ms="200")
-    .input-group-addon(ng-click="$ctrl.nodeSearchRemove()")
+    .input-group-addon.addon-right(ng-click="$ctrl.nodeSearchRemove()")
       i.glyphicon.glyphicon-remove
-  i.glyphicon.glyphicon-refresh(ng-show="loadingSearchResults")
-  div(ng-show="noResults")
-    i.glyphicon.glyphicon-remove No Results Found
+  .no-results(ng-show="noResults")
+    label No Results Found
 #circle-menu.circle-menu
