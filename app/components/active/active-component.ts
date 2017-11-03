@@ -137,7 +137,6 @@ export class ActiveComponentController {
 
   private processResults(res: AutocompletionResults): Result[] {
     let activeItemIds: string[] = this.$ngRedux.getState().frontend.active.activeLayout.items.map((d: IItemState) => d.ids.map((i) => i.value)).reduce((a, b) => a.concat(b), [])
-    console.log(activeItemIds)
     let ret: Result[] = []
     res.localMatchingResults.forEach(l => l.results.forEach(r => {
       if (activeItemIds.indexOf(r.ids[0].value) === -1) ret.push(r)
@@ -153,7 +152,6 @@ export class ActiveComponentController {
   }
 
   private nodeSearchSelect($item: Result, $model, $label, $event): void {
-    console.log($item)
     let item: IItemState = {
       ids: $item.ids,
       item: null,
