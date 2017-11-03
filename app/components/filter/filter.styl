@@ -35,10 +35,40 @@ filter {
     border-style: none
   }
 
-  .filter-title {
-    margin-left: 10px
+  .filter-header {
+    //position: relative
+    height: 20px
     margin-bottom: 10px
-    color: #A9A9A9
+    padding: 0 10px 0 10px
+
+    .filter-title {
+      float: left
+      color: #A9A9A9
+    }
+
+    .filter-controls {
+      float: right
+
+      .minimise-filter {
+        padding: 10px 5px 10px 5px
+        width: 29px
+        height: auto
+      }
+
+      .remove-filter {
+        padding: 5px
+        width: 24px
+        height: auto
+      }
+
+      img {
+        opacity: 0.3
+
+        &:hover {
+          opacity: 0.1
+        }
+      }
+    }
   }
 
   .filter-box {
@@ -46,7 +76,7 @@ filter {
     border: 1px solid #ccc
     border-radius: 6px
     padding: 30px
-    margin-bottom: 30px
+    margin-bottom: 50px
     box-shadow: 0 2px 5px 0 #DCDCDC
 
     .rzslider {
@@ -105,6 +135,7 @@ filter {
     width: 100%
     position: absolute
     padding-bottom: 3em
+    overflow-y: scroll
 
     .class-nav {
       margin-top: 2em
