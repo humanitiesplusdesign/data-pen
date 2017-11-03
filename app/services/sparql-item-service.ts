@@ -5,7 +5,7 @@ import {IRichNode, PrunedRichNodeFromNode, RichNodeFromRichNode, FullRichNodeFro
 import {INode, DataFactory, DefaultGraph, ENodeMap, OWL, Triple, Graph, NamedNode} from 'models/rdf'
 import {IQuad, ITriple} from 'models/rdfjs'
 import {WorkerService, WorkerWorkerService} from 'services/worker-service/worker-service'
-import {EMap} from 'components/collection-utils'
+import {EMap, StringSet} from 'components/collection-utils'
 import {FibraSparqlService} from 'services/fibra-sparql-service'
 import {ISparqlBinding} from 'angular-sparql-service'
 import {SparqlUpdateWorkerService} from 'services/sparql-update-service'
@@ -240,10 +240,16 @@ export class SparqlItemWorkerService {
         if (queryRemote) {
           ret.notify({ endpointType: 'primary', endpoint: this.stateWorkerService.state.project.endpoint, items: items.values()})
           let itemIdQuery: string = ''
+          let seenIds: StringSet = new StringSet()
           for (let item of items.values()) {
             itemIdQuery += '(' + item.toCanonical() + item.toCanonical() + ')'
-            for (let item2 of idSameAses.get(item)) itemIdQuery += '(' + item.toCanonical() + item2.toCanonical() + ')'
+            seenIds.add(item.toCanonical())
+            for (let item2 of idSameAses.get(item)) {
+              itemIdQuery += '(' + item.toCanonical() + item2.toCanonical() + ')'
+              seenIds.add(item2.toCanonical())
+            }
           }
+          if (ids) for (let id of ids as string[]) if (!seenIds.has(id)) itemIdQuery += '(' + id + ' ' + id + ')'
           this.$q.all(this.stateWorkerService.state.project.remoteEndpoints().map(endpoint => {
             let queryTemplate2: string = endpoint.itemQuery
             queryTemplate2 = queryTemplate2.replace(/<IDPAIRS>/g, itemIdQuery)
