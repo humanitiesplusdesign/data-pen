@@ -35,7 +35,6 @@ export class SearchService {
   }
 
   private processResults(res: AutocompletionResults): AutocompletionResult[] {
-    console.log(res)
     let activeItemIds: string[] = this.$ngRedux.getState().frontend.active.activeLayout.items.map((d: IItemState) => d.id)
     let ret: AutocompletionResult[] = []
     res.localMatchingResults.forEach(l => l.results.forEach(r => {

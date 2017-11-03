@@ -1,4 +1,5 @@
 'use strict'
+import { SparqlItemService } from '../../services/sparql-item-service';
 import { IItemState } from 'reducers/frontend/active';
 import * as angular from 'angular';
 import { ProjectService } from 'services/project-service/project-service'
@@ -45,7 +46,8 @@ export class ActiveComponentController {
               private $scope: angular.IScope,
               private $q: angular.IQService,
               private $ngRedux: INgRedux,
-              private searchService: SearchService) {
+              private searchService: SearchService,
+              private sparqlItemService: SparqlItemService) {
     this.unsubscribe = $ngRedux.connect(
       (state: IRootState) => {
         return {
@@ -129,6 +131,7 @@ export class ActiveComponentController {
   }
 
   private nodeSearchSelect($item, $model, $label, $event): void {
+    console.log($item)
     let item: IItemState = {
       id: $item.id,
       description: $item.description,
@@ -136,7 +139,7 @@ export class ActiveComponentController {
       leftOffset: this.nodeSearchOffsetLeft
     }
 
-    this.state.addItemToCurrentLayout(item).then(() => {
+    this.state.addItemToCurrentLayout(item, this.sparqlItemService).then(() => {
         this.updateCanvas()
         this.$scope.$apply(this.nodeSearchRemove.bind(this))
       }
