@@ -24,7 +24,7 @@ active {
 
     .btn {
       margin-bottom: 1em
-      box-shadow: 1px 1px 1px #CCC
+      box-shadow: 1px 1px 3px #CCC
       outline: none
     }
 
@@ -165,6 +165,75 @@ active {
       border: none;
       border-radius: 0;
       box-shadow: none;
+    }
+  }
+
+  .no-results {
+    margin-top: 0.7em
+    margin-left: 40px
+    opacity: 0.5
+  }
+
+  .input-group {
+    border: 1px solid #ccc
+    box-shadow: 0 1px 2px #CCC
+    border-radius: 5px
+
+    .input-group-addon {
+      border: none
+      background-color: #fff
+
+      .addon-left {
+        padding: 6px, 6px, 6px, 18px
+        border-top-left-radius: 7px
+        border-bottom-left-radius: 7px
+      }
+
+      .addon-right {
+        border-top-right-radius: 7px
+        border-bottom-right-radius: 7px
+      }
+    }
+
+    input.form-control {
+      border: none
+      box-shadow: none
+      padding-left: 1px
+      padding-right: 0px
+
+      &:focus {
+        box-shadow: none
+      }
+    }
+
+    @keyframes spinner {
+      to {
+        transform: rotate(360deg)
+      }
+    }
+
+    .spinner {
+      display: inline-block
+      width: 13.5px
+      height: 15px
+      margin-left: 0px
+
+      &:before {
+        content: ''
+        box-sizing: border-box
+        position: absolute
+        top: 50%
+        //left: 50%
+        width: 20px
+        height: 20px
+        margin-top: -10px
+        margin-left: -10px
+        border-radius: 50%
+        border: 2px solid rgba(#456ad2, 0.1)
+        border-top-color: #456ad2
+        animation: spinner 1s linear infinite
+        z-index: 10
+      }
     }
   }
 }
