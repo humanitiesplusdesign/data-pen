@@ -99,6 +99,8 @@ export class ActiveComponentController {
 
   private canvasClick(sel: d3.Selection<SVGGElement, {}, HTMLElement, any>): void {
     this.$scope.$apply(() => {
+      this.menu.hide()
+
       if (!this.currentlyAdding) {
         this.nodeSearchOffsetTop = d3.event.offsetY
         this.nodeSearchOffsetLeft = d3.event.offsetX
@@ -144,6 +146,7 @@ export class ActiveComponentController {
   }
 
   private nodeClick(d: IItemState, groups: SVGCircleElement[]): void {
+    this.menu.hide()
     this.menu.show([d.leftOffset + (this.state.active.dividerPercent / 100 * window.innerWidth), d.topOffset + this.circularMenuTopOffset])
   }
 
