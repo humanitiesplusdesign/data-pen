@@ -1,4 +1,5 @@
 'use strict'
+import { AutocompletionResults, Result, SparqlAutocompleteService } from '../../services/sparql-autocomplete-service';
 import { SparqlItemService } from '../../services/sparql-item-service';
 import { IItemState } from 'reducers/frontend/active';
 import * as angular from 'angular';
@@ -47,6 +48,7 @@ export class ActiveComponentController {
               private $q: angular.IQService,
               private $ngRedux: INgRedux,
               private searchService: SearchService,
+              private sparqlAutocompleteService: SparqlAutocompleteService,
               private sparqlItemService: SparqlItemService) {
     this.unsubscribe = $ngRedux.connect(
       (state: IRootState) => {
@@ -126,15 +128,36 @@ export class ActiveComponentController {
     this.nodeSearchSelected = ''
   }
 
-  private nodeSearchResults(searchValue: string): angular.IPromise<AutocompletionResult[]> {
-    return this.searchService.searchSources(searchValue)
+  private nodeSearchResults(searchValue: string): angular.IPromise<Result[]> {
+    // return this.searchService.searchSources(searchValue)
+    return this.sparqlAutocompleteService.autocomplete(searchValue, 20, true).then(ret => this.processResults(ret), null, ret => {
+      if (ret.results) this.processResults(ret.results)
+    })
   }
 
-  private nodeSearchSelect($item, $model, $label, $event): void {
+  private processResults(res: AutocompletionResults): Result[] {
+    let activeItemIds: string[] = this.$ngRedux.getState().frontend.active.activeLayout.items.map((d: IItemState) => d.ids.map((i) => i.value)).reduce((a, b) => a.concat(b), [])
+    console.log(activeItemIds)
+    let ret: Result[] = []
+    res.localMatchingResults.forEach(l => l.results.forEach(r => {
+      if (activeItemIds.indexOf(r.ids[0].value) === -1) ret.push(r)
+    }))
+    res.remoteResults.forEach(l => l.results.forEach(r => {
+      if (activeItemIds.indexOf(r.ids[0].value) === -1
+        && r.additionalInformation.type && r.additionalInformation.type[0]
+        && r.datasources.reduce((p, c) => this.$ngRedux.getState().frontend.sources.sourceClassToggle[c] && this.$ngRedux.getState().frontend.sources.sourceClassToggle[c][r.additionalInformation.type[0].value], false)) {
+          ret.push(r)
+        }
+    }))
+    return ret
+  }
+
+  private nodeSearchSelect($item: Result, $model, $label, $event): void {
     console.log($item)
     let item: IItemState = {
-      id: $item.id,
-      description: $item.description,
+      ids: $item.ids,
+      item: null,
+      description: $item.prefLabel.value,
       topOffset: this.nodeSearchOffsetTop,
       leftOffset: this.nodeSearchOffsetLeft
     }
@@ -185,7 +208,7 @@ export class ActiveComponentController {
 
     let itemSelection: d3.Selection<SVGGElement, IItemState, Element, {}> = itemG.selectAll<SVGGElement, {}>('.item-node')
       .data(this.state.active.activeLayout.items, (it: IItemState) => {
-        return it.id;
+        return it.ids[0].toCanonical();
       })
 
     let enterSel: d3.Selection<SVGGElement, IItemState, Element, {}> = itemSelection.enter()
