@@ -239,7 +239,6 @@ export class ProjectWorkerService {
       return this.$q.all(promises).then(() => {
         p.archiveEndpoints = narche
         p.authorityEndpoints = nauthe
-        console.log(p)
         return p
       })
     })
