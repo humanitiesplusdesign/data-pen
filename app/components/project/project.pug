@@ -13,8 +13,9 @@
     .nav-element.nav-link.push-down(ng-class="{muted: $ctrl.currentView !== 'sources', active: $ctrl.currentView === 'sources'}", ng-click="$ctrl.setView('sources')") Sources
     .nav-element.nav-link.push-down(ng-class="{muted: $ctrl.currentView !== 'filter', active: $ctrl.currentView === 'filter'}", ng-click="$ctrl.setView('filter')") Filter
     .nav-element.nav-link.push-down(ng-class="{muted: $ctrl.currentView !== 'active', active: $ctrl.currentView === 'active'}", ng-click="$ctrl.setView('active')") Active
-  .nav-element.search(ng-hide="$ctrl.currentView==='sources'")
-    input.search-bar
+  .nav-element.search-container(ng-hide="$ctrl.currentView==='sources'")
+    input.search-bar(placeholder="Search")
+    img.search-image(src="./app/images/nav_bar/search.svg" width="12px" height="auto")
   .nav-element.bibliography-link
     img.bib-icon(src="./app/images/nav_bar/bibliography.svg")
   span.usage(ng-hide="$ctrl.currentView==='sources'")

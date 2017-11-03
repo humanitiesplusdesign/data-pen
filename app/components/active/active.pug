@@ -3,9 +3,9 @@
 .main-canvas(ng-style="$ctrl.canvasWidthStyle()")
   .control-area
     button.btn.btn-circle.btn-lg
-      img.btn-icon(src="./app/images/active/view-options.svg")
+      img.btn-icon.view-options(src="./app/images/active/view_options.svg")
     button.btn.btn-circle.btn-lg
-      img.btn-icon(src="./app/images/active/snapshot.svg")
+      img.btn-icon.snapshot(src="./app/images/active/snapshot.svg")
   svg.main-svg
     g.main-g
       rect.main-background
@@ -19,7 +19,8 @@
       .spinner(ng-if="loadingSearchResults")
     input.form-control(type="text" ng-model="$ctrl.nodeSearchSelected" placeholder="Search" uib-typeahead="result.description for result in $ctrl.nodeSearchResults($viewValue)" typeahead-loading="loadingSearchResults" typeahead-no-results="noResults" typeahead-on-select="$ctrl.nodeSearchSelect($item, $model, $label, $event)" typeahead-wait-ms="200")
     .input-group-addon.addon-right(ng-click="$ctrl.nodeSearchRemove()")
-      i.glyphicon.glyphicon-remove
+      //-i.glyphicon.glyphicon-remove
+      img.dismiss-icon(src="./app/images/filter/remove.svg")
   .no-results(ng-show="noResults")
     label No Results Found
 #circle-menu.circle-menu

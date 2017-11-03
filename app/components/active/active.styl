@@ -23,45 +23,47 @@ active {
     padding-right: 3em
 
     .btn {
-      margin-bottom: 1em
-      box-shadow: 1px 1px 3px #CCC
-      outline: none
-    }
+      width: 46px
+      height: 46px
+      border-radius: 100%
+      padding: 10px 14px
+      margin: 0 0 1em 0
+      background-color: #fff
+      box-shadow: 0px 1px 4px rgba(#000, 0.3)
+      transition: .1s
+      -webkit-transition: .1s
+      -moz-transition: .1s
+      -o-transition: .1s
 
-    .btn-icon {
-      width: 23px
-      height: auto
-      margin-top: -5px
-      margin-left: -3px
-      //margin-left: 1em
-    }
+      &:focus {
+        outline: 0
+      }
 
-    .btn-circle {
-      width: 30px;
-      height: 30px;
-      text-align: center;
-      padding: 6px 0;
-      font-size: 12px;
-      line-height: 1.428571429;
-      border-radius: 15px;
-    }
-    .btn-circle.btn-lg {
-      width: 50px;
-      height: 50px;
-      padding: 10px 16px;
-      text-align: center;
-      font-size: 18px;
-      line-height: 1.33;
-      border-radius: 25px;
-      outline: none;
-    }
-    .btn-circle.btn-xl {
-      width: 70px;
-      height: 70px;
-      padding: 10px 16px;
-      font-size: 24px;
-      line-height: 1.33;
-      border-radius: 35px;
+      &:hover {
+        box-shadow: 0px 1px 6px rgba(#000, 0.4)
+      }
+
+      &:active {
+        background-color: #f5f5f5
+      }
+
+      .btn-icon {
+        opacity: .8
+      }
+
+      .view-options {
+        width: 25px
+        height: auto
+        margin-top: -2px
+        margin-left: -4px
+      }
+
+      .snapshot {
+        width: 20px
+        height: auto
+        margin-top: -2px
+        margin-left: -2px
+      }
     }
   }
 
@@ -135,10 +137,10 @@ active {
     position: absolute
     top: 100px
     left: 100px
-    width: 350px
+    width: 200px
 
     .input-group {
-      width: 350px
+      width: 200px
     }
 
     .custom-popup-wrapper {
@@ -175,8 +177,8 @@ active {
   }
 
   .input-group {
-    border: 1px solid #ccc
-    box-shadow: 0 1px 2px #CCC
+    // border: 1px solid #ccc
+    box-shadow: 0px 1px 4px rgba(#000, 0.3)
     border-radius: 5px
 
     .input-group-addon {
@@ -193,6 +195,15 @@ active {
         border-top-right-radius: 7px
         border-bottom-right-radius: 7px
       }
+    }
+
+    .dismiss-icon {
+      position: absolute;
+      width: 12px
+      height: auto
+      right: 10px
+      top: 11px
+      opacity: .4;
     }
 
     input.form-control {
@@ -229,8 +240,8 @@ active {
         margin-top: -10px
         margin-left: -10px
         border-radius: 50%
-        border: 2px solid rgba(#456ad2, 0.1)
-        border-top-color: #456ad2
+        border: 2px solid rgba(#000, 0.1)
+        border-top-color: rgba(#000, 0.4)
         animation: spinner 1s linear infinite
         z-index: 10
       }
