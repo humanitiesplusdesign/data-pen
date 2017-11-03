@@ -144,8 +144,7 @@ export class ActiveComponentController {
   }
 
   private nodeClick(d: IItemState, groups: SVGCircleElement[]): void {
-    this.menu.show([d.leftOffset, d.topOffset + this.circularMenuTopOffset])
-    console.log(d3.event)
+    this.menu.show([d.leftOffset + (this.state.active.dividerPercent / 100 * window.innerWidth), d.topOffset + this.circularMenuTopOffset])
   }
 
   private appendNode(sel: d3.Selection<SVGGElement, any, HTMLElement, any>, top: number, left: number, clss: string): d3.Selection<SVGGElement, IItemState, Element, {}> {
