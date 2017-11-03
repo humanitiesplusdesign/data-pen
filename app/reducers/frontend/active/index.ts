@@ -1,4 +1,4 @@
-import { ADD_ITEM_TO_CURRENT_LAYOUT, SET_ACTIVE_DIVIDER_PERCENTAGE } from 'actions/active'
+import { ADD_ITEM_TO_CURRENT_LAYOUT, SET_ACTIVE_DIVIDER_PERCENTAGE, CLEAR_ACTIVE_STATE } from 'actions/active'
 
 export type IItemState = {
   id: string,
@@ -25,6 +25,9 @@ let defaultState: IActiveState = {
 
 export default function models(state: IActiveState = defaultState, action): IActiveState {
   switch (action.type) {
+
+    case CLEAR_ACTIVE_STATE:
+      return defaultState
 
     case ADD_ITEM_TO_CURRENT_LAYOUT:
       let newItems: IItemState[] = state.activeLayout.items.slice(0)

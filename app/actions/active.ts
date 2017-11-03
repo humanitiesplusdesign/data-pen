@@ -8,6 +8,7 @@ import { IRootState } from 'reducers'
 
 export const ADD_ITEM_TO_CURRENT_LAYOUT: string = 'ADD_ITEM_TO_CURRENT_LAYOUT'
 export const SET_ACTIVE_DIVIDER_PERCENTAGE: string = 'SET_ACTIVE_DIVIDER_PERCENTAGE'
+export const CLEAR_ACTIVE_STATE: string = 'CLEAR_ACTIVE_STATE'
 
 export interface IAddItemToCurrentLayoutAction extends Action {
   payload: IItemState

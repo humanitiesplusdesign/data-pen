@@ -1,7 +1,7 @@
 import { ILiteral } from '../../../models/rdfjs';
 import { Class } from '../../../services/project-service/data-model';
 import { RemoteEndpointConfiguration } from '../../../services/project-service/remote-endpoint-configuration';
-import { ADD_SOURCE, SET_SOURCE_CLASS_ACTIVE } from '../../../actions/sources';
+import { ADD_SOURCE, CLEAR_SOURCES_STATE, SET_SOURCE_CLASS_ACTIVE } from '../../../actions/sources';
 
 export interface ISourceClassTree {
   [source: string]: {
@@ -36,6 +36,9 @@ let defaultState: ISourcesState = {
 
 export default function models(state: ISourcesState = defaultState, action): ISourcesState {
   switch (action.type) {
+
+    case CLEAR_SOURCES_STATE:
+      return defaultState
 
     case SET_SOURCE_CLASS_ACTIVE:
       return Object.assign({}, state, {
