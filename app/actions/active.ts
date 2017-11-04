@@ -37,6 +37,7 @@ export default {
           }
         })
       })
+
       return Promise.resolve(dispatch({
         type: ADD_ITEM_TO_CURRENT_LAYOUT,
         payload: item

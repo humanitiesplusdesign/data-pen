@@ -1,7 +1,7 @@
 'use strict'
+import { IItemState } from '../../reducers/frontend/active';
 import { AutocompletionResults, Result, SparqlAutocompleteService } from '../../services/sparql-autocomplete-service';
 import { SparqlItemService } from '../../services/sparql-item-service';
-import { IItemState } from 'reducers/frontend/active';
 import * as angular from 'angular';
 import { ProjectService } from 'services/project-service/project-service'
 import { ProjectActionService } from 'actions/project';
@@ -37,10 +37,13 @@ export class ActiveComponentController {
   private menu: any
 
   private nodeSearch: d3.Selection<Element, {}, HTMLElement, any>
+  private tooltip: d3.Selection<HTMLDivElement, {}, HTMLElement, undefined>
   private nodeSearchSelected: string|{}
   private nodeSearchOffsetTop: number
   private nodeSearchOffsetLeft: number
   private unsubscribe: () => void
+
+  private oldActiveLayoutItemState: IItemState[]
 
   /* @ngInject */
   constructor(private projectActionService: ProjectActionService,
@@ -68,6 +71,7 @@ export class ActiveComponentController {
     this.buildCanvas()
 
     this.nodeSearch = d3.select('.node-search')
+    this.tooltip = d3.select('.active-tooltip')
 
     this.menu = cmenu('#circle-menu')
       .config({
@@ -86,6 +90,13 @@ export class ActiveComponentController {
           title: 'T'
         }]
       });
+
+    this.$ngRedux.subscribe(() => {
+      if (this.oldActiveLayoutItemState !== this.state.active.activeLayout.items) {
+        this.oldActiveLayoutItemState = this.state.active.activeLayout.items
+        this.updateCanvas()
+      }
+    })
 
     this.updateCanvas()
   }
@@ -151,6 +162,12 @@ export class ActiveComponentController {
     return ret
   }
 
+  private nodeSearchLabel(res: Result): string {
+    return res ? res.matchedLabel.value === res.prefLabel.value ?
+      res.matchedLabel.value :
+      res.matchedLabel.value + ' (' + res.prefLabel.value + ')' : ''
+  }
+
   private nodeSearchSelect($item: Result, $model, $label, $event): void {
     let item: IItemState = {
       ids: $item.ids,
@@ -170,6 +187,7 @@ export class ActiveComponentController {
   }
 
   private nodeClick(d: IItemState, groups: SVGCircleElement[]): void {
+    this.tooltip.style('visibility', 'hidden')
     this.menu.hide()
     this.menu.show([d.leftOffset + (this.state.active.dividerPercent / 100 * window.innerWidth), d.topOffset + this.circularMenuTopOffset])
   }
@@ -219,6 +237,22 @@ export class ActiveComponentController {
       .classed('node-circle', true)
       .on('click', (d: IItemState, i: number, groups: SVGCircleElement[]) => {
         this.nodeClick(d, groups)
+      })
+      .on('mouseenter', (d: IItemState, i: number, grp: SVGCircleElement[]) => {
+        if (d.item) {
+          this.tooltip.style('top', (grp[i].getBoundingClientRect().top - 5) + 'px')
+            .style('left', (grp[i].getBoundingClientRect().left + 25) + 'px')
+            .style('visibility', 'visible')
+            .text(d.description)
+        } else {
+          this.tooltip.style('top', (grp[i].getBoundingClientRect().top - 5) + 'px')
+          .style('left', (grp[i].getBoundingClientRect().left + 25) + 'px')
+          .style('visibility', 'visible')
+          .text('Loading...')
+        }
+      })
+      .on('mouseout', (d: IItemState, i: number) => {
+        this.tooltip.style('visibility', 'hidden')
       })
 
     itemSelection = itemSelection.merge(enterSel)
