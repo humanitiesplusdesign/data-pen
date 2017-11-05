@@ -71,7 +71,8 @@ export class ActiveComponentController {
         backgroundHover: '#DDDDDD',
         diameter: 150,
         menus: [{
-          title: 'E'
+          //title: 'E',
+          icon: "expand-icon"
         }, {
           title: 'C'
         }, {
