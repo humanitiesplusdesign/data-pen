@@ -75,20 +75,19 @@ export class ActiveComponentController {
 
     this.menu = cmenu('#circle-menu')
       .config({
-        background: '#FFFFFF',
-        backgroundHover: '#DDDDDD',
-        diameter: 150,
+        background: '#ffffff',
+        backgroundHover: '#fafafa',
+        diameter: 160,
         menus: [{
-          //title: 'E',
+          icon: "ghost-icon"
+        }, {
+          icon: "properties-icon"
+        }, {
           icon: "expand-icon"
         }, {
-          title: 'C'
+          icon: "reconcile-icon"
         }, {
-          title: 'D'
-        }, {
-          title: '?'
-        }, {
-          title: 'T'
+          icon: "remove-icon"
         }]
       });
 
