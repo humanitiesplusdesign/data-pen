@@ -1,9 +1,12 @@
 'use strict'
+import { IActiveActions } from '../../actions/active';
 import { ItemsService } from 'services/items-service'
-import * as angular from 'angular'
+import * as angular from 'angular';
 import { ProjectService } from 'services/project-service/project-service'
 import { ProjectActionService } from 'actions/project'
 import { INgRedux } from 'ng-redux'
+import * as FilterActions from '../../actions/filter';
+import ActiveActions from 'actions/active';
 
 export class ProjectComponentController {
 
@@ -18,8 +21,12 @@ export class ProjectComponentController {
               private $ngRedux: INgRedux,
               private $document: angular.IDocumentService) {
     let unsub1: () => void = $ngRedux.connect(this.mapProjectToActions, null)(this.actions)
+    let unsub2: () => void = $ngRedux.connect(this.mapFilterToActions, FilterActions)(this.actions)
+    let unsub3: () => void = $ngRedux.connect(this.mapActiveToActions, ActiveActions)(this.actions)
     this.actions.unsubscribe = () => {
       unsub1()
+      unsub2()
+      unsub3()
     }
 
     // Put the project from $stateParams onto the state
@@ -37,6 +44,36 @@ export class ProjectComponentController {
     itemsService.getFilteredItemsCount().then((count) => this.projectActionService.setFilteredItemCount(count))
   }
 
+  public $postLink(): void {
+    let setView: any = this.setView.bind(this)
+    let setFilterDividerPercentage: any = this.actions.setFilterDividerPercentage.bind(this)
+    let setActiveDividerPercentage: IActiveActions['setActiveDividerPercentage'] = this.actions.setActiveDividerPercentage.bind(this)
+    let ctrl: ProjectComponentController = this
+    this.$document.bind('keydown', function (e: JQueryEventObject): void {
+      if (e.ctrlKey && e.keyCode === 84) {
+        if (ctrl.$stateParams.view === 'filter') { setFilterDividerPercentage(100) }
+        else  { setActiveDividerPercentage(100) }
+      } else if (e.ctrlKey && e.keyCode === 71) {
+        if (ctrl.$stateParams.view === 'filter') { setFilterDividerPercentage(0) }
+        else { setActiveDividerPercentage(0) }
+      } else if (e.ctrlKey && e.keyCode === 72) {
+        if (ctrl.$stateParams.view === 'filter') { setFilterDividerPercentage(50) }
+        else { setActiveDividerPercentage(50) }
+      } else if (e.ctrlKey && e.keyCode === 49) {
+        setView('sources')
+      } else if (e.ctrlKey && e.keyCode === 50) {
+        setView('filter')
+      } else if (e.ctrlKey && e.keyCode === 51) {
+        setView('active')
+      }
+    });
+  }
+
+  public $onDestroy(): void {
+    console.log('DESTROYING')
+    this.$document.detach('keydown')
+  }
+
   private setView(newView: string): void {
     this.$state.go('project', { view: newView })
   }
@@ -49,24 +86,24 @@ export class ProjectComponentController {
         0
   }
 
-	private mapProjectToActions(state: any): any {
-		return {
-			project: state.frontend.project
-		}
-	}
-
-  public $postLink(): void {
-    let setView = this.setView.bind(this)
-    this.$document.bind('keydown', function (e) {
-      if (e.ctrlKey && e.keyCode === 49) {
-        setView('sources')
-      } else if (e.ctrlKey && e.keyCode === 50) {
-        setView('filter')
-      } else if (e.ctrlKey && e.keyCode === 51) {
-        setView('active')
-      }
-    });
+  private mapProjectToActions(state: any): any {
+    return {
+      project: state.frontend.project
+    }
   }
+
+  private mapFilterToActions(state: any): any {
+    return {
+      filter: state.frontend.filter
+    }
+  }
+
+  private mapActiveToActions(state: any): any {
+    return {
+      active: state.frontend.active
+    }
+  }
+
 }
 
 export class ProjectComponent implements angular.IComponentOptions {

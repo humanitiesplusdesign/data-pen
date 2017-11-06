@@ -36,6 +36,7 @@ export class ActiveComponentController {
   private currentlyAdding: boolean = false
 
   private menu: any
+  private propertiesMenu: any
 
   private nodeSearch: d3.Selection<Element, {}, HTMLElement, any>
   private tooltip: d3.Selection<HTMLDivElement, {}, HTMLElement, undefined>
@@ -46,6 +47,9 @@ export class ActiveComponentController {
 
   private dragOrigX: number
   private dragOrigY: number
+
+  private currentMenuCenterX: number
+  private currentMenuCenterY: number
 
   private oldActiveLayoutItemState: IItemState[]
 
@@ -78,23 +82,43 @@ export class ActiveComponentController {
     this.nodeSearch = d3.select('.node-search')
     this.tooltip = d3.select('.active-tooltip')
 
-    this.menu = cmenu('#circle-menu')
-      .config({
-        background: '#ffffff',
-        backgroundHover: '#fafafa',
-        diameter: 160,
-        menus: [{
-          icon: 'ghost-icon'
-        }, {
-          icon: 'properties-icon'
-        }, {
-          icon: 'expand-icon'
-        }, {
-          icon: 'reconcile-icon'
-        }, {
-          icon: 'remove-icon'
-        }]
-      });
+    this.propertiesMenu = cmenu('#properties-menu').config({
+      background: '#ffffff',
+      backgroundHover: '#fafafa',
+      diameter: 160,
+      menus: [{
+        title: 'Pe'
+      }, {
+        title: 'Pl'
+      }, {
+        title: 'Ab'
+      }, {
+        title: 'Cd'
+      }, {
+        title: 'Ef'
+      }]
+    })
+
+    this.menu = cmenu('#circle-menu').config({
+      background: '#ffffff',
+      backgroundHover: '#fafafa',
+      diameter: 160,
+      menus: [{
+        icon: 'ghost-icon'
+      }, {
+        icon: 'properties-icon'
+      }, {
+        icon: 'expand-icon',
+        click: () => {
+          this.propertiesMenu.hide()
+          this.propertiesMenu.show([this.currentMenuCenterX, this.currentMenuCenterY])
+        }
+      }, {
+        icon: 'reconcile-icon'
+      }, {
+        icon: 'remove-icon'
+      }]
+    })
 
     this.$ngRedux.subscribe(() => {
       if (this.oldActiveLayoutItemState !== this.state.active.activeLayout.items) {
@@ -104,18 +128,6 @@ export class ActiveComponentController {
     })
 
     this.updateCanvas()
-
-    let setActiveDividerPercentage: IActiveActions['setActiveDividerPercentage'] = this.state.setActiveDividerPercentage.bind(this)
-    this.$document.bind('keydown', function (e: JQueryEventObject): void {
-      // console.log(e.keyCode) //t=84, g=71, h=72
-      if (e.ctrlKey && e.keyCode === 84) {
-        setActiveDividerPercentage(100)
-      } else if (e.ctrlKey && e.keyCode === 71) {
-        setActiveDividerPercentage(0)
-      } else if (e.ctrlKey && e.keyCode === 72) {
-        setActiveDividerPercentage(50)
-      }
-    });
   }
 
   private buildCanvas(): void {
@@ -132,6 +144,7 @@ export class ActiveComponentController {
   private canvasClick(sel: d3.Selection<SVGGElement, {}, HTMLElement, any>): void {
     this.$scope.$apply(() => {
       this.menu.hide()
+      this.propertiesMenu.hide()
 
       if (!this.currentlyAdding) {
         this.nodeSearchOffsetTop = d3.event.offsetY
@@ -172,7 +185,8 @@ export class ActiveComponentController {
     res.remoteResults.forEach(l => l.results.forEach(r => {
       if (activeItemIds.indexOf(r.ids[0].value) === -1
         && r.additionalInformation.type && r.additionalInformation.type[0]
-        && r.datasources.reduce((p, c) => this.$ngRedux.getState().frontend.sources.sourceClassToggle[c] && this.$ngRedux.getState().frontend.sources.sourceClassToggle[c][r.additionalInformation.type[0].value], false)) {
+        // Class filter (TODO: Move server-side)
+        && r.datasources.reduce((p, c) => this.$ngRedux.getState().frontend.sources.sourceClassToggle[c] && this.$ngRedux.getState().frontend.sources.sourceClassToggle[c][r.additionalInformation.type[0].value], false) ) {
           r.additionalInformation.typeDescriptions = this.state.project.project.dataModel.classMap.get(r.additionalInformation.type[0].value).labels
           ret.push(r)
         }
@@ -205,9 +219,12 @@ export class ActiveComponentController {
   }
 
   private nodeClick(d: IItemState, groups: SVGCircleElement[]): void {
+    this.currentMenuCenterX = d.leftOffset + (this.state.active.dividerPercent / 100 * window.innerWidth)
+    this.currentMenuCenterY = d.topOffset + this.circularMenuTopOffset
     this.tooltip.style('visibility', 'hidden')
     this.menu.hide()
-    this.menu.show([d.leftOffset + (this.state.active.dividerPercent / 100 * window.innerWidth), d.topOffset + this.circularMenuTopOffset])
+    this.propertiesMenu.hide()
+    this.menu.show([this.currentMenuCenterX, this.currentMenuCenterY])
   }
 
   private appendNode(sel: d3.Selection<SVGGElement, any, HTMLElement, any>, top: number, left: number, clss: string): d3.Selection<SVGGElement, IItemState, Element, {}> {
@@ -328,6 +345,7 @@ export class ActiveComponentController {
 
   private dragDivider(evt: DragEvent): void {
     this.menu.hide()
+    this.propertiesMenu.hide()
     let nativePercent: number = 100 * evt.clientX / window.innerWidth
     this.state.setActiveDividerPercentage(nativePercent > 98 ? 100 : nativePercent < 2 ? 0 : nativePercent)
   }

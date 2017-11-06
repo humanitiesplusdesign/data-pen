@@ -74,20 +74,6 @@ export class FilterComponentController {
     })
   }
 
-  public $postLink(): void {
-    let setFilterDividerPercentage: any = this.actions.setFilterDividerPercentage.bind(this)
-    this.$document.bind('keydown', function (e: JQueryEventObject): void {
-      // console.log(e.keyCode) //t=84, g=71, h=72
-      if (e.ctrlKey && e.keyCode === 84) {
-        setFilterDividerPercentage(100)
-      } else if (e.ctrlKey && e.keyCode === 71) {
-        setFilterDividerPercentage(0)
-      } else if (e.ctrlKey && e.keyCode === 72) {
-        setFilterDividerPercentage(50)
-      }
-    });
-  }
-
   private addFilter(clss: Class, prop: Property): void {
     this.actions.setFilter(clss, prop)
   }
