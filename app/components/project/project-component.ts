@@ -10,19 +10,6 @@ export class ProjectComponentController {
 	private actions: any = {}
 	private currentView: string = 'sources'
 
-  public $postLink(): void {
-    let setView = this.setView.bind(this)
-    this.$document.bind('keydown', function (e) {
-      if (e.ctrlKey && e.keyCode === 49) {
-        setView('sources')
-      } else if (e.ctrlKey && e.keyCode === 50) {
-        setView('filter')
-      } else if (e.ctrlKey && e.keyCode === 51) {
-        setView('active')
-      }
-    });
-  }
-
   /* @ngInject */
   constructor(private projectActionService: ProjectActionService,
               private itemsService: ItemsService,
@@ -67,6 +54,19 @@ export class ProjectComponentController {
 			project: state.frontend.project
 		}
 	}
+
+  public $postLink(): void {
+    let setView = this.setView.bind(this)
+    this.$document.bind('keydown', function (e) {
+      if (e.ctrlKey && e.keyCode === 49) {
+        setView('sources')
+      } else if (e.ctrlKey && e.keyCode === 50) {
+        setView('filter')
+      } else if (e.ctrlKey && e.keyCode === 51) {
+        setView('active')
+      }
+    });
+  }
 }
 
 export class ProjectComponent implements angular.IComponentOptions {
