@@ -86,6 +86,18 @@ export class ActiveComponentController {
       });
 
     this.updateCanvas()
+
+    let setActiveDividerPercentage = this.state.setActiveDividerPercentage.bind(this)
+    this.$document.bind('keydown', function (e) {
+      // console.log(e.keyCode) //t=84, g=71, h=72
+      if (e.ctrlKey && e.keyCode === 84) {
+        setActiveDividerPercentage(100)
+      } else if (e.ctrlKey && e.keyCode === 71) {
+        setActiveDividerPercentage(0)
+      } else if (e.ctrlKey && e.keyCode === 72) {
+        setActiveDividerPercentage(50)
+      }
+    });
   }
 
   private buildCanvas(): void {
@@ -244,20 +256,6 @@ export class ActiveComponentController {
   private dragTabLeftStyle(): {} {
     return { 'left': this.state.active.dividerPercent + '%' }
   }
-
-  // public $postLink(): void {
-  //   let setActiveDividerPercentage = this.state.setActiveDividerPercentage.bind(this)
-  //   this.$document.bind('keydown', function (e) {
-  //     // console.log(e.keyCode) //t=84, g=71, h=72
-  //     if (e.ctrlKey && e.keyCode === 84) {
-  //       setActiveDividerPercentage(100)
-  //     } else if (e.ctrlKey && e.keyCode === 71) {
-  //       setActiveDividerPercentage(0)
-  //     } else if (e.ctrlKey && e.keyCode === 72) {
-  //       setActiveDividerPercentage(50)
-  //     }
-  //   });
-  // }
 }
 
 export class ActiveComponent implements angular.IComponentOptions {
