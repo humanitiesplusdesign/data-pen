@@ -34,7 +34,8 @@ export class FilterComponentController {
               private itemsService: ItemsService,
               private $scope: angular.IScope,
               private $q: angular.IQService,
-              private $ngRedux: INgRedux) {
+              private $ngRedux: INgRedux,
+              private $document: angular.IDocumentService) {
     let unsub1: () => void = $ngRedux.connect(this.mapProjectToActions, ProjectActions)(this.actions)
     let unsub2: () => void = $ngRedux.connect(this.mapFilterToActions, FilterActions)(this.actions)
 
@@ -97,6 +98,20 @@ export class FilterComponentController {
 
   private dragTabLeftStyle(): {} {
     return { 'left': this.actions.filter.dividerPercent + '%' }
+  }
+
+  public $postLink(): void {
+    let setFilterDividerPercentage = this.actions.setFilterDividerPercentage.bind(this)
+    this.$document.bind('keydown', function (e) {
+      // console.log(e.keyCode) //t=84, g=71, h=72
+      if (e.ctrlKey && e.keyCode === 84) {
+        setFilterDividerPercentage(100)
+      } else if (e.ctrlKey && e.keyCode === 71) {
+        setFilterDividerPercentage(0)
+      } else if (e.ctrlKey && e.keyCode === 72) {
+        setFilterDividerPercentage(50)
+      }
+    });
   }
 }
 

@@ -1,4 +1,5 @@
 'use strict'
+import { CNode, NamedNode } from '../../models/rdf';
 import { IItemState } from '../../reducers/frontend/active';
 import { AutocompletionResults, Result, SparqlAutocompleteService } from '../../services/sparql-autocomplete-service';
 import { SparqlItemService } from '../../services/sparql-item-service';
@@ -43,6 +44,9 @@ export class ActiveComponentController {
   private nodeSearchOffsetLeft: number
   private unsubscribe: () => void
 
+  private dragOrigX: number
+  private dragOrigY: number
+
   private oldActiveLayoutItemState: IItemState[]
 
   /* @ngInject */
@@ -52,7 +56,8 @@ export class ActiveComponentController {
               private $ngRedux: INgRedux,
               private searchService: SearchService,
               private sparqlAutocompleteService: SparqlAutocompleteService,
-              private sparqlItemService: SparqlItemService) {
+              private sparqlItemService: SparqlItemService,
+              private $document: angular.IDocumentService) {
     this.unsubscribe = $ngRedux.connect(
       (state: IRootState) => {
         return {
@@ -99,6 +104,18 @@ export class ActiveComponentController {
     })
 
     this.updateCanvas()
+
+    let setActiveDividerPercentage = this.state.setActiveDividerPercentage.bind(this)
+    this.$document.bind('keydown', function (e) {
+      // console.log(e.keyCode) //t=84, g=71, h=72
+      if (e.ctrlKey && e.keyCode === 84) {
+        setActiveDividerPercentage(100)
+      } else if (e.ctrlKey && e.keyCode === 71) {
+        setActiveDividerPercentage(0)
+      } else if (e.ctrlKey && e.keyCode === 72) {
+        setActiveDividerPercentage(50)
+      }
+    });
   }
 
   private buildCanvas(): void {
@@ -156,6 +173,7 @@ export class ActiveComponentController {
       if (activeItemIds.indexOf(r.ids[0].value) === -1
         && r.additionalInformation.type && r.additionalInformation.type[0]
         && r.datasources.reduce((p, c) => this.$ngRedux.getState().frontend.sources.sourceClassToggle[c] && this.$ngRedux.getState().frontend.sources.sourceClassToggle[c][r.additionalInformation.type[0].value], false)) {
+          r.additionalInformation.typeDescriptions = this.state.project.project.dataModel.classMap.get(r.additionalInformation.type[0].value).labels //[new CNode('Pe', 'Literal')]
           ret.push(r)
         }
     }))
@@ -163,6 +181,7 @@ export class ActiveComponentController {
   }
 
   private nodeSearchLabel(res: Result): string {
+    console.log(res)
     return res ? res.matchedLabel.value === res.prefLabel.value ?
       res.matchedLabel.value :
       res.matchedLabel.value + ' (' + res.prefLabel.value + ')' : ''
@@ -239,12 +258,12 @@ export class ActiveComponentController {
         this.nodeClick(d, groups)
       })
       .on('mouseenter', (d: IItemState, i: number, grp: SVGCircleElement[]) => {
-        if (d.item) {
+        if (d.item && !this.dragOrigX) {
           this.tooltip.style('top', (grp[i].getBoundingClientRect().top - 5) + 'px')
             .style('left', (grp[i].getBoundingClientRect().left + 25) + 'px')
             .style('visibility', 'visible')
             .text(d.description)
-        } else {
+        } else if (!this.dragOrigX) {
           this.tooltip.style('top', (grp[i].getBoundingClientRect().top - 5) + 'px')
           .style('left', (grp[i].getBoundingClientRect().left + 25) + 'px')
           .style('visibility', 'visible')
@@ -254,6 +273,28 @@ export class ActiveComponentController {
       .on('mouseout', (d: IItemState, i: number) => {
         this.tooltip.style('visibility', 'hidden')
       })
+      .call(d3.drag()
+        .on('start', (d: IItemState, i: number) => {
+          this.tooltip.style('visibility', 'hidden')
+          this.dragOrigX = d.leftOffset
+          this.dragOrigY = d.topOffset
+        })
+        .on('drag', (d: IItemState, i: number, group) => {
+          // TODO: implement change to offsets using actions and reducers
+          d.leftOffset = d3.event.x + this.dragOrigX
+          d.topOffset = d3.event.y + this.dragOrigY
+          this.dragOrigX = d.leftOffset
+          this.dragOrigY = d.topOffset
+          this.updateCanvas()
+        })
+        .on('end',  (d: IItemState, i: number, group) => {
+          // TODO: implement change to offsets using actions and reducers
+          d.leftOffset = d3.event.x + this.dragOrigX
+          d.topOffset = d3.event.y + this.dragOrigY
+          this.dragOrigX = null
+          this.dragOrigY = null
+          this.updateCanvas()
+        }))
 
     itemSelection = itemSelection.merge(enterSel)
 
