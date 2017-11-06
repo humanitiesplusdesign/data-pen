@@ -10,22 +10,6 @@ export class ProjectComponentController {
   private actions: any = {}
   private currentView: string = 'sources'
 
-<<<<<<< HEAD
-=======
-  public $postLink(): void {
-    let setView: any = this.setView.bind(this)
-    this.$document.bind('keydown', (e: JQueryEventObject): void => {
-      if (e.ctrlKey && e.keyCode === 49) {
-        setView('sources')
-      } else if (e.ctrlKey && e.keyCode === 50) {
-        setView('filter')
-      } else if (e.ctrlKey && e.keyCode === 51) {
-        setView('active')
-      }
-    });
-  }
-
->>>>>>> master
   /* @ngInject */
   constructor(private projectActionService: ProjectActionService,
               private itemsService: ItemsService,
@@ -65,7 +49,6 @@ export class ProjectComponentController {
         0
   }
 
-<<<<<<< HEAD
 	private mapProjectToActions(state: any): any {
 		return {
 			project: state.frontend.project
@@ -83,12 +66,6 @@ export class ProjectComponentController {
         setView('active')
       }
     });
-=======
-  private mapProjectToActions(state: any): any {
-    return {
-      project: state.frontend.project
-    }
->>>>>>> master
   }
 }
 

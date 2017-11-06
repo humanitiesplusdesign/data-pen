@@ -53,7 +53,7 @@ export class ActiveComponentController {
               private $ngRedux: INgRedux,
               private searchService: SearchService,
               private sparqlAutocompleteService: SparqlAutocompleteService,
-              private sparqlItemService: SparqlItemService
+              private sparqlItemService: SparqlItemService,
               private $document: angular.IDocumentService) {
     this.unsubscribe = $ngRedux.connect(
       (state: IRootState) => {
