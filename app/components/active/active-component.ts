@@ -84,15 +84,15 @@ export class ActiveComponentController {
         backgroundHover: '#fafafa',
         diameter: 160,
         menus: [{
-          icon: "ghost-icon"
+          icon: 'ghost-icon'
         }, {
-          icon: "properties-icon"
+          icon: 'properties-icon'
         }, {
-          icon: "expand-icon"
+          icon: 'expand-icon'
         }, {
-          icon: "reconcile-icon"
+          icon: 'reconcile-icon'
         }, {
-          icon: "remove-icon"
+          icon: 'remove-icon'
         }]
       });
 
@@ -105,8 +105,8 @@ export class ActiveComponentController {
 
     this.updateCanvas()
 
-    let setActiveDividerPercentage = this.state.setActiveDividerPercentage.bind(this)
-    this.$document.bind('keydown', function (e) {
+    let setActiveDividerPercentage: IActiveActions['setActiveDividerPercentage'] = this.state.setActiveDividerPercentage.bind(this)
+    this.$document.bind('keydown', function (e: JQueryEventObject): void {
       // console.log(e.keyCode) //t=84, g=71, h=72
       if (e.ctrlKey && e.keyCode === 84) {
         setActiveDividerPercentage(100)
@@ -173,7 +173,7 @@ export class ActiveComponentController {
       if (activeItemIds.indexOf(r.ids[0].value) === -1
         && r.additionalInformation.type && r.additionalInformation.type[0]
         && r.datasources.reduce((p, c) => this.$ngRedux.getState().frontend.sources.sourceClassToggle[c] && this.$ngRedux.getState().frontend.sources.sourceClassToggle[c][r.additionalInformation.type[0].value], false)) {
-          r.additionalInformation.typeDescriptions = this.state.project.project.dataModel.classMap.get(r.additionalInformation.type[0].value).labels //[new CNode('Pe', 'Literal')]
+          r.additionalInformation.typeDescriptions = this.state.project.project.dataModel.classMap.get(r.additionalInformation.type[0].value).labels
           ret.push(r)
         }
     }))
@@ -181,7 +181,6 @@ export class ActiveComponentController {
   }
 
   private nodeSearchLabel(res: Result): string {
-    console.log(res)
     return res ? res.matchedLabel.value === res.prefLabel.value ?
       res.matchedLabel.value :
       res.matchedLabel.value + ' (' + res.prefLabel.value + ')' : ''
@@ -328,6 +327,7 @@ export class ActiveComponentController {
   }
 
   private dragDivider(evt: DragEvent): void {
+    this.menu.hide()
     let nativePercent: number = 100 * evt.clientX / window.innerWidth
     this.state.setActiveDividerPercentage(nativePercent > 98 ? 100 : nativePercent < 2 ? 0 : nativePercent)
   }
