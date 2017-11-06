@@ -1,4 +1,5 @@
 'use strict'
+import { CNode, NamedNode } from '../../models/rdf';
 import { IItemState } from '../../reducers/frontend/active';
 import { AutocompletionResults, Result, SparqlAutocompleteService } from '../../services/sparql-autocomplete-service';
 import { SparqlItemService } from '../../services/sparql-item-service';
@@ -156,6 +157,7 @@ export class ActiveComponentController {
       if (activeItemIds.indexOf(r.ids[0].value) === -1
         && r.additionalInformation.type && r.additionalInformation.type[0]
         && r.datasources.reduce((p, c) => this.$ngRedux.getState().frontend.sources.sourceClassToggle[c] && this.$ngRedux.getState().frontend.sources.sourceClassToggle[c][r.additionalInformation.type[0].value], false)) {
+          r.additionalInformation.typeDescriptions = this.state.project.project.dataModel.classMap.get(r.additionalInformation.type[0].value).labels //[new CNode('Pe', 'Literal')]
           ret.push(r)
         }
     }))
@@ -163,6 +165,7 @@ export class ActiveComponentController {
   }
 
   private nodeSearchLabel(res: Result): string {
+    console.log(res)
     return res ? res.matchedLabel.value === res.prefLabel.value ?
       res.matchedLabel.value :
       res.matchedLabel.value + ' (' + res.prefLabel.value + ')' : ''

@@ -17,7 +17,7 @@
     .input-group-addon.addon-left
       i.glyphicon.glyphicon-search(ng-hide="loadingSearchResults")
       .spinner(ng-if="loadingSearchResults")
-    input.form-control(type="text" ng-model="$ctrl.nodeSearchSelected" placeholder="Search" uib-typeahead="$ctrl.nodeSearchLabel(result) for result in $ctrl.nodeSearchResults($viewValue)" typeahead-loading="loadingSearchResults" typeahead-no-results="noResults" typeahead-on-select="$ctrl.nodeSearchSelect($item, $model, $label, $event)" typeahead-wait-ms="200")
+    input.form-control(type="text" ng-model="$ctrl.nodeSearchSelected" placeholder="Search" uib-typeahead="result as $ctrl.nodeSearchLabel(result) for result in $ctrl.nodeSearchResults($viewValue)" typeahead-template-url="resultTemplate.html" typeahead-loading="loadingSearchResults" typeahead-no-results="noResults" typeahead-on-select="$ctrl.nodeSearchSelect($item, $model, $label, $event)" typeahead-wait-ms="200")
     .input-group-addon.addon-right(ng-click="$ctrl.nodeSearchRemove()")
       //-i.glyphicon.glyphicon-remove
       img.dismiss-icon(src="./app/images/filter/remove.svg")
@@ -25,3 +25,7 @@
     label No Results Found
 #circle-menu.circle-menu
 .active-tooltip
+script(type="text/ng-template" id="resultTemplate.html")
+  a
+    span [{{ match.model.additionalInformation.typeDescriptions | prefLang }}]&nbsp;
+    span {{ match.label }}
