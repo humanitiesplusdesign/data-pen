@@ -1,7 +1,8 @@
 'use strict'
+import { IActiveActions } from '../../actions/active';
 import { ISourcesState } from '../../reducers/frontend/sources';
 import { ProjectState } from '../../reducers/frontend/project';
-import { IFilterState } from '../../reducers/frontend/filter';
+import { IClassFilterTree, IFilterState } from '../../reducers/frontend/filter';
 import { IRootState } from '../../reducers';
 import { Class, Property } from '../../services/project-service/data-model';
 import { ItemsService } from '../../services/items-service';
@@ -28,6 +29,7 @@ export class FilterComponentController {
   private state: IFilterComponentControllerState = <IFilterComponentControllerState>{}
   private allItems: {}[] = []
   private selectedClass: Class
+  private localFilterTree: IClassFilterTree
 
   /* @ngInject */
   constructor(private projectService: ProjectService,
@@ -58,10 +60,44 @@ export class FilterComponentController {
     })
 
     this.selectedClass = this.getActiveClasses()[0]
+
+    this.localFilterTree = angular.copy(this.state.filter.filtersByClass)
+
+    let oldFilterTree: IClassFilterTree = this.state.filter.filtersByClass
+
+    // Because we need to keep a local copy of the state to mutate, we have to observe it for changes.
+    $ngRedux.subscribe(() => {
+      if (this.state.filter.filtersByClass !== oldFilterTree) {
+        this.localFilterTree = angular.copy(this.state.filter.filtersByClass)
+        oldFilterTree = this.state.filter.filtersByClass
+      }
+    })
+  }
+
+  public $postLink(): void {
+    let setFilterDividerPercentage: any = this.actions.setFilterDividerPercentage.bind(this)
+    this.$document.bind('keydown', function (e: JQueryEventObject): void {
+      // console.log(e.keyCode) //t=84, g=71, h=72
+      if (e.ctrlKey && e.keyCode === 84) {
+        setFilterDividerPercentage(100)
+      } else if (e.ctrlKey && e.keyCode === 71) {
+        setFilterDividerPercentage(0)
+      } else if (e.ctrlKey && e.keyCode === 72) {
+        setFilterDividerPercentage(50)
+      }
+    });
   }
 
   private addFilter(clss: Class, prop: Property): void {
     this.actions.setFilter(clss, prop)
+  }
+
+  private removeFilter(clss: Class, prop: Property): void {
+    this.actions.removeFilter(clss, prop)
+  }
+
+  private setFilterSelection(clss: Class, prop: Property, id: string, low: number, high: number): void {
+    this.actions.setFilterSelection(clss, prop, [low, high])
   }
 
   private getActiveClasses(): Class[] {
@@ -98,20 +134,6 @@ export class FilterComponentController {
 
   private dragTabLeftStyle(): {} {
     return { 'left': this.actions.filter.dividerPercent + '%' }
-  }
-
-  public $postLink(): void {
-    let setFilterDividerPercentage = this.actions.setFilterDividerPercentage.bind(this)
-    this.$document.bind('keydown', function (e) {
-      // console.log(e.keyCode) //t=84, g=71, h=72
-      if (e.ctrlKey && e.keyCode === 84) {
-        setFilterDividerPercentage(100)
-      } else if (e.ctrlKey && e.keyCode === 71) {
-        setFilterDividerPercentage(0)
-      } else if (e.ctrlKey && e.keyCode === 72) {
-        setFilterDividerPercentage(50)
-      }
-    });
   }
 }
 

@@ -16,12 +16,12 @@
         li(ng-repeat="prop in clss.properties")
           a(ng-click="$ctrl.addFilter(clss, prop)") {{ prop.labels | prefLang }}
     hr
-    .filter(ng-repeat="(propId, filter) in $ctrl.state.filter.filtersByClass[clss.id.value]" ng-init="slideMin = filter.domain[0]; slideMax=filter.domain[1]; slideOptions={ floor: filter.selection[0], ceil: filter.selection[1], draggableRange: true, showTicks: filter.domain[1]/10, showTicksValues: true }")
+    .filter(ng-repeat="(propId, filter) in $ctrl.localFilterTree[clss.id.value]" ng-init="slideMin = filter.domain[0]; slideMax=filter.domain[1]; slideOptions={ floor: filter.selection[0], ceil: filter.selection[1], draggableRange: true, showTicks: filter.domain[1]/10, showTicksValues: true, onEnd: $ctrl.setFilterSelection.bind($ctrl, filter.clss, filter.prop) }")
       .filter-header
         .filter-title {{ filter.description }}: {{ $ctrl.state.project.project.dataModel.propertyMap.s[propId].labels | prefLang }}
         .filter-controls
           img.minimise-filter(src="./app/images/filter/minimise.svg")
-          img.remove-filter(src="./app/images/filter/remove.svg")
+          img.remove-filter(src="./app/images/filter/remove.svg", ng-click="$ctrl.removeFilter(filter.clss, filter.prop)")
       div.filter-box
         rzslider(rz-slider-model="slideMin", rz-slider-high="slideMax", rz-slider-options="slideOptions")
 .draggable-divider(drag-container="true" on-drag-end="dragging = false; $ctrl.dragDivider($event)" ng-style="$ctrl.dragTabLeftStyle()")
