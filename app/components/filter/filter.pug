@@ -25,4 +25,4 @@
       div.filter-box
         rzslider(rz-slider-model="slideMin", rz-slider-high="slideMax", rz-slider-options="slideOptions")
 .draggable-divider(drag-container="true" on-drag-end="dragging = false; $ctrl.dragDivider($event)" ng-style="$ctrl.dragTabLeftStyle()")
-  .drag-tab
+  .drag-tab(ng-hide="$ctrl.actions.filter.dividerPercent > 2 && $ctrl.actions.filter.dividerPercent < 98")
