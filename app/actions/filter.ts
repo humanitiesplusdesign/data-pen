@@ -3,6 +3,7 @@ import {Action} from '../models/action'
 
 export const SET_FILTER_DIVIDER_PERCENTAGE: string = 'SET_FILTER_DIVIDER_PERCENTAGE'
 export const SET_FILTER_FOR_CLASS_AND_PROP: string = 'SET_FILTER_FOR_CLASS_AND_PROP'
+export const CLEAR_FILTER_STATE: string = 'CLEAR_FILTER_STATE'
 
 export function setFilterDividerPercentage(percent: number): any {
   return dispatch => {

@@ -1,5 +1,5 @@
 import { Property } from '../../../services/project-service/data-model';
-import { SET_FILTER_DIVIDER_PERCENTAGE, SET_FILTER_FOR_CLASS_AND_PROP } from '../../../actions/filter'
+import { CLEAR_FILTER_STATE, SET_FILTER_DIVIDER_PERCENTAGE, SET_FILTER_FOR_CLASS_AND_PROP } from '../../../actions/filter';
 
 export interface IFilter {
   type: string
@@ -26,6 +26,9 @@ let defaultState: IFilterState = {
 
 export default function models(state: IFilterState = defaultState, action): IFilterState {
   switch (action.type) {
+
+    case CLEAR_FILTER_STATE:
+      return defaultState
 
     case SET_FILTER_DIVIDER_PERCENTAGE:
       return Object.assign({}, state, {

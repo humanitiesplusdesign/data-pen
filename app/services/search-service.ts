@@ -35,8 +35,7 @@ export class SearchService {
   }
 
   private processResults(res: AutocompletionResults): AutocompletionResult[] {
-    console.log(res)
-    let activeItemIds: string[] = this.$ngRedux.getState().frontend.active.activeLayout.items.map((d: IItemState) => d.id)
+    let activeItemIds: string[] = this.$ngRedux.getState().frontend.active.activeLayout.items.map((d: IItemState) => d.ids).reduce((a, b) => a.concat(b), [])
     let ret: AutocompletionResult[] = []
     res.localMatchingResults.forEach(l => l.results.forEach(r => {
       if (activeItemIds.indexOf(r.ids[0].value) === -1) ret.push(new AutocompletionResult(r.ids[0].value, r.matchedLabel.value))

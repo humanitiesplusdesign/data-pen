@@ -1,10 +1,13 @@
+import { CLEAR_FILTER_STATE } from './filter';
+import { CLEAR_ACTIVE_STATE } from './active';
+import { CLEAR_SOURCES_STATE } from './sources';
 import { Action, Dispatch } from 'redux'
 import {ProjectService} from 'services/project-service/project-service'
 import {Project} from 'services/project-service/project'
 import { IRootState } from 'reducers'
 import { INgRedux } from 'ng-redux'
 import SourceActions from './sources'
-import * as angular from 'angular'
+import * as angular from 'angular';
 import { ADD_SOURCE } from './sources'
 
 export const SET_PROJECT: string = 'SET_PROJECT'
@@ -33,6 +36,15 @@ export class ProjectActionService {
   constructor(private $ngRedux: INgRedux, private projectService: ProjectService) {
   }
   public setProject(id: string, sparqlEndpoint: string, graph: string): angular.IPromise<IProjectLoadedAction> {
+    this.$ngRedux.dispatch({
+      type: CLEAR_ACTIVE_STATE
+    })
+    this.$ngRedux.dispatch({
+      type: CLEAR_FILTER_STATE
+    })
+    this.$ngRedux.dispatch({
+      type: CLEAR_SOURCES_STATE
+    })
     return this.projectService.loadProject({ sparqlEndpoint: sparqlEndpoint, graph: graph }, id, true).then(
         project => {
           // TODO: Get the actual sources associated with each endpoint

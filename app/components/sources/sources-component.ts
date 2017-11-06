@@ -1,7 +1,7 @@
 'use strict'
 import { ISourcesActions } from '../../actions/sources';
 import { IRootState } from '../../reducers';
-import { ISourceClassTree, ISourcesState } from '../../reducers/frontend/sources';
+import { ISource, ISourceClassTree, ISourcesState } from '../../reducers/frontend/sources';
 import { ProjectState } from '../../reducers/frontend/project';
 import { IActiveActions } from '../../actions/active';
 import * as angular from 'angular';
@@ -40,6 +40,16 @@ export class SourcesComponentController {
     }
 
     this.localSourceClassTree = angular.copy(this.state.sources.sourceClassToggle)
+
+    let oldSourceClassTree: ISourceClassTree = this.state.sources.sourceClassToggle
+
+    // Because we need to keep a local copy of the state to mutate, we have to observe it for changes.
+    $ngRedux.subscribe(() => {
+      if (this.state.sources.sourceClassToggle !== oldSourceClassTree) {
+        this.localSourceClassTree = angular.copy(this.state.sources.sourceClassToggle)
+        oldSourceClassTree = this.state.sources.sourceClassToggle
+      }
+    })
   }
 
   private getSourceClassStatus(source: string, clss: string): boolean {

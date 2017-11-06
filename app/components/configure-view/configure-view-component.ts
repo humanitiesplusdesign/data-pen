@@ -36,9 +36,7 @@ export class ConfigureViewComponentController implements angular.IComponentContr
     this.project.authorityEndpoints = this.authorities.filter(a => this.selectedAuthorities[a.id])
     this.project.archiveEndpoints = this.archives.filter(a => this.selectedArchives[a.id])
     this.project.schemas = this.schemas.filter(a => this.selectedSchemas[a.id])
-
-    console.log(this.project)
-    this.projectService.saveCitable(this.projectSource.updateEndpoint, this.projectSource.graphStoreEndpoint, this.project).then(() => this.$state.go('project', { id: this.project.id, sparqlEndpoint: this.project.source.sparqlEndpoint, graph: this.project.source.graph}))
+    this.projectService.saveCitable(this.projectSource.updateEndpoint, this.projectSource.graphStoreEndpoint, this.project).then(() => this.$state.go('project', { id: this.project.id, sparqlEndpoint: this.project.source.sparqlEndpoint, graph: this.project.source.graph, view: 'active'}))
   }
 
   public delete(): void {

@@ -5,6 +5,7 @@ import {Action} from '../models/action'
 
 export const SET_SOURCE_CLASS_ACTIVE: string = 'SET_SOURCE_CLASS_ACTIVE'
 export const ADD_SOURCE: string = 'ADD_SOURCE'
+export const CLEAR_SOURCES_STATE: string = 'CLEAR_SOURCES_STATE'
 
 export interface ISetSourceClassActiveAction extends Action {
   payload: {

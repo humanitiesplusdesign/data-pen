@@ -1,5 +1,8 @@
 'use strict'
-import { IItemState } from 'reducers/frontend/active';
+import { CNode, NamedNode } from '../../models/rdf';
+import { IItemState } from '../../reducers/frontend/active';
+import { AutocompletionResults, Result, SparqlAutocompleteService } from '../../services/sparql-autocomplete-service';
+import { SparqlItemService } from '../../services/sparql-item-service';
 import * as angular from 'angular';
 import { ProjectService } from 'services/project-service/project-service'
 import { ProjectActionService } from 'actions/project';
@@ -35,10 +38,13 @@ export class ActiveComponentController {
   private menu: any
 
   private nodeSearch: d3.Selection<Element, {}, HTMLElement, any>
+  private tooltip: d3.Selection<HTMLDivElement, {}, HTMLElement, undefined>
   private nodeSearchSelected: string|{}
   private nodeSearchOffsetTop: number
   private nodeSearchOffsetLeft: number
   private unsubscribe: () => void
+
+  private oldActiveLayoutItemState: IItemState[]
 
   /* @ngInject */
   constructor(private projectActionService: ProjectActionService,
@@ -46,6 +52,8 @@ export class ActiveComponentController {
               private $q: angular.IQService,
               private $ngRedux: INgRedux,
               private searchService: SearchService,
+              private sparqlAutocompleteService: SparqlAutocompleteService,
+              private sparqlItemService: SparqlItemService
               private $document: angular.IDocumentService) {
     this.unsubscribe = $ngRedux.connect(
       (state: IRootState) => {
@@ -65,6 +73,7 @@ export class ActiveComponentController {
     this.buildCanvas()
 
     this.nodeSearch = d3.select('.node-search')
+    this.tooltip = d3.select('.active-tooltip')
 
     this.menu = cmenu('#circle-menu')
       .config({
@@ -84,6 +93,13 @@ export class ActiveComponentController {
           title: 'T'
         }]
       });
+
+    this.$ngRedux.subscribe(() => {
+      if (this.oldActiveLayoutItemState !== this.state.active.activeLayout.items) {
+        this.oldActiveLayoutItemState = this.state.active.activeLayout.items
+        this.updateCanvas()
+      }
+    })
 
     this.updateCanvas()
 
@@ -113,6 +129,8 @@ export class ActiveComponentController {
 
   private canvasClick(sel: d3.Selection<SVGGElement, {}, HTMLElement, any>): void {
     this.$scope.$apply(() => {
+      this.menu.hide()
+
       if (!this.currentlyAdding) {
         this.nodeSearchOffsetTop = d3.event.offsetY
         this.nodeSearchOffsetLeft = d3.event.offsetX
@@ -136,19 +154,47 @@ export class ActiveComponentController {
     this.nodeSearchSelected = ''
   }
 
-  private nodeSearchResults(searchValue: string): angular.IPromise<AutocompletionResult[]> {
-    return this.searchService.searchSources(searchValue)
+  private nodeSearchResults(searchValue: string): angular.IPromise<Result[]> {
+    // return this.searchService.searchSources(searchValue)
+    return this.sparqlAutocompleteService.autocomplete(searchValue, 20, true).then(ret => this.processResults(ret), null, ret => {
+      if (ret.results) this.processResults(ret.results)
+    })
   }
 
-  private nodeSearchSelect($item, $model, $label, $event): void {
+  private processResults(res: AutocompletionResults): Result[] {
+    let activeItemIds: string[] = this.$ngRedux.getState().frontend.active.activeLayout.items.map((d: IItemState) => d.ids.map((i) => i.value)).reduce((a, b) => a.concat(b), [])
+    let ret: Result[] = []
+    res.localMatchingResults.forEach(l => l.results.forEach(r => {
+      if (activeItemIds.indexOf(r.ids[0].value) === -1) ret.push(r)
+    }))
+    res.remoteResults.forEach(l => l.results.forEach(r => {
+      if (activeItemIds.indexOf(r.ids[0].value) === -1
+        && r.additionalInformation.type && r.additionalInformation.type[0]
+        && r.datasources.reduce((p, c) => this.$ngRedux.getState().frontend.sources.sourceClassToggle[c] && this.$ngRedux.getState().frontend.sources.sourceClassToggle[c][r.additionalInformation.type[0].value], false)) {
+          r.additionalInformation.typeDescriptions = this.state.project.project.dataModel.classMap.get(r.additionalInformation.type[0].value).labels //[new CNode('Pe', 'Literal')]
+          ret.push(r)
+        }
+    }))
+    return ret
+  }
+
+  private nodeSearchLabel(res: Result): string {
+    console.log(res)
+    return res ? res.matchedLabel.value === res.prefLabel.value ?
+      res.matchedLabel.value :
+      res.matchedLabel.value + ' (' + res.prefLabel.value + ')' : ''
+  }
+
+  private nodeSearchSelect($item: Result, $model, $label, $event): void {
     let item: IItemState = {
-      id: $item.id,
-      description: $item.description,
+      ids: $item.ids,
+      item: null,
+      description: $item.prefLabel.value,
       topOffset: this.nodeSearchOffsetTop,
       leftOffset: this.nodeSearchOffsetLeft
     }
 
-    this.state.addItemToCurrentLayout(item).then(() => {
+    this.state.addItemToCurrentLayout(item, this.sparqlItemService).then(() => {
         this.updateCanvas()
         this.$scope.$apply(this.nodeSearchRemove.bind(this))
       }
@@ -158,8 +204,9 @@ export class ActiveComponentController {
   }
 
   private nodeClick(d: IItemState, groups: SVGCircleElement[]): void {
-    this.menu.show([d.leftOffset, d.topOffset + this.circularMenuTopOffset])
-    console.log(d3.event)
+    this.tooltip.style('visibility', 'hidden')
+    this.menu.hide()
+    this.menu.show([d.leftOffset + (this.state.active.dividerPercent / 100 * window.innerWidth), d.topOffset + this.circularMenuTopOffset])
   }
 
   private appendNode(sel: d3.Selection<SVGGElement, any, HTMLElement, any>, top: number, left: number, clss: string): d3.Selection<SVGGElement, IItemState, Element, {}> {
@@ -194,7 +241,7 @@ export class ActiveComponentController {
 
     let itemSelection: d3.Selection<SVGGElement, IItemState, Element, {}> = itemG.selectAll<SVGGElement, {}>('.item-node')
       .data(this.state.active.activeLayout.items, (it: IItemState) => {
-        return it.id;
+        return it.ids[0].toCanonical();
       })
 
     let enterSel: d3.Selection<SVGGElement, IItemState, Element, {}> = itemSelection.enter()
@@ -207,6 +254,22 @@ export class ActiveComponentController {
       .classed('node-circle', true)
       .on('click', (d: IItemState, i: number, groups: SVGCircleElement[]) => {
         this.nodeClick(d, groups)
+      })
+      .on('mouseenter', (d: IItemState, i: number, grp: SVGCircleElement[]) => {
+        if (d.item) {
+          this.tooltip.style('top', (grp[i].getBoundingClientRect().top - 5) + 'px')
+            .style('left', (grp[i].getBoundingClientRect().left + 25) + 'px')
+            .style('visibility', 'visible')
+            .text(d.description)
+        } else {
+          this.tooltip.style('top', (grp[i].getBoundingClientRect().top - 5) + 'px')
+          .style('left', (grp[i].getBoundingClientRect().left + 25) + 'px')
+          .style('visibility', 'visible')
+          .text('Loading...')
+        }
+      })
+      .on('mouseout', (d: IItemState, i: number) => {
+        this.tooltip.style('visibility', 'hidden')
       })
 
     itemSelection = itemSelection.merge(enterSel)
