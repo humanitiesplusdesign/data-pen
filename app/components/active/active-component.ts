@@ -44,6 +44,9 @@ export class ActiveComponentController {
   private nodeSearchOffsetLeft: number
   private unsubscribe: () => void
 
+  private dragOrigX: number
+  private dragOrigY: number
+
   private oldActiveLayoutItemState: IItemState[]
 
   /* @ngInject */
@@ -242,12 +245,12 @@ export class ActiveComponentController {
         this.nodeClick(d, groups)
       })
       .on('mouseenter', (d: IItemState, i: number, grp: SVGCircleElement[]) => {
-        if (d.item) {
+        if (d.item && !this.dragOrigX) {
           this.tooltip.style('top', (grp[i].getBoundingClientRect().top - 5) + 'px')
             .style('left', (grp[i].getBoundingClientRect().left + 25) + 'px')
             .style('visibility', 'visible')
             .text(d.description)
-        } else {
+        } else if (!this.dragOrigX) {
           this.tooltip.style('top', (grp[i].getBoundingClientRect().top - 5) + 'px')
           .style('left', (grp[i].getBoundingClientRect().left + 25) + 'px')
           .style('visibility', 'visible')
@@ -257,6 +260,28 @@ export class ActiveComponentController {
       .on('mouseout', (d: IItemState, i: number) => {
         this.tooltip.style('visibility', 'hidden')
       })
+      .call(d3.drag()
+        .on('start', (d: IItemState, i: number) => {
+          this.tooltip.style('visibility', 'hidden')
+          this.dragOrigX = d.leftOffset
+          this.dragOrigY = d.topOffset
+        })
+        .on('drag', (d: IItemState, i: number, group) => {
+          // TODO: implement change to offsets using actions and reducers
+          d.leftOffset = d3.event.x + this.dragOrigX
+          d.topOffset = d3.event.y + this.dragOrigY
+          this.dragOrigX = d.leftOffset
+          this.dragOrigY = d.topOffset
+          this.updateCanvas()
+        })
+        .on('end',  (d: IItemState, i: number, group) => {
+          // TODO: implement change to offsets using actions and reducers
+          d.leftOffset = d3.event.x + this.dragOrigX
+          d.topOffset = d3.event.y + this.dragOrigY
+          this.dragOrigX = null
+          this.dragOrigY = null
+          this.updateCanvas()
+        }))
 
     itemSelection = itemSelection.merge(enterSel)
 
