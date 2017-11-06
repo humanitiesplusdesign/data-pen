@@ -10,3 +10,4 @@ ui-bundle.js
 worker-bundle.js
 dist-dev
 .DS_Store
+Thumbs.db
