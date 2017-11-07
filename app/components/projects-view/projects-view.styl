@@ -55,7 +55,7 @@ projects-view {
     margin: 0 0 30px 0
     padding: 3px 0 0 20px
     border-radius: 3px
-    border: none;
+    border: none
     border-bottom: 2px solid rgba(#000, 0.2)
     background-color: #466bd3
     background-image: url('../../app/images/general/plus_light.svg')
@@ -64,7 +64,7 @@ projects-view {
     background-repeat: no-repeat
     font-size: 1.05em
     color: #f5f5f5
-    outline: none;
+    outline: none
     transition: .1s
     -webkit-transition: .1s
     -moz-transition: .1s
@@ -84,7 +84,7 @@ projects-view {
       width: 100%
       text-align: left
       font-family: 'Roboto', sans-serif
-      padding: 35px 0 35px 0
+      padding: 35px 15px 35px 15px
       border-top: 1px solid rgba(0, 0, 0, 0.1)
       color: #3c3c3c
       transition: .1s
@@ -106,37 +106,76 @@ projects-view {
     .citable-label {
       font-size: 1.3em
       font-weight: 400
+      color: #3c3c3c
+    }
+
+    .citable-date {
+      display: block
+      font-size: 0.9em
+      color: #959595
+      text-align: left
+      margin-top: 3px
     }
 
     .citable-description {
       font-size: 1em
+      color: #3c3c3c
     }
 
-    .citable-date {
-      font-size: 0.9em
-      color: #959595
-      text-align: right
+    .citable-sources {
+      color: #879fbf
+      font-family: 'Roboto Mono', monospace
+      font-size: 0.85em
+
+      label {
+        text-transform: uppercase
+        display: none
+      }
+
+      ul {
+        list-style: none
+
+        li {
+          border: none !important
+          margin-bottom: 5px
+        }
+      }
+    }
+
+    .project-options {
+      list-style: none
+      display: inline-block
       float: right
-    }
-
-    .edit-project-icon {
-      margin-left: 15px
+      font-family: 'Roboto Mono', monospace
+      text-align: right
+      font-size: 0.85em
+      line-height: 1.8em
+      margin-right: 30px
       top: 3px
-      font-size: 1em
       opacity: 0
-      z-index: 2
-      color: rgba(#000, 0.3)
+      color: rgba(#000, 1)
       transition: .2s
       -webkit-transition: .2s
       -moz-transition: .2s
       -o-transition: 2s
+      text-decoration: none
 
-      &:hover {
+      &.visible {
         opacity: 1
       }
 
-      &.visible {
-        opacity: .5
+      li {
+        opacity: .3
+        border: none !important
+        cursor: pointer
+
+        &:hover {
+          opacity: .8
+        }
+      }
+
+      .delete-project {
+        color: #b80000
       }
     }
   }
