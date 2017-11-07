@@ -1,5 +1,5 @@
 'use strict'
-import { CNode, NamedNode } from '../../models/rdf';
+import { CNode, NamedNode, RDF, SKOS } from '../../models/rdf';
 import { IItemState } from '../../reducers/frontend/active';
 import { AutocompletionResults, Result, SparqlAutocompleteService } from '../../services/sparql-autocomplete-service';
 import { SparqlItemService } from '../../services/sparql-item-service';
@@ -48,8 +48,7 @@ export class ActiveComponentController {
   private dragOrigX: number
   private dragOrigY: number
 
-  private currentMenuCenterX: number
-  private currentMenuCenterY: number
+  private currentMenuItem: IItemState
 
   private oldActiveLayoutItemState: IItemState[]
 
@@ -111,7 +110,7 @@ export class ActiveComponentController {
         icon: 'expand-icon',
         click: () => {
           this.propertiesMenu.hide()
-          this.propertiesMenu.show([this.currentMenuCenterX, this.currentMenuCenterY])
+          this.buildAndDisplayPropertiesMenu(this.currentMenuItem)
         }
       }, {
         icon: 'reconcile-icon'
@@ -128,6 +127,27 @@ export class ActiveComponentController {
     })
 
     this.updateCanvas()
+  }
+
+  private buildAndDisplayPropertiesMenu(item: IItemState): void {
+    console.log(item)
+    this.propertiesMenu.config({
+      background: '#ffffff',
+      backgroundHover: '#fafafa',
+      diameter: 160,
+      menus: item.item.localProperties.concat(item.item.remoteProperties)
+        .filter((p) => p.value !== RDF.type.value
+          && p.value !== SKOS.prefLabel.value
+          && p.value !== SKOS.altLabel.value
+          && p.value !== 'http://purl.org/dc/terms/identifier'
+        )
+        .map((p) => {
+          return {
+            title: p.label + ' (' + p.values.length + ')'
+          }
+        })
+    })
+    this.propertiesMenu.show(this.getMenuPosition(item))
   }
 
   private buildCanvas(): void {
@@ -186,7 +206,12 @@ export class ActiveComponentController {
       if (activeItemIds.indexOf(r.ids[0].value) === -1
         && r.additionalInformation.type && r.additionalInformation.type[0]
         // Class filter (TODO: Move server-side)
-        && r.datasources.reduce((p, c) => this.$ngRedux.getState().frontend.sources.sourceClassToggle[c] && this.$ngRedux.getState().frontend.sources.sourceClassToggle[c][r.additionalInformation.type[0].value], false) ) {
+        && r.datasources.reduce(
+            (p, c) => {
+              return this.$ngRedux.getState().frontend.sources.sourceClassToggle[c]
+                && this.$ngRedux.getState().frontend.sources.sourceClassToggle[c][r.additionalInformation.type[0].value]
+            },
+            false)) {
           r.additionalInformation.typeDescriptions = this.state.project.project.dataModel.classMap.get(r.additionalInformation.type[0].value).labels
           r.additionalInformation.dataSourceDescriptions = this.state.project.project.authorityEndpoints
             .filter((ae) => r.datasources.filter((rd) => ae.id === rd ).length > 0)
@@ -222,12 +247,18 @@ export class ActiveComponentController {
   }
 
   private nodeClick(d: IItemState, groups: SVGCircleElement[]): void {
-    this.currentMenuCenterX = d.leftOffset + (this.state.active.dividerPercent / 100 * window.innerWidth)
-    this.currentMenuCenterY = d.topOffset + this.circularMenuTopOffset
+    this.currentMenuItem = d
     this.tooltip.style('visibility', 'hidden')
     this.menu.hide()
     this.propertiesMenu.hide()
-    this.menu.show([this.currentMenuCenterX, this.currentMenuCenterY])
+    this.menu.show(this.getMenuPosition(d))
+  }
+
+  private getMenuPosition(itemState: IItemState): [number, number] {
+    return [
+      itemState.leftOffset + (this.state.active.dividerPercent / 100 * window.innerWidth),
+      itemState.topOffset + this.circularMenuTopOffset
+    ]
   }
 
   private appendNode(sel: d3.Selection<SVGGElement, any, HTMLElement, any>, top: number, left: number, clss: string): d3.Selection<SVGGElement, IItemState, Element, {}> {

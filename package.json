@@ -4,6 +4,7 @@
   "devDependencies": {
     "@types/angular-http-auth": "^1.2.32",
     "@types/angular-toastr": "^1.6.33",
+    "@types/angular-ui-bootstrap": "^0.13.46",
     "@types/angular-ui-router": "^1.1.40",
     "@types/d3": "^4.11.0",
     "@types/n3": "^0.0.3",

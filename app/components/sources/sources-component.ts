@@ -9,6 +9,7 @@ import { ProjectService } from '../../services/project-service/project-service'
 import * as ProjectActions from '../../actions/project';
 import { INgRedux } from 'ng-redux'
 import SourcesActions from '../../actions/sources'
+import { IModalService } from 'angular-ui-bootstrap'
 
 interface ISourcesComponentControllerState extends ISourcesActions {
   project: ProjectState
@@ -24,7 +25,8 @@ export class SourcesComponentController {
 
   /* @ngInject */
   constructor(private projectService: ProjectService,
-              private $ngRedux: INgRedux) {
+              private $ngRedux: INgRedux,
+              private $uibModal: IModalService) {
     let unsub1: () => void = $ngRedux.connect(this.mapProjectToActions, ProjectActions)(this.actions)
     let stateUnsubscribe: () => void = $ngRedux.connect(
       (state: IRootState) => {
@@ -50,6 +52,15 @@ export class SourcesComponentController {
         oldSourceClassTree = this.state.sources.sourceClassToggle
       }
     })
+  }
+
+  private openAddSourcesModal(): void {
+    let modalInstance: any = this.$uibModal.open({
+      animation: true,
+      component: 'addSource',
+      resolve: {
+      }
+    });
   }
 
   private getSourceClassStatus(source: string, clss: string): boolean {
