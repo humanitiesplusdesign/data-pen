@@ -27,5 +27,5 @@
 .active-tooltip
 script(type="text/ng-template" id="resultTemplate.html")
   a
-    span [{{ match.model.additionalInformation.typeDescriptions | prefLang }}]&nbsp;
+    span.resultType [{{ match.model.additionalInformation.typeDescriptions | prefLang | limitTo : 2 : 0 }}]&nbsp;
     span {{ match.label }}
