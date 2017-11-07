@@ -2,7 +2,7 @@
   .sources-left
     .sources-head
       h3.pull-left Project sources
-      span.pull-right add
+      span.pull-right(ng-click="$ctrl.openAddSourcesModal()") add
     .sources-list
       span(ng-repeat="source in $ctrl.state.sources.sources")
         h4(ng-click="$ctrl.projectsOpen[source.id] = !$ctrl.projectsOpen[source.id]")

@@ -1,0 +1,10 @@
+.modal-header
+  h3.modal-title#modal-title Select Sources
+.modal-body#modal-body
+  ul
+    li(ng-repeat="endpoint in $ctrl.authorityEndpoints.concat($ctrl.archiveEndpoints)")
+      input(type="checkbox", ng-model="$ctrl.sourceSelections[endpoint.id]")
+      span &nbsp;{{ endpoint.labels | prefLang }}
+.modal-footer
+  button.btn.btn-primary OK
+  button.btn.warning Cancel
