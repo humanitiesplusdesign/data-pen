@@ -47,6 +47,7 @@ export class ProjectActionService {
     })
     return this.projectService.loadProject({ sparqlEndpoint: sparqlEndpoint, graph: graph }, id, true).then(
         project => {
+          console.log(project)
           // TODO: Get the actual sources associated with each endpoint
           project.archiveEndpoints.forEach((ae) => {
             this.$ngRedux.dispatch({

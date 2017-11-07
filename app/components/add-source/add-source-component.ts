@@ -1,4 +1,7 @@
 'use strict'
+import { Citable } from '../../models/citable';
+import { PrimaryEndpointConfiguration } from '../../services/project-service/primary-endpoint-configuration';
+import { Project } from '../../services/project-service/project';
 import { ProjectSourceInfo } from '../project-sources-view/project-sources-view-component';
 import { RemoteEndpointConfiguration } from '../../services/project-service/remote-endpoint-configuration';
 import { ISourcesState } from '../../reducers/frontend/sources';
@@ -7,6 +10,7 @@ import { IRootState } from '../../reducers';
 import { INgRedux } from 'ng-redux'
 import { ProjectService } from '../../services/project-service/project-service';
 import SourcesActions, { ISourcesActions } from '../../actions/sources';
+import { ProjectActionService } from '../../actions/project'
 
 import * as angular from 'angular';
 
@@ -24,9 +28,13 @@ export class AddSourceComponentController {
 
   private sourceSelections: {}
 
+  private close: any
+  private dismiss: any
+
   /* @ngInject */
   constructor(
     private projectService: ProjectService,
+    private projectActionService: ProjectActionService,
     private $ngRedux: INgRedux,
     private $q: angular.IQService
   ) {
@@ -37,7 +45,7 @@ export class AddSourceComponentController {
           sources: state.frontend.sources
         }
       },
-      SourcesActions)(this.state)
+      {})(this.state)
     this.actions.unsubscribe = () => {
       stateUnsubscribe()
     }
@@ -54,6 +62,30 @@ export class AddSourceComponentController {
           .indexOf(ae.id) !== -1
       })
     })
+  }
+
+  private commit(): void {
+    // This doesn't fly
+    this.projectService.loadProject(this.primarySource, this.state.project.project.id, true).then((p) => {
+      p.labels = this.state.project.project.labels
+      p.archiveEndpoints = this.archiveEndpoints.filter((ae) => this.sourceSelections[ae.id])
+      p.authorityEndpoints = this.authorityEndpoints.filter((ae) => this.sourceSelections[ae.id])
+      p.descriptions = this.state.project.project.descriptions
+      p.rightsHolders = this.state.project.project.rightsHolders
+      p.schemas = this.state.project.project.schemas
+
+      this.projectService.saveCitable(this.primarySource.updateEndpoint, this.primarySource.graphStoreEndpoint, p)
+        .then(() => {
+          this.projectActionService.setProject(p.id, this.primarySource.sparqlEndpoint, this.primarySource.graphStoreEndpoint)
+            .then(() => {
+              this.close()
+            })
+        })
+    })
+  }
+
+  private cancel(): void {
+    this.dismiss()
   }
 }
 
