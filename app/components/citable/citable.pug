@@ -1,14 +1,8 @@
 a(ng-if="$ctrl.citable.url && !$ctrl.noLink",href="{{$ctrl.citable.url}}",title="{{$ctrl.citable.descriptions | prefLang}}") {{$ctrl.citable.labels | prefLang}}
 .col-md-3
   span.citable-label(ng-if="!$ctrl.citable.url",title="{{$ctrl.citable.labels | prefLang}}") {{$ctrl.citable.labels | prefLang}}
-  span.citable-date 01 January 1970
+  span.citable-date {{ $ctrl.parseDate($ctrl.citable.dateCreated) | date : 'd MMMM, yyyy' }}
 span.citable-description.col-md-4(ng-if="!$ctrl.citable.url",title="{{$ctrl.citable.descriptions | prefLang}}") {{$ctrl.citable.descriptions | prefLang}}
-.col-md-3.citable-sources
-  label Sources
-  ul
-    li Virtual International Authority File
-    li GeoNames
-    li Electronic Enlightenment
 //- span.citable-date.col-md-3(ng-if="!$ctrl.citable.url",title="{{$ctrl.citable.dateCreated ? $ctrl.citable.dateCreated : '' | prefLang}}") {{$ctrl.citable.dateCreated | prefLang}}
 span(ng-repeat="rightsHolder in $ctrl.citable.rightsHolders")
   span(ng-if="$first") &nbsp;(

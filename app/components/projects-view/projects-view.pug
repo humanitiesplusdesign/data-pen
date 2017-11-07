@@ -28,8 +28,15 @@
       li.project-cell(ng-if="$ctrl.projectSourceState[id]=='ready'",ng-repeat="project in $ctrl.projects[id] track by $index" ng-init="optionsVisibility=''" ng-mouseenter="optionsVisibility='visible'" ng-mouseleave="optionsVisibility=''")
         .row
           a.citable-content(ui-sref="project({id:project.id,sparqlEndpoint:project.source.sparqlEndpoint,graph:project.source.graph})"): citable(citable="project",no-link)
+          .citable-sources
+            label Sources
+            ul
+              //- li(ng-repeat="source in project.authorityEndpoints.concat(project.archiveEndpoints)") {{ source.labels | prefLabel }}
+              li Virtual International Authority File
+              li GeoNames
+              li Electronic Enlightenment
           ul.project-options(ng-class="optionsVisibility")
             li Edit
             li Duplicate
             li Export
-            li.delete-project Delete
+            li.delete-project(ng-click="$ctrl.deleteProject(id, $index, project)") Delete

@@ -50,6 +50,7 @@ export class ProjectsViewComponentController implements angular.IComponentContro
 				projects => {
 					this.projectSourceState[source.id] = 'ready'
 					this.projects[source.id] = projects
+					console.log(this.projects)
 				},
 				err => {
 					this.projectSourceState[source.id] = 'error'
