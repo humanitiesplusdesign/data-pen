@@ -28,6 +28,6 @@
 .active-tooltip
 script(type="text/ng-template" id="resultTemplate.html")
   a
-    span.resultType {{ match.model.additionalInformation.typeDescriptions | prefLang | limitTo : 50 : 0 }}&nbsp;
-    //-span.resultType(ng-repeat="ds in match.model.additionalInformation.dataSourceDescriptions") [{{ ds.value | limitTo : 20 : 0 }}]
-    span {{ match.label }}
+    span.resultType {{ (match.model.additionalInformation.typeDescriptions | prefLang).length > 8 ? (match.model.additionalInformation.typeDescriptions | prefLang | limitTo:7:0)+"…" : (match.model.additionalInformation.typeDescriptions | prefLang) }}
+    span.resultActual {{ match.label }}
+    span.resultSource(ng-repeat="ds in match.model.additionalInformation.dataSourceDescriptions") {{ ds.value.length > 14 ? (ds.value | limitTo:13:0)+"…" : (ds.value) }}
