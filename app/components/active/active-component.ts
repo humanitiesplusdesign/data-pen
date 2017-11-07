@@ -188,6 +188,9 @@ export class ActiveComponentController {
         // Class filter (TODO: Move server-side)
         && r.datasources.reduce((p, c) => this.$ngRedux.getState().frontend.sources.sourceClassToggle[c] && this.$ngRedux.getState().frontend.sources.sourceClassToggle[c][r.additionalInformation.type[0].value], false) ) {
           r.additionalInformation.typeDescriptions = this.state.project.project.dataModel.classMap.get(r.additionalInformation.type[0].value).labels
+          r.additionalInformation.dataSourceDescriptions = this.state.project.project.authorityEndpoints
+            .filter((ae) => r.datasources.filter((rd) => ae.id === rd ).length > 0)
+            .map((ae) => ae.labels.find(la => la.language === 'en'))
           ret.push(r)
         }
     }))
