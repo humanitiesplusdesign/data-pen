@@ -21,12 +21,15 @@
             .modal-footer
               .button.btn.btn-secondary(type="button" data-dismiss="modal") Close
               .button.btn.btn-primary(type="button") Save changes
-
-    //- original button, links to external page
-    //- button.new-project-button(ui-sref="configure({sourceId:id})") Start new project
     .row
     .spinner(ng-if="$ctrl.projectSourceState[id]=='loading'")
     .alert.alert-danger(ng-if="$ctrl.projectSourceState[id]=='error'") Error loading: {{projects}}
     ul.projects-list
-      li(ng-if="$ctrl.projectSourceState[id]=='ready'",ng-repeat="project in $ctrl.projects[id] track by $index")
-        a(ui-sref="project({id:project.id,sparqlEndpoint:project.source.sparqlEndpoint,graph:project.source.graph})"): citable(citable="project",no-link)
+      li.project-cell(ng-if="$ctrl.projectSourceState[id]=='ready'",ng-repeat="project in $ctrl.projects[id] track by $index" ng-init="optionsVisibility=''" ng-mouseenter="optionsVisibility='visible'" ng-mouseleave="optionsVisibility=''")
+        .row
+          a.citable-content(ui-sref="project({id:project.id,sparqlEndpoint:project.source.sparqlEndpoint,graph:project.source.graph})"): citable(citable="project",no-link)
+          ul.project-options(ng-class="optionsVisibility")
+            li Edit
+            li Duplicate
+            li Export
+            li.delete-project Delete

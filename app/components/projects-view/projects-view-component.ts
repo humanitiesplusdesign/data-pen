@@ -21,7 +21,7 @@ export class ProjectsViewComponentController implements angular.IComponentContro
 	}
 
 	public $postLink(): void {
-		retina();
+		
 	}
 
 	/* @ngInject */
