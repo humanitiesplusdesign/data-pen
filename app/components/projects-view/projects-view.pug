@@ -10,17 +10,7 @@
   div(ng-repeat="(id,projectSource) in $ctrl.projectSources track by $index")   
     a(ui-sref="configure({sourceId:id})") 
       button.new-project-button(type="button" data-toggle="modal" data-target="#newProjectDialog") Start new project
-      .modal#newProjectDialog(tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="false")
-        .modal-dialog(role="document")
-          .modal-content
-            .modal-header
-              h5.modal-title Modal title
-              .button.close(type="button" data-dismiss="modal" aria-label="Close")
-                .span(aria-hidden="true") &times;
-            .modal-body stuff here
-            .modal-footer
-              .button.btn.btn-secondary(type="button" data-dismiss="modal") Close
-              .button.btn.btn-primary(type="button") Save changes
+                  
     .row
     .spinner(ng-if="$ctrl.projectSourceState[id]=='loading'")
     .alert.alert-danger(ng-if="$ctrl.projectSourceState[id]=='error'") Error loading: {{projects}}
@@ -28,7 +18,7 @@
       li.project-cell(ng-if="$ctrl.projectSourceState[id]=='ready'",ng-repeat="project in $ctrl.projects[id] track by $index" ng-init="optionsVisibility=''" ng-mouseenter="optionsVisibility='visible'" ng-mouseleave="optionsVisibility=''")
         .row
           a.citable-content(ui-sref="project({id:project.id,sparqlEndpoint:project.source.sparqlEndpoint,graph:project.source.graph})"): citable(citable="project",no-link)
-          .citable-sources
+          .citable-sources.col-md-3
             label Sources
             ul
               //- li(ng-repeat="source in project.authorityEndpoints.concat(project.archiveEndpoints)") {{ source.labels | prefLabel }}

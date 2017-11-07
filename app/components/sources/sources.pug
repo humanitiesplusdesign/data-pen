@@ -1,8 +1,20 @@
 .sources-main
-  .sources-left
+  .sources-left(ng-init="editSourcesStatus=''")
     .sources-head
       h3.pull-left Project sources
-      span.pull-right add
+      span.edit-sources-icon.transition-100.glyphicon.glyphicon-cog(ng-click="editSourcesStatus='visible'")
+      
+      .edit-sources-dialog-container.transition-200(ng-class="editSourcesStatus")
+        .edit-sources-dialog
+          ul
+            li
+              input(type="checkbox")
+              span test
+            li
+              input(type="checkbox")
+              span test
+    
+              
     .sources-list
       span(ng-repeat="source in $ctrl.state.sources.sources")
         h4(ng-click="$ctrl.projectsOpen[source.id] = !$ctrl.projectsOpen[source.id]")

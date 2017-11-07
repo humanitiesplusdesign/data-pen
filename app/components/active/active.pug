@@ -28,6 +28,6 @@
 .active-tooltip
 script(type="text/ng-template" id="resultTemplate.html")
   a
-    span.resultType [{{ match.model.additionalInformation.typeDescriptions | prefLang | limitTo : 2 : 0 }}]&nbsp;
-    span.resultType(ng-repeat="ds in match.model.additionalInformation.dataSourceDescriptions") [{{ ds.value | limitTo : 2 : 0 }}]
+    span.resultType {{ match.model.additionalInformation.typeDescriptions | prefLang | limitTo : 50 : 0 }}&nbsp;
+    //-span.resultType(ng-repeat="ds in match.model.additionalInformation.dataSourceDescriptions") [{{ ds.value | limitTo : 20 : 0 }}]
     span {{ match.label }}

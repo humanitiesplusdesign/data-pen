@@ -21,7 +21,7 @@ export class ProjectsViewComponentController implements angular.IComponentContro
 	}
 
 	public $postLink(): void {
-		
+
 	}
 
 	/* @ngInject */
@@ -65,7 +65,7 @@ export class ProjectsViewComponent implements angular.IComponentOptions {
 	public template: string = require('./projects-view.pug')()
 }
 
-angular.module('fibra.components.projects-view', [])
+angular.module('fibra.components.projects-view', ['ui.bootstrap'])
 	.component('projectsView', new ProjectsViewComponent())
 	.controller('projectsSortController', function($scope) {
 		$scope.item = {
