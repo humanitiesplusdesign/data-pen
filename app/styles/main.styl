@@ -25,6 +25,10 @@ h1, h2, h3, h4, h5, h6, p {
   font-weight: normal
 }
 
+p.description {
+  font-size: 0.9em
+}
+
 label {
   font-size: 1em
   font-weight: 400
@@ -190,11 +194,40 @@ position: absolute
 .auth-text {
   float: right
   margin: 50px 0 -70px 0
-  font-family: 'Roboto Mono', monospace
   color: rgba(0, 0, 0, 0.7)
   font-size: 0.9em
 }
 
 .border {
   border: 1px solid rgba(#000, 0.1)
+}
+
+.transition-100 {
+  transition: .1s
+  -webkit-transition: .1s
+  -moz-transition: .1s
+  -o-transition: .1s
+}
+
+.transition-200 {
+  transition: .2s
+  -webkit-transition: .2s
+  -moz-transition: .2s
+  -o-transition: .2s
+}
+
+.modal-backdrop {
+  background-color: #868686
+}
+
+.modal-content {
+  border: none
+  box-shadow: 0 1px 10px rgba(#000, 0.2)
+  padding: 40px
+  border-radius: 3px
+
+  .modal-header, .modal-body, .modal-footer {
+    padding: 0
+    border: none
+  }
 }
