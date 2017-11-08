@@ -3,17 +3,6 @@
     .sources-head
       h3.pull-left Project sources
       span.edit-sources-icon.transition-100.glyphicon.glyphicon-cog(ng-click="$ctrl.openAddSourcesModal()")
-      
-      .edit-sources-dialog-container.transition-200(ng-class="editSourcesStatus")
-        .edit-sources-dialog
-          ul
-            li
-              input(type="checkbox")
-              span test
-            li
-              input(type="checkbox")
-              span test
-    
               
     .sources-list
       span(ng-repeat="source in $ctrl.state.sources.sources")
@@ -25,10 +14,4 @@
           label.checkbox-container(ng-repeat="clss in source.classes" ng-hide="clss.labels.length === 0") 
             input(type="checkbox", ng-model="$ctrl.localSourceClassTree[source.id][clss.id.value]" ng-click="$ctrl.state.setSourceClassActive(source.id, clss.id.value, !$ctrl.getSourceClassStatus(source.id, clss.id.value))")
             span {{clss.labels | prefLang}}
-      //- h4  
-      //-   i.glyphicon.glyphicon-triangle-right
-      //-   span Physiocrats.csv
-      //- h4
-      //-   i.glyphicon.glyphicon-triangle-right
-      //-   span Created in Active
   .sources-right

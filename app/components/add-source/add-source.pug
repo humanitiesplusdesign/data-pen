@@ -1,10 +1,11 @@
 .modal-header
-  h3.modal-title#modal-title Select Sources
+  h4.modal-title#modal-title Select Sources
+  p.description Configure your project with external authorities and archives to draw in external data.
 .modal-body#modal-body
-  ul
+  ul.available-sources-list
     li(ng-repeat="endpoint in $ctrl.authorityEndpoints.concat($ctrl.archiveEndpoints)")
       input(type="checkbox", ng-model="$ctrl.sourceSelections[endpoint.id]")
       span &nbsp;{{ endpoint.labels | prefLang }}
 .modal-footer
-  button.btn.btn-primary OK
-  button.btn.warning Cancel
+  button.cancel-button.transition-200 Cancel
+  button.select-button.transition-200 Select
