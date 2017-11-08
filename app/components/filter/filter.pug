@@ -1,5 +1,5 @@
 .main-table(ng-style="$ctrl.tableWidthStyle()")
-  .main-grid(ui-grid="{ data: $ctrl.allItems, enableFiltering: true }" ng-hide="$ctrl.actions.filter.dividerPercent < 2" ui-grid-auto-resize)
+  .main-grid(ui-grid="{ data: $ctrl.allItems, enableFiltering: true }" ng-hide="$ctrl.state.active.dividerPercent < 2" ui-grid-auto-resize ui-grid-edit ui-grid-resize-columns ui-grid-empty-base-layer)
 .main-canvas(ng-style="$ctrl.canvasWidthStyle()")
   ul.nav.nav-tabs.class-nav
     li(ng-repeat="clss in $ctrl.getActiveClasses()" ng-class="{ active: $ctrl.selectedClass === clss }")

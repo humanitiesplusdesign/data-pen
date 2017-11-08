@@ -7,5 +7,5 @@
       input(type="checkbox", ng-model="$ctrl.sourceSelections[endpoint.id]")
       span &nbsp;{{ endpoint.labels | prefLang }}
 .modal-footer
-  button.cancel-button.transition-200(ng-click="$ctrl.cancel()") Cancel
-  button.select-button.transition-200(ng-click="$ctrl.commit()") Select
+  button.cancel-button.text-button.transition-200(ng-click="$ctrl.cancel()") Cancel
+  button.select-button.text-button.transition-200(ng-click="$ctrl.commit()") Select

@@ -1,5 +1,5 @@
 .main-table(ng-style="$ctrl.tableWidthStyle()")
-  .main-grid(ui-grid="{ data: $ctrl.state.active.activeLayout.items }" ng-hide="$ctrl.state.active.dividerPercent < 2" ui-grid-auto-resize)
+  .main-grid(ui-grid="{ data: $ctrl.state.active.activeLayout.items, enableFiltering: true }" ng-hide="$ctrl.state.active.dividerPercent < 2" ui-grid-auto-resize ui-grid-edit ui-grid-resize-columns ui-grid-empty-base-layer)
 .main-canvas(ng-style="$ctrl.canvasWidthStyle()")
   .control-area
     button.btn.btn-circle.btn-lg
@@ -10,7 +10,7 @@
     g.main-g
       rect.main-background
       g.main-g-items
-.draggable-divider(drag-container="true" on-drag-end="dragging = false; $ctrl.dragDivider($event)" ng-style="$ctrl.dragTabLeftStyle()")
+.draggable-divider(drag-container="true" on-drag-end="dragging = false; $ctrl.dragDivider($event)" on-drag="$ctrl.dragDivider($event)" ng-style="$ctrl.dragTabLeftStyle()")
   .drag-tab(ng-hide="$ctrl.state.active.dividerPercent > 2 && $ctrl.state.active.dividerPercent < 98")
 .node-search(ng-show="$ctrl.currentlyAdding")
   .input-group
