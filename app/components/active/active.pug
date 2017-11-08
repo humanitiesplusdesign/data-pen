@@ -10,7 +10,7 @@
     g.main-g
       rect.main-background
       g.main-g-items
-.draggable-divider(drag-container="true" on-drag-end="dragging = false; $ctrl.dragDivider($event)" ng-style="$ctrl.dragTabLeftStyle()")
+.draggable-divider(drag-container="true" on-drag-end="dragging = false; $ctrl.dragDivider($event)" on-drag="$ctrl.dragDivider($event)" ng-style="$ctrl.dragTabLeftStyle()")
   .drag-tab(ng-hide="$ctrl.state.active.dividerPercent > 2 && $ctrl.state.active.dividerPercent < 98")
 .node-search(ng-show="$ctrl.currentlyAdding")
   .input-group
