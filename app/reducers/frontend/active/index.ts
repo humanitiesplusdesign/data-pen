@@ -49,7 +49,7 @@ export default function models(state: IActiveState = defaultState, action): IAct
       let fullItem: Item = action.payload.fullItem
       newItems2.splice(newItems2.indexOf(updateItem), 1)
       newItems2.push(Object.assign({}, updateItem, {
-        description: !updateItem.description && fullItem.remoteProperties.find((rp) => rp.value === SKOS.prefLabel.value) ?
+        description: !updateItem.description && fullItem && fullItem.remoteProperties.find((rp) => rp.value === SKOS.prefLabel.value) ?
           fullItem.remoteProperties.find((rp) => rp.value === SKOS.prefLabel.value).values[0].value.label :
           updateItem.description,
         item: fullItem
