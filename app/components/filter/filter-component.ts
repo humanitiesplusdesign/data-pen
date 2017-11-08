@@ -128,5 +128,5 @@ export class FilterComponent implements angular.IComponentOptions {
     public controller: any = FilterComponentController
 }
 
-angular.module('fibra.components.filter', ['ui.bootstrap', 'filearts.dragDrop', 'ui.grid', 'ui.grid.autoResize', 'rzModule'])
+angular.module('fibra.components.filter', ['ui.bootstrap', 'filearts.dragDrop', 'rzModule', 'ui.grid', 'ui.grid.emptyBaseLayer', 'ui.grid.resizeColumns', 'ui.grid.autoResize', 'ui.grid.edit'])
   .component('filter', new FilterComponent())
