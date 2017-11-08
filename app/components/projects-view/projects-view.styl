@@ -4,6 +4,19 @@ projects-view {
     margin-top: 150px
   }
 
+  .message-text {
+    font-family: 'Roboto Mono', monospace
+    text-align: center
+    font-size: 1.3em
+    line-height: 1.5em
+    color: #AAA
+  }
+
+  .error-loading {
+    position: relative
+    margin-top: 100px
+  }
+
   .sort-container {
     position: relative
     display: block
@@ -78,7 +91,7 @@ projects-view {
     &.none-position {
       position: relative
       margin-left: 50%
-      margin-top: 100px
+      margin-top: 10px
       transform: translateX(-50%)
     }
   }
@@ -92,6 +105,7 @@ projects-view {
       text-align: left
       font-family: 'Roboto', sans-serif
       padding: 35px 15px 35px 15px
+      margin-left: -15px
       border-top: 1px solid rgba(0, 0, 0, 0.1)
       color: #3c3c3c
       transition: .1s
@@ -217,16 +231,9 @@ projects-view {
   }
 
   .no-projects {
-    width: 100%
     margin-top: 20px
     text-align: center
-    padding: 50px 100px 50px 100px
-
-    .no-project-text {
-      color: #AAA
-      font-family: 'Roboto Mono', monospace
-      font-size: 1.5em
-      margin-bottom: 80px
-    }
+    padding: 50px 0 50px 0
+    margin-bottom: 30px
   }
 }
