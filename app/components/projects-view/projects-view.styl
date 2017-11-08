@@ -2,50 +2,50 @@ projects-view {
 
   .head {
     margin-top: 150px
+  }
 
-    .sort-container {
-      position: relative
-      display: block
+  .sort-container {
+    position: relative
+    display: block
+    float: right
+    margin: 10px 0 0 0
+    width: 130px
+    height: 40px
+    line-height: 2.3
+    background: none
+    overflow: hidden
+
+    .sort-label, select {
+      font-size: 0.8
+    }
+
+    select {
+      width: 100%
+      height: 100%
       float: right
-      margin: 10px 0 0 0
-      width: 130px
-      height: 40px
-      line-height: 2.3
+      margin: 0
+      padding-right: 30px
+      font-size: 1em
+      color: #3c3c3c
+      cursor: pointer
+      border: none
+      direction: rtl
+    }
+
+    select::-ms-expand {
+      display: none
+    }
+
+    &::after {
+      content: '\25be'
+      position: absolute
+      top: 0
+      right: 10px
+      bottom: 0
+      font-size: 1.2em
+      color: #3c3c3c
       background: none
-      overflow: hidden
-
-      .sort-label, select {
-        font-size: 0.8
-      }
-
-      select {
-        width: 100%
-        height: 100%
-        float: right
-        margin: 0
-        padding-right: 30px
-        font-size: 1em
-        color: #3c3c3c
-        cursor: pointer
-        border: none
-        direction: rtl
-      }
-
-      select::-ms-expand {
-        display: none
-      }
-
-      &::after {
-        content: '\25be'
-        position: absolute
-        top: 0
-        right: 10px
-        bottom: 0
-        font-size: 1.2em
-        color: #3c3c3c
-        background: none
-        pointer-events: none
-      }
+      pointer-events: none
     }
   }
 
@@ -73,6 +73,13 @@ projects-view {
     &:hover {
       background-color: rgba(#456ad2, 0.8)
       cursor: pointer
+    }
+
+    &.none-position {
+      position: relative
+      margin-left: 50%
+      margin-top: 100px
+      transform: translateX(-50%)
     }
   }
 
@@ -211,7 +218,7 @@ projects-view {
 
   .no-projects {
     width: 100%
-    margin-top: 100px
+    margin-top: 20px
     text-align: center
     padding: 50px 100px 50px 100px
 
