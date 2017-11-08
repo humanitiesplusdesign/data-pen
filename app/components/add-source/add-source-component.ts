@@ -25,6 +25,7 @@ export class AddSourceComponentController {
   private authorityEndpoints: RemoteEndpointConfiguration[]
   private archiveEndpoints: RemoteEndpointConfiguration[]
   private primarySource: ProjectSourceInfo =  new ProjectSourceInfo('Shared projects', 'http://ldf.fi/fibra/sparql', 'http://ldf.fi/fibra/update', 'http://ldf.fi/fibra/data', 'http://ldf.fi/fibra/shared-projects/', 'http://ldf.fi/fibra/fusekiEndpointWithTextIndexAndSecoFunctions')
+  private userSource: ProjectSourceInfo
 
   private sourceSelections: {}
 
@@ -61,12 +62,15 @@ export class AddSourceComponentController {
           .map((projectEndpoint) => projectEndpoint.id)
           .indexOf(ae.id) !== -1
       })
+
+      this.userSource = projectService.getProjectSources()[0]
+
     })
   }
 
   private commit(): void {
     // This doesn't fly
-    this.projectService.loadProject(this.primarySource, this.state.project.project.id, true).then((p) => {
+    this.projectService.loadProject(this.userSource, this.state.project.project.id, true).then((p) => {
       p.labels = this.state.project.project.labels
       p.archiveEndpoints = this.archiveEndpoints.filter((ae) => this.sourceSelections[ae.id])
       p.authorityEndpoints = this.authorityEndpoints.filter((ae) => this.sourceSelections[ae.id])
@@ -74,9 +78,9 @@ export class AddSourceComponentController {
       p.rightsHolders = this.state.project.project.rightsHolders
       p.schemas = this.state.project.project.schemas
 
-      this.projectService.saveCitable(this.primarySource.updateEndpoint, this.primarySource.graphStoreEndpoint, p)
+      this.projectService.saveCitable(this.userSource.updateEndpoint, this.userSource.graphStoreEndpoint, p)
         .then(() => {
-          this.projectActionService.setProject(p.id, this.primarySource.sparqlEndpoint, this.primarySource.graphStoreEndpoint)
+          this.projectActionService.setProject(p.id, p.source.sparqlEndpoint, p.source.graph)
             .then(() => {
               this.close()
             })
