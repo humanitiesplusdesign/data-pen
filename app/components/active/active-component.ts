@@ -251,7 +251,12 @@ export class ActiveComponentController {
 
   private maintainNode(sel: d3.Selection<SVGGElement, IItemState, Element, {}>, top: number, left: number): d3.Selection<SVGGElement, IItemState, Element, {}> {
     sel.attr('transform', 'translate(' + top + ',' + left + ')')
-    sel.select('circle').transition().attr('r', this.radius + 'px')
+    sel.select('circle')
+      .classed('loading', (d): boolean => {
+        console.log(d)
+        return d.item === null
+      })
+      .transition().attr('r', this.radius + 'px')
     return sel
   }
 
