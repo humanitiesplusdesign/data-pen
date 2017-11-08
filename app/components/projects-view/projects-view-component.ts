@@ -1,11 +1,13 @@
 'use strict'
-import * as angular from 'angular'
+import { Project } from '../../services/project-service/project';
+import { RemoteEndpointConfiguration } from '../../services/project-service/remote-endpoint-configuration';
+import * as angular from 'angular';
 
 import { ICitable } from '../../models/citable'
 import { ProjectSourceInfo } from '../project-sources-view/project-sources-view-component'
 import { ProjectService } from '../../services/project-service/project-service'
 import { SocialAuthService } from '../../services/social-auth-service'
-import * as CryptoJS from 'crypto-js'
+import * as CryptoJS from 'crypto-js';
 import retina from 'retinajs'
 
 export class ProjectsViewComponentController implements angular.IComponentController {
@@ -14,6 +16,9 @@ export class ProjectsViewComponentController implements angular.IComponentContro
 	public projects: { [id: string]: ICitable[] } = {}
 	public projectSources: { [id: string]: ProjectSourceInfo } = {}
 	public lang: string
+
+	private authorities: RemoteEndpointConfiguration[]
+	private archives: RemoteEndpointConfiguration[]
 
 	public deleteProject(sourceId: string, projectIndex: number, project: ICitable): void {
 		this.projects[sourceId].splice(projectIndex, 1)
@@ -55,7 +60,19 @@ export class ProjectsViewComponentController implements angular.IComponentContro
 				err => {
 					this.projectSourceState[source.id] = 'error'
 					this.projects[source.id] = err
-				})
+				}
+			)
+		})
+
+		this.authorities = []
+		this.archives = []
+		projectService.listAuthorityEndpointConfigurations(new ProjectSourceInfo('Shared projects', 'http://ldf.fi/fibra/sparql', 'http://ldf.fi/fibra/update', 'http://ldf.fi/fibra/data', 'http://ldf.fi/fibra/shared-projects/', 'http://ldf.fi/fibra/fusekiEndpointWithTextIndexAndSecoFunctions')).then(pt => this.authorities = this.authorities.concat(pt))
+		projectService.listArchiveEndpointConfigurations(new ProjectSourceInfo('Shared projects', 'http://ldf.fi/fibra/sparql', 'http://ldf.fi/fibra/update', 'http://ldf.fi/fibra/data', 'http://ldf.fi/fibra/shared-projects/', 'http://ldf.fi/fibra/fusekiEndpointWithTextIndexAndSecoFunctions')).then(pt => this.archives = this.archives.concat(pt))
+	}
+
+	private getSources(project: Project): RemoteEndpointConfiguration[] {
+		return this.authorities.concat(this.archives).filter((ae) => {
+			return project.authorityEndpoints.concat(project.archiveEndpoints).map((p) => p.id).indexOf(ae.id) !== -1
 		})
 	}
 }

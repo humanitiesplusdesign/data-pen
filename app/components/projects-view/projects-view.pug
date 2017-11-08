@@ -25,9 +25,7 @@
           .citable-sources.col-md-3
             label Sources
             ul
-              //- li(ng-repeat="source in project.authorityEndpoints.concat(project.archiveEndpoints)") {{ source.labels | prefLabel }}
-              li Virtual International Authority File
-              li GeoNames
+              li(ng-repeat="source in $ctrl.getSources(project)") {{ source.labels | prefLang }}
           ul.project-options(ng-class="optionsVisibility")
             //-li Edit
             //-li Duplicate
