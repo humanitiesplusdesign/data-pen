@@ -18,6 +18,7 @@ import { IActiveState } from 'reducers/frontend/active'
 import 'angular-drag-drop';
 import 'angular-ui-grid';
 import cmenu from 'circular-menu';
+import { IModalService } from 'angular-ui-bootstrap'
 
 interface IActiveComponentControllerState extends IActiveActions {
   project: ProjectState
@@ -36,7 +37,6 @@ export class ActiveComponentController {
   private currentlyAdding: boolean = false
 
   private menu: any
-  private propertiesMenu: any
 
   private nodeSearch: d3.Selection<Element, {}, HTMLElement, any>
   private tooltip: d3.Selection<HTMLDivElement, {}, HTMLElement, undefined>
@@ -57,6 +57,7 @@ export class ActiveComponentController {
               private $scope: angular.IScope,
               private $q: angular.IQService,
               private $ngRedux: INgRedux,
+              private $uibModal: IModalService,
               private searchService: SearchService,
               private sparqlAutocompleteService: SparqlAutocompleteService,
               private sparqlItemService: SparqlItemService,
@@ -81,23 +82,6 @@ export class ActiveComponentController {
     this.nodeSearch = d3.select('.node-search')
     this.tooltip = d3.select('.active-tooltip')
 
-    this.propertiesMenu = cmenu('#properties-menu').config({
-      background: '#ffffff',
-      backgroundHover: '#fafafa',
-      diameter: 160,
-      menus: [{
-        title: 'Pe'
-      }, {
-        title: 'Pl'
-      }, {
-        title: 'Ab'
-      }, {
-        title: 'Cd'
-      }, {
-        title: 'Ef'
-      }]
-    })
-
     this.menu = cmenu('#circle-menu').config({
       background: '#ffffff',
       backgroundHover: '#fafafa',
@@ -109,7 +93,6 @@ export class ActiveComponentController {
       }, {
         icon: 'expand-icon',
         click: () => {
-          this.propertiesMenu.hide()
           this.buildAndDisplayPropertiesMenu(this.currentMenuItem)
         }
       }, {
@@ -130,24 +113,13 @@ export class ActiveComponentController {
   }
 
   private buildAndDisplayPropertiesMenu(item: IItemState): void {
-    console.log(item)
-    this.propertiesMenu.config({
-      background: '#ffffff',
-      backgroundHover: '#fafafa',
-      diameter: 160,
-      menus: item.item.localProperties.concat(item.item.remoteProperties)
-        .filter((p) => p.value !== RDF.type.value
-          && p.value !== SKOS.prefLabel.value
-          && p.value !== SKOS.altLabel.value
-          && p.value !== 'http://purl.org/dc/terms/identifier'
-        )
-        .map((p) => {
-          return {
-            title: p.label + ' (' + p.values.length + ')'
-          }
-        })
-    })
-    this.propertiesMenu.show(this.getMenuPosition(item))
+    let modalInstance: any = this.$uibModal.open({
+      animation: true,
+      component: 'expandModal',
+      resolve: {
+        item: function(): IItemState { return item }
+      }
+    });
   }
 
   private buildCanvas(): void {
@@ -164,7 +136,6 @@ export class ActiveComponentController {
   private canvasClick(sel: d3.Selection<SVGGElement, {}, HTMLElement, any>): void {
     this.$scope.$apply(() => {
       this.menu.hide()
-      this.propertiesMenu.hide()
 
       if (!this.currentlyAdding) {
         this.nodeSearchOffsetTop = d3.event.offsetY
@@ -250,7 +221,6 @@ export class ActiveComponentController {
     this.currentMenuItem = d
     this.tooltip.style('visibility', 'hidden')
     this.menu.hide()
-    this.propertiesMenu.hide()
     this.menu.show(this.getMenuPosition(d))
   }
 
@@ -379,7 +349,6 @@ export class ActiveComponentController {
 
   private dragDivider(evt: DragEvent): void {
     this.menu.hide()
-    this.propertiesMenu.hide()
     let nativePercent: number = 100 * evt.clientX / window.innerWidth
     this.state.setActiveDividerPercentage(nativePercent > 98 ? 100 : nativePercent < 2 ? 0 : nativePercent)
   }

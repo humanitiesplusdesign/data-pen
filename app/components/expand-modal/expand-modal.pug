@@ -1,0 +1,13 @@
+.modal-header
+  h4.modal-title#modal-title Properties of {{ $ctrl.itemState.description }}
+.modal-body#modal-body
+  ul
+    li(ng-repeat="propValues in $ctrl.itemProperties")
+      span {{ propValues.label }}
+      span &nbsp;(
+      span {{ propValues.values.length }}
+      span ) 
+      button.btn.btn-sm(ng-click="$ctrl.expand(propValues)") Expand
+.modal-footer
+  button.cancel-button.transition-200(ng-click="$ctrl.cancel()") Cancel
+//-   button.select-button.transition-200(ng-click="$ctrl.commit()") Select
