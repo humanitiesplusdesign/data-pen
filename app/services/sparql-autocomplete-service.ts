@@ -2,7 +2,7 @@
 
 import {INode, ONodeSet, DataFactory} from '../models/rdf'
 import {WorkerService, WorkerWorkerService} from './worker-service/worker-service'
-import {EMap, StringSet} from '../components/collection-utils'
+import {FMap, EMap, StringSet} from 'components/collection-utils'
 import {FibraSparqlService} from './fibra-sparql-service'
 import {StateWorkerService} from './worker-service/worker-service'
 import {DataModel} from './project-service/data-model'
@@ -98,14 +98,17 @@ class ProcessingData {
   public idToMatchedLabelSet: EMap<ONodeSet<INode>> = new EMap<ONodeSet<INode>>(() => new ONodeSet<INode>())
   public idToAltLabelSet: EMap<ONodeSet<INode>> = new EMap<ONodeSet<INode>>(() => new ONodeSet<INode>())
   public idToDatasourceSet: EMap<StringSet> = new EMap<StringSet>(() => new StringSet())
-  public seen: StringSet = new StringSet()
+  public touchedIds: StringSet = new StringSet()
+  public idToResult: d3.Map<Result> = new FMap<Result>()
 }
 
 export class SparqlAutocompleteWorkerService {
 
   private static processBindings(pd: ProcessingData, endpoint: string, result: ISparqlBindingResult<{[id: string]: ISparqlBinding}>): void {
+    pd.touchedIds.clear()
     result.results.bindings.forEach(binding => {
       let id: string = binding['id'].value
+      pd.touchedIds.add(id)
       pd.idToIdSet.goc(id).add(id)
       pd.idToDatasourceSet.goc(id).add(endpoint)
       if (binding['prefLabel'])
@@ -129,16 +132,17 @@ export class SparqlAutocompleteWorkerService {
 
   private static buildResults(pd: ProcessingData, groupIdToGroup: EMap<ResultGroup>, dataModel: DataModel, prefLang: string): ResultGroup[] {
     let res: ResultGroup[] = []
-    pd.idToIdSet.each((idSet: StringSet, id: string) => {
-      let seen: boolean = pd.seen.has(id) || idSet.values().some(id2 => pd.seen.has(id2))
-      if (!seen) {
-        pd.seen.adds(idSet)
-        let result: Result = new Result(idSet.values().map(oid => DataFactory.instance.namedNode(oid)), pd.idToDatasourceSet.get(id).values(), pd.idToMatchedLabelSet.get(id).values()[0], pd.idToPrefLabelSet.has(id) ? pd.idToPrefLabelSet.get(id).values()[0] : null)
-        if (pd.idToAltLabelSet.has(id)) result.additionalInformation['altLabel'] = pd.idToAltLabelSet.get(id).values()
-        result.additionalInformation['type'] = pd.idToGroupIdSet.get(id).values().map(v => DataFactory.instance.namedNode(v))
-        result.additionalInformation['typeLabel'] = pd.idToGroupIdSet.get(id).values().map(v => {
-          return pd.idToPrefLabelSet.has(id) ? pd.idToPrefLabelSet.get(id).values()[0] : null
-        })
+    pd.touchedIds.each((id: string) => {
+      let idSet: StringSet = pd.idToIdSet.goc(id)
+      let resultId: string = idSet.values().find(id2 => pd.idToResult.has(id2))
+      let result: Result = null
+      if (resultId) {
+        result = pd.idToResult.get(resultId)
+        result.ids = idSet.values().map(oid => DataFactory.instance.namedNode(oid))
+        result.datasources = pd.idToDatasourceSet.get(id).values()
+      } else {
+        result = new Result(idSet.values().map(oid => DataFactory.instance.namedNode(oid)), pd.idToDatasourceSet.get(id).values(), pd.idToMatchedLabelSet.get(id).values()[0], pd.idToPrefLabelSet.has(id) ? pd.idToPrefLabelSet.get(id).values()[0] : null)
+        idSet.each(id2 => pd.idToResult.set(id2, result))
         pd.idToGroupIdSet.get(id).each(gid =>
           groupIdToGroup.goc(gid, () => {
             let glabel: string = dataModel.classMap.has(gid) ? dataModel.classMap.get(gid).getLabel(prefLang) :
@@ -149,6 +153,16 @@ export class SparqlAutocompleteWorkerService {
           }).results.push(result)
         )
       }
+      let altLabels: INode[] = pd.idToAltLabelSet.has(id) ? pd.idToAltLabelSet.get(id).values() : []
+      if (pd.idToPrefLabelSet.has(id)) {
+        let prefLabels: INode[] = pd.idToPrefLabelSet.get(id).values()
+        altLabels = altLabels.concat(prefLabels.slice(1))
+      }
+      result.additionalInformation['altLabel'] = altLabels.length > 0 ? altLabels : null
+      result.additionalInformation['type'] = pd.idToGroupIdSet.get(id).values().map(v => DataFactory.instance.namedNode(v))
+      result.additionalInformation['typeLabel'] = pd.idToGroupIdSet.get(id).values().map(v => {
+        return pd.idToPrefLabelSet.has(id) ? pd.idToPrefLabelSet.get(id).values()[0] : null
+      })
     })
     return res
   }
