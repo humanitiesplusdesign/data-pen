@@ -386,3 +386,12 @@ export class ActiveComponent implements angular.IComponentOptions {
 
 angular.module('fibra.components.active', ['ui.bootstrap', 'fibra.actions.project', 'fibra.services.search-service', 'filearts.dragDrop', 'ui.grid', 'ui.grid.emptyBaseLayer', 'ui.grid.resizeColumns', 'ui.grid.autoResize', 'ui.grid.edit'])
   .component('active', new ActiveComponent())
+  .filter('makeAcronym', function() {
+    return function (item) {
+      if (item.match(' ') != null) {
+        return item.match(/\b([A-Z])/g).join('')
+      } else {
+        return item
+      }
+    };
+  });
