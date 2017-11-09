@@ -30,4 +30,5 @@
             //-li Edit
             //-li Duplicate
             //-li Export
-            li.delete-project(ng-click="$ctrl.deleteProject(id, $index, project)") Delete
+            //-li.delete-project(ng-click="$ctrl.deleteProject(id, $index, project)") Delete
+            li.delete-project(ng-click="$ctrl.openDeleteProjectModal()") Delete

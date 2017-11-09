@@ -7,6 +7,7 @@ import { ICitable } from '../../models/citable'
 import { ProjectSourceInfo } from '../project-sources-view/project-sources-view-component'
 import { ProjectService } from '../../services/project-service/project-service'
 import { SocialAuthService } from '../../services/social-auth-service'
+import { IModalService } from 'angular-ui-bootstrap'
 import * as CryptoJS from 'crypto-js';
 import retina from 'retinajs'
 
@@ -25,12 +26,8 @@ export class ProjectsViewComponentController implements angular.IComponentContro
 		this.projectService.deleteCitable(this.projectSources[sourceId].updateEndpoint, project)
 	}
 
-	public $postLink(): void {
-
-	}
-
 	/* @ngInject */
-	constructor(private projectService: ProjectService, socialAuthService: SocialAuthService, $localStorage: any, $document: angular.IDocumentService) {
+	constructor(private projectService: ProjectService, socialAuthService: SocialAuthService, $localStorage: any, $document: angular.IDocumentService, private $uibModal: IModalService) {
 		let projectSources: ProjectSourceInfo[] = null//$localStorage['projectSources']
 		if (!projectSources || projectSources.length === 0) {
 			projectSources = []
@@ -75,6 +72,21 @@ export class ProjectsViewComponentController implements angular.IComponentContro
 			return project.authorityEndpoints.concat(project.archiveEndpoints).map((p) => p.id).indexOf(ae.id) !== -1
 		})
 	}
+
+	private openDeleteProjectModal(): void {
+		let modalInstance: any = this.$uibModal.open({
+			animation: true,
+			component: 'confirmDeleteModal',
+			resolve: {
+			}
+		});
+		modalInstance.result.then(function(selectedItem) {
+      // deleteProject(id, $index, project) ??
+		}, function() {
+			// didn't delete
+		});
+	};
+
 }
 
 export class ProjectsViewComponent implements angular.IComponentOptions {

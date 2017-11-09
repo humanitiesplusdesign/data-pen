@@ -205,14 +205,51 @@ active {
       }
 
       .node {
+        transition: 1s
+        -webkit-transition: 1s
+
         .node-circle {
-          stroke: #7E7E7E
-          fill: #aaaaaa
+          fill: #c6c6c6
+          stroke: rgba(#000000, 0.35)
+        }
+
+      }
+
+      @keyframes node-pulse {
+        0% {
+          -webkit-transform: scale(1);
+          transform: scale(1);
+        }
+        50% {
+          -webkit-transform: scale(0.8);
+          transform: scale(0.8);
+        }
+        100% {
+          -webkit-transform: scale(1);
+          transform: scale(1);
         }
       }
 
-      .loading-node {
-        opacity: .5
+      .loading {
+        &:after {
+          content: ''
+          box-sizing: border-box
+          position: absolute
+          top: 50%
+          //left: 50%
+          width: 20px
+          height: 20px
+          margin-top: -10px
+          margin-left: -10px
+          border-radius: 50%
+          border: 2px solid rgba(#000, 0.1)
+          border-top-color: rgba(#000, 0.4)
+          animation: spinner 1s linear infinite
+          z-index: 10
+        }
+
+        //-webkit-animation: node-pulse 0.7s infinite linear;
+        //animation: node-pulse 0.7s infinite linear;
       }
     }
   }
