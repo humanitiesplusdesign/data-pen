@@ -308,6 +308,10 @@ export class ActiveComponentController {
           // TODO: implement change to offsets using actions and reducers
           d.leftOffset = d3.event.x + this.dragOrigX
           d.topOffset = d3.event.y + this.dragOrigY
+          if (d.topOffset < 20) { d.topOffset = 20 }
+          if (d.topOffset > window.innerHeight-75) { d.topOffset = window.innerHeight-75 }
+          if (d.leftOffset < 20) { d.leftOffset = 20 }
+          if (d.leftOffset > window.innerWidth-20) { d.leftOffset = window.innerWidth-20 }
           this.dragOrigX = d.leftOffset
           this.dragOrigY = d.topOffset
           this.updateCanvas()
@@ -316,6 +320,10 @@ export class ActiveComponentController {
           // TODO: implement change to offsets using actions and reducers
           d.leftOffset = d3.event.x + this.dragOrigX
           d.topOffset = d3.event.y + this.dragOrigY
+          if (d.topOffset < 20) { d.topOffset = 20 }
+          if (d.topOffset > window.innerHeight-75) { d.topOffset = window.innerHeight-75 }
+          if (d.leftOffset < 20) { d.leftOffset = 20 }
+          if (d.leftOffset > window.innerWidth-20) { d.leftOffset = window.innerWidth-20 }
           this.dragOrigX = null
           this.dragOrigY = null
           this.updateCanvas()
