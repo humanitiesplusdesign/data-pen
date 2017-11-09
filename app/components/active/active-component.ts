@@ -184,12 +184,13 @@ export class ActiveComponentController {
             },
             false)) {
           r.additionalInformation.typeDescriptions = this.state.project.project.dataModel.classMap.get(r.additionalInformation.type[0].value).labels
-          r.additionalInformation.dataSourceDescriptions = this.state.project.project.authorityEndpoints
+          r.additionalInformation.dataSourceDescriptions = this.state.project.project.authorityEndpoints.concat(this.state.project.project.archiveEndpoints)
             .filter((ae) => r.datasources.filter((rd) => ae.id === rd ).length > 0)
             .map((ae) => ae.labels.find(la => la.language === 'en'))
           ret.push(r)
         }
     }))
+    console.log(ret)
     return ret
   }
 
@@ -253,7 +254,6 @@ export class ActiveComponentController {
     sel.attr('transform', 'translate(' + top + ',' + left + ')')
     sel.select('circle')
       .classed('loading', (d): boolean => {
-        console.log(d)
         return d.item === null
       })
       .transition().attr('r', this.radius + 'px')
