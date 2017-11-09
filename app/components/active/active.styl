@@ -72,6 +72,12 @@ active {
     background-position -2px 4px
   }
 
+  .cold-node {
+    margin-top: 10px
+    margin-left: 78px
+    margin-bottom: -5px
+    opacity: 0.5
+  }
 
   .resultType {
     width: 50px
@@ -81,16 +87,25 @@ active {
     opacity: 0.5
     text-align: right
     margin-right: 8px
+    margin-bottom: -0.3em
+    text-overflow: ellipsis
+    overflow: hidden
+    white-space: nowrap
   }
 
   .resultActual {
   }
 
   .resultSource {
+    display: inline-block
     font-family: 'Roboto Mono', monospace
     font-size: 0.75em
+    margin-bottom: -0.3em
     opacity: 0.5
     margin-left: 8px
+    text-overflow: ellipsis
+    overflow: hidden
+    white-space: nowrap
   }
 
   .control-area {
@@ -270,7 +285,12 @@ active {
       left: 0;
       z-index: 1000;
       display: none;
-      background-color: #f9f9f9;
+      background-color: #fff !important
+      border-radius: 4px !important
+      border: 1px solid rgba(0, 0, 0, 0.15) !important
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.175) !important
+      -webkit-box-shadow: 0 6px 12px rgba(0, 0, 0, 0.175) !important
+      margin-top: 1em
     }
 
     .custom-popup-wrapper > .message {
