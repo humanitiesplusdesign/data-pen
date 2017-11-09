@@ -17,7 +17,6 @@
     .input-group-addon.addon-left
       i.glyphicon.glyphicon-search(ng-hide="loadingSearchResults")
       .spinner(ng-if="loadingSearchResults")
-    input.form-control(type="text" ng-model="$ctrl.nodeSearchSelected" placeholder="Search" uib-typeahead="result as $ctrl.nodeSearchLabel(result) for result in $ctrl.nodeSearchResults($viewValue)" typeahead-template-url="resultTemplate.html" typeahead-loading="loadingSearchResults" typeahead-no-results="noResults" typeahead-on-select="$ctrl.nodeSearchSelect($item, $model, $label, $event)" typeahead-wait-ms="1000")
     input.form-control(type="text" ng-model="$ctrl.nodeSearchSelected" placeholder="Search" uib-typeahead="result as $ctrl.nodeSearchLabel(result) for result in $ctrl.nodeSearchResults($viewValue)" typeahead-popup-template-url="resultPopupTemplate.html" typeahead-template-url="resultTemplate.html" typeahead-loading="loadingSearchResults" typeahead-no-results="noResults" typeahead-on-select="$ctrl.nodeSearchSelect($item, $model, $label, $event)" typeahead-wait-ms="1000")
     .input-group-addon.addon-right(ng-click="$ctrl.nodeSearchRemove()")
       //-i.glyphicon.glyphicon-remove
