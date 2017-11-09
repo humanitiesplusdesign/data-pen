@@ -72,6 +72,12 @@ active {
     background-position -2px 4px
   }
 
+  .cold-node {
+    margin-top: 10px
+    margin-left: 78px
+    margin-bottom: -5px
+    opacity: 0.5
+  }
 
   .resultType {
     width: 50px
@@ -81,16 +87,25 @@ active {
     opacity: 0.5
     text-align: right
     margin-right: 8px
+    margin-bottom: -0.3em
+    text-overflow: ellipsis
+    overflow: hidden
+    white-space: nowrap
   }
 
   .resultActual {
   }
 
   .resultSource {
+    display: inline-block
     font-family: 'Roboto Mono', monospace
     font-size: 0.75em
+    margin-bottom: -0.3em
     opacity: 0.5
     margin-left: 8px
+    text-overflow: ellipsis
+    overflow: hidden
+    white-space: nowrap
   }
 
   .control-area {
@@ -205,14 +220,51 @@ active {
       }
 
       .node {
+        transition: 1s
+        -webkit-transition: 1s
+
         .node-circle {
-          stroke: #7E7E7E
-          fill: #aaaaaa
+          fill: #c6c6c6
+          stroke: rgba(#000000, 0.35)
+        }
+
+      }
+
+      @keyframes node-pulse {
+        0% {
+          -webkit-transform: scale(1);
+          transform: scale(1);
+        }
+        50% {
+          -webkit-transform: scale(0.8);
+          transform: scale(0.8);
+        }
+        100% {
+          -webkit-transform: scale(1);
+          transform: scale(1);
         }
       }
 
-      .loading-node {
-        opacity: .5
+      .loading {
+        &:after {
+          content: ''
+          box-sizing: border-box
+          position: absolute
+          top: 50%
+          //left: 50%
+          width: 20px
+          height: 20px
+          margin-top: -10px
+          margin-left: -10px
+          border-radius: 50%
+          border: 2px solid rgba(#000, 0.1)
+          border-top-color: rgba(#000, 0.4)
+          animation: spinner 1s linear infinite
+          z-index: 10
+        }
+
+        //-webkit-animation: node-pulse 0.7s infinite linear;
+        //animation: node-pulse 0.7s infinite linear;
       }
     }
   }
@@ -233,7 +285,12 @@ active {
       left: 0;
       z-index: 1000;
       display: none;
-      background-color: #f9f9f9;
+      background-color: #fff !important
+      border-radius: 4px !important
+      border: 1px solid rgba(0, 0, 0, 0.15) !important
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.175) !important
+      -webkit-box-shadow: 0 6px 12px rgba(0, 0, 0, 0.175) !important
+      margin-top: 1em
     }
 
     .custom-popup-wrapper > .message {

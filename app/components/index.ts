@@ -27,6 +27,7 @@ import './active/active-component'
 import './filter/filter-component'
 import './add-source/add-source-component'
 import './expand-modal/expand-modal-component'
+import './project-delete-modal/project-delete-modal-component'
 
 angular.module('fibra.components', [
   'fibra.components.construct-view',
@@ -54,5 +55,6 @@ angular.module('fibra.components', [
   'fibra.components.active',
   'fibra.components.filter',
   'fibra.components.add-source',
-  'fibra.components.expand-modal'
+  'fibra.components.expand-modal',
+  'fibra.components.project-delete-modal'
 ])

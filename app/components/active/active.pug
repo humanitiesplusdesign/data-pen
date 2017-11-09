@@ -18,6 +18,7 @@
       i.glyphicon.glyphicon-search(ng-hide="loadingSearchResults")
       .spinner(ng-if="loadingSearchResults")
     input.form-control(type="text" ng-model="$ctrl.nodeSearchSelected" placeholder="Search" uib-typeahead="result as $ctrl.nodeSearchLabel(result) for result in $ctrl.nodeSearchResults($viewValue)" typeahead-template-url="resultTemplate.html" typeahead-loading="loadingSearchResults" typeahead-no-results="noResults" typeahead-on-select="$ctrl.nodeSearchSelect($item, $model, $label, $event)" typeahead-wait-ms="1000")
+    input.form-control(type="text" ng-model="$ctrl.nodeSearchSelected" placeholder="Search" uib-typeahead="result as $ctrl.nodeSearchLabel(result) for result in $ctrl.nodeSearchResults($viewValue)" typeahead-popup-template-url="resultPopupTemplate.html" typeahead-template-url="resultTemplate.html" typeahead-loading="loadingSearchResults" typeahead-no-results="noResults" typeahead-on-select="$ctrl.nodeSearchSelect($item, $model, $label, $event)" typeahead-wait-ms="1000")
     .input-group-addon.addon-right(ng-click="$ctrl.nodeSearchRemove()")
       //-i.glyphicon.glyphicon-remove
       img.dismiss-icon(src="./app/images/filter/remove.svg")
@@ -28,6 +29,13 @@
 .active-tooltip
 script(type="text/ng-template" id="resultTemplate.html")
   a
-    span.resultType {{ (match.model.additionalInformation.typeDescriptions | prefLang).length > 8 ? (match.model.additionalInformation.typeDescriptions | prefLang | limitTo:7:0)+"…" : (match.model.additionalInformation.typeDescriptions | prefLang) }}
+    span.resultType {{ match.model.additionalInformation.typeDescriptions | prefLang }}
     span.resultActual {{ match.label }}
-    span.resultSource(ng-repeat="ds in match.model.additionalInformation.dataSourceDescriptions") {{ ds.value.length > 14 ? (ds.value | limitTo:13:0)+"…" : (ds.value) }}
+    label.resultSource(ng-repeat="ds in match.model.additionalInformation.dataSourceDescriptions") {{ ds.value | makeAcronym }}
+script(type="text/ng-template" id="resultPopupTemplate.html")
+  .custom-popup-wrapper(ng-style="{top:position().top+'px', left: position().left+'px'}" style="display: block;" ng-show="isOpen() && !moveInProgress" aria-hidden="{{!isOpen()}}")
+    label.cold-node Add "{{ match.query }}" as an unlinked node 
+    
+    ul.dropdown-menu(role="listbox")
+      li.uib-typeahead-match(ng-repeat="match in matches track by $index" ng-class="{active: isActive($index) }" ng-mouseenter="selectActive($index)" ng-click="selectMatch($index)" role="option" id="{{::match.id}}")
+        div(uib-typeahead-match index="$index" match="match" query="query" template-url="templateUrl")
