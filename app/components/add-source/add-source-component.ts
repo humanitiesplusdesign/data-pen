@@ -69,7 +69,6 @@ export class AddSourceComponentController {
   }
 
   private commit(): void {
-    // This doesn't fly
     this.projectService.loadProject(this.userSource, this.state.project.project.id, true).then((p) => {
       p.labels = this.state.project.project.labels
       p.archiveEndpoints = this.archiveEndpoints.filter((ae) => this.sourceSelections[ae.id])

@@ -3,7 +3,7 @@ import { Project } from '../../services/project-service/project';
 import { RemoteEndpointConfiguration } from '../../services/project-service/remote-endpoint-configuration';
 import * as angular from 'angular';
 
-import { ICitable } from '../../models/citable'
+import { Citable, ICitable } from '../../models/citable';
 import { ProjectSourceInfo } from '../project-sources-view/project-sources-view-component'
 import { ProjectService } from '../../services/project-service/project-service'
 import { SocialAuthService } from '../../services/social-auth-service'
@@ -28,18 +28,18 @@ export class ProjectsViewComponentController implements angular.IComponentContro
 
   /* @ngInject */
   constructor(private projectService: ProjectService, socialAuthService: SocialAuthService, $localStorage: any, $document: angular.IDocumentService, private $uibModal: IModalService) {
-    let projectSources: ProjectSourceInfo[] = null//$localStorage['projectSources']
+    let projectSources: ProjectSourceInfo[] = $localStorage['projectSources']
     if (!projectSources || projectSources.length === 0) {
       projectSources = []
       //projectSources.push(new ProjectSourceInfo('Private projects in local browser storage', 'local:projects', 'local:projects', 'local:projects', '', 'http://ldf.fi/fibra/rdfstoreJSEndpoint'))
       // http://localhost:3000/#!/project-sources?sourceId=Private projects in local browser storage&sparqlEndpoint=local:projects&type=http://ldf.fi/fibra/rdfstoreJSEndpoint
-      //projectSources.push(new ProjectSourceInfo('Projects in local Fuseki SPARQL server', 'http://localhost:3030/fibra/sparql', 'http://localhost:3030/fibra/update', 'http://localhost:3030/fibra/data', '', 'http://ldf.fi/fibra/fusekiEndpoint'))
+      projectSources.push(new ProjectSourceInfo('Projects in local Fuseki SPARQL server', 'http://localhost:3030/fibra/sparql', 'http://localhost:3030/fibra/update', 'http://localhost:3030/fibra/data', '', 'http://ldf.fi/fibra/fusekiEndpoint'))
       // http://localhost:3000/#!/project-sources?sourceId=Projects in local Fuseki SPARQL server&sparqlEndpoint=http://localhost:3030/fibra/sparql&updateEndpoint=http://localhost:3030/fibra/update&graphStoreEndpoint=http://localhost:3030/fibra/data&type=http://ldf.fi/fibra/fusekiEndpoint
-      // projectSources.push(new ProjectSourceInfo('Shared projects', 'http://ldf.fi/fibra/sparql', 'http://ldf.fi/fibra/update', 'http://ldf.fi/fibra/data', 'http://ldf.fi/fibra/shared-projects/', 'http://ldf.fi/fibra/fusekiEndpointWithTextIndexAndSecoFunctions'))
+      projectSources.push(new ProjectSourceInfo('Shared projects', 'http://ldf.fi/fibra/sparql', 'http://ldf.fi/fibra/update', 'http://ldf.fi/fibra/data', 'http://ldf.fi/fibra/shared-projects/', 'http://ldf.fi/fibra/fusekiEndpointWithTextIndexAndSecoFunctions'))
       $localStorage['projectSources'] = projectSources
     }
 
-    if (socialAuthService.isLoggedIn() && !projectSources.some(s => s.id === 'Personal projects')) {
+    if (socialAuthService.isLoggedIn() && !projectSources.some(s => s.id === 'Projects')) {
       let uid: string = CryptoJS.SHA256(socialAuthService.loginState())
       projectSources.unshift(new ProjectSourceInfo('Projects', 'http://ldf.fi/fibra/sparql', 'http://ldf.fi/fibra/sparql', 'http://ldf.fi/fibra/sparql', 'http://ldf.fi/fibra/user/' + uid + '/projects/', 'http://ldf.fi/fibra/fusekiEndpointWithTextIndexAndSecoFunctions'))
     }
@@ -73,18 +73,24 @@ export class ProjectsViewComponentController implements angular.IComponentContro
     })
   }
 
-  private openDeleteProjectModal(): void {
+  private openDeleteProjectModal(project: Project, i: number, sourceId: string): void {
+    let deleteProject: (string, number, Citable) => void = this.deleteProject.bind(this)
     let modalInstance: any = this.$uibModal.open({
       animation: true,
       component: 'confirmDeleteModal',
       resolve: {
+        project: function(): Project {
+          return project
+        }
       }
     });
-    modalInstance.result.then(function(selectedItem) {
-      // deleteProject(id, $index, project) ??
-    }, function() {
-      // didn't delete
-    });
+    modalInstance.result.then(
+      function(): void {
+        deleteProject(sourceId, i, project)
+      },
+      function(): void {
+        // didn't delete
+      });
   };
 
 }
