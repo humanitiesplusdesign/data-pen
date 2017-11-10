@@ -1,11 +1,18 @@
 .modal-header
-  h4.modal-title#modal-title Select Sources
+  h4.modal-title Select Sources
   p.description Configure your project with external authorities and archives to draw in external data.
-.modal-body#modal-body
-  ul.available-sources-list
+.modal-body
+  
+  //-.sources-tabs-controller(ng-controller="TabsCtrl")
+    uib-tabset(active="activeJustified" justified="true")
+    uib-tab(index="0" heading="Archives") archives and authorities
+    uib-tab(index="1" heading="Upload CSV") upload your data
+    uib-tab(index="2" heading="Custom Endpoint") endpoint stuff
+      
+  -ul.available-sources-list
     li(ng-repeat="endpoint in $ctrl.authorityEndpoints.concat($ctrl.archiveEndpoints)")
       input(type="checkbox", ng-model="$ctrl.sourceSelections[endpoint.id]")
       span &nbsp;{{ endpoint.labels | prefLang }}
 .modal-footer
   button.cancel-button.text-button.transition-200(ng-click="$ctrl.cancel()") Cancel
-  button.select-button.text-button.transition-200(ng-click="$ctrl.commit()") Select
+  button.select-button.text-button.transition-200.disabled(ng-click="$ctrl.commit()") Select
