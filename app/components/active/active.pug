@@ -1,11 +1,18 @@
 .main-table(ng-style="$ctrl.tableWidthStyle()")
   .main-grid(ui-grid="{ data: $ctrl.state.active.activeLayout.items, enableFiltering: true }" ng-hide="$ctrl.state.active.dividerPercent < 2" ui-grid-auto-resize ui-grid-edit ui-grid-resize-columns ui-grid-empty-base-layer)
 .main-canvas(ng-style="$ctrl.canvasWidthStyle()")
-  .control-area
-    button.btn.btn-circle.btn-lg
-      img.btn-icon.view-options(src="./app/images/active/view_options.svg")
-    button.btn.btn-circle.btn-lg
-      img.btn-icon.snapshot(src="./app/images/active/snapshot.svg")
+  .control-area(ng-controller="buttonController")
+    .containers
+      .options-container.view-options-container(ng-show="viewOptionsVisible")
+      .options-container.snapshot-container(ng-show="snapshotVisible")
+      .options-container.layout-container(ng-show="layoutVisible")
+    .buttons
+      button.btn.btn-circle.btn-lg(ng-click="viewOptionsVisible=!viewOptionsVisible; snapshotVisible=false; layoutVisible=false" ng-class="viewOptionsVisible ? 'button-active' : ''")
+        img.btn-icon.view-options(src="./app/images/active/view_options.svg")
+      button.btn.btn-circle.btn-lg(disabled ng-click="snapshotVisible=!snapshotVisible; viewOptionsVisible=false; layoutVisible=false" ng-class="snapshotVisible ? 'button-active' : ''")
+        img.btn-icon.snapshot(src="./app/images/active/snapshot.svg")
+      button.btn.btn-circle.btn-lg(disabled ng-click="layoutVisible=!layoutVisible; viewOptionsVisible=false; snapshotVisible=false" ng-class="layoutVisible ? 'button-active' : ''")
+        img.btn-icon.snapshot(src="./app/images/active/layout.svg")
   svg.main-svg
     g.main-g
       rect.main-background
