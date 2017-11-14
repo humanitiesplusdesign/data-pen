@@ -83,5 +83,5 @@ export class SourcesComponent implements angular.IComponentOptions {
     public controller: any = SourcesComponentController
 }
 
-angular.module('fibra.components.sources', [])
+angular.module('fibra.components.sources', ['ui.bootstrap'])
   .component('sources', new SourcesComponent())
