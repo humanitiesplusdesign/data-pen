@@ -1,12 +1,12 @@
 .title
   .row
-    label Title
+    label.input-label Title
   .row
     .form-group(ng-repeat="label in $ctrl.citable.labels")
       input.title-input(type="text",ng-model="label.value" required)
 .description
   .row
-    label Description
+    label.input-label Description
   .row
     .form-group(ng-repeat="descr in $ctrl.citable.descriptions")
       textarea.description-input.form-control(ng-model="descr.value")

@@ -33,6 +33,14 @@ label {
   font-size: 1em
   font-weight: 400
 }
+
+label.input-label {
+  font-family: 'Roboto Mono', monospace
+  font-size: 0.85em
+  color: #838383
+  margin-bottom: 10px
+}
+
 select {
   -webkit-appearance: none;
   -moz-appearance: none;
@@ -201,8 +209,6 @@ position: absolute
   fill: #999
 }
 
-/* Authentication text */
-
 .auth-text {
   float: right
   margin: 50px 0 -70px 0
@@ -249,6 +255,38 @@ position: absolute
   }
 }
 
+.modal-tabs {
+  li {
+    a {
+      background: none
+      text-align: center
+      background-color: rgba(#000000, 0.05)
+      border: 1px solid transparent
+      border-radius: 3px
+      margin: 0 10px 50px 0
+      padding: 8px -10px 8px -10px
+      color: #3c3c3c
+      opacity: .8
+      transition: .2s
+      -webkit-transition: .2s
+      -moz-transition: .2s
+      -o-transition: .2s
+
+      &:hover {
+        opacity: 1
+      }
+    }
+  }
+
+  ul > li.active > a {
+      background-color: #466bd3 !important
+      opacity: 1
+      box-shadow: 0px 1px 2px rgba(#000, 0.2)
+      border-bottom: 1px solid rgba(#000000, 0.3)
+      color: #fff !important
+  }
+}
+
 .text-button {
   appearance: none
   border: none
@@ -258,5 +296,4 @@ position: absolute
   &:hover {
     opacity: .4;
   }
-
 }

@@ -104,3 +104,54 @@ export class AddSourceComponent implements angular.IComponentOptions {
 
 angular.module('fibra.components.add-source', ['ui.bootstrap'])
   .component('addSource', new AddSourceComponent())
+  .controller('classListController', function($scope) {
+		$scope.options = [{
+			"id": "0",
+			"description": "1st class name.",
+			"name": "Person"
+		},
+		{
+			"id": "1",
+			"description": "2nd class name.",
+			"name": "Place"
+		},
+		{
+			"id": "2",
+			"description": "3rd class name.",
+			"name": "Work"
+		}]
+  })
+  .controller('fileColumnsListController', function($scope) {
+		$scope.options = [{
+			"id": "0",
+			"description": "1st column name.",
+			"name": "Name"
+		},
+		{
+			"id": "1",
+			"description": "2nd column name.",
+			"name": "Hometown"
+		},
+		{
+			"id": "2",
+			"description": "3rd column name.",
+			"name": "Place of death"
+		}]
+  })
+  .controller('sourceListController', function($scope) {
+		$scope.options = [{
+			"id": "0",
+			"description": "1st source name.",
+			"name": "VIAF"
+		},
+		{
+			"id": "1",
+			"description": "2nd source name.",
+			"name": "GeoNames"
+		},
+		{
+			"id": "2",
+			"description": "3rd source name.",
+			"name": "Electronic Enlightenment"
+		}]
+  })
