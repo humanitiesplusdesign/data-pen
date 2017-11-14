@@ -136,7 +136,22 @@ angular.module('fibra.components.add-source', ['ui.bootstrap'])
 			"id": "2",
 			"description": "3rd column name.",
 			"name": "Place of death"
-		}]
+		},
+    {
+      "id": "3",
+      "description": "4th column name.",
+      "name": "VIAF ID"
+    },
+    {
+      "id": "4",
+      "description": "5th column name.",
+      "name": "EE ID"
+    },
+    {
+      "id": "5",
+      "description": "6th column name.",
+      "name": "GeoNames ID"
+    }]
   })
   .controller('sourceListController', function($scope) {
 		$scope.options = [{
