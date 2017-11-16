@@ -58,6 +58,7 @@ export class SourcesComponentController {
     let modalInstance: any = this.$uibModal.open({
       animation: true,
       component: 'addSource',
+      size: 'lg',
       resolve: {
       }
     });

@@ -1,13 +1,17 @@
 add-source {
 
-  p {
-    width: 300px
+  .sources-tabs {
+    //margin-top: 40px
+  }
+
+  p.description {
+    width: 350px !important
     margin-top: 15px
   }
 
   .available-sources-list {
-    margin-left: -7px
     margin-top: 30px
+    margin-left: -7px
     list-style: none
     line-height: 1.7em
 
@@ -24,6 +28,100 @@ add-source {
       font-size: 1em
       margin-left:-1.16em
       line-height: 1
+    }
+  }
+
+  .csv-setup {
+    margin-top: 30px
+
+    .select-file-button, .add-column-button {
+      width: 40%
+      height: 27px
+      margin: 0 15px 0 0
+      appearance: none
+      -webkit-appearance: none
+      -moz-appearance: none
+      -o-appearance: none
+      outline: none
+      padding-top: 4px
+      border: 1px solid rgba(#000, 0.3)
+      border-radius: 3px
+      box-shadow: 0 1px 1px rgba(#000, 0.05)
+      background-color: #fff
+      font-size: 0.9em
+      text-align: center
+      color: #3c3c3c
+      cursor: pointer
+
+      &:active {
+        background-color: #f5f5f5
+      }
+    }
+
+    input[type="file"] {
+      display: none;
+    }
+
+    .entity-type-selection, .entity-label-column-selection {
+      margin-top: 20px
+    }
+
+    .dropdown-container {
+      width: 60%
+      height: 30px
+      position: relative
+      display: block
+      line-height: 1.8
+      background: none
+      overflow: hidden
+
+      select {
+        width: 100%
+        height: 100%
+        margin: 0
+        padding: 0 30px 0 10px
+        font-size: 0.9em
+        color: #3c3c3c
+        cursor: pointer
+        border: 1px solid rgba(#000, 0.3)
+        border-radius: 3px
+        box-shadow: 0 1px 1px rgba(#000, 0.05)
+
+        &::-ms-expand {
+          display: none
+        }
+
+        &:focus {
+          border: 1px solid rgba(#466bd3, 1)
+        }
+      }
+
+      &::after {
+        content: '\25be'
+        position: absolute
+        top: 0
+        right: 10px
+        bottom: 0
+        font-size: 1.2em
+        color: #3c3c3c
+        background: none
+        pointer-events: none
+      }
+    }
+
+    .select-source, .select-id-column {
+      display: inline-block
+      width: 50%
+      margin-top: 20px
+
+      .dropdown-container {
+        width: 90%
+      }
+    }
+
+    .add-column-button {
+      width: 30%
+      margin-top: 20px
     }
   }
 

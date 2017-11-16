@@ -104,19 +104,69 @@ export class AddSourceComponent implements angular.IComponentOptions {
 
 angular.module('fibra.components.add-source', ['ui.bootstrap'])
   .component('addSource', new AddSourceComponent())
-  .controller('TabsCtrl', function ($scope, $window) {
-  $scope.tabs = [
-    { title:'Dynamic Title 1', content:'Dynamic content 1' },
-    { title:'Dynamic Title 2', content:'Dynamic content 2', disabled: true }
-  ];
-
-  $scope.alertMe = function() {
-    setTimeout(function() {
-      $window.alert('You\'ve selected the alert tab!');
-    });
-  };
-
-  $scope.model = {
-    name: 'Tabs'
-  };
-});
+  .controller('classListController', function($scope) {
+		$scope.options = [{
+			"id": "0",
+			"description": "1st class name.",
+			"name": "Person"
+		},
+		{
+			"id": "1",
+			"description": "2nd class name.",
+			"name": "Place"
+		},
+		{
+			"id": "2",
+			"description": "3rd class name.",
+			"name": "Work"
+		}]
+  })
+  .controller('fileColumnsListController', function($scope) {
+		$scope.options = [{
+			"id": "0",
+			"description": "1st column name.",
+			"name": "Name"
+		},
+		{
+			"id": "1",
+			"description": "2nd column name.",
+			"name": "Hometown"
+		},
+		{
+			"id": "2",
+			"description": "3rd column name.",
+			"name": "Place of death"
+		},
+    {
+      "id": "3",
+      "description": "4th column name.",
+      "name": "VIAF ID"
+    },
+    {
+      "id": "4",
+      "description": "5th column name.",
+      "name": "EE ID"
+    },
+    {
+      "id": "5",
+      "description": "6th column name.",
+      "name": "GeoNames ID"
+    }]
+  })
+  .controller('sourceListController', function($scope) {
+		$scope.options = [{
+			"id": "0",
+			"description": "1st source name.",
+			"name": "VIAF"
+		},
+		{
+			"id": "1",
+			"description": "2nd source name.",
+			"name": "GeoNames"
+		},
+		{
+			"id": "2",
+			"description": "3rd source name.",
+			"name": "Electronic Enlightenment"
+		}]
+  })
