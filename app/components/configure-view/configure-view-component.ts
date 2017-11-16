@@ -31,6 +31,21 @@ export class ConfigureViewComponentController implements angular.IComponentContr
   public schemas: Schema[] = []
   public authorities: RemoteEndpointConfiguration[] = []
   public archives: RemoteEndpointConfiguration[] = []
+  public existingProjectOptions = [{
+    "id": "0",
+    "description": "1st project name.",
+    "name": "Project name 1"
+  },
+  {
+    "id": "1",
+    "description": "2nd project name.",
+    "name": "Project name 2"
+  },
+  {
+    "id": "2",
+    "description": "3rd project name.",
+    "name": "Project name 3"
+  }]
 
   public projectsList = [{
     "id": "0",
