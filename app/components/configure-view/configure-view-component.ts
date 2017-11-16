@@ -47,6 +47,22 @@ export class ConfigureViewComponentController implements angular.IComponentContr
     "name": "Project name 3"
   }]
 
+  public projectsList = [{
+    "id": "0",
+    "description": "1st project name.",
+    "name": "Project name 1"
+  },
+  {
+    "id": "1",
+    "description": "2nd project name.",
+    "name": "Project name 2"
+  },
+  {
+    "id": "2",
+    "description": "3rd project name.",
+    "name": "Project name 3"
+  }]
+
   public saveAndOpen(): void {
     this.project.authorityEndpoints = this.authorities.filter(a => this.selectedAuthorities[a.id])
     this.project.archiveEndpoints = this.archives.filter(a => this.selectedArchives[a.id])
@@ -60,6 +76,15 @@ export class ConfigureViewComponentController implements angular.IComponentContr
 
   public changeTemplate(): void {
     if (this.project) this.selectedTemplate.copyToProject(this.project)
+  }
+
+  public projectTitleFilled(): boolean {
+    let projectTitleLength = this.project.labels[0].value.length
+    if (projectTitleLength > 0) {
+      return true
+    } else {
+      return false
+    }
   }
 
   /* @ngInject */

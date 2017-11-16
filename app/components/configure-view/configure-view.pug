@@ -26,5 +26,5 @@
             label.input-label Data
               input(type="checkbox" checked)
     .action-items
-      button.save-project.text-button.transition-200(ng-click="$ctrl.saveAndOpen()") Save and open
+      button.save-project.text-button.transition-200(ng-class="{'button-disabled' : !$ctrl.projectTitleFilled()}" ng-click="$ctrl.projectTitleFilled() ? $ctrl.saveAndOpen() : ''") Save and open
       button.cancel-project.text-button.transition-200(ng-click="$ctrl.delete()") Cancel
