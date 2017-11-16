@@ -27,27 +27,27 @@
                 .row
                   label.input-label 2. Select entity type
                 .row
-                  .dropdown-container(ng-controller="classListController")
-                    select(ng-model="item.id" ng-selected="0" ng-options="option.id as option.name for option in options")
+                  .dropdown-container
+                    select(ng-model="item.id" ng-selected="0" ng-options="option.id as option.name for option in $ctrl.typeListOptions")
                       option(ng-repeat="option in data.availableOptions" value="{{option.id}}") {{option.name}}
               .entity-label-column-selection
                 .row
                   label.input-label 3. Select entity label column
                 .row
-                  .dropdown-container(ng-controller="fileColumnsListController")
-                    select(ng-model="item.id" ng-selected="0" ng-options="option.id as option.name for option in options")
+                  .dropdown-container
+                    select(ng-model="item.id" ng-selected="0" ng-options="option.id as option.name for option in $ctrl.filePropertyOptions")
                       option(ng-repeat="option in data.availableOptions" value="{{option.id}}") {{option.name}}
             .right-side.col-md-4
               p.description If your data includes one or more sets of unique identifiers from an authority or archive, add those columns here to reconcile your entities. 
               .select-id-column
                 label.input-label Authority/archive
-                .dropdown-container(ng-controller="sourceListController")
-                  select(ng-model="item.id" ng-selected="0" ng-options="option.id as option.name for option in options")
+                .dropdown-container
+                  select(ng-model="item.id" ng-selected="0" ng-options="option.id as option.name for option in $ctrl.sourcesListOptions")
                     option(ng-repeat="option in data.availableOptions" value="{{option.id}}") {{option.name}}
               .select-source
                 label.input-label ID column
-                .dropdown-container(ng-controller="fileColumnsListController")
-                  select(ng-model="item.id" ng-selected="0" ng-options="option.id as option.name for option in options")
+                .dropdown-container
+                  select(ng-model="item.id" ng-selected="0" ng-options="option.id as option.name for option in $ctrl.filePropertyOptions")
                     option(ng-repeat="option in data.availableOptions" value="{{option.id}}") {{option.name}}
               button.add-column-button Add column
               
