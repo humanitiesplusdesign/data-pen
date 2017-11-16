@@ -1,8 +1,5 @@
 'use strict'
 
-import {ICitable} from '../models/citable'
-import {FibraService} from '../services/fibra-service'
-import {getPrefLangString} from './preferred-language-filter'
 import * as angular from 'angular'
 
 export function generateAcronym(item: string): string {
@@ -14,6 +11,4 @@ export function generateAcronym(item: string): string {
 }
 
 angular.module('fibra.filters.make-acronym', [])
-  .filter('makeAcronym', (item: string) => {
-    return generateAcronym(item)
-  })
+  .filter('makeAcronym', /* @ngInject */ () => generateAcronym)
