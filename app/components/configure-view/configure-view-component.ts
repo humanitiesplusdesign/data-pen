@@ -31,6 +31,21 @@ export class ConfigureViewComponentController implements angular.IComponentContr
   public schemas: Schema[] = []
   public authorities: RemoteEndpointConfiguration[] = []
   public archives: RemoteEndpointConfiguration[] = []
+  public existingProjectOptions = [{
+    "id": "0",
+    "description": "1st project name.",
+    "name": "Project name 1"
+  },
+  {
+    "id": "1",
+    "description": "2nd project name.",
+    "name": "Project name 2"
+  },
+  {
+    "id": "2",
+    "description": "3rd project name.",
+    "name": "Project name 3"
+  }]
 
   public saveAndOpen(): void {
     this.project.authorityEndpoints = this.authorities.filter(a => this.selectedAuthorities[a.id])
@@ -95,20 +110,3 @@ export class ConfigureViewComponent implements angular.IComponentOptions {
 
 angular.module('fibra.components.configure', ['fibra.services'])
   .component('configureView', new ConfigureViewComponent())
-  .controller('projectsListController', function($scope) {
-		$scope.options = [{
-			"id": "0",
-			"description": "1st project name.",
-			"name": "Project name 1"
-		},
-		{
-			"id": "1",
-			"description": "2nd project name.",
-			"name": "Project name 2"
-		},
-		{
-			"id": "2",
-			"description": "3rd project name.",
-			"name": "Project name 3"
-		}]
-  })
