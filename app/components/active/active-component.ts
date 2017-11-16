@@ -391,12 +391,12 @@ angular.module('fibra.components.active', ['ui.bootstrap', 'fibra.actions.projec
     $scope.snapshotVisible = false;
     $scope.layoutVisible = false;
   }])
-  .filter('makeAcronym', function() {
-    return function (item) {
-      if (item.match(' ') != null) {
-        return item.match(/\b([A-Z])/g).join('')
-      } else {
-        return item
-      }
-    };
-  });
+  // .filter('makeAcronym', function() {
+  //   return function (item) {
+  //     if (item.match(' ') != null) {
+  //       return item.match(/\b([A-Z])/g).join('')
+  //     } else {
+  //       return item
+  //     }
+  //   };
+  // });
