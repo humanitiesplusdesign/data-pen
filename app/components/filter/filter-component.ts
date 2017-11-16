@@ -131,11 +131,11 @@ export class FilterComponent implements angular.IComponentOptions {
 angular.module('fibra.components.filter', ['ui.bootstrap', 'filearts.dragDrop', 'rzModule', 'ui.grid', 'ui.grid.emptyBaseLayer', 'ui.grid.resizeColumns', 'ui.grid.autoResize', 'ui.grid.edit'])
   .component('filter', new FilterComponent())
   .controller('GraphCtrl', function($scope) {
-    $scope.graph = {'width': 200, 'height': 100};
+    $scope.graph = {'width': 1000, 'height': 100};
     $scope.colour = "blue";
     $scope.rectangles = [
       {'x': 20, 'y': 100-80, 'w': 20, 'h': 80},
       {'x': 60, 'y': 100-50, 'w': 20, 'h': 50},
-      {'x': 100, 'y': 100-20, 'w': 20, 'h': 20},
+      {'x': 500, 'y': 100-20, 'w': 20, 'h': 20},
     ];
   });
