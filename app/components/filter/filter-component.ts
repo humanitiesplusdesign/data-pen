@@ -33,11 +33,19 @@ export class FilterComponentController {
   private histogramWidth: number = 1000
   private histogramHeight: number = 100
   //private histogramColour = "blue"
-  private histogramRectangles: any = [
-    {'x': 20, 'y': 100-80, 'w': 20, 'h': 80},
-    {'x': 60, 'y': 100-50, 'w': 20, 'h': 50},
-    {'x': 1200, 'y': 100-20, 'w': 20, 'h': 20},
+  private histogramData: any = [
+    {key: '1900', count: 4},
+    {key: '1910', count: 9},
+    {key: '1920', count: 17},
+    {key: '1930', count: 5},
+    {key: '1940', count: 10},
+    {key: '1950', count: 22},
+    {key: '1960', count: 0},
+    {key: '1970', count: 8},
+    {key: '1980', count: 21},
+    {key: '1990', count: 12}
   ]
+  private histogramRectangles: any = []
 
   /* @ngInject */
   constructor(private projectService: ProjectService,
@@ -80,6 +88,8 @@ export class FilterComponentController {
         oldFilterTree = this.state.filter.filtersByClass
       }
     })
+
+    this.histogramRectangles = this.generateHistogram(this.histogramData)
   }
 
   private addFilter(clss: Class, prop: Property): void {
@@ -128,6 +138,38 @@ export class FilterComponentController {
 
   private dragTabLeftStyle(): {} {
     return { 'left': this.actions.filter.dividerPercent + '%' }
+  }
+
+  private map_range(value, low1, high1, low2, high2) {
+    return low2 + (high2 - low2) * (value - low1) / (high1 - low1);
+  }
+
+  private generateHistogram(data: any): any {
+    // get min and max count
+    var countsArray: number[] = []
+    for (var i = 0; i < data.length; i++) {
+      countsArray.push(data[i].count)
+    }
+    var minCount: number = Math.min.apply(Math, countsArray)
+    var maxCount: number = Math.max.apply(Math, countsArray)
+
+    // get and set graph width and height
+    var graphWidth = 1547
+    var graphHeight = 100
+
+    console.log("width?")
+    console.log(this.actions.filter.dividerPercent)
+
+    // generate histogram rectangles
+    let rects: any = []
+    for (var i = 0; i < data.length; i++) {
+      var rectWidth = graphWidth/data.length
+      var rectHeight = this.map_range(data[i].count, 0, maxCount, 0, 100)
+      var tempRect = {'x': i*rectWidth, 'y': graphHeight-rectHeight, 'w': rectWidth, 'h': rectHeight}
+      rects.push(tempRect)
+    }
+
+    return rects
   }
 }
 
