@@ -1,4 +1,4 @@
-.container
+.container(ng-init="titleWarning=''")
   h3.header-title Data Pen
     span.header-subtitle New project
   .project-setup-container.col-md-10.col-md-offset-1
@@ -6,6 +6,7 @@
       .header
         h4.col-md-3.col-md-offset-1 Start a new project.
     .left-side.col-md-4.col-md-offset-1
+      label.title-warning.transition-200(ng-class="titleWarning") Please enter a project title
       citable-editor(citable="$ctrl.project",no-id)
     .right-side.col-md-4.col-md-offset-1
       h5 Pull from an existing project
@@ -26,5 +27,5 @@
             label.input-label Data
               input(type="checkbox" checked)
     .action-items
-      button.save-project.text-button.transition-200(ng-class="{'button-disabled' : !$ctrl.projectTitleFilled()}" ng-click="$ctrl.projectTitleFilled() ? $ctrl.saveAndOpen() : ''") Save and open
+      button.save-project.text-button.transition-200(ng-class="{'button-disabled' : !$ctrl.projectTitleFilled()}" ng-click="$ctrl.projectTitleFilled() ? $ctrl.saveAndOpen() : titleWarning='visible'") Save and open
       button.cancel-project.text-button.transition-200(ng-click="$ctrl.delete()") Cancel

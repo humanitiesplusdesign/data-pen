@@ -6,6 +6,7 @@ configure-view {
     background-color: #ffffff
     border-radius: 5px
     box-shadow: 0 1px 6px rgba(#000, 0.1)
+    margin-bottom: 150px
 
     .header {
       margin-top: 50px
@@ -13,6 +14,21 @@ configure-view {
 
     .left-side {
       margin-top: 30px
+
+      .title-warning {
+        position: absolute
+        display: block
+        text-align: right
+        top: 3px
+        right: 3px
+        font-size: 0.8em
+        color: #ee1515
+        opacity: 0
+
+        &.visible {
+          opacity: 1
+        }
+      }
     }
 
     .right-side {
@@ -114,6 +130,7 @@ configure-view {
       .save-project {
         color: #1571ee
       }
+
     }
   }
 }
