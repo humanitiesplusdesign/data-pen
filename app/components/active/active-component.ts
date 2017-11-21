@@ -383,8 +383,8 @@ export class ActiveComponentController {
   }
 
   private gridOptions(): {} {
-    // console.log("grid options")
-    // console.log(JSON.stringify(this.state.active.activeLayout.items))
+    console.log("grid options")
+    console.log(JSON.stringify(this.state.active.activeLayout.items[0].ids[0].value))
     return { data: this.state.active.activeLayout.items, enableFiltering: true }
   }
 }
