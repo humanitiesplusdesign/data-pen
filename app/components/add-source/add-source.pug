@@ -2,13 +2,19 @@
 .modal-body
   .sources-tabs
     uib-tabset.modal-tabs(type="pills" justified="true")
-      uib-tab(index="0" heading="Archives & Authorities")
-        h4 Pull from external archives and authorities
-        p.description Configure your project with external archives and authorities to draw in external data.
+      uib-tab(index="0" heading="Authorities & Archives")
+        h4 Configure external authorities and archives
+        p.description Authorities are databases used to uniquely identify your entities and reconcile them with other linked data sources.
         ul.available-sources-list
-          li(ng-repeat="endpoint in $ctrl.authorityEndpoints.concat($ctrl.archiveEndpoints)")
+          li(ng-repeat="endpoint in $ctrl.authorityEndpoints")
             input(type="checkbox", ng-model="$ctrl.sourceSelections[endpoint.id]")
-            span &nbsp;{{ endpoint.labels | prefLang }}
+            span &nbsp;{{ endpoint.labels | prefLang }}    
+        hr
+        p.description Archives are domain-specific sources of linked data which can be used to populate the properties of your entities.
+        ul.available-sources-list
+          li(ng-repeat="endpoint in $ctrl.archiveEndpoints")
+            input(type="checkbox", ng-model="$ctrl.sourceSelections[endpoint.id]")
+            span &nbsp;{{ endpoint.labels | prefLang }}   
       uib-tab(index="1" heading="Upload CSV")
         .container
           .row
