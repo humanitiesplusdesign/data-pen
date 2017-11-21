@@ -56,6 +56,8 @@ export class ActiveComponentController {
   private snapshotVisible: boolean = false
   private layoutVisible: boolean = false
 
+  private gridOptions: {}
+
   /* @ngInject */
   constructor(private projectActionService: ProjectActionService,
               private $scope: angular.IScope,
@@ -110,6 +112,7 @@ export class ActiveComponentController {
       if (this.oldActiveLayoutItemState !== this.state.active.activeLayout.items) {
         this.oldActiveLayoutItemState = this.state.active.activeLayout.items
         this.updateCanvas()
+        this.setGridOptions()
       }
     })
 
@@ -382,10 +385,11 @@ export class ActiveComponentController {
     return { 'left': this.state.active.dividerPercent + '%' }
   }
 
-  private gridOptions(): {} {
-    // console.log("grid options")
-    // console.log(JSON.stringify(this.state.active.activeLayout.items))
-    return { data: this.state.active.activeLayout.items, enableFiltering: true }
+  private setGridOptions(): void {
+    this.gridOptions = {
+      data: this.state.active.activeLayout.items,
+      enableFiltering: true
+    }
   }
 }
 
