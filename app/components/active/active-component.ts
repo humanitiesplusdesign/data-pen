@@ -386,6 +386,12 @@ export class ActiveComponentController {
   }
 
   private setGridOptions(): void {
+    //console.log("grid options")
+    // console.log(this.state.active.activeLayout.items[0].ids[0].value)
+    var newKey = 'link'
+    var newVal = this.state.active.activeLayout.items[0].ids[0].value
+    this.state.active.activeLayout.items[0][newKey] = newVal
+
     this.gridOptions = {
       data: this.state.active.activeLayout.items,
       enableFiltering: true
