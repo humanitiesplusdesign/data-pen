@@ -381,6 +381,12 @@ export class ActiveComponentController {
   private dragTabLeftStyle(): {} {
     return { 'left': this.state.active.dividerPercent + '%' }
   }
+
+  private gridOptions(): {} {
+    // console.log("grid options")
+    // console.log(JSON.stringify(this.state.active.activeLayout.items))
+    return { data: this.state.active.activeLayout.items, enableFiltering: true }
+  }
 }
 
 export class ActiveComponent implements angular.IComponentOptions {

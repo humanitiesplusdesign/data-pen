@@ -1,5 +1,6 @@
 .main-table(ng-style="$ctrl.tableWidthStyle()")
-  .main-grid(ui-grid="{ data: $ctrl.state.active.activeLayout.items, enableFiltering: true }" ng-hide="$ctrl.state.active.dividerPercent < 2" ui-grid-auto-resize ui-grid-edit ui-grid-resize-columns ui-grid-empty-base-layer)
+  //- .main-grid(ui-grid="{ data: $ctrl.state.active.activeLayout.items, enableFiltering: true }" ng-hide="$ctrl.state.active.dividerPercent < 2" ui-grid-auto-resize ui-grid-edit ui-grid-resize-columns ui-grid-empty-base-layer)
+  .main-grid(ui-grid="$ctrl.gridOptions()" ng-hide="$ctrl.state.active.dividerPercent < 2" ui-grid-auto-resize ui-grid-edit ui-grid-resize-columns ui-grid-empty-base-layer)
 .main-canvas(ng-style="$ctrl.canvasWidthStyle()")
   .control-area
     .containers
