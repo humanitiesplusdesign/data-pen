@@ -55,7 +55,7 @@ export class ActiveComponentController {
   private viewOptionsVisible: boolean = false
   private snapshotVisible: boolean = false
   private layoutVisible: boolean = false
-  
+
   private viewOptionsShowLabels: boolean = false
   private gridOptions: {}
 
