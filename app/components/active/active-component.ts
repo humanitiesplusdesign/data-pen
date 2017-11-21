@@ -56,6 +56,8 @@ export class ActiveComponentController {
   private snapshotVisible: boolean = false
   private layoutVisible: boolean = false
 
+  private viewOptionsShowLabels: boolean = false
+
   /* @ngInject */
   constructor(private projectActionService: ProjectActionService,
               private $scope: angular.IScope,
@@ -85,6 +87,7 @@ export class ActiveComponentController {
 
     this.nodeSearch = d3.select('.node-search')
     this.tooltip = d3.select('.active-tooltip')
+    this.tooltip.style('opacity', '1')
 
     this.menu = cmenu('#circle-menu').config({
       background: '#ffffff',
@@ -224,7 +227,7 @@ export class ActiveComponentController {
 
   private nodeClick(d: IItemState, groups: SVGCircleElement[]): void {
     this.currentMenuItem = d
-    this.tooltip.style('visibility', 'hidden')
+    this.tooltip.style('opacity', '0')
     this.menu.hide()
     this.menu.show(this.getMenuPosition(d))
   }
@@ -289,22 +292,24 @@ export class ActiveComponentController {
       .on('mouseenter', (d: IItemState, i: number, grp: SVGCircleElement[]) => {
         if (d.item && !this.dragOrigX) {
           this.tooltip.style('top', (grp[i].getBoundingClientRect().top - 5) + 'px')
-            .style('left', (grp[i].getBoundingClientRect().left + 25) + 'px')
-            .style('visibility', 'visible')
-            .text(d.description)
+          .style('left', (grp[i].getBoundingClientRect().left + 25) + 'px')
+          .style('opacity', '1')
+          .text(d.description)
         } else if (!this.dragOrigX) {
           this.tooltip.style('top', (grp[i].getBoundingClientRect().top - 5) + 'px')
           .style('left', (grp[i].getBoundingClientRect().left + 25) + 'px')
-          .style('visibility', 'visible')
+          .style('opacity', '1')
           .text('Loading...')
         }
       })
       .on('mouseout', (d: IItemState, i: number) => {
-        this.tooltip.style('visibility', 'hidden')
+        if (!this.viewOptionsShowLabels) {
+          this.tooltip.style('opacity', '0')
+        }
       })
       .call(d3.drag()
         .on('start', (d: IItemState, i: number) => {
-          this.tooltip.style('visibility', 'hidden')
+          this.tooltip.style('opacity', '0')
           this.dragOrigX = d.leftOffset
           this.dragOrigY = d.topOffset
         })

@@ -7,13 +7,19 @@ active {
   .active-tooltip {
     position: absolute
     z-index: 20
-    background-color: gray
-    color: white
+    background-color: rgba(#f4f4f4, 0.8)
+    color: #555555
+    font-size: 0.9em
+    margin-top: 1px
     padding: 3px
     padding-left: 6px
     padding-right: 6px
     border-radius: 2px
-    visibility: hidden
+    opacity: 0
+    transition: .1s
+    -webkit-transition: .1s
+    -moz-transition: .1s
+    -o-transition: .1s
   }
 
   .circular-menu {
@@ -73,10 +79,12 @@ active {
   }
 
   .cold-node {
+    font-size: 0.95em
     margin-top: 10px
     margin-left: 78px
     margin-bottom: -5px
     opacity: 0.5
+    cursor: pointer
   }
 
   .resultType {
@@ -121,18 +129,45 @@ active {
         position: absolute
         right: 70px
         border-radius: 6px
-        padding: 10px 14px
+        padding: 20px
         background-color: #fff
         box-shadow: 0px 1px 4px rgba(#000, 0.2)
+
         transition: .1s
         -webkit-transition: .1s
         -moz-transition: .1s
         -o-transition: .1s
+
+        h4 {
+          font-size: 1.2em
+          margin-bottom: 20px
+        }
+
+        .checkbox-title {
+          margin-left: 7px
+          font-size: 0.95em
+        }
+
+        .option-description {
+          color: #a4a4a4
+          font-size: 0.8em
+          margin-top: 3px
+          padding-left: 19px
+        }
       }
 
       .view-options-container {
         width: 300px
-        height: 200px
+
+        .linked-text {
+          font-weight: 500
+          color: #83b5db
+        }
+
+        .unlinked-text {
+          font-weight: 500
+          color: #e36b76
+        }
       }
 
       .snapshot-container {
@@ -179,7 +214,7 @@ active {
         }
 
         .btn-icon {
-          opacity: .8
+          opacity: 1
         }
 
         .view-options {
@@ -260,10 +295,17 @@ active {
       .node {
 
         .node-circle {
-          fill: #c6c6c6
-          stroke: rgba(#000000, 0.35)
-        }
+          fill: #cbcbcb
+          stroke: #7a7a7a
 
+          &::after {
+            content: ''
+            display: block
+            width: 30px
+            height: 30px
+            background-color: red
+          }
+        }
       }
 
       @keyframes node-loading-animation {
@@ -271,14 +313,18 @@ active {
           opacity: 1
         }
         50% {
-          opacity: 0.5
+          opacity: 0.3
         }
         100% {
           opacity: 1
         }
+        // to {
+        //   transform: rotate(360deg)
+        // }
       }
 
       .loading {
+        //stroke-dasharray: 15, 40
         -webkit-animation: node-loading-animation 0.7s infinite linear;
         animation: node-loading-animation 0.7s infinite linear;
       }
@@ -287,14 +333,14 @@ active {
         opacity:0.3
       }
 
-      .unlinked {
-        stroke: #ff3c00
-        stroke-width: 2
+      .linked {
+        fill: #e36b76
+        stroke: #81393f
       }
 
-      .linked {
-        stroke: #2568ff
-        stroke-width: 2
+      .unlinked {
+        fill: #83b5db
+        stroke: #335c7b
       }
     }
   }
@@ -316,11 +362,17 @@ active {
       z-index: 1000;
       display: none;
       background-color: #fff !important
-      border-radius: 4px !important
-      border: 1px solid rgba(0, 0, 0, 0.15) !important
-      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.175) !important
-      -webkit-box-shadow: 0 6px 12px rgba(0, 0, 0, 0.175) !important
+      border-radius: 3px !important
+      // border: 1px solid rgba(0, 0, 0, 0.15) !important
+      border: none !important
+      box-shadow: 0px 1px 4px rgba(#000, 0.2) !important
+      -webkit-box-shadow: 0px 1px 4px rgba(#000, 0.2) !important
       margin-top: 1em
+
+      .active > a {
+        background-color: rgba(#000, 0.03) !important
+        color: rgba(#000, 0.8)
+      }
     }
 
     .custom-popup-wrapper > .message {
@@ -338,6 +390,10 @@ active {
       border: none;
       border-radius: 0;
       box-shadow: none;
+
+      li {
+        cursor: pointer
+      }
     }
   }
 

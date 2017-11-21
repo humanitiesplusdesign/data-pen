@@ -4,6 +4,22 @@
   .control-area
     .containers
       .options-container.view-options-container(ng-show="$ctrl.viewOptionsVisible")
+        h4 View options
+        hr
+        //- p.description Configure your project with external archives and authorities to draw in external data.
+        input(type="checkbox", ng-model="$ctrl.viewOptionsShowLabels")
+        span.checkbox-title Show node labels
+        p.description.option-description Always display labels next to nodes.
+        hr
+        //- p.description Configure your project with external archives and authorities to draw in external data.
+        input(type="checkbox")
+        span.checkbox-title Show node linked status
+        p.description.option-description
+          | Colors nodes to represent their 
+          span.linked-text linked
+          |  or 
+          span.unlinked-text unlinked
+          |  status.
       .options-container.snapshot-container(ng-show="snapshotVisible")
       .options-container.layout-container(ng-show="layoutVisible")
     .buttons
@@ -41,7 +57,6 @@ script(type="text/ng-template" id="resultTemplate.html")
 script(type="text/ng-template" id="resultPopupTemplate.html")
   .custom-popup-wrapper(ng-style="{top:position().top+'px', left: position().left+'px'}" style="display: block;" ng-show="isOpen() && !moveInProgress" aria-hidden="{{!isOpen()}}")
     label.cold-node Add "{{ query }}" as an unlinked node 
-    
     ul.dropdown-menu(role="listbox")
       li.uib-typeahead-match(ng-repeat="match in matches track by $index" ng-class="{active: isActive($index) }" ng-mouseenter="selectActive($index)" ng-click="selectMatch($index)" role="option" id="{{::match.id}}")
         div(uib-typeahead-match index="$index" match="match" query="query" template-url="templateUrl")
