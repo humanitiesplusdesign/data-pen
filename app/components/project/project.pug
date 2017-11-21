@@ -17,7 +17,7 @@
     input.search-bar(placeholder="Search")
     img.search-image(src="./app/images/nav_bar/search.svg" width="12px" height="auto")
   .nav-element.bibliography-link
-    img.bib-icon(src="./app/images/nav_bar/bibliography.svg")
+    img.bib-icon(src="./app/images/nav_bar/bibliography.svg" ng-click="$ctrl.openBibliographyModal($ctrl.currentView)")
   span.usage(ng-hide="$ctrl.currentView==='sources'")
     .nav-element.usage-chart
       .progress

@@ -25,8 +25,7 @@
       .filter-box(ng-class="minimised ? 'filter-min' : ''")
         .filter-graph
           svg(ng-attr-height="$ctrl.histogramHeight" ng-attr-width="$ctrl.histogramWidth")
-            //-g(ng-attr-fill="$ctrl.histogramColour")
-            g
+            g(ng-attr-fill="silver")
               rect(ng-repeat="rectangle in $ctrl.histogramRectangles" ng-attr-x="{{rectangle.x}}" ng-attr-y="{{rectangle.y}}" ng-attr-width="{{rectangle.w}}" ng-attr-height="{{rectangle.h}}")
         rzslider(rz-slider-model="slideMin", rz-slider-high="slideMax", rz-slider-options="slideOptions")
 .draggable-divider(drag-container="true" on-drag-end="dragging = false; $ctrl.dragDivider($event)" ng-style="$ctrl.dragTabLeftStyle()")

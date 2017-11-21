@@ -55,8 +55,9 @@ export class ActiveComponentController {
   private viewOptionsVisible: boolean = false
   private snapshotVisible: boolean = false
   private layoutVisible: boolean = false
-
+  
   private viewOptionsShowLabels: boolean = false
+  private gridOptions: {}
 
   /* @ngInject */
   constructor(private projectActionService: ProjectActionService,
@@ -114,6 +115,8 @@ export class ActiveComponentController {
         this.oldActiveLayoutItemState = this.state.active.activeLayout.items
         this.updateCanvas()
       }
+
+      this.setGridOptions()
     })
 
     this.updateCanvas()
@@ -385,6 +388,29 @@ export class ActiveComponentController {
 
   private dragTabLeftStyle(): {} {
     return { 'left': this.state.active.dividerPercent + '%' }
+  }
+
+  private setGridOptions(): void {
+    let data: {}[] = this.state.active.activeLayout.items.map((item) => {
+      let obj: {} = {}
+      obj['id'] = item.ids[0].value
+      obj['description'] = item.description
+      return obj
+    })
+
+    this.gridOptions = {
+      data: data,
+      enableFiltering: true,
+      columnDefs: [
+        {
+          field: 'id',
+          cellTemplate: '<div class="ui-grid-cell-contents"><a href="{{row.entity.id}}" target="_blank">{{row.entity.id}}</a></div>'
+        },
+        {
+          field: 'description'
+        }
+      ]
+    }
   }
 }
 

@@ -162,9 +162,9 @@ export class FilterComponentController {
 
     // generate histogram rectangles
     let rects: any = []
+    var rectWidth = graphWidth/data.length
     for (var i = 0; i < data.length; i++) {
-      var rectWidth = graphWidth/data.length
-      var rectHeight = this.map_range(data[i].count, 0, maxCount, 0, 100)
+      var rectHeight = this.map_range(data[i].count, 0, maxCount, 0, 1*graphHeight)
       var tempRect = {'x': i*rectWidth, 'y': graphHeight-rectHeight, 'w': rectWidth, 'h': rectHeight}
       rects.push(tempRect)
     }

@@ -5,6 +5,7 @@ import * as angular from 'angular';
 import { ProjectService } from 'services/project-service/project-service'
 import { ProjectActionService } from 'actions/project'
 import { INgRedux } from 'ng-redux'
+import { IModalService } from 'angular-ui-bootstrap'
 import * as FilterActions from '../../actions/filter';
 import ActiveActions from 'actions/active';
 
@@ -19,7 +20,8 @@ export class ProjectComponentController {
               private $stateParams: any,
               private $state: any,
               private $ngRedux: INgRedux,
-              private $document: angular.IDocumentService) {
+              private $document: angular.IDocumentService,
+              private $uibModal: IModalService) {
     let unsub1: () => void = $ngRedux.connect(this.mapProjectToActions, null)(this.actions)
     let unsub2: () => void = $ngRedux.connect(this.mapFilterToActions, FilterActions)(this.actions)
     let unsub3: () => void = $ngRedux.connect(this.mapActiveToActions, ActiveActions)(this.actions)
@@ -103,6 +105,27 @@ export class ProjectComponentController {
       active: state.frontend.active
     }
   }
+
+  private openBibliographyModal(currentView: string): void {
+    //let deleteProject: (string, number, Citable) => void = this.deleteProject.bind(this)
+    console.log(currentView)
+    let modalInstance: any = this.$uibModal.open({
+      animation: true,
+      component: 'bibliographyModal',
+      resolve: {
+        currentView: function(): string {
+          return currentView
+        }
+      }
+    });
+    modalInstance.result.then(
+      function(): void {
+        // deleteProject(sourceId, i, project)
+      },
+      function(): void {
+        // didn't delete
+      });
+  };
 
 }
 

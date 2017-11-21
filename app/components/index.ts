@@ -28,6 +28,7 @@ import './filter/filter-component'
 import './add-source/add-source-component'
 import './expand-modal/expand-modal-component'
 import './project-delete-modal/project-delete-modal-component'
+import './bibliography-modal/bibliography-modal-component'
 
 angular.module('fibra.components', [
   'fibra.components.construct-view',
@@ -56,5 +57,6 @@ angular.module('fibra.components', [
   'fibra.components.filter',
   'fibra.components.add-source',
   'fibra.components.expand-modal',
-  'fibra.components.project-delete-modal'
+  'fibra.components.project-delete-modal',
+  'fibra.components.bibliography-modal'
 ])
