@@ -112,8 +112,9 @@ export class ActiveComponentController {
       if (this.oldActiveLayoutItemState !== this.state.active.activeLayout.items) {
         this.oldActiveLayoutItemState = this.state.active.activeLayout.items
         this.updateCanvas()
-        this.setGridOptions()
       }
+
+      this.setGridOptions()
     })
 
     this.updateCanvas()
@@ -386,15 +387,25 @@ export class ActiveComponentController {
   }
 
   private setGridOptions(): void {
-    //console.log("grid options")
-    // console.log(this.state.active.activeLayout.items[0].ids[0].value)
-    var newKey = 'link'
-    var newVal = this.state.active.activeLayout.items[0].ids[0].value
-    this.state.active.activeLayout.items[0][newKey] = newVal
+    let data: {}[] = this.state.active.activeLayout.items.map((item) => {
+      let obj: {} = {}
+      obj['id'] = item.ids[0].value
+      obj['description'] = item.description
+      return obj
+    })
 
     this.gridOptions = {
-      data: this.state.active.activeLayout.items,
-      enableFiltering: true
+      data: data,
+      enableFiltering: true,
+      columnDefs: [
+        {
+          field: 'id',
+          cellTemplate: '<div class="ui-grid-cell-contents"><a href="{{row.entity.id}}" target="_blank">{{row.entity.id}}</a></div>'
+        },
+        {
+          field: 'description'
+        }
+      ]
     }
   }
 }
