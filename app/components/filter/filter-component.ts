@@ -46,6 +46,16 @@ export class FilterComponentController {
     {key: '1990', count: 12}
   ]
   private histogramRectangles: any = []
+  private min: number = 0
+  private max: number = 2500
+  private slideMin: number = this.min
+  private slideMax: number = this.max
+  private slider: any = {
+    min: 0,
+    max: 2500,
+    ceil: 2500,
+    floor: 0
+  }
 
   /* @ngInject */
   constructor(private projectService: ProjectService,
@@ -170,6 +180,22 @@ export class FilterComponentController {
     }
 
     return rects
+  }
+
+  private changeMinSlider(): void {
+    if (this.slider.min < this.min) {
+      this.slideMin = this.min
+    } else {
+      this.slideMin = this.slider.min
+    }
+  }
+
+  private changeMaxSlider(): void {
+    if (this.slider.max > this.max) {
+       this.slideMax = this.max
+    } else {
+      this.slideMax = this.slider.max
+    }
   }
 }
 
