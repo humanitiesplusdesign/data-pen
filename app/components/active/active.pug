@@ -3,33 +3,12 @@
   .main-grid(ui-grid="$ctrl.gridOptions" ng-hide="$ctrl.state.active.dividerPercent < 2" ui-grid-auto-resize ui-grid-edit ui-grid-resize-columns ui-grid-empty-base-layer)
 .main-canvas(ng-style="$ctrl.canvasWidthStyle()")
   .control-area
-    .containers
-      .options-container.view-options-container(ng-show="$ctrl.viewOptionsVisible")
-        h4 View options
-        hr
-        //- p.description Configure your project with external archives and authorities to draw in external data.
-        input(type="checkbox", ng-model="$ctrl.viewOptionsShowLabels")
-        span.checkbox-title Show node labels
-        p.description.option-description Always display labels next to nodes.
-        hr
-        //- p.description Configure your project with external archives and authorities to draw in external data.
-        input(type="checkbox")
-        span.checkbox-title Show node linked status
-        p.description.option-description
-          | Colors nodes to represent their 
-          span.linked-text linked
-          |  or 
-          span.unlinked-text unlinked
-          |  status.
-      .options-container.snapshot-container(ng-show="snapshotVisible")
-      .options-container.layout-container(ng-show="layoutVisible")
-    .buttons
-      button.btn.btn-circle.btn-lg(ng-click="$ctrl.viewOptionsVisible=!$ctrl.viewOptionsVisible; $ctrl.snapshotVisible=false; $ctrl.layoutVisible=false" ng-class="$ctrl.viewOptionsVisible ? 'button-active' : ''")
-        img.btn-icon.view-options(src="./app/images/active/view_options.svg")
-      button.btn.btn-circle.btn-lg(disabled ng-click="$ctrl.snapshotVisible=!$ctrl.snapshotVisible; $ctrl.viewOptionsVisible=false; $ctrl.layoutVisible=false" ng-class="$ctrl.snapshotVisible ? 'button-active' : ''")
-        img.btn-icon.snapshot(src="./app/images/active/snapshot.svg")
-      button.btn.btn-circle.btn-lg(disabled ng-click="$ctrl.layoutVisible=!$ctrl.layoutVisible; $ctrl.viewOptionsVisible=false; $ctrl.snapshotVisible=false" ng-class="$ctrl.layoutVisible ? 'button-active' : ''")
-        img.btn-icon.snapshot(src="./app/images/active/layout.svg")
+    button.active-circle-button(uib-popover-template="'viewOptionsPopover.html'" popover-trigger="'outsideClick'" popover-placement="auto left-top" popover-class="active-options-popover" popover-is-open="$ctrl.viewOptionsPopoverVisible" ng-class="{true: 'button-active', false: ''}[$ctrl.viewOptionsPopoverVisible]")
+      img.view-options-icon(src="./app/images/active/view_options.svg")
+    button.active-circle-button.button-disabled(disabled uib-popover-template="'snapshotsPopover.html'" popover-trigger="'outsideClick'" popover-placement="auto left-top" popover-class="active-options-popover" popover-is-open="$ctrl.snapshotsPopoverVisible" ng-class="{true: 'button-active', false: ''}[$ctrl.snapshotsPopoverVisible]")
+      img.snapshots-icon(src="./app/images/active/snapshot.svg")
+    button.active-circle-button.button-disabled(disabled uib-popover-template="'layoutsPopover.html'" popover-trigger="'outsideClick'" popover-placement="auto left-top" popover-class="active-options-popover" popover-is-open="$ctrl.layoutsPopoverVisible" ng-class="{true: 'button-active', false: ''}[$ctrl.layoutsPopoverVisible]")
+      img.layouts-icon(src="./app/images/active/layout.svg")
   svg.main-svg
     g.main-g
       rect.main-background
@@ -61,3 +40,27 @@ script(type="text/ng-template" id="resultPopupTemplate.html")
     ul.dropdown-menu(role="listbox")
       li.uib-typeahead-match(ng-repeat="match in matches track by $index" ng-class="{active: isActive($index) }" ng-mouseenter="selectActive($index)" ng-click="selectMatch($index)" role="option" id="{{::match.id}}")
         div(uib-typeahead-match index="$index" match="match" query="query" template-url="templateUrl")
+script(type="text/ng-template" id="viewOptionsPopover.html")
+  .view-options-popover
+    h4 View options
+    hr
+    input(type="checkbox", ng-model="$ctrl.viewOptionsShowLabels")
+    span.checkbox-title Show node labels
+    p.description.option-description Always display labels next to nodes.
+    hr
+    input(type="checkbox")
+    span.checkbox-title Show node linked status
+    p.description.option-description
+      | Colors nodes to represent their 
+      span.linked-text linked
+      |  or 
+      span.unlinked-text unlinked
+      |  status.
+script(type="text/ng-template" id="snapshotsPopover.html")
+  .snapshots-popover
+    h4 Snapshots
+    hr
+script(type="text/ng-template" id="layoutsPopover.html")
+  .layouts-popover
+    h4 Layouts
+    hr

@@ -31,7 +31,7 @@ export class ActiveComponentController {
 
   private radiusInitial: number = 1
   private radius: number = 8
-  private radiusBounce: number = 15
+  private radiusBounce: number = 12
   private nodeSearchTopOffset: number = 39
   private circularMenuTopOffset: number = 55
   private currentlyAdding: boolean = false
@@ -52,9 +52,9 @@ export class ActiveComponentController {
 
   private oldActiveLayoutItemState: IItemState[]
 
-  private viewOptionsVisible: boolean = false
-  private snapshotVisible: boolean = false
-  private layoutVisible: boolean = false
+  private viewOptionsPopoverVisible: boolean = false
+  private snapshotsPopoverVisible: boolean = false
+  private layoutsPopoverVisible: boolean = false
 
   private viewOptionsShowLabels: boolean = false
   private gridOptions: {}
@@ -88,7 +88,6 @@ export class ActiveComponentController {
 
     this.nodeSearch = d3.select('.node-search')
     this.tooltip = d3.select('.active-tooltip')
-    this.tooltip.style('opacity', '1')
 
     this.menu = cmenu('#circle-menu').config({
       background: '#ffffff',
