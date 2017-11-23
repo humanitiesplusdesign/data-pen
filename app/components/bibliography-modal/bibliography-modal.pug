@@ -1,42 +1,46 @@
 .modal-header
   h4.modal-title#modal-title Bibliography (at the {{ $ctrl.resolve.currentView }} level)
 .modal-body#modal-body
-  h5 Sources
-  ul
-    li Authorities
-      ul
-        li VIAF, www.viaf.org (Accessed March 2017)
-          ul
-            li People: 30,000 (1702-1823)
-            li Works: 56,000 (1700-1800)
-        li Geonames, www.geonames.org (Accessed January 2017)
-          ul
-            li Toponyms: 324,000
-        li BnF, www.bnf.fr (Accessed February 2017)
-          ul
-            li Works: 2000
-    li Archives
-      ul
-        li Electronic Enlightenment
-          ul
-            li People: 15,000
-    li Uploaded
-      ul
-        li FileX.csv (Uploaded January 17, 2017)
-          ul 
-            li People: 53
-  h5 Schema
-  ul
-    li Person
-      ul
-        li Name (VIAF, BNF)
-        li Birthdate (VIAF)
-        li Death date (VIAF, BNF)
-        li Physiocrats (Dan Edelstein)
-    li Place
-      ul
-        li Toponym (Geonames)
-        li Coordinates (Geonames)
+  .bibliography-tabs
+    uib-tabset.modal-tabs(type="pills" justified="true")
+      uib-tab(index="0" heading="Bibliography")
+        h5 Sources
+        ul
+          li Authorities
+            ul
+              li VIAF, www.viaf.org (Accessed March 2017)
+                ul
+                  li People: 30,000 (1702-1823)
+                  li Works: 56,000 (1700-1800)
+              li Geonames, www.geonames.org (Accessed January 2017)
+                ul
+                  li Toponyms: 324,000
+              li BnF, www.bnf.fr (Accessed February 2017)
+                ul
+                  li Works: 2000
+          li Archives
+            ul
+              li Electronic Enlightenment
+                ul
+                  li People: 15,000
+          li Uploaded
+            ul
+              li FileX.csv (Uploaded January 17, 2017)
+                ul 
+                  li People: 53
+      uib-tab(index="1" heading="Schema")
+        h5 Schema
+        ul
+          li Person
+            ul
+              li Name (VIAF, BNF)
+              li Birthdate (VIAF)
+              li Death date (VIAF, BNF)
+              li Physiocrats (Dan Edelstein)
+          li Place
+            ul
+              li Toponym (Geonames)
+              li Coordinates (Geonames)
 .modal-footer
   button.copy-button.transition-200 Export
   button.cancel-button.text-button.transition-200(ng-click="$ctrl.cancel()") Dismiss
