@@ -4,13 +4,17 @@
     uib-tabset.modal-tabs(type="pills" justified="true")
       uib-tab(index="0" heading="Authorities & Archives")
         h4 Configure external authorities and archives
-        p.description Authorities are databases used to uniquely identify your entities and reconcile them with other linked data sources.
+        p.description
+          span.bold Authorities 
+          | are databases used to uniquely identify your entities and reconcile them with other linked data sources.
         ul.available-sources-list
           li(ng-repeat="endpoint in $ctrl.authorityEndpoints")
             input(type="checkbox", ng-model="$ctrl.sourceSelections[endpoint.id]")
             span &nbsp;{{ endpoint.labels | prefLang }}    
         hr
-        p.description Archives are domain-specific sources of linked data which can be used to populate the properties of your entities.
+        p.description
+          span.bold Archives 
+          | are domain-specific sources of linked data which can be used to populate the properties of your entities.
         ul.available-sources-list
           li(ng-repeat="endpoint in $ctrl.archiveEndpoints")
             input(type="checkbox", ng-model="$ctrl.sourceSelections[endpoint.id]")
