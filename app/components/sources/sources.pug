@@ -15,3 +15,11 @@
             input(type="checkbox", ng-model="$ctrl.localSourceClassTree[source.id][clss.id.value]" ng-click="$ctrl.state.setSourceClassActive(source.id, clss.id.value, !$ctrl.getSourceClassStatus(source.id, clss.id.value))")
             span {{clss.labels | prefLang}}
   .sources-right
+    uib-tabset(type="tabs")
+      uib-tab(ng-repeat="class in $ctrl.allClasses()" index="$index" heading="{{ class.labels | prefLang }}")
+        ul
+          li(ng-repeat="prop in $ctrl.sourcePropsForClass(class).properties") {{ prop.labels | prefLang }}
+        ul
+          li(ng-repeat="source in $ctrl.state.sources.sources") {{ source.labels | prefLang }}
+            ul
+              li(ng-repeat="prop in $ctrl.sourcePropsForClass(class).properties") Value for {{prop.labels | prefLang}} : {{ 1 }}

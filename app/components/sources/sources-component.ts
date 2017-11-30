@@ -10,6 +10,8 @@ import * as ProjectActions from '../../actions/project';
 import { INgRedux } from 'ng-redux'
 import SourcesActions from '../../actions/sources'
 import { IModalService } from 'angular-ui-bootstrap'
+import * as d3 from 'd3';
+import { Class, Property } from 'services/project-service/data-model';
 
 interface ISourcesComponentControllerState extends ISourcesActions {
   project: ProjectState
@@ -62,6 +64,26 @@ export class SourcesComponentController {
       resolve: {
       }
     });
+  }
+
+  private allClasses(): Class[] {
+    return d3.keys(this.localSourceClassTree).reduce(
+      (a, b) => {
+        let sourceClasses: string[] = d3.keys(this.localSourceClassTree[b])
+          .filter(k => this.localSourceClassTree[b][k])
+          .filter(k => a.indexOf(k) === -1)
+        return a.concat(sourceClasses)
+      },
+      []).map(c => this.state.project.project.dataModel.classMap.get(c))
+  }
+
+  private sourcePropsForClass(c: Class): any {
+    let sources: string[] = d3.keys(this.localSourceClassTree)
+    let properties: Property[] = c.properties.map(p => p.id.value).map(p => this.state.project.project.dataModel.propertyMap.get(p))
+    return {
+      sources: sources,
+      properties: properties
+    }
   }
 
   private getSourceClassStatus(source: string, clss: string): boolean {
