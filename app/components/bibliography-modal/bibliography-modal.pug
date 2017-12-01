@@ -1,0 +1,68 @@
+.modal-header
+.modal-body
+  .bibliography-tabs
+    uib-tabset.modal-tabs(type="pills" justified="true")
+      uib-tab(index="0" heading="Bibliography")
+        h4 Bibliography (at the {{ $ctrl.resolve.currentView }} level)
+        p.description Describe the bibliography here, with reference to the current level.
+        hr
+        .source-type-container
+          label.input-label Authorities
+          .source-container
+            .source-header
+              label VIAF, www.viaf.org (Accessed March 2017)
+            .source-contents
+              ul
+                li People: 30,000 (1702-1823)
+                li Works: 56,000 (1700-1800)
+          .source-container
+            .source-header
+              label Geonames, www.geonames.org (Accessed January 2017)
+            .source-contents
+              ul
+                li Toponyms: 324,000
+          .source-container
+            .source-header
+              label BnF, www.bnf.fr (Accessed February 2017)
+            .source-contents
+              ul
+                li Works: 2000
+        .source-type-container
+          label.input-label Archives
+          .source-container
+            .source-header
+              label Electronic Enlightenment
+            .source-contents
+              ul
+                li People: 15,000
+        .source-type-container
+          label.input-label Uploaded
+          .source-container
+            .source-header
+              label FileX.csv (Uploaded January 17, 2017)
+            .source-contents
+              ul 
+                li People: 53
+      uib-tab(index="1" heading="Schema")
+        h4 Schema (at the {{ $ctrl.resolve.currentView }} level)
+        p.description Describe the schema here, with reference to the current level.
+        hr
+        .source-container
+          .source-header
+            label.input-label Person
+          .source-contents
+            ul
+              li Name (VIAF, BNF)
+              li Birthdate (VIAF)
+              li Death date (VIAF, BNF)
+              li Physiocrats (Dan Edelstein)
+        .source-container
+          .source-header
+            label.input-label Place
+          .source-contents
+            ul
+              li Toponym (Geonames)
+              li Coordinates (Geonames)
+.modal-footer
+  button.cancel-button.text-button.transition-200(ng-click="$ctrl.cancel()") Dismiss
+  button.copy-button.transition-200 Export

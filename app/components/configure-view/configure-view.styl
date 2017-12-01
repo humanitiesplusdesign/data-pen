@@ -6,6 +6,7 @@ configure-view {
     background-color: #ffffff
     border-radius: 5px
     box-shadow: 0 1px 6px rgba(#000, 0.1)
+    margin-bottom: 150px
 
     .header {
       margin-top: 50px
@@ -13,6 +14,21 @@ configure-view {
 
     .left-side {
       margin-top: 30px
+
+      .title-warning {
+        position: absolute
+        display: block
+        text-align: right
+        top: 3px
+        right: 3px
+        font-size: 0.8em
+        color: #ee1515
+        opacity: 0
+
+        &.visible {
+          opacity: 1
+        }
+      }
     }
 
     .right-side {
@@ -105,34 +121,16 @@ configure-view {
 
       button {
         position: relative
-        appearance: none
-        border: none
         width: 110px
         height: 30px
         margin-left: -10px
         float: right
-        background: none
-        outline: none
-        transition: .2s
-        -webkit-transition: .2s
-        -moz-transition: .2s
-        -o-transition: .2s
-
-        &:hover {
-          opacity: .4;
-        }
       }
 
       .save-project {
         color: #1571ee
       }
-    }
 
-    label {
-      font-family: 'Roboto Mono', monospace
-      font-size: 0.85em
-      color: #838383
-      margin-bottom: 10px
     }
   }
 }

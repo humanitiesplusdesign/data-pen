@@ -18,6 +18,7 @@ import { IActiveState } from 'reducers/frontend/active'
 import 'angular-drag-drop';
 import 'angular-ui-grid';
 import cmenu from 'circular-menu';
+import { IModalService } from 'angular-ui-bootstrap'
 
 interface IActiveComponentControllerState extends IActiveActions {
   project: ProjectState
@@ -30,13 +31,12 @@ export class ActiveComponentController {
 
   private radiusInitial: number = 1
   private radius: number = 8
-  private radiusBounce: number = 15
+  private radiusBounce: number = 12
   private nodeSearchTopOffset: number = 39
   private circularMenuTopOffset: number = 55
   private currentlyAdding: boolean = false
 
   private menu: any
-  private propertiesMenu: any
 
   private nodeSearch: d3.Selection<Element, {}, HTMLElement, any>
   private tooltip: d3.Selection<HTMLDivElement, {}, HTMLElement, undefined>
@@ -52,11 +52,19 @@ export class ActiveComponentController {
 
   private oldActiveLayoutItemState: IItemState[]
 
+  private viewOptionsPopoverVisible: boolean = false
+  private snapshotsPopoverVisible: boolean = false
+  private layoutsPopoverVisible: boolean = false
+
+  private viewOptionsShowLabels: boolean = false
+  private gridOptions: {}
+
   /* @ngInject */
   constructor(private projectActionService: ProjectActionService,
               private $scope: angular.IScope,
               private $q: angular.IQService,
               private $ngRedux: INgRedux,
+              private $uibModal: IModalService,
               private searchService: SearchService,
               private sparqlAutocompleteService: SparqlAutocompleteService,
               private sparqlItemService: SparqlItemService,
@@ -81,23 +89,6 @@ export class ActiveComponentController {
     this.nodeSearch = d3.select('.node-search')
     this.tooltip = d3.select('.active-tooltip')
 
-    this.propertiesMenu = cmenu('#properties-menu').config({
-      background: '#ffffff',
-      backgroundHover: '#fafafa',
-      diameter: 160,
-      menus: [{
-        title: 'Pe'
-      }, {
-        title: 'Pl'
-      }, {
-        title: 'Ab'
-      }, {
-        title: 'Cd'
-      }, {
-        title: 'Ef'
-      }]
-    })
-
     this.menu = cmenu('#circle-menu').config({
       background: '#ffffff',
       backgroundHover: '#fafafa',
@@ -109,7 +100,6 @@ export class ActiveComponentController {
       }, {
         icon: 'expand-icon',
         click: () => {
-          this.propertiesMenu.hide()
           this.buildAndDisplayPropertiesMenu(this.currentMenuItem)
         }
       }, {
@@ -124,30 +114,21 @@ export class ActiveComponentController {
         this.oldActiveLayoutItemState = this.state.active.activeLayout.items
         this.updateCanvas()
       }
+
+      this.setGridOptions()
     })
 
     this.updateCanvas()
   }
 
   private buildAndDisplayPropertiesMenu(item: IItemState): void {
-    console.log(item)
-    this.propertiesMenu.config({
-      background: '#ffffff',
-      backgroundHover: '#fafafa',
-      diameter: 160,
-      menus: item.item.localProperties.concat(item.item.remoteProperties)
-        .filter((p) => p.value !== RDF.type.value
-          && p.value !== SKOS.prefLabel.value
-          && p.value !== SKOS.altLabel.value
-          && p.value !== 'http://purl.org/dc/terms/identifier'
-        )
-        .map((p) => {
-          return {
-            title: p.label + ' (' + p.values.length + ')'
-          }
-        })
-    })
-    this.propertiesMenu.show(this.getMenuPosition(item))
+    let modalInstance: any = this.$uibModal.open({
+      animation: true,
+      component: 'expandModal',
+      resolve: {
+        item: function(): IItemState { return item }
+      }
+    });
   }
 
   private buildCanvas(): void {
@@ -164,7 +145,6 @@ export class ActiveComponentController {
   private canvasClick(sel: d3.Selection<SVGGElement, {}, HTMLElement, any>): void {
     this.$scope.$apply(() => {
       this.menu.hide()
-      this.propertiesMenu.hide()
 
       if (!this.currentlyAdding) {
         this.nodeSearchOffsetTop = d3.event.offsetY
@@ -213,12 +193,13 @@ export class ActiveComponentController {
             },
             false)) {
           r.additionalInformation.typeDescriptions = this.state.project.project.dataModel.classMap.get(r.additionalInformation.type[0].value).labels
-          r.additionalInformation.dataSourceDescriptions = this.state.project.project.authorityEndpoints
+          r.additionalInformation.dataSourceDescriptions = this.state.project.project.authorityEndpoints.concat(this.state.project.project.archiveEndpoints)
             .filter((ae) => r.datasources.filter((rd) => ae.id === rd ).length > 0)
             .map((ae) => ae.labels.find(la => la.language === 'en'))
           ret.push(r)
         }
     }))
+    console.log(ret)
     return ret
   }
 
@@ -248,9 +229,8 @@ export class ActiveComponentController {
 
   private nodeClick(d: IItemState, groups: SVGCircleElement[]): void {
     this.currentMenuItem = d
-    this.tooltip.style('visibility', 'hidden')
+    this.tooltip.style('opacity', '0')
     this.menu.hide()
-    this.propertiesMenu.hide()
     this.menu.show(this.getMenuPosition(d))
   }
 
@@ -281,7 +261,11 @@ export class ActiveComponentController {
 
   private maintainNode(sel: d3.Selection<SVGGElement, IItemState, Element, {}>, top: number, left: number): d3.Selection<SVGGElement, IItemState, Element, {}> {
     sel.attr('transform', 'translate(' + top + ',' + left + ')')
-    sel.select('circle').transition().attr('r', this.radius + 'px')
+    sel.select('circle')
+      .classed('loading', (d): boolean => {
+        return d.item === null
+      })
+      .transition().attr('r', this.radius + 'px')
     return sel
   }
 
@@ -310,22 +294,24 @@ export class ActiveComponentController {
       .on('mouseenter', (d: IItemState, i: number, grp: SVGCircleElement[]) => {
         if (d.item && !this.dragOrigX) {
           this.tooltip.style('top', (grp[i].getBoundingClientRect().top - 5) + 'px')
-            .style('left', (grp[i].getBoundingClientRect().left + 25) + 'px')
-            .style('visibility', 'visible')
-            .text(d.description)
+          .style('left', (grp[i].getBoundingClientRect().left + 25) + 'px')
+          .style('opacity', '1')
+          .text(d.description)
         } else if (!this.dragOrigX) {
           this.tooltip.style('top', (grp[i].getBoundingClientRect().top - 5) + 'px')
           .style('left', (grp[i].getBoundingClientRect().left + 25) + 'px')
-          .style('visibility', 'visible')
+          .style('opacity', '1')
           .text('Loading...')
         }
       })
       .on('mouseout', (d: IItemState, i: number) => {
-        this.tooltip.style('visibility', 'hidden')
+        if (!this.viewOptionsShowLabels) {
+          this.tooltip.style('opacity', '0')
+        }
       })
       .call(d3.drag()
         .on('start', (d: IItemState, i: number) => {
-          this.tooltip.style('visibility', 'hidden')
+          this.tooltip.style('opacity', '0')
           this.dragOrigX = d.leftOffset
           this.dragOrigY = d.topOffset
         })
@@ -333,6 +319,10 @@ export class ActiveComponentController {
           // TODO: implement change to offsets using actions and reducers
           d.leftOffset = d3.event.x + this.dragOrigX
           d.topOffset = d3.event.y + this.dragOrigY
+          if (d.topOffset < 20) { d.topOffset = 20 }
+          if (d.topOffset > window.innerHeight-75) { d.topOffset = window.innerHeight-75 }
+          if (d.leftOffset < 20) { d.leftOffset = 20 }
+          if (d.leftOffset > window.innerWidth-20) { d.leftOffset = window.innerWidth-20 }
           this.dragOrigX = d.leftOffset
           this.dragOrigY = d.topOffset
           this.updateCanvas()
@@ -341,6 +331,10 @@ export class ActiveComponentController {
           // TODO: implement change to offsets using actions and reducers
           d.leftOffset = d3.event.x + this.dragOrigX
           d.topOffset = d3.event.y + this.dragOrigY
+          if (d.topOffset < 20) { d.topOffset = 20 }
+          if (d.topOffset > window.innerHeight-75) { d.topOffset = window.innerHeight-75 }
+          if (d.leftOffset < 20) { d.leftOffset = 20 }
+          if (d.leftOffset > window.innerWidth-20) { d.leftOffset = window.innerWidth-20 }
           this.dragOrigX = null
           this.dragOrigY = null
           this.updateCanvas()
@@ -379,7 +373,6 @@ export class ActiveComponentController {
 
   private dragDivider(evt: DragEvent): void {
     this.menu.hide()
-    this.propertiesMenu.hide()
     let nativePercent: number = 100 * evt.clientX / window.innerWidth
     this.state.setActiveDividerPercentage(nativePercent > 98 ? 100 : nativePercent < 2 ? 0 : nativePercent)
   }
@@ -395,6 +388,29 @@ export class ActiveComponentController {
   private dragTabLeftStyle(): {} {
     return { 'left': this.state.active.dividerPercent + '%' }
   }
+
+  private setGridOptions(): void {
+    let data: {}[] = this.state.active.activeLayout.items.map((item) => {
+      let obj: {} = {}
+      obj['id'] = item.ids[0].value
+      obj['description'] = item.description
+      return obj
+    })
+
+    this.gridOptions = {
+      data: data,
+      enableFiltering: true,
+      columnDefs: [
+        {
+          field: 'id',
+          cellTemplate: '<div class="ui-grid-cell-contents"><a href="{{row.entity.id}}" target="_blank">{{row.entity.id}}</a></div>'
+        },
+        {
+          field: 'description'
+        }
+      ]
+    }
+  }
 }
 
 export class ActiveComponent implements angular.IComponentOptions {
@@ -402,5 +418,5 @@ export class ActiveComponent implements angular.IComponentOptions {
     public controller: any = ActiveComponentController
 }
 
-angular.module('fibra.components.active', ['ui.bootstrap', 'fibra.actions.project', 'fibra.services.search-service', 'filearts.dragDrop', 'ui.grid', 'ui.grid.autoResize'])
+angular.module('fibra.components.active', ['ui.bootstrap', 'fibra.actions.project', 'fibra.services.search-service', 'filearts.dragDrop', 'ui.grid', 'ui.grid.emptyBaseLayer', 'ui.grid.resizeColumns', 'ui.grid.autoResize', 'ui.grid.edit'])
   .component('active', new ActiveComponent())

@@ -6,7 +6,7 @@
   sources
 .top-nav
   .nav-element.return-button
-    img.back-icon(src="./app/images/nav_bar/back.svg" ui-sref="projects")
+    img.back-icon.transition-200(src="./app/images/nav_bar/back.svg" ui-sref="projects" uib-popover="Back to projects" popover-placement="bottom-left" popover-popup-delay="750" popover-trigger="'mouseenter'")
   .nav-element.project-description.push-down {{ $ctrl.actions.project.description.length > 30 ? $ctrl.actions.project.description.substr(0, 27) + '...' : $ctrl.actions.project.description }}
   .nav-element.vertical-divider.muted |
   span.nav-links
@@ -17,7 +17,7 @@
     input.search-bar(placeholder="Search")
     img.search-image(src="./app/images/nav_bar/search.svg" width="12px" height="auto")
   .nav-element.bibliography-link
-    img.bib-icon(src="./app/images/nav_bar/bibliography.svg")
+    img.bib-icon(src="./app/images/nav_bar/bibliography.svg" ng-click="$ctrl.openBibliographyModal($ctrl.currentView)")
   span.usage(ng-hide="$ctrl.currentView==='sources'")
     .nav-element.usage-chart
       .progress

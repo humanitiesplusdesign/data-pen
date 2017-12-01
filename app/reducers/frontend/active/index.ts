@@ -1,6 +1,6 @@
 import { ADD_ITEM_TO_ITEM_STATE } from '../../../actions/active';
 import { Item } from '../../../services/sparql-item-service';
-import { INode } from '../../../models/rdf';
+import { INode, SKOS } from '../../../models/rdf';
 import { ADD_ITEM_TO_CURRENT_LAYOUT, SET_ACTIVE_DIVIDER_PERCENTAGE, CLEAR_ACTIVE_STATE } from 'actions/active'
 
 export type IItemState = {
@@ -46,9 +46,13 @@ export default function models(state: IActiveState = defaultState, action): IAct
     case ADD_ITEM_TO_ITEM_STATE:
       let newItems2: IItemState[] = state.activeLayout.items.slice(0)
       let updateItem: IItemState = action.payload.itemState
+      let fullItem: Item = action.payload.fullItem
       newItems2.splice(newItems2.indexOf(updateItem), 1)
       newItems2.push(Object.assign({}, updateItem, {
-        item: action.payload.fullItem
+        description: !updateItem.description && fullItem && fullItem.remoteProperties.find((rp) => rp.value === SKOS.prefLabel.value) ?
+          fullItem.remoteProperties.find((rp) => rp.value === SKOS.prefLabel.value).values[0].value.label :
+          updateItem.description,
+        item: fullItem
       }))
       return Object.assign({}, state, {
         activeLayout: Object.assign({}, state.activeLayout, {

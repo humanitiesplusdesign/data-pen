@@ -1,23 +1,26 @@
 .main-table(ng-style="$ctrl.tableWidthStyle()")
-  .main-grid(ui-grid="{ data: $ctrl.state.active.activeLayout.items }" ng-hide="$ctrl.state.active.dividerPercent < 2" ui-grid-auto-resize)
+  //- .main-grid(ui-grid="{ data: $ctrl.state.active.activeLayout.items, enableFiltering: true }" ng-hide="$ctrl.state.active.dividerPercent < 2" ui-grid-auto-resize ui-grid-edit ui-grid-resize-columns ui-grid-empty-base-layer)
+  .main-grid(ui-grid="$ctrl.gridOptions" ng-hide="$ctrl.state.active.dividerPercent < 2" ui-grid-auto-resize ui-grid-edit ui-grid-resize-columns ui-grid-empty-base-layer)
 .main-canvas(ng-style="$ctrl.canvasWidthStyle()")
   .control-area
-    button.btn.btn-circle.btn-lg
-      img.btn-icon.view-options(src="./app/images/active/view_options.svg")
-    button.btn.btn-circle.btn-lg
-      img.btn-icon.snapshot(src="./app/images/active/snapshot.svg")
+    button.active-circle-button(uib-popover-template="'viewOptionsPopover.html'" popover-trigger="'outsideClick'" popover-placement="auto left-top" popover-class="active-options-popover" popover-is-open="$ctrl.viewOptionsPopoverVisible" ng-class="{true: 'button-active', false: ''}[$ctrl.viewOptionsPopoverVisible]")
+      img.view-options-icon(src="./app/images/active/view_options.svg")
+    button.active-circle-button.button-disabled(disabled uib-popover-template="'snapshotsPopover.html'" popover-trigger="'outsideClick'" popover-placement="auto left-top" popover-class="active-options-popover" popover-is-open="$ctrl.snapshotsPopoverVisible" ng-class="{true: 'button-active', false: ''}[$ctrl.snapshotsPopoverVisible]")
+      img.snapshots-icon(src="./app/images/active/snapshot.svg")
+    button.active-circle-button.button-disabled(disabled uib-popover-template="'layoutsPopover.html'" popover-trigger="'outsideClick'" popover-placement="auto left-top" popover-class="active-options-popover" popover-is-open="$ctrl.layoutsPopoverVisible" ng-class="{true: 'button-active', false: ''}[$ctrl.layoutsPopoverVisible]")
+      img.layouts-icon(src="./app/images/active/layout.svg")
   svg.main-svg
     g.main-g
       rect.main-background
       g.main-g-items
-.draggable-divider(drag-container="true" on-drag-end="dragging = false; $ctrl.dragDivider($event)" ng-style="$ctrl.dragTabLeftStyle()")
+.draggable-divider(drag-container="true" on-drag-end="dragging = false; $ctrl.dragDivider($event)" on-drag="$ctrl.dragDivider($event)" ng-style="$ctrl.dragTabLeftStyle()")
   .drag-tab(ng-hide="$ctrl.state.active.dividerPercent > 2 && $ctrl.state.active.dividerPercent < 98")
 .node-search(ng-show="$ctrl.currentlyAdding")
   .input-group
     .input-group-addon.addon-left
       i.glyphicon.glyphicon-search(ng-hide="loadingSearchResults")
       .spinner(ng-if="loadingSearchResults")
-    input.form-control(type="text" ng-model="$ctrl.nodeSearchSelected" placeholder="Search" uib-typeahead="result as $ctrl.nodeSearchLabel(result) for result in $ctrl.nodeSearchResults($viewValue)" typeahead-template-url="resultTemplate.html" typeahead-loading="loadingSearchResults" typeahead-no-results="noResults" typeahead-on-select="$ctrl.nodeSearchSelect($item, $model, $label, $event)" typeahead-wait-ms="200")
+    input.form-control(type="text" ng-model="$ctrl.nodeSearchSelected" placeholder="Search" uib-typeahead="result as $ctrl.nodeSearchLabel(result) for result in $ctrl.nodeSearchResults($viewValue)" typeahead-popup-template-url="resultPopupTemplate.html" typeahead-template-url="resultTemplate.html" typeahead-loading="loadingSearchResults" typeahead-no-results="noResults" typeahead-on-select="$ctrl.nodeSearchSelect($item, $model, $label, $event)" typeahead-wait-ms="1000")
     .input-group-addon.addon-right(ng-click="$ctrl.nodeSearchRemove()")
       //-i.glyphicon.glyphicon-remove
       img.dismiss-icon(src="./app/images/filter/remove.svg")
@@ -28,6 +31,36 @@
 .active-tooltip
 script(type="text/ng-template" id="resultTemplate.html")
   a
-    span.resultType [{{ match.model.additionalInformation.typeDescriptions | prefLang | limitTo : 2 : 0 }}]&nbsp;
-    span.resultType(ng-repeat="ds in match.model.additionalInformation.dataSourceDescriptions") [{{ ds.value | limitTo : 2 : 0 }}]
-    span {{ match.label }}
+    span.resultType {{ match.model.additionalInformation.typeDescriptions | prefLang }}
+    span.resultActual {{ match.label }}
+    label.resultSource(ng-repeat="ds in match.model.additionalInformation.dataSourceDescriptions") {{ ds.value | makeAcronym }}
+script(type="text/ng-template" id="resultPopupTemplate.html")
+  .custom-popup-wrapper(ng-style="{top:position().top+'px', left: position().left+'px'}" style="display: block;" ng-show="isOpen() && !moveInProgress" aria-hidden="{{!isOpen()}}")
+    label.cold-node Add "{{ query }}" as an unlinked node 
+    ul.dropdown-menu(role="listbox")
+      li.uib-typeahead-match(ng-repeat="match in matches track by $index" ng-class="{active: isActive($index) }" ng-mouseenter="selectActive($index)" ng-click="selectMatch($index)" role="option" id="{{::match.id}}")
+        div(uib-typeahead-match index="$index" match="match" query="query" template-url="templateUrl")
+script(type="text/ng-template" id="viewOptionsPopover.html")
+  .view-options-popover
+    h4 View options
+    hr
+    input(type="checkbox", ng-model="$ctrl.viewOptionsShowLabels")
+    span.checkbox-title Show node labels
+    p.description.option-description Always display labels next to nodes.
+    hr
+    input(type="checkbox")
+    span.checkbox-title Show node linked status
+    p.description.option-description
+      | Colors nodes to represent their 
+      span.linked-text linked
+      |  or 
+      span.unlinked-text unlinked
+      |  status.
+script(type="text/ng-template" id="snapshotsPopover.html")
+  .snapshots-popover
+    h4 Snapshots
+    hr
+script(type="text/ng-template" id="layoutsPopover.html")
+  .layouts-popover
+    h4 Layouts
+    hr

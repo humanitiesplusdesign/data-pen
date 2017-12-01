@@ -46,6 +46,7 @@ m.value('workerServiceConfiguration', {
   workerThreads: 1,
   importScripts: [
     'https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js',
+    'common-bundle.js',
     'worker-bundle.js'
   ]
 })

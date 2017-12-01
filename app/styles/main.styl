@@ -25,10 +25,22 @@ h1, h2, h3, h4, h5, h6, p {
   font-weight: normal
 }
 
+p.description {
+  font-size: 0.9em
+}
+
 label {
   font-size: 1em
   font-weight: 400
 }
+
+label.input-label {
+  font-family: 'Roboto Mono', monospace
+  font-size: 0.85em
+  color: #838383
+  margin-bottom: 10px
+}
+
 select {
   -webkit-appearance: none;
   -moz-appearance: none;
@@ -48,6 +60,18 @@ a:hover {
   color: #1581e6
 }
 
+.bold {
+  font-weight: 500
+}
+
+.red-text {
+  color: #d24545
+}
+
+.blue-text {
+  color: #466bd3
+}
+
 .header-title {
   margin-top: 50px
 
@@ -57,6 +81,10 @@ a:hover {
     color: #466bd3
     margin-left: 20px
   }
+}
+
+.visible {
+  opacity: 1
 }
 
 .keyline {
@@ -185,16 +213,96 @@ position: absolute
   fill: #999
 }
 
-/* Authentication text */
-
 .auth-text {
   float: right
   margin: 50px 0 -70px 0
-  font-family: 'Roboto Mono', monospace
   color: rgba(0, 0, 0, 0.7)
   font-size: 0.9em
 }
 
 .border {
   border: 1px solid rgba(#000, 0.1)
+}
+
+.transition-100 {
+  transition: .1s
+  -webkit-transition: .1s
+  -moz-transition: .1s
+  -o-transition: .1s
+}
+
+.transition-200 {
+  transition: .2s
+  -webkit-transition: .2s
+  -moz-transition: .2s
+  -o-transition: .2s
+}
+
+.modal-backdrop {
+  background-color: #868686
+}
+
+.modal-content {
+  border: none
+  box-shadow: 0 1px 10px rgba(#000, 0.2)
+  padding: 40px
+  border-radius: 3px
+
+  .modal-header, .modal-body, .modal-footer {
+    padding: 0
+    border: none
+  }
+
+  .description {
+    width: 300px
+    margin-top: 15px
+  }
+}
+
+.modal-tabs {
+  li {
+    a {
+      background: none
+      text-align: center
+      background-color: rgba(#000000, 0.05)
+      border: 1px solid transparent
+      border-radius: 3px
+      margin: 0 10px 50px 0
+      padding: 8px -10px 8px -10px
+      color: #3c3c3c
+      opacity: .8
+      transition: .2s
+      -webkit-transition: .2s
+      -moz-transition: .2s
+      -o-transition: .2s
+
+      &:hover {
+        opacity: 1
+      }
+    }
+  }
+
+  ul > li.active > a {
+      background-color: #466bd3 !important
+      opacity: 1
+      box-shadow: 0px 1px 2px rgba(#000, 0.2)
+      border-bottom: 1px solid rgba(#000000, 0.3)
+      color: #fff !important
+  }
+}
+
+.text-button {
+  appearance: none
+  border: none
+  background: none
+  outline: none
+
+  &:hover {
+    opacity: .4;
+  }
+}
+
+.button-disabled {
+  cursor: default
+  opacity: .3 !important
 }

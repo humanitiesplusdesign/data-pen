@@ -13,6 +13,7 @@ filter {
     opacity: 0.5
     background-color: gray
     position: absolute
+    cursor:col-resize;
   }
 
   .drag-tab {
@@ -35,85 +36,120 @@ filter {
     border-style: none
   }
 
-  .filter-header {
-    //position: relative
-    height: 20px
-    margin-bottom: 10px
-    padding: 0 10px 0 10px
+  .filter-container {
+    margin-bottom: 20px
 
-    .filter-title {
-      float: left
-      color: #A9A9A9
-    }
+    .filter-header {
+      //position: relative
+      height: 20px
+      margin-bottom: 10px
+      padding: 0 10px 0 10px
 
-    .filter-controls {
-      float: right
+      .filter-inputs {
+        display: inline-block
+        margin-top: -10px
+        margin-left: 10px
 
-      .minimise-filter {
-        padding: 10px 5px 10px 5px
-        width: 29px
-        height: auto
+        .filter-input-text {
+          color: #A9A9A9
+        }
+
+        .timeline-input {
+          outline: 0
+          padding: 2px 5px 2px 5px
+          border: 1px solid rgba(#000, 0.3)
+          border-radius: 5px
+
+          &:focus {
+            border: 1px solid rgba(#466bd3, 1)
+          }
+        }
       }
 
-      .remove-filter {
-        padding: 5px
-        width: 24px
-        height: auto
+      .filter-title {
+        float: left
+        color: #A9A9A9
       }
 
-      img {
-        opacity: 0.3
+      .filter-controls {
+        float: right
 
-        &:hover {
-          opacity: 0.1
+        .minimise-filter {
+          padding: 10px 5px 10px 5px
+          width: 29px
+          height: auto
+        }
+
+        .remove-filter {
+          padding: 5px
+          width: 24px
+          height: auto
+        }
+
+        img {
+          opacity: 0.3
+
+          &:hover {
+            opacity: 0.1
+          }
         }
       }
     }
-  }
 
-  .filter-box {
-    height: 230px
-    border: 1px solid #ccc
-    border-radius: 6px
-    padding: 30px
-    margin-bottom: 50px
-    box-shadow: 0 2px 5px 0 #DCDCDC
+    .filter-box {
+      height: 230px
+      border: 1px solid #ccc
+      border-radius: 6px
+      padding: 30px
+      margin-bottom: 30px
+      box-shadow: 0 2px 5px 0 #DCDCDC
 
-    .rzslider {
-      .rz-bar {
-        background: rgba(0, 99, 255, 0.05)
-        height: 100px
-        width: 100%
-      }
-
-      .rz-selection {
-        background: rgba(0, 99, 255, 0.3)
-      }
-
-      .rz-pointer {
-        width: 8px
-        height: 100px
-        top: 0
-        background-color: #2d7efc
-        border-radius: 0px
-        outline: none
-      }
-
-      .rz-pointer:after {
+      &.filter-min {
         display: none
       }
 
-      .rz-tick {
-        width: 2px
-        height: 10px
-        margin-left: 4px
-        border-radius: 0
-        background: rgba(0, 99, 255, 0.05)
-        top: 102px
+      .filter-graph {
+        position: absolute
+        width: 100%
+        padding-top: 35px
       }
 
-      .rz-tick.rz-selected {
-        background: #2d7efc
+      .rzslider {
+        .rz-bar {
+          background: rgba(0, 99, 255, 0.05)
+          height: 100px
+          width: 100%
+        }
+
+        .rz-selection {
+          background: rgba(0, 99, 255, 0.3)
+        }
+
+        .rz-pointer {
+          width: 8px
+          height: 100px
+          top: 0
+          background-color: #2d7efc
+          border-radius: 0px
+          outline: none
+        }
+
+        .rz-pointer:after {
+          display: none
+        }
+
+        .rz-tick {
+          width: 2px
+          height: 10px
+          margin-left: 4px
+          border-radius: 0
+          background: rgba(0, 99, 255, 0.05)
+          top: 102px
+        }
+
+        .rz-tick.rz-selected {
+          background: #2d7efc
+        }
       }
     }
   }

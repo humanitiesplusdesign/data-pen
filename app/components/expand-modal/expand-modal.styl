@@ -1,0 +1,75 @@
+expand-modal {
+
+  p {
+    width: 300px
+    margin-top: 15px
+  }
+
+  .modal-body {
+
+    ul {
+      margin-top: 50px
+      list-style: none
+      line-height: 1.5em
+      margin-left: -15px
+
+      li {
+        width: 100%
+        height: 30px
+        padding-left: 5px
+
+        &:nth-child(odd) {
+          background-color: rgba(#000, 0.02)
+        }
+
+        .property-name {
+          position: relative
+          top: 4px
+        }
+
+        .property-results {
+          font-family: 'Roboto Mono', monospace
+          font-size: 0.85em
+          color: rgba(#000000, 0.4)
+          padding: 0 3px 0 3px
+          border-radius: 3px
+          position: relative
+          margin-left: 5px
+          top: 4px
+          //background-color: rgba(#000000, 0.3)
+
+        }
+
+        .expand-button {
+          float: right
+          font-family: 'Roboto Mono', monospace
+          color: rgba(#000000, 0.3)
+          font-size: 0.9em
+          margin-top: 2px
+        }
+      }
+    }
+  }
+
+  .modal-footer {
+    margin-top: 30px
+
+    button {
+      position: relative
+      appearance: none
+      border: none
+      width: 80px
+      height: 30px
+      background: none
+      outline: none
+
+      &:hover {
+        opacity: .4;
+      }
+    }
+
+    .select-button {
+      color: #1571ee
+    }
+  }
+}

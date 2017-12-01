@@ -9,6 +9,9 @@ import { ProjectService } from '../../services/project-service/project-service'
 import * as ProjectActions from '../../actions/project';
 import { INgRedux } from 'ng-redux'
 import SourcesActions from '../../actions/sources'
+import { IModalService } from 'angular-ui-bootstrap'
+import * as d3 from 'd3';
+import { Class, Property } from 'services/project-service/data-model';
 
 interface ISourcesComponentControllerState extends ISourcesActions {
   project: ProjectState
@@ -24,7 +27,8 @@ export class SourcesComponentController {
 
   /* @ngInject */
   constructor(private projectService: ProjectService,
-              private $ngRedux: INgRedux) {
+              private $ngRedux: INgRedux,
+              private $uibModal: IModalService) {
     let unsub1: () => void = $ngRedux.connect(this.mapProjectToActions, ProjectActions)(this.actions)
     let stateUnsubscribe: () => void = $ngRedux.connect(
       (state: IRootState) => {
@@ -52,6 +56,36 @@ export class SourcesComponentController {
     })
   }
 
+  private openAddSourcesModal(): void {
+    let modalInstance: any = this.$uibModal.open({
+      animation: true,
+      component: 'addSource',
+      size: 'lg',
+      resolve: {
+      }
+    });
+  }
+
+  private allClasses(): Class[] {
+    return d3.keys(this.localSourceClassTree).reduce(
+      (a, b) => {
+        let sourceClasses: string[] = d3.keys(this.localSourceClassTree[b])
+          .filter(k => this.localSourceClassTree[b][k])
+          .filter(k => a.indexOf(k) === -1)
+        return a.concat(sourceClasses)
+      },
+      []).map(c => this.state.project.project.dataModel.classMap.get(c))
+  }
+
+  private sourcePropsForClass(c: Class): any {
+    let sources: string[] = d3.keys(this.localSourceClassTree)
+    let properties: Property[] = c.properties.map(p => p.id.value).map(p => this.state.project.project.dataModel.propertyMap.get(p))
+    return {
+      sources: sources,
+      properties: properties
+    }
+  }
+
   private getSourceClassStatus(source: string, clss: string): boolean {
     if (this.state.sources.sourceClassToggle[source] && this.state.sources.sourceClassToggle[source][clss]) {
       return this.state.sources.sourceClassToggle[source][clss]
@@ -72,5 +106,5 @@ export class SourcesComponent implements angular.IComponentOptions {
     public controller: any = SourcesComponentController
 }
 
-angular.module('fibra.components.sources', [])
+angular.module('fibra.components.sources', ['ui.bootstrap'])
   .component('sources', new SourcesComponent())

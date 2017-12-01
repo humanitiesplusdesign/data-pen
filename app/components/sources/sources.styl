@@ -16,9 +16,6 @@ sources {
       width: 30%
       height: 100%
       background-color: #f6f6f6
-      border-color: #dddddd
-      border-style: none solid none none
-      border-width: 1px
       padding: 30px
       overflow-y: scroll
       padding-bottom: 3em
@@ -32,9 +29,25 @@ sources {
           font-size: 1.2em
         }
 
-        .pull-right {
-          margin-top: 26px
+        .edit-sources-icon {
+          float: right
+          margin-top: 20px
+          font-size: 1.4em
+          opacity: .4
+
+          &:hover {
+            opacity: .8
+            cursor: pointer
+            transform: rotate(15deg)
+          }
         }
+      }
+
+      /* Add/edit sources modal styles */
+
+      .available-sources-list {
+        margin-top: 50px
+        list-style: none
       }
 
       .sources-list {

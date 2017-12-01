@@ -2,40 +2,33 @@
   h3.header-title Data Pen
     span.header-subtitle Projects
 
-  .head
-    .sort-container(ng-controller="projectsSortController")
+  div.head(ng-repeat="(id,projectSource) in $ctrl.projectSources track by $index",ng-if="id=='Projects'")
+    .sort-container(ng-controller="projectsSortController" ng-if="$ctrl.projectSourceState[id]=='ready' && $ctrl.projects.Projects.length !== 0")
       select(ng-model="item.id" ng-selected="0" ng-options="option.id as option.name for option in options")
         option(ng-repeat="option in data.availableOptions" value="{{option.id}}") {{option.name}}
 
-  div(ng-repeat="(id,projectSource) in $ctrl.projectSources track by $index")   
-    a(ui-sref="configure({sourceId:id})") 
-      button.new-project-button(type="button" data-toggle="modal" data-target="#newProjectDialog") Start new project
-      .modal#newProjectDialog(tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="false")
-        .modal-dialog(role="document")
-          .modal-content
-            .modal-header
-              h5.modal-title Modal title
-              .button.close(type="button" data-dismiss="modal" aria-label="Close")
-                .span(aria-hidden="true") &times;
-            .modal-body stuff here
-            .modal-footer
-              .button.btn.btn-secondary(type="button" data-dismiss="modal") Close
-              .button.btn.btn-primary(type="button") Save changes
-    .row
     .spinner(ng-if="$ctrl.projectSourceState[id]=='loading'")
-    .alert.alert-danger(ng-if="$ctrl.projectSourceState[id]=='error'") Error loading: {{projects}}
+
+    .error-loading.col-md-6.col-md-offset-3(ng-if="$ctrl.projectSourceState[id]=='error'")
+      p.message-text Something went wrong while loading your projects. Check your internet connection and try a refresh?
+
+    .no-projects.col-md-6.col-md-offset-3(ng-if="$ctrl.projects.Projects.length === 0 && $ctrl.projectSourceState[id]=='ready'")
+      p.message-text A project contains a set of sources, filters, and active data, as well as tabular and graphical workspaces. Create a project to get started!
+
+    a(ui-sref="configure({sourceId:id})" ng-if="$ctrl.projectSourceState[id]=='ready'" )
+      button.new-project-button(type="button" data-toggle="modal" data-target="#newProjectDialog" ng-class="$ctrl.projects.Projects.length === 0 ? 'none-position' : ''") Start new project
+
     ul.projects-list
       li.project-cell(ng-if="$ctrl.projectSourceState[id]=='ready'",ng-repeat="project in $ctrl.projects[id] track by $index" ng-init="optionsVisibility=''" ng-mouseenter="optionsVisibility='visible'" ng-mouseleave="optionsVisibility=''")
         .row
           a.citable-content(ui-sref="project({id:project.id,sparqlEndpoint:project.source.sparqlEndpoint,graph:project.source.graph})"): citable(citable="project",no-link)
-          .citable-sources
+          .citable-sources.col-md-3
             label Sources
             ul
-              //- li(ng-repeat="source in project.authorityEndpoints.concat(project.archiveEndpoints)") {{ source.labels | prefLabel }}
-              li Virtual International Authority File
-              li GeoNames
+              li(ng-repeat="source in $ctrl.getSources(project)") {{ source.labels | prefLang }}
           ul.project-options(ng-class="optionsVisibility")
-            li Edit
-            li Duplicate
-            li Export
-            li.delete-project(ng-click="$ctrl.deleteProject(id, $index, project)") Delete
+            //-li Edit
+            //-li Duplicate
+            //-li Export
+            //-li.delete-project(ng-click="$ctrl.deleteProject(id, $index, project)") Delete
+            li.delete-project(ng-click="$ctrl.openDeleteProjectModal(project, $index, id)") Delete

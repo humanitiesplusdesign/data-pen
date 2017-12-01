@@ -1,0 +1,9 @@
+.modal-header
+  h4.modal-title#modal-title Delete project
+.modal-body#modal-body
+  p.description Are you sure you want to delete&nbsp;
+    span.bold {{ $ctrl.resolve.project.labels | prefLang }}
+    span ? This action cannot be undone.
+.modal-footer
+  button.cancel-button.text-button.transition-200(ng-click="$ctrl.cancel()") Cancel
+  button.select-button.text-button.red-text.transition-200(ng-click="$ctrl.commit()") Delete

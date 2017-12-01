@@ -1,8 +1,9 @@
 .sources-main
-  .sources-left
+  .sources-left(ng-init="editSourcesStatus=''")
     .sources-head
       h3.pull-left Project sources
-      span.pull-right add
+      span.edit-sources-icon.transition-200.glyphicon.glyphicon-cog(ng-click="$ctrl.openAddSourcesModal()")
+              
     .sources-list
       span(ng-repeat="source in $ctrl.state.sources.sources")
         h4(ng-click="$ctrl.projectsOpen[source.id] = !$ctrl.projectsOpen[source.id]")
@@ -13,10 +14,12 @@
           label.checkbox-container(ng-repeat="clss in source.classes" ng-hide="clss.labels.length === 0") 
             input(type="checkbox", ng-model="$ctrl.localSourceClassTree[source.id][clss.id.value]" ng-click="$ctrl.state.setSourceClassActive(source.id, clss.id.value, !$ctrl.getSourceClassStatus(source.id, clss.id.value))")
             span {{clss.labels | prefLang}}
-      //- h4  
-      //-   i.glyphicon.glyphicon-triangle-right
-      //-   span Physiocrats.csv
-      //- h4
-      //-   i.glyphicon.glyphicon-triangle-right
-      //-   span Created in Active
   .sources-right
+    uib-tabset(type="tabs")
+      uib-tab(ng-repeat="class in $ctrl.allClasses()" index="$index" heading="{{ class.labels | prefLang }}")
+        ul
+          li(ng-repeat="prop in $ctrl.sourcePropsForClass(class).properties") {{ prop.labels | prefLang }}
+        ul
+          li(ng-repeat="source in $ctrl.state.sources.sources") {{ source.labels | prefLang }}
+            ul
+              li(ng-repeat="prop in $ctrl.sourcePropsForClass(class).properties") Value for {{prop.labels | prefLang}} : {{ 1 }}

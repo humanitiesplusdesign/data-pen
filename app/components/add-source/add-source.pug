@@ -1,0 +1,69 @@
+.modal-header
+.modal-body
+  .sources-tabs
+    uib-tabset.modal-tabs(type="pills" justified="true")
+      uib-tab(index="0" heading="Authorities & Archives")
+        h4 Configure external authorities and archives
+        p.description
+          span.bold Authorities 
+          | are databases used to uniquely identify your entities and reconcile them with other linked data sources.
+        ul.available-sources-list
+          li(ng-repeat="endpoint in $ctrl.authorityEndpoints")
+            input(type="checkbox", ng-model="$ctrl.sourceSelections[endpoint.id]")
+            span &nbsp;{{ endpoint.labels | prefLang }}    
+        hr
+        p.description
+          span.bold Archives 
+          | are domain-specific sources of linked data which can be used to populate the properties of your entities.
+        ul.available-sources-list
+          li(ng-repeat="endpoint in $ctrl.archiveEndpoints")
+            input(type="checkbox", ng-model="$ctrl.sourceSelections[endpoint.id]")
+            span &nbsp;{{ endpoint.labels | prefLang }}   
+      uib-tab(index="1" heading="Upload CSV")
+        .container
+          .row
+            h4 Upload your own data
+            p.description Select a .csv file to upload to Data Pen. A file must refer to only one entity type, but multiple files can be uploaded.
+          .row.csv-setup
+            .left-side.col-md-4
+              .file-selection
+                .row
+                  label.input-label 1. Select file
+                .row
+                  label.select-file-button Choose file
+                    input(type="file")
+                  label No file chosen
+              .entity-type-selection
+                .row
+                  label.input-label 2. Select entity type
+                .row
+                  .dropdown-container
+                    select(ng-model="item.id" ng-selected="0" ng-options="option.id as option.name for option in $ctrl.typeListOptions")
+                      option(ng-repeat="option in data.availableOptions" value="{{option.id}}") {{option.name}}
+              .entity-label-column-selection
+                .row
+                  label.input-label 3. Select entity label column
+                .row
+                  .dropdown-container
+                    select(ng-model="item.id" ng-selected="0" ng-options="option.id as option.name for option in $ctrl.filePropertyOptions")
+                      option(ng-repeat="option in data.availableOptions" value="{{option.id}}") {{option.name}}
+            .right-side.col-md-4
+              p.description If your data includes one or more sets of unique identifiers from an authority or archive, add those columns here to reconcile your entities. 
+              .select-id-column
+                label.input-label Authority/archive
+                .dropdown-container
+                  select(ng-model="item.id" ng-selected="0" ng-options="option.id as option.name for option in $ctrl.sourcesListOptions")
+                    option(ng-repeat="option in data.availableOptions" value="{{option.id}}") {{option.name}}
+              .select-source
+                label.input-label ID column
+                .dropdown-container
+                  select(ng-model="item.id" ng-selected="0" ng-options="option.id as option.name for option in $ctrl.filePropertyOptions")
+                    option(ng-repeat="option in data.availableOptions" value="{{option.id}}") {{option.name}}
+              button.add-column-button Add column
+              
+      uib-tab(index="2" heading="Custom SPARQL Query")
+        h4 Title
+        p.description Description
+.modal-footer
+  button.cancel-button.text-button.transition-200(ng-click="$ctrl.cancel()") Cancel
+  button.select-button.text-button.transition-200.disabled(ng-click="$ctrl.commit()") Apply
