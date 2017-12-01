@@ -17,6 +17,7 @@ module.exports = [ Object.assign({
   name: 'ui',
   entry: {
     ui: './app/index.ts',
+    worker: './app/worker-index.ts',
     'webpack-dev-server-client': 'webpack-dev-server/client'
   },
   plugins: [
@@ -29,11 +30,15 @@ module.exports = [ Object.assign({
       template: 'app/index.pug'
     }),
     new ExtractTextPlugin('styles.css'),
+    new webpack.optimize.CommonsChunkPlugin({
+      name: "common",
+      filename: "common-bundle.js"
+    }),
     new WebpackBuildNotifierPlugin({
       title: "Fibra UI Webpack Build"
     })
   ]
-}, commonConf), Object.assign({
+}, commonConf)/*, Object.assign({
   name: 'worker',
   entry: {
     worker: './app/worker-index.ts',
@@ -47,4 +52,4 @@ module.exports = [ Object.assign({
       title: "Fibra WebWorker Webpack Build"
     })
   ]
-}, commonConf)];
+}, commonConf)*/];
