@@ -33,6 +33,8 @@ export class DetailedProperty extends BasicProperty {
 
   constructor(prop: BasicProperty) {
     super(prop)
+    this.minimumValue = prop.minimumValue
+    this.maximumValue = prop.maximumValue
   }
 }
 
@@ -50,7 +52,7 @@ export class PropertyService {
     this.$ngRedux = $ngRedux
   }
 
-  public getBasicProperty(prop: Property): BasicProperty {
+  public getBasicProperty(prop: Property): angular.IPromise<BasicProperty> {
     let bp: BasicProperty = new BasicProperty(prop)
     bp.maximumValue = new FullRichNodeFromNode(
       new CNode(
@@ -65,12 +67,12 @@ export class PropertyService {
       )
     )
     bp.type = 'DateTime'
-    return bp
+    return this.$q.resolve(bp)
   }
 
-  public getDetailedProperty(prop: BasicProperty): DetailedProperty {
+  public getDetailedProperty(prop: BasicProperty): angular.IPromise<DetailedProperty> {
     let dp: DetailedProperty = new DetailedProperty(prop)
-    return dp
+    return this.$q.resolve(dp)
   }
 }
 

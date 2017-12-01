@@ -104,7 +104,7 @@ export class FilterComponentController {
   }
 
   private addFilter(clss: Class, prop: Property): void {
-    this.actions.setFilter(clss, prop)
+    this.actions.setFilter(clss, prop, this.propertyService)
   }
 
   private removeFilter(clss: Class, prop: Property): void {
