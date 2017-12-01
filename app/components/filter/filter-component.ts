@@ -16,6 +16,7 @@ import 'angular-drag-drop';
 import 'angular-ui-grid';
 import * as d3 from 'd3';
 import 'angularjs-slider';
+import { PropertyService, BasicProperty } from 'services/property-service';
 
 interface IFilterComponentControllerState {
   project: ProjectState
@@ -32,7 +33,6 @@ export class FilterComponentController {
   private localFilterTree: IClassFilterTree
   private histogramWidth: number = 1000
   private histogramHeight: number = 100
-  //private histogramColour = "blue"
   private histogramData: any = [
     {key: '1900', count: 4},
     {key: '1910', count: 9},
@@ -63,7 +63,8 @@ export class FilterComponentController {
               private $scope: angular.IScope,
               private $q: angular.IQService,
               private $ngRedux: INgRedux,
-              private $document: angular.IDocumentService) {
+              private $document: angular.IDocumentService,
+              private propertyService: PropertyService) {
     let unsub1: () => void = $ngRedux.connect(this.mapProjectToActions, ProjectActions)(this.actions)
     let unsub2: () => void = $ngRedux.connect(this.mapFilterToActions, FilterActions)(this.actions)
 
