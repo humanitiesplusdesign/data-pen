@@ -152,7 +152,6 @@ export class FilterComponentController {
     }
 
     options['showTicks'] = options['ceil'] / 10
-    console.log(options)
     return options
   }
 
