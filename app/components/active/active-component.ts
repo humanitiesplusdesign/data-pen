@@ -199,7 +199,7 @@ export class ActiveComponentController {
           ret.push(r)
         }
     }))
-    console.log(ret)
+    console.log(res, ret)
     return ret
   }
 
