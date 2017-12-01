@@ -151,32 +151,29 @@ export class FilterComponentController {
     return { 'left': this.actions.filter.dividerPercent + '%' }
   }
 
-  private map_range(value, low1, high1, low2, high2) {
+  private map_range(value, low1, high1, low2, high2): number {
     return low2 + (high2 - low2) * (value - low1) / (high1 - low1);
   }
 
   private generateHistogram(data: any): any {
     // get min and max count
-    var countsArray: number[] = []
-    for (var i = 0; i < data.length; i++) {
-      countsArray.push(data[i].count)
+    let countsArray: number[] = []
+    for (let j: number = 0; j < data.length; j++) {
+      countsArray.push(data[j].count)
     }
-    var minCount: number = Math.min.apply(Math, countsArray)
-    var maxCount: number = Math.max.apply(Math, countsArray)
+    let minCount: number = Math.min.apply(Math, countsArray)
+    let maxCount: number = Math.max.apply(Math, countsArray)
 
     // get and set graph width and height
-    var graphWidth = 1547
-    var graphHeight = 100
-
-    console.log("width?")
-    console.log(this.actions.filter.dividerPercent)
+    let graphWidth: number = 1547
+    let graphHeight: number = 100
 
     // generate histogram rectangles
     let rects: any = []
-    var rectWidth = graphWidth/data.length
-    for (var i = 0; i < data.length; i++) {
-      var rectHeight = this.map_range(data[i].count, 0, maxCount, 0, 1*graphHeight)
-      var tempRect = {'x': i*rectWidth, 'y': graphHeight-rectHeight, 'w': rectWidth, 'h': rectHeight}
+    let rectWidth: number = graphWidth / data.length
+    for (let i: number = 0; i < data.length; i++) {
+      let rectHeight: number = this.map_range(data[i].count, 0, maxCount, 0, 1 * graphHeight)
+      let tempRect: any = {'x': i * rectWidth, 'y': graphHeight - rectHeight, 'w': rectWidth, 'h': rectHeight}
       rects.push(tempRect)
     }
 
