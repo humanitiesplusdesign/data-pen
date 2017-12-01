@@ -16,11 +16,11 @@
         li(ng-repeat="prop in clss.properties")
           a(ng-click="$ctrl.addFilter(clss, prop)") {{ prop.labels | prefLang }}
     hr
-    .filter(ng-repeat="(propId, filter) in $ctrl.localFilterTree[clss.id.value]" ng-init="slideMin = filter.domain[0]; slideMax=filter.domain[1]; slideOptions={ floor: filter.selection[0], ceil: filter.selection[1], draggableRange: true, showTicks: filter.domain[1]/10, showTicksValues: true, onEnd: $ctrl.setFilterSelection.bind($ctrl, filter.clss, filter.prop) }")
+    .filter(ng-repeat="(propId, filter) in $ctrl.localFilterTree[clss.id.value] track by propId+filter.domain[0]+filter.domain[1]" ng-show="filter.domain" ng-init="slideMin = $ctrl.slideOptionsFromFilter(filter).floor; slideMax=$ctrl.slideOptionsFromFilter(filter).ceil; slideOptions=$ctrl.slideOptionsFromFilter(filter)")
       .filter-container
         .filter-header
           .filter-title {{ filter.description }}: {{ $ctrl.state.project.project.dataModel.propertyMap.s[propId].labels | prefLang }}
-          .filter-inputs 
+          .filter-inputs
             input.timeline-input(type="number" min="0" max="2500" ng-model="slideMin" ng-change="$ctrl.changeMinSlider()")
             span.filter-input-text &nbsp;to&nbsp;
             input.timeline-input(type="number" min="0" max="2500" ng-model="slideMax" ng-change="$ctrl.changeMaxSlider()")

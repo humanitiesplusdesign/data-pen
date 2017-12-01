@@ -2,7 +2,7 @@
 import { IActiveActions } from '../../actions/active';
 import { ISourcesState } from '../../reducers/frontend/sources';
 import { ProjectState } from '../../reducers/frontend/project';
-import { IClassFilterTree, IFilterState } from '../../reducers/frontend/filter';
+import { IClassFilterTree, IFilterState, IFilter } from '../../reducers/frontend/filter';
 import { IRootState } from '../../reducers';
 import { Class, Property } from '../../services/project-service/data-model';
 import { ItemsService } from '../../services/items-service';
@@ -132,6 +132,28 @@ export class FilterComponentController {
     return {
       filter: state.frontend.filter
     }
+  }
+
+  private slideOptionsFromFilter(filter: IFilter): any {
+    let options: {} = {
+      draggableRange: true,
+      showTicks: filter.domain[1] / 10,
+      showTicksValues: true,
+      onEnd: this.setFilterSelection.bind(this, filter.clss, filter.prop)
+    }
+    switch (filter.prop['type']) {
+      case 'DateTime':
+        options['floor'] = d3.timeParse('%Y-%m-%d')(filter.prop['minimumValue'].value).getFullYear()
+        options['ceil'] = d3.timeParse('%Y-%m-%d')(filter.prop['maximumValue'].value).getFullYear()
+        break;
+      default:
+        options['floor'] = 0
+        options['ceil'] = 2550
+    }
+
+    options['showTicks'] = options['ceil'] / 10
+    console.log(options)
+    return options
   }
 
   private dragDivider(evt: DragEvent): void {

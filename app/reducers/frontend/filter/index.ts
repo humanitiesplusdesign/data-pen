@@ -52,8 +52,8 @@ export default function models(state: IFilterState = defaultState, action): IFil
             [action.payload.property.id.value]: {
               type: 'TIMELINE',
               description: 'Timeline',
-              domain: [0, 2500],
-              selection: [0, 2500],
+              domain: [],
+              selection: [100, 2400],
               clss: action.payload.clss,
               prop: action.payload.property
             }
@@ -62,16 +62,16 @@ export default function models(state: IFilterState = defaultState, action): IFil
       })
 
     case UPDATE_PROPERTY_ON_FILTER:
-    return Object.assign({}, state, {
-      filtersByClass: Object.assign({}, state.filtersByClass, {
-        [action.payload.clss.id.value]: Object.assign({}, state.filtersByClass[action.payload.clss.id.value], {
-          [action.payload.property.id.value]: Object.assign({}, state.filtersByClass[action.payload.clss.id.value][action.payload.property.id.value], {
-            domain: [action.payload.property.minimumValue ? action.payload.property.minimumValue : state.filtersByClass[action.payload.clss.id.value][action.payload.property.id.value].domain[0], action.payload.property.maximumValue ? action.payload.property.maximumValue : state.filtersByClass[action.payload.clss.id.value][action.payload.property.id.value].domain[1]],
-            prop: action.payload.property
+      return Object.assign({}, state, {
+        filtersByClass: Object.assign({}, state.filtersByClass, {
+          [action.payload.clss.id.value]: Object.assign({}, state.filtersByClass[action.payload.clss.id.value], {
+            [action.payload.property.id.value]: Object.assign({}, state.filtersByClass[action.payload.clss.id.value][action.payload.property.id.value], {
+              domain: [action.payload.property.minimumValue ? action.payload.property.minimumValue : state.filtersByClass[action.payload.clss.id.value][action.payload.property.id.value].domain[0], action.payload.property.maximumValue ? action.payload.property.maximumValue : state.filtersByClass[action.payload.clss.id.value][action.payload.property.id.value].domain[1]],
+              prop: action.payload.property
+            })
           })
         })
       })
-    })
 
     case SET_FILTER_SELECTION:
       return Object.assign({}, state, {
