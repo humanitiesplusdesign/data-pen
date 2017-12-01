@@ -1,7 +1,7 @@
 import { ILiteral } from '../../../models/rdfjs';
 import { Class } from '../../../services/project-service/data-model';
 import { RemoteEndpointConfiguration } from '../../../services/project-service/remote-endpoint-configuration';
-import { ADD_SOURCE, CLEAR_SOURCES_STATE, SET_SOURCE_CLASS_ACTIVE } from '../../../actions/sources';
+import { CLEAR_SOURCES_STATE, SET_SOURCE_CLASS_ACTIVE, ADD_ARCHIVE_SOURCE, ADD_AUTHORITY_SOURCE } from '../../../actions/sources';
 
 export interface ISourceClassTree {
   [source: string]: {
@@ -16,12 +16,14 @@ export interface ISource {
 }
 
 export interface ISourcesState {
-  sources: ISource[]
+  archiveSources: ISource[]
+  authoritySources: ISource[]
   sourceClassToggle: ISourceClassTree
 }
 
 let defaultState: ISourcesState = {
-  sources: [],
+  archiveSources: [],
+  authoritySources: [],
   sourceClassToggle: {
     'http://ldf.fi/fibra/viafCidocLiteEndpointConfiguration': {
       'http://www.cidoc-crm.org/cidoc-crm/E21_Person': true,
@@ -49,11 +51,18 @@ export default function models(state: ISourcesState = defaultState, action): ISo
         })
       })
 
-    case ADD_SOURCE:
-      let newSources: ISource[] = state.sources.slice()
-      newSources.push(action.payload)
+    case ADD_ARCHIVE_SOURCE:
+      let newArchiveSources: ISource[] = state.archiveSources.slice()
+      newArchiveSources.push(action.payload)
       return Object.assign({}, state, {
-        sources: newSources
+        archiveSources: newArchiveSources
+      })
+
+    case ADD_AUTHORITY_SOURCE:
+      let newAuthoritySources: ISource[] = state.authoritySources.slice()
+      newAuthoritySources.push(action.payload)
+      return Object.assign({}, state, {
+        authoritySources: newAuthoritySources
       })
 
     default:

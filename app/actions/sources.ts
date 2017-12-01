@@ -4,7 +4,8 @@ import { IRootState } from '../reducers';
 import {Action} from '../models/action'
 
 export const SET_SOURCE_CLASS_ACTIVE: string = 'SET_SOURCE_CLASS_ACTIVE'
-export const ADD_SOURCE: string = 'ADD_SOURCE'
+export const ADD_ARCHIVE_SOURCE: string = 'ADD_ARCHIVE_SOURCE'
+export const ADD_AUTHORITY_SOURCE: string = 'ADD_AUTHORITY_SOURCE'
 export const CLEAR_SOURCES_STATE: string = 'CLEAR_SOURCES_STATE'
 
 export interface ISetSourceClassActiveAction extends Action {
@@ -37,10 +38,18 @@ export default {
       }))
     }
   },
-  addSource: function(source: ISource): (dispatch: Dispatch<IRootState>) => Promise<IAddSourceAction> {
+  addArchiveSource: function(source: ISource): (dispatch: Dispatch<IRootState>) => Promise<IAddSourceAction> {
     return dispatch => {
       return Promise.resolve(dispatch({
-        type: ADD_SOURCE,
+        type: ADD_ARCHIVE_SOURCE,
+        payload: source
+      }))
+    }
+  },
+  addAuthoritySource: function(source: ISource): (dispatch: Dispatch<IRootState>) => Promise<IAddSourceAction> {
+    return dispatch => {
+      return Promise.resolve(dispatch({
+        type: ADD_AUTHORITY_SOURCE,
         payload: source
       }))
     }
