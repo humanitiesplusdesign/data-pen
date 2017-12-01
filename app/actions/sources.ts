@@ -1,11 +1,11 @@
 import { ISource } from '../reducers/frontend/sources';
 import { Dispatch } from 'redux';
 import { IRootState } from '../reducers';
-import {Action} from '../models/action'
+import { Action } from '../models/action'
 import { Class } from 'services/project-service/data-model';
 import { disconnect } from 'cluster';
 import { SparqlItemService, PropertyAndValue } from 'services/sparql-item-service';
-import { SKOS, DataFactory, RDF } from 'models/rdf';
+import { SKOS, DataFactory, RDF, INode, FIBRA } from 'models/rdf';
 
 export const SET_SOURCE_CLASS_ACTIVE: string = 'SET_SOURCE_CLASS_ACTIVE'
 export const ADD_ARCHIVE_SOURCE: string = 'ADD_ARCHIVE_SOURCE'
@@ -29,7 +29,7 @@ export interface ISourcesActions {
   setSourceClassActive(source: string, clss: string, status: boolean): Promise<ISetSourceClassActiveAction>
   addArchiveSource(source: ISource): Promise<IAddSourceAction>,
   addAuthoritySource(source: ISource): Promise<IAddSourceAction>,
-  uploadFile(parsedFile: d3.DSVParsedArray<{}>, type: Class, labelColumn: string, sparqlItemService: SparqlItemService): Promise<IAddSourceAction>
+  uploadFile(filename: string, parsedFile: d3.DSVParsedArray<{}>, type: Class, labelColumn: string, sparqlItemService: SparqlItemService): Promise<IAddSourceAction>
 }
 
 export default {
@@ -61,21 +61,23 @@ export default {
       }))
     }
   },
-  uploadFile: (parsedFile: d3.DSVParsedArray<{}>, type: Class, labelColumn: string, sparqlItemService: SparqlItemService): (dispatch: Dispatch<IRootState>) => Promise<IAddSourceAction> => {
+  uploadFile: (filename: string, parsedFile: d3.DSVParsedArray<{}>, type: Class, labelColumn: string, sparqlItemService: SparqlItemService): (dispatch: Dispatch<IRootState>) => Promise<IAddSourceAction> => {
     return dispatch => {
 
       let localColumns: string[] = parsedFile.columns.slice().filter((c) => c !== labelColumn)
-      parsedFile.forEach((line) => {
-        sparqlItemService.createNewItem([
-          new PropertyAndValue(SKOS.prefLabel, DataFactory.instance.literal(line[labelColumn])),
-          new PropertyAndValue(RDF.type, type.id)
-        ])
-      })
 
-      return Promise.resolve(dispatch({
-        type: UPLOAD_FILE,
-        payload: null
-      }))
+      return Promise.all(parsedFile.map((line) => {
+        return sparqlItemService.createNewItem([
+          new PropertyAndValue(SKOS.prefLabel, DataFactory.instance.literal(line[labelColumn])),
+          new PropertyAndValue(RDF.type, type.id),
+          new PropertyAndValue(FIBRA.sourceFile, DataFactory.instance.literal(filename))
+        ])
+      })).then(() => {
+        return dispatch({
+          type: UPLOAD_FILE,
+          payload: null
+        })
+      })
     }
   }
 }

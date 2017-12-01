@@ -133,6 +133,7 @@ export class AddSourceComponentController {
 
     if (this.currentFile) {
       this.state.uploadFile(
+        this.currentFileName,
         this.parsedFile,
         this.state.project.project.dataModel.classMap.get(this.uploadType),
         this.entityLabelColumn,
