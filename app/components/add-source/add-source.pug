@@ -31,8 +31,8 @@
                   label.input-label 1. Select file
                 .row
                   label.select-file-button Choose file
-                    input(type="file")
-                  label No file chosen
+                    input(type="file" onchange="angular.element(this).scope().$ctrl.fileChanged(this)")
+                  label {{ $ctrl.currentFileName }}
               .entity-type-selection
                 .row
                   label.input-label 2. Select entity type

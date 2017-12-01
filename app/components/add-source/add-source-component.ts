@@ -88,6 +88,7 @@ export class AddSourceComponentController {
   private archiveEndpoints: RemoteEndpointConfiguration[]
   private primarySource: ProjectSourceInfo =  new ProjectSourceInfo('Shared projects', 'http://ldf.fi/fibra/sparql', 'http://ldf.fi/fibra/update', 'http://ldf.fi/fibra/data', 'http://ldf.fi/fibra/shared-projects/', 'http://ldf.fi/fibra/fusekiEndpointWithTextIndexAndSecoFunctions')
   private userSource: ProjectSourceInfo
+  private currentFileName: string = 'No file chosen'
 
   private sourceSelections: {}
 
@@ -99,7 +100,8 @@ export class AddSourceComponentController {
     private projectService: ProjectService,
     private projectActionService: ProjectActionService,
     private $ngRedux: INgRedux,
-    private $q: angular.IQService
+    private $q: angular.IQService,
+    private $scope: angular.IScope
   ) {
     let stateUnsubscribe: () => void = $ngRedux.connect(
       (state: IRootState) => {
@@ -127,6 +129,13 @@ export class AddSourceComponentController {
 
       this.userSource = projectService.getProjectSources()[0]
 
+    })
+  }
+
+  private fileChanged(inputElement: HTMLInputElement): void {
+    this.$scope.$apply(() => {
+      let files: FileList = inputElement.files
+      this.currentFileName = files[0] ? files[0].name : 'No file chosen'
     })
   }
 
