@@ -3,7 +3,7 @@ import { ActiveActionService } from '../../actions/active';
 import { Class } from '../../services/project-service/data-model';
 import { CNode, NamedNode, RDF, SKOS } from '../../models/rdf';
 import { IItemState } from '../../reducers/active';
-import { AutocompletionResults, Result, SparqlAutocompleteService } from '../../services/sparql-autocomplete-service';
+import { AutocompletionResults, Result, SparqlAutocompleteService, ResultGroup } from '../../services/sparql-autocomplete-service';
 import { SparqlItemService } from '../../services/sparql-item-service';
 import * as angular from 'angular';
 import { ProjectService } from 'services/project-service/project-service'
@@ -179,27 +179,25 @@ export class ActiveComponentController {
   private processResults(res: AutocompletionResults): Result[] {
     let activeItemIds: string[] = this.$ngRedux.getState().active.activeLayout.items.map((d: IItemState) => d.ids.map((i) => i.value)).reduce((a, b) => a.concat(b), [])
     let ret: Result[] = []
-    res.localMatchingResults.forEach(l => l.results.forEach(r => {
-      if (activeItemIds.indexOf(r.ids[0].value) === -1) ret.push(r)
-    }))
-    res.remoteResults.forEach(l => l.results.forEach(r => {
-      if (activeItemIds.indexOf(r.ids[0].value) === -1
-        && r.additionalInformation.type && r.additionalInformation.type[0]
-        // Class filter (TODO: Move server-side)
-        && r.datasources.reduce(
-            (p, c) => {
-              return this.$ngRedux.getState().sources.sourceClassToggle[c]
-                && this.$ngRedux.getState().sources.sourceClassToggle[c][r.additionalInformation.type[0].value]
-            },
-            false)) {
-          r.additionalInformation.typeDescriptions = this.state.project.project.dataModel.classMap.get(r.additionalInformation.type[0].value).labels
-          r.additionalInformation.dataSourceDescriptions = this.state.project.project.authorityEndpoints.concat(this.state.project.project.archiveEndpoints)
-            .filter((ae) => r.datasources.filter((rd) => ae.id === rd ).length > 0)
-            .map((ae) => ae.labels.find(la => la.language === 'en'))
-          ret.push(r)
-        }
-    }))
-    console.log(res, ret)
+    console.log(res)
+    let processMatchingResults: (results: ResultGroup, classRestrict: boolean) => void = (results, classRestrict) => results.results.forEach(r => {
+      if (activeItemIds.indexOf(r.ids[0].value) === -1 && r.additionalInformation.type && r.additionalInformation.type[0]
+      // Class filter (TODO: Move server-side)
+      && (!classRestrict || r.datasources.reduce(
+          (p, c) => {
+            return this.$ngRedux.getState().sources.sourceClassToggle[c]
+              && this.$ngRedux.getState().sources.sourceClassToggle[c][r.additionalInformation.type[0].value]
+          },
+          false))) {
+        r.additionalInformation.typeDescriptions = this.state.project.project.dataModel.classMap.get(r.additionalInformation.type[0].value).labels
+        r.additionalInformation.dataSourceDescriptions = this.state.project.project.authorityEndpoints.concat(this.state.project.project.archiveEndpoints)
+          .filter((ae) => r.datasources.filter((rd) => ae.id === rd ).length > 0)
+          .map((ae) => ae.labels.find(la => la.language === 'en'))
+        ret.push(r)
+      }
+    })
+    res.localMatchingResults.forEach((results) => processMatchingResults(results, false))
+    res.remoteResults.forEach((results) => processMatchingResults(results, true))
     return ret
   }
 
@@ -220,7 +218,8 @@ export class ActiveComponentController {
 
     this.activeActionService.addItemToCurrentLayout(item)
     this.updateCanvas()
-    this.$scope.$apply(this.nodeSearchRemove.bind(this))
+    // this.$scope.$apply(this.nodeSearchRemove.bind(this))
+    this.nodeSearchRemove()
 
     this.projectActionService.setActiveItemCount(this.state.active.activeLayout.items.length)
   }
