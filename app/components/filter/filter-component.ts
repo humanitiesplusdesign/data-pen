@@ -1,4 +1,5 @@
 'use strict'
+import { ProjectActionService } from '../../actions/project';
 import { ISourcesState } from 'reducers/sources';
 import { ProjectState } from 'reducers/project';
 import { IClassFilterTree, IFilterState, IFilter } from 'reducers/filter';
@@ -8,14 +9,13 @@ import { ItemsService } from '../../services/items-service';
 import { $stateChangeCancel } from 'angular-ui-router/lib-esm/legacy/stateEvents';
 import * as angular from 'angular';
 import { ProjectService } from '../../services/project-service/project-service'
-import * as ProjectActions from '../../actions/project';
-import * as FilterActions from '../../actions/filter';
 import { IFibraNgRedux } from 'reducers'
 import 'angular-drag-drop';
 import 'angular-ui-grid';
 import * as d3 from 'd3';
 import 'angularjs-slider';
 import { PropertyService, BasicProperty } from 'services/property-service';
+import { FilterActionService } from 'actions/filter';
 
 interface IFilterComponentControllerState {
   project: ProjectState
@@ -25,7 +25,6 @@ interface IFilterComponentControllerState {
 
 export class FilterComponentController {
 
-  private actions: any = {}
   private state: IFilterComponentControllerState = <IFilterComponentControllerState>{}
   private allItems: {}[] = []
   private selectedClass: Class
@@ -63,9 +62,9 @@ export class FilterComponentController {
               private $q: angular.IQService,
               private $ngRedux: IFibraNgRedux,
               private $document: angular.IDocumentService,
-              private propertyService: PropertyService) {
-    let unsub1: () => void = $ngRedux.connect(this.mapProjectToActions, ProjectActions)(this.actions)
-    let unsub2: () => void = $ngRedux.connect(this.mapFilterToActions, FilterActions)(this.actions)
+              private propertyService: PropertyService,
+              private filterActionService: FilterActionService,
+              private projectActionService: ProjectActionService) {
 
     let stateUnsubscribe: () => void = $ngRedux.connect(
       (state: IRootState) => {
@@ -75,11 +74,6 @@ export class FilterComponentController {
           filter: state.filter
         }
       })(this.state)
-    this.actions.unsubscribe = () => {
-      unsub1()
-      unsub2()
-      stateUnsubscribe()
-    }
 
     this.itemsService.getAllItems().then((items) => {
       this.allItems = items
@@ -103,15 +97,15 @@ export class FilterComponentController {
   }
 
   private addFilter(clss: Class, prop: Property): void {
-    this.actions.setFilter(clss, prop, this.propertyService)
+    this.filterActionService.setFilter(clss, prop, this.propertyService)
   }
 
   private removeFilter(clss: Class, prop: Property): void {
-    this.actions.removeFilter(clss, prop)
+    this.filterActionService.removeFilter(clss, prop)
   }
 
   private setFilterSelection(clss: Class, prop: Property, id: string, low: number, high: number): void {
-    this.actions.setFilterSelection(clss, prop, [low, high])
+    this.filterActionService.setFilterSelection(clss, prop, [low, high])
   }
 
   private getActiveClasses(): Class[] {
@@ -119,18 +113,6 @@ export class FilterComponentController {
     new Set(this.state.sources.archiveSources.concat(this.state.sources.authoritySources).map((s) => d3.keys(this.state.sources.sourceClassToggle[s.id]))
       .reduce((a, b) => a.concat(b), [])).forEach((c) => classes.push(this.state.project.project.dataModel.classMap['s'][c]))
     return classes
-  }
-
-  private mapProjectToActions(state: any): any {
-    return {
-      project: state.project
-    }
-  }
-
-  private mapFilterToActions(state: any): any {
-    return {
-      filter: state.filter
-    }
   }
 
   private slideOptionsFromFilter(filter: IFilter): any {
@@ -156,19 +138,19 @@ export class FilterComponentController {
 
   private dragDivider(evt: DragEvent): void {
     let nativePercent: number = 100 * evt.clientX / window.innerWidth
-    this.actions.setFilterDividerPercentage(nativePercent > 98 ? 100 : nativePercent < 2 ? 0 : nativePercent)
+    this.filterActionService.setFilterDividerPercentage(nativePercent > 98 ? 100 : nativePercent < 2 ? 0 : nativePercent)
   }
 
   private tableWidthStyle(): {} {
-    return { 'width': this.actions.filter.dividerPercent + '%' }
+    return { 'width': this.state.filter.dividerPercent + '%' }
   }
 
   private canvasWidthStyle(): {} {
-    return { 'width': (100 - this.actions.filter.dividerPercent) + '%', 'left': this.actions.filter.dividerPercent + '%' }
+    return { 'width': (100 - this.state.filter.dividerPercent) + '%', 'left': this.state.filter.dividerPercent + '%' }
   }
 
   private dragTabLeftStyle(): {} {
-    return { 'left': this.actions.filter.dividerPercent + '%' }
+    return { 'left': this.state.filter.dividerPercent + '%' }
   }
 
   private map_range(value, low1, high1, low2, high2): number {

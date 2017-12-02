@@ -34,4 +34,4 @@
                 rect(ng-repeat="rectangle in $ctrl.histogramRectangles" ng-attr-x="{{rectangle.x}}" ng-attr-y="{{rectangle.y}}" ng-attr-width="{{rectangle.w}}" ng-attr-height="{{rectangle.h}}")
           rzslider(rz-slider-model="slideMin", rz-slider-high="slideMax", rz-slider-options="slideOptions")
 .draggable-divider(drag-container="true" on-drag-end="dragging = false; $ctrl.dragDivider($event)" ng-style="$ctrl.dragTabLeftStyle()")
-  .drag-tab(ng-hide="$ctrl.actions.filter.dividerPercent > 2 && $ctrl.actions.filter.dividerPercent < 98")
+  .drag-tab(ng-hide="$ctrl.filterActionService.filter.dividerPercent > 2 && $ctrl.filterActionService.filter.dividerPercent < 98")

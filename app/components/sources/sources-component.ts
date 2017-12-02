@@ -1,10 +1,10 @@
 'use strict'
+import { ProjectActionService } from '../../actions/project';
 import { IRootState } from '../../reducers';
 import { ISource, ISourceClassTree, ISourcesState } from '../../reducers/sources';
 import { ProjectState } from '../../reducers/project';
 import * as angular from 'angular';
 import { ProjectService } from '../../services/project-service/project-service'
-import * as ProjectActions from '../../actions/project';
 import { IFibraNgRedux } from 'reducers'
 import { IModalService } from 'angular-ui-bootstrap'
 import * as d3 from 'd3';
@@ -17,28 +17,22 @@ interface ISourcesComponentControllerState {
 
 export class SourcesComponentController {
 
-  private actions: any = {}
   private state: ISourcesComponentControllerState = <ISourcesComponentControllerState>{}
   private projectsOpen: { [id: string]: boolean } = {}
   private localSourceClassTree: ISourceClassTree
 
   /* @ngInject */
   constructor(private projectService: ProjectService,
+              private projectActionService: ProjectActionService,
               private $ngRedux: IFibraNgRedux,
               private $uibModal: IModalService) {
-    let unsub1: () => void = $ngRedux.connect(this.mapProjectToActions, ProjectActions)(this.actions)
     let stateUnsubscribe: () => void = $ngRedux.connect(
       (state: IRootState) => {
         return {
           project: state.project,
           sources: state.sources
         }
-      },
-      null)(this.state)
-    this.actions.unsubscribe = () => {
-      unsub1()
-      stateUnsubscribe()
-    }
+      })(this.state)
 
     this.localSourceClassTree = angular.copy(this.state.sources.sourceClassToggle)
 
@@ -71,7 +65,8 @@ export class SourcesComponentController {
           .filter(k => a.indexOf(k) === -1)
         return a.concat(sourceClasses)
       },
-      []).map(c => this.state.project.project.dataModel.classMap.get(c))
+      []).map(c => this.state.project.project ? this.state.project.project.dataModel.classMap.get(c) : null)
+        .filter(c => c)
   }
 
   private sourcePropsForClass(c: Class): any {
