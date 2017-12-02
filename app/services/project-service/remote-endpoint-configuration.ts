@@ -15,7 +15,7 @@ PREFIX dcterms: <http://purl.org/dc/terms/>
 PREFIX foaf: <http://xmlns.com/foaf/0.1/>
 PREFIX void: <http://rdfs.org/ns/void#>
 PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
-SELECT ?id ?types ?schemaEndpoint ?compatibleSchemas ?labels ?descriptions ?rightsHolders ?rightsHolders_labels ?rightsHolders_descriptions ?rightsHolders_url ?rightsHolders_order ?url ?endpoint ?autocompletionQuery ?itemQuery ?treeQuery ?propertyQuery ?classQuery {
+SELECT ?id ?types ?schemaEndpoint ?compatibleSchemas ?labels ?descriptions ?rightsHolders ?rightsHolders_labels ?rightsHolders_descriptions ?rightsHolders_url ?rightsHolders_order ?url ?endpoint ?autocompletionQuery ?itemQuery ?classStatisticsQuery ?propertyQuery ?classQuery {
 # STARTGRAPH
   ?id a fibra:AuthorityEndpointConfiguration .
   ?id a ?types .
@@ -31,7 +31,7 @@ SELECT ?id ?types ?schemaEndpoint ?compatibleSchemas ?labels ?descriptions ?righ
     ?id void:sparqlEndpoint ?endpoint .
     ?id fibra:autocompletionQuery ?autocompletionQuery .
     ?id fibra:itemQuery ?itemQuery .
-    ?id fibra:treeQuery ?treeQuery .
+    ?id fibra:classStatisticsQuery ?classStatisticsQuery .
     ?id fibra:propertyQuery ?propertyQuery .
     ?id fibra:classQuery ?classQuery .
     OPTIONAL { ?id foaf:homepage ?url }
@@ -61,7 +61,7 @@ PREFIX dcterms: <http://purl.org/dc/terms/>
 PREFIX foaf: <http://xmlns.com/foaf/0.1/>
 PREFIX void: <http://rdfs.org/ns/void#>
 PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
-SELECT ?types ?schemaEndpoint ?compatibleSchemas ?labels ?descriptions ?rightsHolders ?rightsHolders_labels ?rightsHolders_descriptions ?rightsHolders_url ?rightsHolders_order ?url ?endpoint ?autocompletionQuery ?itemQuery ?treeQuery ?propertyQuery ?classQuery {
+SELECT ?types ?schemaEndpoint ?compatibleSchemas ?labels ?descriptions ?rightsHolders ?rightsHolders_labels ?rightsHolders_descriptions ?rightsHolders_url ?rightsHolders_order ?url ?endpoint ?autocompletionQuery ?itemQuery ?classStatisticsQuery ?propertyQuery ?classQuery {
 # STARTGRAPH
   { <ID> fibra:schemaEndpoint ?schemaEndpoint }
   UNION
@@ -76,7 +76,7 @@ SELECT ?types ?schemaEndpoint ?compatibleSchemas ?labels ?descriptions ?rightsHo
     <ID> void:sparqlEndpoint ?endpoint .
     <ID> fibra:autocompletionQuery ?autocompletionQuery .
     <ID> fibra:itemQuery ?itemQuery .
-    <ID> fibra:treeQuery ?treeQuery .
+    <ID> fibra:classStatisticsQuery ?classStatisticsQuery .
     <ID> fibra:propertyQuery ?propertyQuery .
     <ID> fibra:classQuery ?classQuery .
     OPTIONAL { <ID> foaf:homepage ?url }
