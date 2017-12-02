@@ -1,7 +1,7 @@
 import * as angular from 'angular';
 
-import { NamedNode } from '../models/rdf';
-import { SparqlItemService } from '../services/sparql-item-service';
+import { DataFactory, FIBRA, NamedNode, RDF, SKOS } from '../models/rdf';
+import { SparqlItemService, PropertyAndValue } from '../services/sparql-item-service';
 
 import { IItemState } from 'reducers/active'
 import { Dispatch, Action } from 'redux'
@@ -11,6 +11,7 @@ export const ADD_ITEM_TO_CURRENT_LAYOUT: string = 'ADD_ITEM_TO_CURRENT_LAYOUT'
 export const SET_ACTIVE_DIVIDER_PERCENTAGE: string = 'SET_ACTIVE_DIVIDER_PERCENTAGE'
 export const CLEAR_ACTIVE_STATE: string = 'CLEAR_ACTIVE_STATE'
 export const ADD_ITEM_TO_ITEM_STATE: string = 'ADD_ITEM_TO_ITEM_STATE'
+export const CREATE_NEW_ITEM: string = 'CREATE_NEW_ITEM'
 
 export interface IAddItemToCurrentLayoutAction extends Action {
   payload: IItemState
@@ -46,6 +47,19 @@ export class ActiveActionService {
     return this.$ngRedux.dispatch({
       type: SET_ACTIVE_DIVIDER_PERCENTAGE,
       payload: percent
+    })
+  }
+
+  public createNewItem(item: IItemState): angular.IPromise<IAddItemToCurrentLayoutAction> {
+    console.log('before')
+    return this.sparqlItemService.createNewItem([
+      new PropertyAndValue(SKOS.prefLabel, DataFactory.instance.literal(item.description)),
+      new PropertyAndValue(RDF.type, DataFactory.instance.namedNode('http://www.cidoc-crm.org/cidoc-crm/E21_Person')),
+      new PropertyAndValue(FIBRA.sourceFile, DataFactory.instance.literal('Manually entered'))
+    ]).then((node) => {
+      console.log('after')
+      item.ids = [node]
+      return this.addItemToCurrentLayout(item)
     })
   }
 }

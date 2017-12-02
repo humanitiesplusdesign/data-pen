@@ -1,7 +1,7 @@
 'use strict'
 import { ActiveActionService } from '../../actions/active';
 import { Class } from '../../services/project-service/data-model';
-import { CNode, NamedNode, RDF, SKOS } from '../../models/rdf';
+import { CNode, DataFactory, NamedNode, RDF, SKOS } from '../../models/rdf';
 import { IItemState } from '../../reducers/active';
 import { AutocompletionResults, Result, SparqlAutocompleteService, ResultGroup } from '../../services/sparql-autocomplete-service';
 import { SparqlItemService, PropertyToValues } from '../../services/sparql-item-service';
@@ -222,6 +222,19 @@ export class ActiveComponentController {
     this.nodeSearchRemove()
 
     this.projectActionService.setActiveItemCount(this.state.active.activeLayout.items.length)
+  }
+
+  private addColdNode(query: string): void {
+    console.log('here')
+    let item: IItemState = {
+      ids: [],
+      item: null,
+      description: query,
+      topOffset: this.nodeSearchOffsetTop,
+      leftOffset: this.nodeSearchOffsetLeft
+    }
+
+    this.activeActionService.createNewItem(item)
   }
 
   private sanitizeId(id: string): string {
