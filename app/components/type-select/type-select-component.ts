@@ -7,7 +7,7 @@ export class TypeSelectComponent implements angular.IComponentOptions {
       tree: '<',
       onSelect: '&',
     }
-    public template = require('./type-select.pug')
+    public template: string = require('./type-select.pug')
 }
 
 angular.module('fibra.components.type-select', [])
