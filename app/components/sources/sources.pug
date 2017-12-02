@@ -32,6 +32,6 @@
         ul
           li(ng-repeat="prop in $ctrl.sourcePropsForClass(class).properties") {{ prop.labels | prefLang }}
         ul
-          li(ng-repeat="source in $ctrl.state.sources.sources") {{ source.labels | prefLang }}
+          li(ng-repeat="source in $ctrl.state.sources.authoritySources.concat($ctrl.state.sources.archiveSources)") {{ source.labels | prefLang }}
             ul
               li(ng-repeat="prop in $ctrl.sourcePropsForClass(class).properties") Value for {{prop.labels | prefLang}} : {{ 1 }}
