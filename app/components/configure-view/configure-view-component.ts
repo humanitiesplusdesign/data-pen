@@ -54,7 +54,7 @@ export class ConfigureViewComponentController implements angular.IComponentContr
   }
 
   /* @ngInject */
-  constructor(private $q: angular.IQService, private projectService: ProjectService, $stateParams: any, private ngRedux: INgRedux, private $state: angular.ui.IStateService) {
+  constructor(private $q: angular.IQService, private projectService: ProjectService, $stateParams: any, private $ngRedux: INgRedux, private $state: angular.ui.IStateService) {
     this.projectSources = projectService.getProjectSources()
     this.projectSource = this.projectSources.find(ps => ps.id === $stateParams.sourceId)
     if ($stateParams.id) {
@@ -65,8 +65,8 @@ export class ConfigureViewComponentController implements angular.IComponentContr
     } else {
       let pid: string = 'http://ldf.fi/fibra/project_' + UUID()
       this.project = new Project(pid)
-      this.project.labels = [ DataFactory.literal('', ngRedux.getState().frontend.general.language)]
-      this.project.descriptions = [ DataFactory.literal('', ngRedux.getState().frontend.general.language)]
+      this.project.labels = [ DataFactory.literal('', $ngRedux.getState().frontend.general.language)]
+      this.project.descriptions = [ DataFactory.literal('', $ngRedux.getState().frontend.general.language)]
       this.project.source = this.projectSource
       this.project.endpoint = this.projectSource.sparqlEndpoint
       this.project.updateEndpoint = this.projectSource.updateEndpoint
