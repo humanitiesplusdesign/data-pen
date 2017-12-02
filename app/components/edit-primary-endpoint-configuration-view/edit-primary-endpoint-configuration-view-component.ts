@@ -17,14 +17,14 @@ export class EditPrimaryEndpointConfigurationViewComponentController  extends Ed
   }
 
   /* @ngInject */
-  constructor($stateParams: any, ngRedux: IFibraNgRedux, projectService: ProjectService, toastr: angular.toastr.IToastrService) {
+  constructor($stateParams: any, $ngRedux: IFibraNgRedux, projectService: ProjectService, toastr: angular.toastr.IToastrService) {
     super($stateParams.sourceId, projectService, toastr)
     if ($stateParams.id) projectService.loadPrimaryEndpointConfiguration(this.projectSource, $stateParams.id).then(ps => this.c = ps)
     else {
       this.c = new PrimaryEndpointConfiguration()
       this.c.id = $stateParams.id
-      this.c.labels = [ DataFactory.literal('', ngRedux.getState().general.language)]
-      this.c.descriptions = [ DataFactory.literal('', ngRedux.getState().general.language)]
+      this.c.labels = [ DataFactory.literal('', $ngRedux.getState().general.language)]
+      this.c.descriptions = [ DataFactory.literal('', $ngRedux.getState().general.language)]
     }
   }
 }
