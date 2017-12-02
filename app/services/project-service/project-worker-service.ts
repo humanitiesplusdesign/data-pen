@@ -23,7 +23,7 @@ export class ProjectWorkerService {
   constructor(private fibraSparqlService: FibraSparqlService, private $q: angular.IQService) {}
 
   public loadPrimaryEndpointConfiguration(source: ICitableSource, templateId: string): angular.IPromise<PrimaryEndpointConfiguration> {
-    return this.runSingleQuery(source, PrimaryEndpointConfiguration.primaryEndpointConfigurationQuery, templateId, new PrimaryEndpointConfiguration(templateId, source))
+    return this.runSingleQuery(source, PrimaryEndpointConfiguration.listPrimaryEndpointConfigurationsQuery, templateId, new PrimaryEndpointConfiguration(templateId, source))
   }
 
   public listPrimaryEndpointConfigurations(source: ICitableSource): angular.IPromise<PrimaryEndpointConfiguration[]> {
@@ -136,7 +136,7 @@ export class ProjectWorkerService {
   }
 
   public loadProject(source: ICitableSource, id: string, loadFull: boolean): angular.IPromise<Project> {
-    let q: angular.IPromise<Project> = this.runSingleQuery(source, Project.projectQuery, id, new Project(id, source))
+    let q: angular.IPromise<Project> = this.runSingleQuery(source, Project.listProjectsQuery, id, new Project(id, source))
     if (!loadFull) return q; else return q.then(p => {
       let promises: angular.IPromise<any>[] = []
       promises.push(this.$q.all(p.schemas.map(schema => this.loadSchema(schema.source, schema.id))).then(schemas => {
@@ -157,7 +157,7 @@ export class ProjectWorkerService {
 
   private runSingleQuery<T extends ICitable>(source: ICitableSource, tq: string, id: string, ps: T): angular.IPromise<T> {
     tq = source.graph ? tq.replace(/# STARTGRAPH/g, 'GRAPH <' + source.graph + '> {').replace(/# ENDGRAPH/g, '}') : tq.replace(/.*# STARTGRAPH\n/g, '').replace(/.*# ENDGRAPH\n/g, '')
-    tq = tq.replace(/<ID>/g, '<' + id + '>')
+    tq = tq.replace(/# VALUE/g, 'VALUES ?id { <' + id + '> }').replace(/<ID>/g, '<' + id + '>')
     let deferred: angular.IDeferred<T> = this.$q.defer()
     this.fibraSparqlService.query(source.sparqlEndpoint, tq).then(response => {
       let conf: IBindingsToObjectConfiguration = {

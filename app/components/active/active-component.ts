@@ -217,7 +217,7 @@ export class ActiveComponentController {
     }
 
     this.activeActionService.addItemToCurrentLayout(item)
-    this.updateCanvas()
+    // this.updateCanvas()
     // this.$scope.$apply(this.nodeSearchRemove.bind(this))
     this.nodeSearchRemove()
 
@@ -442,7 +442,7 @@ export class ActiveComponentController {
 
     this.allClasses().forEach((c) => {
       this.gridOptions[c.id.value] = {
-        data: data.filter((d) => { return d['types'] ? d['types'].map(v => v.value.value).indexOf(c.id.value) !== -1 : false }),
+        data: [{}].concat(data.filter((d) => { return d['types'] ? d['types'].map(v => v.value.value).indexOf(c.id.value) !== -1 : false })),
         enableFiltering: true,
         columnDefs: [
           {
@@ -455,8 +455,6 @@ export class ActiveComponentController {
         ]
       }
     })
-
-    console.log(this.gridOptions)
   }
 }
 

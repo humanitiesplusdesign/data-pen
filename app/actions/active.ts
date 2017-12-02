@@ -26,7 +26,7 @@ export class ActiveActionService {
 
   public addItemToCurrentLayout(item: IItemState): IAddItemToCurrentLayoutAction {
     // TODO: Fix to use the local item associated with this node
-    this.sparqlItemService.getItem(item.ids[0], true).then((i) => {
+    this.sparqlItemService.getItem(item.ids, true).then((i) => {
       this.$ngRedux.dispatch({
         type: ADD_ITEM_TO_ITEM_STATE,
         payload: {

@@ -8,6 +8,7 @@ import {StateWorkerService, WorkerWorkerService} from './worker-service/worker-w
 import {DataModel} from './project-service/data-model'
 import {SparqlService, ISparqlBindingResult} from 'angular-sparql-service'
 import * as angular from 'angular'
+import { UnifyMap } from 'services/id-consolidation-utils';
 
 export class AutocompletionResults {
   public localMatchingResults: ResultGroup[] = []
@@ -91,124 +92,111 @@ SELECT ?groupId ?id ?prefLabel ?matchedLabel ?sameAs ?altLabel { # ADDITIONALVAR
 }
 
 class ProcessingData {
-  public idToIdSet: EMap<StringSet> = new EMap<StringSet>(() => new StringSet()) // id to sameAs ids
+  public unifyMap: UnifyMap = new UnifyMap()
   public idToGroupIdSet: EMap<StringSet> = new EMap<StringSet>(() => new StringSet())
-  public ifpVarPlusValueToIdSet: EMap<EMap<StringSet>> = new EMap<EMap<StringSet>>(() => new EMap<StringSet>(() => new StringSet())) // inverse functional properties & values to ids
   public idToPrefLabelSet: EMap<ONodeSet<INode>> = new EMap<ONodeSet<INode>>(() => new ONodeSet<INode>())
   public idToMatchedLabelSet: EMap<ONodeSet<INode>> = new EMap<ONodeSet<INode>>(() => new ONodeSet<INode>())
   public idToAltLabelSet: EMap<ONodeSet<INode>> = new EMap<ONodeSet<INode>>(() => new ONodeSet<INode>())
   public idToDatasourceSet: EMap<StringSet> = new EMap<StringSet>(() => new StringSet())
-  public touchedIds: StringSet = new StringSet()
-  public idToResult: d3.Map<Result> = new FMap<Result>()
+  public processAndConsolidate(result: ISparqlBindingResult<{[id: string]: ISparqlBinding}>, endpoint: string): void {
+    result.results.bindings.forEach(binding => {
+      let id: string = binding['id'].value
+      this.idToDatasourceSet.goc(id).add(endpoint)
+      if (binding['prefLabel'])
+        this.idToPrefLabelSet.goc(id).add(DataFactory.instance.nodeFromBinding(binding['prefLabel']))
+      if (binding['altLabel'])
+        this.idToAltLabelSet.goc(id).add(DataFactory.instance.nodeFromBinding(binding['altLabel']))
+      if (binding['matchedLabel'])
+        this.idToMatchedLabelSet.goc(id).add(DataFactory.instance.nodeFromBinding(binding['matchedLabel']))
+      if (binding['groupId']) {
+        this.idToGroupIdSet.goc(id).add(binding['groupId'].value)
+        if (binding['groupLabel'])
+          this.idToPrefLabelSet.goc(binding['groupId'].value).add(DataFactory.instance.nodeFromBinding(binding['groupLabel']))
+      }
+    })
+    this.unifyMap.consolidate(result)
+    this.unifyMap.idToIdSet.each((idSet: StringSet, id: string) => {
+      let datasourceSet: StringSet = this.idToDatasourceSet.get(id)
+      let groupIdSet: StringSet = this.idToGroupIdSet.get(id)
+      let prefLabelSet: ONodeSet<INode> = this.idToPrefLabelSet.get(id)
+      let matchedLabelSet: ONodeSet<INode> = this.idToMatchedLabelSet.get(id)
+      let altLabelSet: ONodeSet<INode> = this.idToAltLabelSet.get(id)
+      idSet.each(oid => {
+        let oDatasourceSet: StringSet = this.idToDatasourceSet.get(oid)
+        if (datasourceSet !== oDatasourceSet) {
+          if (datasourceSet) {
+            if (oDatasourceSet) datasourceSet.adds(oDatasourceSet)
+            this.idToDatasourceSet.set(oid, datasourceSet)
+          } else if (oDatasourceSet) this.idToDatasourceSet.set(id, oDatasourceSet)
+        }
+        let oGroupIdSet: StringSet = this.idToGroupIdSet.get(oid)
+        if (groupIdSet !== oGroupIdSet) {
+          if (groupIdSet) {
+            if (oGroupIdSet) groupIdSet.adds(oGroupIdSet)
+            this.idToGroupIdSet.set(oid, groupIdSet)
+          } else if (oGroupIdSet) this.idToGroupIdSet.set(id, oGroupIdSet)
+        }
+        let oPrefLabelSet: ONodeSet<INode> = this.idToPrefLabelSet.get(oid)
+        if (prefLabelSet !== oPrefLabelSet) {
+          if (prefLabelSet) {
+            if (oPrefLabelSet) prefLabelSet.adds(oPrefLabelSet)
+            this.idToPrefLabelSet.set(oid, prefLabelSet)
+          } else if (oPrefLabelSet) this.idToPrefLabelSet.set(id, oPrefLabelSet)
+        }
+        let oMatchedLabelSet: ONodeSet<INode> = this.idToMatchedLabelSet.get(oid)
+        if (matchedLabelSet !== oMatchedLabelSet) {
+          if (matchedLabelSet) {
+            if (oMatchedLabelSet) matchedLabelSet.adds(oMatchedLabelSet)
+            this.idToMatchedLabelSet.set(oid, matchedLabelSet)
+          } else if (oMatchedLabelSet) this.idToMatchedLabelSet.set(id, oMatchedLabelSet)
+        }
+        let oAltLabelSet: ONodeSet<INode> = this.idToAltLabelSet.get(oid)
+        if (altLabelSet !== oAltLabelSet) {
+          if (altLabelSet) {
+            if (oAltLabelSet) altLabelSet.adds(oAltLabelSet)
+            this.idToAltLabelSet.set(oid, altLabelSet)
+          } else if (oAltLabelSet) this.idToAltLabelSet.set(id, oAltLabelSet)
+        }
+      })
+    })
+  }
 }
 
 export class SparqlAutocompleteWorkerService {
 
-  private static processBindings(pd: ProcessingData, endpoint: string, result: ISparqlBindingResult<{[id: string]: ISparqlBinding}>): void {
-    pd.touchedIds.clear()
-    result.results.bindings.forEach(binding => {
-      let id: string = binding['id'].value
-      pd.touchedIds.add(id)
-      pd.idToIdSet.goc(id).add(id)
-      pd.idToDatasourceSet.goc(id).add(endpoint)
-      if (binding['prefLabel'])
-        pd.idToPrefLabelSet.goc(id).add(DataFactory.instance.nodeFromBinding(binding['prefLabel']))
-      if (binding['altLabel'])
-        pd.idToAltLabelSet.goc(id).add(DataFactory.instance.nodeFromBinding(binding['altLabel']))
-      if (binding['matchedLabel'])
-        pd.idToMatchedLabelSet.goc(id).add(DataFactory.instance.nodeFromBinding(binding['matchedLabel']))
-      if (binding['groupId']) {
-        pd.idToGroupIdSet.goc(id).add(binding['groupId'].value)
-        if (binding['groupLabel'])
-          pd.idToPrefLabelSet.goc(binding['groupId'].value).add(DataFactory.instance.nodeFromBinding(binding['groupLabel']))
-      }
-      if (binding['sameAs']) {
-        pd.idToIdSet.get(id).add(binding['sameAs'].value)
-        pd.idToIdSet.goc(binding['sameAs'].value).add(id)
-      }
-      for (let v of result.head.vars) if (v.indexOf('ifp') === 0 && binding[v]) pd.ifpVarPlusValueToIdSet.goc(v.substring(3)).goc(binding[v].value).add(id)
-    })
-  }
-
-  private static buildResults(pd: ProcessingData, groupIdToGroup: EMap<ResultGroup>, dataModel: DataModel, prefLang: string): ResultGroup[] {
+  private static buildResults(pd: ProcessingData, filteredIds: StringSet, dataModel: DataModel, prefLang: string): ResultGroup[] {
     let res: ResultGroup[] = []
-    pd.touchedIds.each((id: string) => {
-      let idSet: StringSet = pd.idToIdSet.goc(id)
-      let resultId: string = idSet.values().find(id2 => pd.idToResult.has(id2))
-      let result: Result = null
-      if (resultId) {
-        result = pd.idToResult.get(resultId)
-        result.ids = idSet.values().map(oid => DataFactory.instance.namedNode(oid))
-        result.datasources = pd.idToDatasourceSet.get(id).values()
-      } else {
-        result = new Result(idSet.values().map(oid => DataFactory.instance.namedNode(oid)), pd.idToDatasourceSet.get(id).values(), pd.idToMatchedLabelSet.get(id).values()[0], pd.idToPrefLabelSet.has(id) ? pd.idToPrefLabelSet.get(id).values()[0] : null)
-        idSet.each(id2 => pd.idToResult.set(id2, result))
-        pd.idToGroupIdSet.get(id).each(gid =>
-          groupIdToGroup.goc(gid, () => {
-            let glabel: string = dataModel.classMap.has(gid) ? dataModel.classMap.get(gid).getLabel(prefLang) :
-              (pd.idToPrefLabelSet.has(gid) ? pd.idToPrefLabelSet.get(gid).values()[0].value : gid)
-            let resultGroup: ResultGroup = new ResultGroup(glabel)
-            res.push(resultGroup)
-            return resultGroup
-          }).results.push(result)
-        )
+    let idToResult: FMap<Result> = new FMap<Result>()
+    let groupIdToGroup: EMap<ResultGroup> = new EMap<ResultGroup>()
+    pd.unifyMap.idToIdSet.each((idSet: StringSet, id: string) => {
+      if (!idSet.values().some(v => filteredIds.has(v))) {
+        let resultId: string = idSet.values().find(id2 => idToResult.has(id2))
+        if (!resultId) {
+          let result: Result = new Result(idSet.values().map(oid => DataFactory.instance.namedNode(oid)), pd.idToDatasourceSet.get(id).values(), pd.idToMatchedLabelSet.get(id).values()[0], pd.idToPrefLabelSet.has(id) ? pd.idToPrefLabelSet.get(id).values()[0] : null)
+          let altLabels: INode[] = pd.idToAltLabelSet.has(id) ? pd.idToAltLabelSet.get(id).values() : []
+          if (pd.idToPrefLabelSet.has(id)) {
+            let prefLabels: INode[] = pd.idToPrefLabelSet.get(id).values()
+            altLabels = altLabels.concat(prefLabels.slice(1))
+          }
+          result.additionalInformation['altLabel'] = altLabels.length > 0 ? altLabels : null
+          result.additionalInformation['type'] = pd.idToGroupIdSet.get(id).values().map(v => DataFactory.instance.namedNode(v))
+          result.additionalInformation['typeLabel'] = pd.idToGroupIdSet.get(id).values().map(v => {
+            return pd.idToPrefLabelSet.has(id) ? pd.idToPrefLabelSet.get(id).values()[0] : null
+          })
+          idSet.each(id2 => idToResult.set(id2, result))
+          pd.idToGroupIdSet.get(id).each(gid =>
+            groupIdToGroup.goc(gid, () => {
+              let glabel: string = dataModel.classMap.has(gid) ? dataModel.classMap.get(gid).getLabel(prefLang) :
+                (pd.idToPrefLabelSet.has(gid) ? pd.idToPrefLabelSet.get(gid).values()[0].value : gid)
+              let resultGroup: ResultGroup = new ResultGroup(glabel)
+              res.push(resultGroup)
+              return resultGroup
+            }).results.push(result)
+          )
+        }
       }
-      let altLabels: INode[] = pd.idToAltLabelSet.has(id) ? pd.idToAltLabelSet.get(id).values() : []
-      if (pd.idToPrefLabelSet.has(id)) {
-        let prefLabels: INode[] = pd.idToPrefLabelSet.get(id).values()
-        altLabels = altLabels.concat(prefLabels.slice(1))
-      }
-      result.additionalInformation['altLabel'] = altLabels.length > 0 ? altLabels : null
-      result.additionalInformation['type'] = pd.idToGroupIdSet.get(id).values().map(v => DataFactory.instance.namedNode(v))
-      result.additionalInformation['typeLabel'] = pd.idToGroupIdSet.get(id).values().map(v => {
-        return pd.idToPrefLabelSet.has(id) ? pd.idToPrefLabelSet.get(id).values()[0] : null
-      })
     })
     return res
-  }
-
-  private static unifyResults(pd: ProcessingData): void {
-    // create sameAses for all objects sharing same inverse functional property values
-    pd.ifpVarPlusValueToIdSet.each(valueToIdSet => valueToIdSet.each(ids => ids.each(id => pd.idToIdSet.goc(id).adds(ids))))
-    // consolidate id sets as well as all id -related information
-    pd.idToIdSet.each((idSet: StringSet, id: string) => idSet.each(oid => {
-      let oidSet: StringSet = pd.idToIdSet.get(oid)
-      if (idSet !== oidSet) {
-        pd.idToIdSet.set(oid, idSet)
-
-        idSet.adds(oidSet)
-        let datasourceSet: StringSet = pd.idToDatasourceSet.get(id)
-        let oDatasourceSet: StringSet = pd.idToDatasourceSet.get(oid)
-        if (datasourceSet) {
-          if (oDatasourceSet) datasourceSet.adds(oDatasourceSet)
-          pd.idToDatasourceSet.set(oid, datasourceSet)
-        } else if (oDatasourceSet) pd.idToDatasourceSet.set(id, oDatasourceSet)
-        let groupIdSet: StringSet = pd.idToGroupIdSet.get(id)
-        let oGroupIdSet: StringSet = pd.idToGroupIdSet.get(oid)
-        if (groupIdSet) {
-          if (oGroupIdSet) groupIdSet.adds(oGroupIdSet)
-          pd.idToGroupIdSet.set(oid, groupIdSet)
-        } else if (oGroupIdSet) pd.idToGroupIdSet.set(id, oGroupIdSet)
-        let mSet: ONodeSet<INode> = pd.idToPrefLabelSet.get(id)
-        let oSet: ONodeSet<INode> = pd.idToPrefLabelSet.get(oid)
-        if (mSet) {
-          if (oSet) mSet.adds(oSet)
-          pd.idToPrefLabelSet.set(oid, mSet)
-        } else if (oSet) pd.idToPrefLabelSet.set(id, oSet)
-        mSet = pd.idToMatchedLabelSet.get(id)
-        oSet = pd.idToMatchedLabelSet.get(oid)
-        if (mSet) {
-          if (oSet) mSet.adds(oSet)
-          pd.idToMatchedLabelSet.set(oid, mSet)
-        } else if (oSet) pd.idToMatchedLabelSet.set(id, oSet)
-        mSet = pd.idToAltLabelSet.get(id)
-        oSet = pd.idToAltLabelSet.get(oid)
-        if (mSet) {
-          if (oSet) mSet.adds(oSet)
-          pd.idToAltLabelSet.set(oid, mSet)
-        } else if (oSet) pd.idToAltLabelSet.set(id, oSet)
-      }
-    }))
   }
 
   /* @ngInject */
@@ -224,16 +212,17 @@ export class SparqlAutocompleteWorkerService {
     queryTemplate = queryTemplate.replace(/# CONSTRAINTS/g, limits)
     queryTemplate = queryTemplate.replace(/<PREFLANG>/g, this.stateWorkerService.state.language)
     let pd: ProcessingData = new ProcessingData()
+    let localResults: StringSet = new StringSet()
     let primaryProcessed: angular.IPromise<void> = this.fibraSparqlService.query(this.stateWorkerService.state.project.endpoint, queryTemplate, {timeout: canceller}).then(
       (response) => {
-        SparqlAutocompleteWorkerService.processBindings(pd, this.stateWorkerService.state.project.endpoint, response)
-        // SparqlAutocompleteWorkerService.unifyResults(pd)
-        results.localMatchingResults = SparqlAutocompleteWorkerService.buildResults(pd, new EMap<ResultGroup>(), this.stateWorkerService.state.project.dataModel, this.stateWorkerService.state.language)
+        pd.processAndConsolidate(response, this.stateWorkerService.state.project.endpoint)
+        results.localMatchingResults = SparqlAutocompleteWorkerService.buildResults(pd, localResults, this.stateWorkerService.state.project.dataModel, this.stateWorkerService.state.language)
         if (!queryRemote) d.resolve(results)
         else d.notify({endpointType: 'primary', endpoint: this.stateWorkerService.state.project.id, results: results})
       }
     )
     if (queryRemote) {
+      results.localMatchingResults.forEach(rg => rg.results.forEach(r => r.ids.forEach(id => localResults.add(id.value))))
       // FIXME: It is currently possible that we miss equivalencies because equivalent data from one source doesn't fit the limit while it does for another. Add further query to make sure all equivalencies are fetched (either in autocompletion or latest in import)
       let remoteGroupIdToGroup: EMap<ResultGroup> = new EMap<ResultGroup>()
       this.$q.all(this.stateWorkerService.state.project.remoteEndpoints().map(endpointConfiguration => {
@@ -245,9 +234,8 @@ export class SparqlAutocompleteWorkerService {
         (response) => {
           if (response.results.bindings.length !== 0) {
             primaryProcessed.then(() => {
-              SparqlAutocompleteWorkerService.processBindings(pd, endpointConfiguration.id, response)
-              SparqlAutocompleteWorkerService.unifyResults(pd)
-              results.remoteResults = results.remoteResults.concat(SparqlAutocompleteWorkerService.buildResults(pd, remoteGroupIdToGroup, this.stateWorkerService.state.project.dataModel, this.stateWorkerService.state.language))
+              pd.processAndConsolidate(response, endpointConfiguration.id)
+              results.remoteResults = SparqlAutocompleteWorkerService.buildResults(pd, localResults, this.stateWorkerService.state.project.dataModel, this.stateWorkerService.state.language)
               d.notify({endpointType: 'remote', endpoint: endpointConfiguration.id, results: results})
             })
           }
