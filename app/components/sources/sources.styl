@@ -30,28 +30,32 @@ sources {
         }
 
         .edit-sources-icon {
+          width: 15px
           float: right
           margin-top: 20px
           font-size: 1.4em
-          opacity: .4
+          opacity: .7
 
           &:hover {
-            opacity: .8
+            opacity: .4
             cursor: pointer
-            transform: rotate(15deg)
           }
         }
       }
 
-      /* Add/edit sources modal styles */
-
-      .available-sources-list {
-        margin-top: 50px
-        list-style: none
+      .sources-category-title {
+        letter-spacing: 0.03em
+        //text-transform: uppercase
+        font-size: 0.9em
+        color: #8b8b8b
       }
 
       .sources-list {
-        margin-bottom: 150px
+        margin-bottom: 40px
+
+        .source-title {
+          font-size: 1.2em
+        }
 
         label {
           font-size: 0.9em
@@ -66,16 +70,31 @@ sources {
           }
         }
 
-        .glyphicon {
+        .glyphicon-triangle-right {
           font-size: 0.8em
+          opacity: .4
+          transform: scale(1, 0.8)
+          -webkit-transform: scale(1, 0.8)
+
+          &:hover {
+            pointer: cursor
+          }
+        }
+
+        .triangle-rotated {
+          transform: scale(0.8, 1) rotate(90deg)
+          -webkit-transform: scale(0.8, 1) rotate(90deg)
         }
 
         .source-name {
           font-size: 0.9em
+          &:hover {
+            pointer: cursor
+          }
         }
 
         .class-list {
-          margin-bottom: 50px
+          margin-bottom: 20px
         }
       }
     }
@@ -88,6 +107,70 @@ sources {
       width: 70%
       height: 100%
       background-color: white
+
+      .matrix {
+        border: 1px solid red
+
+        ul {
+          list-style: none
+        }
+
+        .matrix-property-container {
+          margin-left: 150px
+          height: 150px
+
+          .matrix-property {
+            border: 1px solid blue
+            display: inline-block
+            width: 50px
+            height: 150px
+
+            .matrix-property-label-container {
+              position: absolute
+              transform: rotate(-90deg)
+              margin-left: -105px
+
+              .matrix-property-label {
+                width: 130px
+                white-space: nowrap
+                margin-top: 125px
+                overflow-x: hidden
+                text-overflow: ellipsis
+              }
+            }
+          }
+        }
+
+        .matrix-source-container {
+          height: 50px
+
+          .matrix-source {
+            border: 1px solid blue
+            display: inline-block
+            width: 150px
+            height: 50px
+
+            .matrix-source-label {
+              display: inline-block
+              width: 150px
+              height: 50px
+              text-align: right
+              overflow-y: hidden
+              text-overflow: ellipsis
+              // vertical-align: middle
+              padding-right: 5px
+            }
+          }
+
+          .matrix-cell {
+            border: 1px solid blue
+            display: inline-block
+            width: 50px
+            height: 50px
+            vertical-align: top
+          }
+        }
+      }
     }
   }
 }
