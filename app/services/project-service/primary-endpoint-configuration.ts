@@ -15,14 +15,17 @@ PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
 PREFIX dcterms: <http://purl.org/dc/terms/>
 PREFIX foaf: <http://xmlns.com/foaf/0.1/>
 PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
-SELECT ?id ?labels ?descriptions ?compatibleEndpoints ?rightsHolders ?rightsHolders_labels ?rightsHolders_descriptions ?rightsHolders_url ?rightsHolders_order ?url ?autocompletionQuery ?itemQuery ?deleteItemQuery ?classStatisticsQuery ?properyQuery ?classQuery {
+SELECT ?id ?labels ?descriptions ?compatibleEndpoints ?coalesceIdsQuery ?rightsHolders ?rightsHolders_labels ?rightsHolders_descriptions ?rightsHolders_url ?rightsHolders_order ?url ?autocompletionQuery ?itemQuery ?deleteItemQuery ?classStatisticsQuery ?properyQuery ?classQuery {
 # STARTGRAPH
+  # VALUE
   ?id a fibra:PrimaryEndpointConfiguration .
   { ?id skos:prefLabel ?labels }
   UNION
   { ?id dcterms:description ?descriptions }
   UNION
   { ?id fibra:compatibleEndpoint ?compatibleEndpoints }
+  UNION
+  { ?d fibra:coalesceIdsQuery ?coalesceIdsQuery }
   UNION
   {
     ?id fibra:autocompletionQuery ?autocompletionQuery .
@@ -51,49 +54,10 @@ SELECT ?id ?labels ?descriptions ?compatibleEndpoints ?rightsHolders ?rightsHold
   }
 # ENDGRAPH
 }`
-  public static primaryEndpointConfigurationQuery: string = `PREFIX fibra: <http://hdlab.stanford.edu/fibra/ontology#>
-PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
-PREFIX dcterms: <http://purl.org/dc/terms/>
-PREFIX foaf: <http://xmlns.com/foaf/0.1/>
-PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
-SELECT ?labels ?descriptions ?compatibleEndpoints ?rightsHolders ?rightsHolders_labels ?rightsHolders_descriptions ?rightsHolders_url ?rightsHolders_order ?url ?autocompletionQuery ?itemQuery ?deleteItemQuery ?classStatisticsQuery ?properyQuery ?classQuery {
-# STARTGRAPH
-  { <ID> skos:prefLabel ?labels }
-  UNION
-  { <ID> dcterms:description ?descriptions }
-  UNION
-  { <ID> fibra:compatibleEndpoint ?compatibleEndpoints }
-  UNION
-  {
-    <ID> fibra:autocompletionQuery ?autocompletionQuery .
-    <ID> fibra:itemQuery ?itemQuery .
-    <ID> fibra:deleteItemQuery ?deleteItemQuery .
-    <ID> fibra:classStatisticsQuery ?classStatisticsQuery .
-    <ID> fibra:propertyQuery ?propertyQuery .
-    <ID> fibra:classQuery ?classQuery .
-    OPTIONAL { <ID> foaf:homepage ?url }
-  } UNION {
-    {
-      <ID> dcterms:rightsHolder ?rightsHolders
-    } UNION {
-      <ID> fibra:qualifiedAssertion ?qa .
-      <ID> rdf:predicate dcterms:rightsHolder .
-      <ID> rdf:object ?rightsHolders .
-      OPTIONAL { <ID> fibra:order ?rightsHolders_order }
-    }
-    {
-      ?rightsHolders skos:prefLabel ?rightsHolders_labels
-    } UNION {
-      ?rightsHolders foaf:homepage ?rightsHolders_url
-    } UNION {
-      ?rightsHolders dcterms:description ?rightsHolders_descriptions
-    }
-  }
-# ENDGRAPH
-}`
   public compatibleEndpoints: string[] = []
   public autocompletionQuery: string = SparqlAutocompleteService.defaultMatchQuery
-  public itemQuery: string = SparqlItemService.getLocalItemPropertiesQuery
+  public itemQuery: string = SparqlItemService.getItemPropertiesQuery
+  public coalesceIdsQuery: string = SparqlItemService.coalesceIdsQuery
   public deleteItemQuery: string = SparqlItemService.deleteItemQuery
   public classStatisticsQuery: string = SparqlStatisticsService.getClassStatisticsQuery
   public classQuery: string = DataModel.classQuery
@@ -104,6 +68,7 @@ SELECT ?labels ?descriptions ?compatibleEndpoints ?rightsHolders ?rightsHolders_
     clone.compatibleEndpoints = this.compatibleEndpoints.slice(0)
     clone.autocompletionQuery = this.autocompletionQuery
     clone.itemQuery = this.itemQuery
+    clone.coalesceIdsQuery = this.coalesceIdsQuery
     clone.deleteItemQuery = this.deleteItemQuery
     clone.classStatisticsQuery = this.classStatisticsQuery
     clone.classQuery = this.classQuery
@@ -129,6 +94,7 @@ fibra:classStatisticsQuery ${SparqlService.stringToSPARQLString(this.classStatis
 fibra:propertyQuery ${SparqlService.stringToSPARQLString(this.propertyQuery)} ;
 fibra:classQuery ${SparqlService.stringToSPARQLString(this.classQuery)} ;
 fibra:itemQuery ${SparqlService.stringToSPARQLString(this.itemQuery)} ;
+fibra:coalesceIdsQuery ${SparqlService.stringToSPARQLString(this.coalesceIdsQuery)} ;
 fibra:deleteItemQuery ${SparqlService.stringToSPARQLString(this.deleteItemQuery)} .`
       fragmentsById.set(this.id, f)
     }
@@ -140,6 +106,9 @@ fibra:deleteItemQuery ${SparqlService.stringToSPARQLString(this.deleteItemQuery)
     aq = this.itemQuery
     aq = p.graph ? aq.replace(/# STARTGRAPH/g, 'GRAPH <' + p.graph + '> {').replace(/# ENDGRAPH/g, '}') : aq.replace(/.*# STARTGRAPH\n/g, '').replace(/.*# ENDGRAPH\n/g, '')
     p.itemQuery = aq
+    aq = this.coalesceIdsQuery
+    aq = p.graph ? aq.replace(/# STARTGRAPH/g, 'GRAPH <' + p.graph + '> {').replace(/# ENDGRAPH/g, '}') : aq.replace(/.*# STARTGRAPH\n/g, '').replace(/.*# ENDGRAPH\n/g, '')
+    p.coalesceIdsQuery = aq
     aq = this.deleteItemQuery
     aq = p.graph ? aq.replace(/# STARTGRAPH/g, 'GRAPH <' + p.graph + '> {').replace(/# ENDGRAPH/g, '}') : aq.replace(/.*# STARTGRAPH\n/g, '').replace(/.*# ENDGRAPH\n/g, '')
     p.deleteItemQuery = aq
