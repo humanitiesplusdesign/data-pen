@@ -1,7 +1,7 @@
-import { ILiteral } from '../../../models/rdfjs';
-import { Class } from '../../../services/project-service/data-model';
-import { RemoteEndpointConfiguration } from '../../../services/project-service/remote-endpoint-configuration';
-import { ADD_SOURCE, CLEAR_SOURCES_STATE, SET_SOURCE_CLASS_ACTIVE } from '../../../actions/sources';
+import { ILiteral } from 'models/rdfjs';
+import { Class } from 'services/project-service/data-model';
+import { RemoteEndpointConfiguration } from 'services/project-service/remote-endpoint-configuration';
+import { ADD_SOURCE, CLEAR_SOURCES_STATE, SET_SOURCE_CLASS_ACTIVE } from 'actions/sources';
 
 export interface ISourceClassTree {
   [source: string]: {

@@ -1,6 +1,6 @@
-import { ADD_ITEM_TO_ITEM_STATE } from '../../../actions/active';
-import { Item } from '../../../services/sparql-item-service';
-import { INode, SKOS } from '../../../models/rdf';
+import { ADD_ITEM_TO_ITEM_STATE } from 'actions/active';
+import { Item } from 'services/sparql-item-service';
+import { INode, SKOS } from 'models/rdf';
 import { ADD_ITEM_TO_CURRENT_LAYOUT, SET_ACTIVE_DIVIDER_PERCENTAGE, CLEAR_ACTIVE_STATE } from 'actions/active'
 
 export type IItemState = {

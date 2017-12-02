@@ -1,6 +1,6 @@
 'use strict'
 
-import {WorkerWorkerService} from '../services/worker-service/worker-service'
+import {WorkerWorkerService} from '../services/worker-service/worker-worker-service'
 import * as angular from 'angular'
 
 let m: angular.IModule = angular.module('fibra', ['fi.seco.sparql', 'http-auth-interceptor'])

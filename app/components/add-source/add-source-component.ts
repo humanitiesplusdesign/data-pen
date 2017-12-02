@@ -4,8 +4,8 @@ import { PrimaryEndpointConfiguration } from '../../services/project-service/pri
 import { Project } from '../../services/project-service/project';
 import { ProjectSourceInfo } from '../project-sources-view/project-sources-view-component';
 import { RemoteEndpointConfiguration } from '../../services/project-service/remote-endpoint-configuration';
-import { ISourcesState } from '../../reducers/frontend/sources';
-import { ProjectState } from '../../reducers/frontend/project';
+import { ISourcesState } from '../../reducers/sources';
+import { ProjectState } from '../../reducers/project';
 import { IRootState } from '../../reducers';
 import { INgRedux } from 'ng-redux'
 import { ProjectService } from '../../services/project-service/project-service';
@@ -104,8 +104,8 @@ export class AddSourceComponentController {
     let stateUnsubscribe: () => void = $ngRedux.connect(
       (state: IRootState) => {
         return {
-          project: state.frontend.project,
-          sources: state.frontend.sources
+          project: state.project,
+          sources: state.sources
         }
       },
       {})(this.state)

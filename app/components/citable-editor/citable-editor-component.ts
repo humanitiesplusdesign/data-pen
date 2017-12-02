@@ -5,8 +5,8 @@ import {ProjectSourceInfo} from '../project-sources-view/project-sources-view-co
 import {ProjectService} from '../../services/project-service/project-service'
 import {UUID} from '../misc-utils'
 import {DataFactory} from '../../models/rdf'
-import {FibraService} from '../../services/fibra-service'
 import * as angular from 'angular'
+import { INgRedux } from 'ng-redux';
 
 export class EditCitableComponentController<T extends ICitable> implements angular.IComponentController {
   public c: T
@@ -58,8 +58,8 @@ export class CitableEditorComponentController implements angular.IComponentContr
   public noRightsHolderIds: string
   public addRightsHolder(): void {
     let c: ICitable = new Citable('http://ldf.fi/fibra/citable_' + UUID())
-    c.labels = [ DataFactory.literal('', this.fibraService.getState().language)]
-    c.descriptions = [ DataFactory.literal('', this.fibraService.getState().language) ]
+    c.labels = [ DataFactory.literal('', this.ngRedux.getState().frontend.general.language)]
+    c.descriptions = [ DataFactory.literal('', this.ngRedux.getState().frontend.general.language) ]
     this.citable.rightsHolders.push(c)
   }
   public addLabel(): void {
@@ -74,7 +74,7 @@ export class CitableEditorComponentController implements angular.IComponentContr
   public removeDescription(index: number): void {
     this.citable.descriptions.splice(index, 1)
   }
-  constructor(private fibraService: FibraService) {
+  constructor(private ngRedux: INgRedux) {
   }
 }
 

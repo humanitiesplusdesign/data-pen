@@ -1,6 +1,6 @@
 'use strict'
 import { CNode, NamedNode, RDF, SKOS } from '../../models/rdf';
-import { IItemState } from '../../reducers/frontend/active';
+import { IItemState } from '../../reducers/active';
 import { AutocompletionResults, Result, SparqlAutocompleteService } from '../../services/sparql-autocomplete-service';
 import { SparqlItemService } from '../../services/sparql-item-service';
 import * as angular from 'angular';
@@ -12,9 +12,9 @@ import { Dispatch } from 'redux'
 import * as d3 from 'd3';
 import { SearchService, AutocompletionResult } from 'services/search-service'
 import { IActiveActions } from 'actions/active'
-import { ProjectState } from 'reducers/frontend/project'
+import { ProjectState } from 'reducers/project'
 import { IRootState } from 'reducers'
-import { IActiveState } from 'reducers/frontend/active'
+import { IActiveState } from 'reducers/active'
 import 'angular-drag-drop';
 import 'angular-ui-grid';
 import cmenu from 'circular-menu';
@@ -72,8 +72,8 @@ export class ActiveComponentController {
     this.unsubscribe = $ngRedux.connect(
       (state: IRootState) => {
         return {
-          project: state.frontend.project,
-          active: state.frontend.active
+          project: state.project,
+          active: state.active
         }
       },
       ActiveActions)(this.state)

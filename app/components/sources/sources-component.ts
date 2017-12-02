@@ -1,8 +1,8 @@
 'use strict'
 import { ISourcesActions } from '../../actions/sources';
 import { IRootState } from '../../reducers';
-import { ISource, ISourceClassTree, ISourcesState } from '../../reducers/frontend/sources';
-import { ProjectState } from '../../reducers/frontend/project';
+import { ISource, ISourceClassTree, ISourcesState } from '../../reducers/sources';
+import { ProjectState } from '../../reducers/project';
 import { IActiveActions } from '../../actions/active';
 import * as angular from 'angular';
 import { ProjectService } from '../../services/project-service/project-service'
@@ -33,8 +33,8 @@ export class SourcesComponentController {
     let stateUnsubscribe: () => void = $ngRedux.connect(
       (state: IRootState) => {
         return {
-          project: state.frontend.project,
-          sources: state.frontend.sources
+          project: state.project,
+          sources: state.sources
         }
       },
       SourcesActions)(this.state)
@@ -96,7 +96,7 @@ export class SourcesComponentController {
 
   private mapProjectToActions(state: any): any {
     return {
-      project: state.frontend.project
+      project: state.project
     }
   }
 }

@@ -1,8 +1,8 @@
 'use strict'
 import { IActiveActions } from '../../actions/active';
-import { ISourcesState } from '../../reducers/frontend/sources';
-import { ProjectState } from '../../reducers/frontend/project';
-import { IClassFilterTree, IFilterState } from '../../reducers/frontend/filter';
+import { ISourcesState } from '../../reducers/sources';
+import { ProjectState } from '../../reducers/project';
+import { IClassFilterTree, IFilterState } from '../../reducers/filter';
 import { IRootState } from '../../reducers';
 import { Class, Property } from '../../services/project-service/data-model';
 import { ItemsService } from '../../services/items-service';
@@ -71,9 +71,9 @@ export class FilterComponentController {
     let stateUnsubscribe: () => void = $ngRedux.connect(
       (state: IRootState) => {
         return {
-          project: state.frontend.project,
-          sources: state.frontend.sources,
-          filter: state.frontend.filter
+          project: state.project,
+          sources: state.sources,
+          filter: state.filter
         }
       })(this.state)
     this.actions.unsubscribe = () => {
@@ -124,13 +124,13 @@ export class FilterComponentController {
 
   private mapProjectToActions(state: any): any {
     return {
-      project: state.frontend.project
+      project: state.project
     }
   }
 
   private mapFilterToActions(state: any): any {
     return {
-      filter: state.frontend.filter
+      filter: state.filter
     }
   }
 

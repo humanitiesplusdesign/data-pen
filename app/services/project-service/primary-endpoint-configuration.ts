@@ -3,11 +3,11 @@
 import {Citable} from '../../models/citable'
 import {SparqlAutocompleteService} from '../sparql-autocomplete-service'
 import {SparqlItemService} from '../sparql-item-service'
-import {SparqlTreeService} from '../../services/sparql-tree-service'
 import {DataModel} from './data-model'
 import {FIBRA} from '../../models/rdf'
 import {Project} from '../project-service/project'
 import {SparqlService} from 'angular-sparql-service'
+import { SparqlStatisticsService } from 'services/sparql-statistics-service';
 
 export class PrimaryEndpointConfiguration extends Citable {
   public static listPrimaryEndpointConfigurationsQuery: string = `PREFIX fibra: <http://hdlab.stanford.edu/fibra/ontology#>
@@ -95,7 +95,7 @@ SELECT ?labels ?descriptions ?compatibleEndpoints ?rightsHolders ?rightsHolders_
   public autocompletionQuery: string = SparqlAutocompleteService.defaultMatchQuery
   public itemQuery: string = SparqlItemService.getLocalItemPropertiesQuery
   public deleteItemQuery: string = SparqlItemService.deleteItemQuery
-  public treeQuery: string = SparqlTreeService.getClassTreeQuery
+  public classStatisticsQuery: string = SparqlStatisticsService.getClassStatisticsQuery
   public classQuery: string = DataModel.classQuery
   public propertyQuery: string = DataModel.propertyQuery
   public toTurtle(fragmentsById: d3.Map<string>, prefixes: {[id: string]: string}): void {
@@ -113,7 +113,7 @@ fibra:compatibleEndpoint `
       }
       f = f + `
 fibra:autocompletionQuery ${SparqlService.stringToSPARQLString(this.autocompletionQuery)} ;
-fibra:treeQuery ${SparqlService.stringToSPARQLString(this.treeQuery)} ;
+fibra:classStatisticsQuery ${SparqlService.stringToSPARQLString(this.classStatisticsQuery)} ;
 fibra:propertyQuery ${SparqlService.stringToSPARQLString(this.propertyQuery)} ;
 fibra:classQuery ${SparqlService.stringToSPARQLString(this.classQuery)} ;
 fibra:itemQuery ${SparqlService.stringToSPARQLString(this.itemQuery)} ;
@@ -131,9 +131,9 @@ fibra:deleteItemQuery ${SparqlService.stringToSPARQLString(this.deleteItemQuery)
     aq = this.deleteItemQuery
     aq = p.graph ? aq.replace(/# STARTGRAPH/g, 'GRAPH <' + p.graph + '> {').replace(/# ENDGRAPH/g, '}') : aq.replace(/.*# STARTGRAPH\n/g, '').replace(/.*# ENDGRAPH\n/g, '')
     p.deleteItemQuery = aq
-    aq = this.treeQuery
+    aq = this.classStatisticsQuery
     aq = p.graph ? aq.replace(/# STARTGRAPH/g, 'GRAPH <' + p.graph + '> {').replace(/# ENDGRAPH/g, '}') : aq.replace(/.*# STARTGRAPH\n/g, '').replace(/.*# ENDGRAPH\n/g, '')
-    p.treeQuery = aq
+    p.classStatisticsQuery = aq
     aq = this.propertyQuery
     aq = p.graph ? aq.replace(/# STARTGRAPH/g, 'GRAPH <' + p.graph + '> {').replace(/# ENDGRAPH/g, '}') : aq.replace(/.*# STARTGRAPH\n/g, '').replace(/.*# ENDGRAPH\n/g, '')
     p.propertyQuery = aq

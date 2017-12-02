@@ -5,7 +5,7 @@ import {INode, FIBRA, VOID, RDF} from 'models/rdf'
 import {SparqlAutocompleteService} from 'services/sparql-autocomplete-service'
 import {DataModel} from 'services/project-service/data-model'
 import {SparqlItemService} from 'services/sparql-item-service'
-import {SparqlTreeService} from 'services/sparql-tree-service'
+import {SparqlStatisticsService} from 'services/sparql-statistics-service'
 import {SparqlService} from 'angular-sparql-service'
 
 export class RemoteEndpointConfiguration extends Citable {
@@ -15,10 +15,14 @@ PREFIX dcterms: <http://purl.org/dc/terms/>
 PREFIX foaf: <http://xmlns.com/foaf/0.1/>
 PREFIX void: <http://rdfs.org/ns/void#>
 PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
-SELECT ?id ?types ?labels ?descriptions ?rightsHolders ?rightsHolders_labels ?rightsHolders_descriptions ?rightsHolders_url ?rightsHolders_order ?url ?endpoint ?autocompletionQuery ?itemQuery ?treeQuery ?propertyQuery ?classQuery {
+SELECT ?id ?types ?schemaEndpoint ?compatibleSchemas ?labels ?descriptions ?rightsHolders ?rightsHolders_labels ?rightsHolders_descriptions ?rightsHolders_url ?rightsHolders_order ?url ?endpoint ?autocompletionQuery ?itemQuery ?treeQuery ?propertyQuery ?classQuery {
 # STARTGRAPH
   ?id a fibra:AuthorityEndpointConfiguration .
   ?id a ?types .
+  { ?id fibra:schemaEndpoint ?schemaEndpoint }
+  UNION
+  { ?id fibra:compatibleWith ?compatibleSchemas }
+  UNION
   { ?id skos:prefLabel ?labels }
   UNION
   { ?id dcterms:description ?descriptions }
@@ -57,8 +61,12 @@ PREFIX dcterms: <http://purl.org/dc/terms/>
 PREFIX foaf: <http://xmlns.com/foaf/0.1/>
 PREFIX void: <http://rdfs.org/ns/void#>
 PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
-SELECT ?types ?labels ?descriptions ?rightsHolders ?rightsHolders_labels ?rightsHolders_descriptions ?rightsHolders_url ?rightsHolders_order ?url ?endpoint ?autocompletionQuery ?itemQuery ?treeQuery ?propertyQuery ?classQuery {
+SELECT ?types ?schemaEndpoint ?compatibleSchemas ?labels ?descriptions ?rightsHolders ?rightsHolders_labels ?rightsHolders_descriptions ?rightsHolders_url ?rightsHolders_order ?url ?endpoint ?autocompletionQuery ?itemQuery ?treeQuery ?propertyQuery ?classQuery {
 # STARTGRAPH
+  { <ID> fibra:schemaEndpoint ?schemaEndpoint }
+  UNION
+  { <ID> fibra:compatibleWith ?compatibleSchemas }
+  UNION
   { <ID> skos:prefLabel ?labels }
   UNION
   { <ID> dcterms:description ?descriptions }
@@ -92,30 +100,37 @@ SELECT ?types ?labels ?descriptions ?rightsHolders ?rightsHolders_labels ?rights
 # ENDGRAPH
 }`
   public types: INode[] = []
+  public compatibleSchemas: INode[] = []
   public autocompletionQuery: string = SparqlAutocompleteService.defaultMatchQuery
   public propertyQuery: string = DataModel.propertyQuery
   public classQuery: string = DataModel.classQuery
   public itemQuery: string = SparqlItemService.getRemoteItemPropertiesQuery
-  // TODO remove
-  public treeQuery: string = SparqlTreeService.getClassTreeQuery
+  public classStatisticsQuery: string = SparqlStatisticsService.getClassStatisticsQuery
+  public schemaEndpoint: string
   public endpoint: string
   public toTurtle(fragmentsById: d3.Map<string>, prefixes: {[id: string]: string}): void {
-    console.log(fragmentsById)
     if (!fragmentsById.has(this.id)) {
       prefixes['fibra'] = FIBRA.ns
       prefixes['void'] = VOID.ns
       prefixes['rdf'] = RDF.ns
       let f: string = `<${this.id}> a `
-      this.types.forEach(type => f = f + `${type.toCanonical()} ,`)
+      this.types.forEach(type => f = f + `${type.toCanonical()}, `)
       f = f.substring(0, f.length - 2) + ' ;'
+      if (this.compatibleSchemas.length > 0) {
+        f = f + `
+fibra:schemaMap `
+        this.compatibleSchemas.forEach(cs => f = f + `fibra:compatibleWith ${cs.toCanonical()}, `)
+        f = f.substring(0, f.length - 2) + ' ;'
+      }
       fragmentsById.set(this.id, f)
       super.toTurtle(fragmentsById, prefixes)
       f  = fragmentsById.get(this.id)
       f = f + `
+fibra:schemaEndpoint <${this.schemaEndpoint}> ;
 void:sparqlEndpoint <${this.endpoint}> ;
 fibra:autocompletionQuery ${SparqlService.stringToSPARQLString(this.autocompletionQuery)} ;
 fibra:itemQuery ${SparqlService.stringToSPARQLString(this.itemQuery)} ;
-fibra:treeQuery ${SparqlService.stringToSPARQLString(this.treeQuery)} ;
+fibra:classStatisticsQuery ${SparqlService.stringToSPARQLString(this.classStatisticsQuery)} ;
 fibra:propertyQuery ${SparqlService.stringToSPARQLString(this.propertyQuery)} ;
 fibra:classQuery ${SparqlService.stringToSPARQLString(this.classQuery)} .`
       fragmentsById.set(this.id, f)

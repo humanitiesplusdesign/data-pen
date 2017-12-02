@@ -4,12 +4,12 @@ import {Citable} from 'models/citable'
 import {DataModel} from 'services/project-service/data-model'
 import {SparqlService} from 'angular-sparql-service'
 import {SparqlAutocompleteService} from 'services/sparql-autocomplete-service'
-import {SparqlTreeService} from 'services/sparql-tree-service'
 import {SparqlItemService} from 'services/sparql-item-service'
 import {RemoteEndpointConfiguration} from 'services/project-service/remote-endpoint-configuration'
 import {PrimaryEndpointConfiguration} from 'services/project-service/primary-endpoint-configuration'
 import {Schema} from 'services/project-service/schema'
 import {FIBRA, VOID} from 'models/rdf'
+import { SparqlStatisticsService } from 'services/sparql-statistics-service';
 
 export class Project extends Citable {
 
@@ -150,7 +150,7 @@ SELECT ?labels ?descriptions ?url ?dateCreated ?rightsHolders ?rightsHolders_lab
   public dataModel: DataModel = new DataModel()
   public autocompletionQuery: string = SparqlAutocompleteService.defaultMatchQuery
   // TODO: remove
-  public treeQuery: string = SparqlTreeService.getClassTreeQuery
+  public classStatisticsQuery: string = SparqlStatisticsService.getClassStatisticsQuery
   public itemQuery: string = SparqlItemService.getLocalItemPropertiesQuery
   public deleteItemQuery: string = SparqlItemService.deleteItemQuery
   public classQuery: string = DataModel.classQuery
@@ -170,7 +170,7 @@ SELECT ?labels ?descriptions ?url ?dateCreated ?rightsHolders ?rightsHolders_lab
     p.autocompletionQuery = this.autocompletionQuery
     p.itemQuery = this.itemQuery
     p.deleteItemQuery = this.deleteItemQuery
-    p.treeQuery = this.treeQuery
+    p.classStatisticsQuery = this.classStatisticsQuery
     p.propertyQuery = this.propertyQuery
     p.classQuery = this.classQuery
     return p
@@ -246,7 +246,7 @@ fibra:archiveEndpointReference [
 fibra:graph <${this.graph}> ;`
       f = f + `
 fibra:autocompletionQuery ${SparqlService.stringToSPARQLString(this.autocompletionQuery)} ;
-fibra:treeQuery ${SparqlService.stringToSPARQLString(this.treeQuery)} ;
+fibra:classStatisticsQuery ${SparqlService.stringToSPARQLString(this.classStatisticsQuery)} ;
 fibra:itemQuery ${SparqlService.stringToSPARQLString(this.itemQuery)} ;
 fibra:deleteItemQuery ${SparqlService.stringToSPARQLString(this.deleteItemQuery)} ;
 fibra:classQuery ${SparqlService.stringToSPARQLString(this.classQuery)} ;

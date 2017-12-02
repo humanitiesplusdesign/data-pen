@@ -2,7 +2,7 @@
 
 import * as angular from 'angular'
 import { INgRedux } from 'ng-redux'
-import { IItemState } from 'reducers/frontend/active'
+import { IItemState } from 'reducers/active'
 import { SparqlAutocompleteService, AutocompletionResults} from 'services/sparql-autocomplete-service'
 
 export class AutocompletionResult {

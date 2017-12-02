@@ -1,4 +1,4 @@
-import { ISource } from '../reducers/frontend/sources';
+import { ISource } from '../reducers/sources';
 import { Dispatch } from 'redux';
 import { IRootState } from '../reducers';
 import {Action} from '../models/action'

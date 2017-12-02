@@ -1,13 +1,13 @@
 'use strict'
 
 import {ICitable} from '../models/citable'
-import {FibraService} from '../services/fibra-service'
 import {getPrefLangString} from './preferred-language-filter'
 import * as angular from 'angular'
+import { IFibraNgRedux } from 'reducers';
 
 angular.module('fibra.filters.citable', [])
-  .filter('citable', /* @ngInject */ (fibraService: FibraService) => (obj: ICitable) => {
-    let prefLang: string = fibraService.getState().language
+  .filter('citable', /* @ngInject */ ($ngRedux: IFibraNgRedux) => (obj: ICitable) => {
+    let prefLang: string = $ngRedux.getState().general.language
     let ret: string = getPrefLangString(obj.labels, prefLang)
     if (obj.rightsHolders.length > 0) {
       ret += ' ('
