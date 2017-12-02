@@ -1,19 +1,16 @@
 'use strict'
-import { ISourcesActions } from '../../actions/sources';
 import { IRootState } from '../../reducers';
 import { ISource, ISourceClassTree, ISourcesState } from '../../reducers/sources';
 import { ProjectState } from '../../reducers/project';
-import { IActiveActions } from '../../actions/active';
 import * as angular from 'angular';
 import { ProjectService } from '../../services/project-service/project-service'
 import * as ProjectActions from '../../actions/project';
 import { IFibraNgRedux } from 'reducers'
-import SourcesActions from '../../actions/sources'
 import { IModalService } from 'angular-ui-bootstrap'
 import * as d3 from 'd3';
 import { Class, Property } from 'services/project-service/data-model';
 
-interface ISourcesComponentControllerState extends ISourcesActions {
+interface ISourcesComponentControllerState {
   project: ProjectState
   sources: ISourcesState
 }
@@ -37,7 +34,7 @@ export class SourcesComponentController {
           sources: state.sources
         }
       },
-      SourcesActions)(this.state)
+      null)(this.state)
     this.actions.unsubscribe = () => {
       unsub1()
       stateUnsubscribe()

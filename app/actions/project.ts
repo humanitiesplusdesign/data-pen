@@ -6,7 +6,6 @@ import {ProjectService} from 'services/project-service/project-service'
 import {Project} from 'services/project-service/project'
 import { IRootState } from 'reducers'
 import { IFibraNgRedux } from 'reducers'
-import SourceActions from './sources'
 import * as angular from 'angular';
 
 export const SET_PROJECT: string = 'SET_PROJECT'

@@ -4,11 +4,10 @@ import { PropertyToValues, SparqlItemService } from '../../services/sparql-item-
 import { IRootState } from '../../reducers';
 import { IFibraNgRedux } from 'reducers';
 import { IActiveState, IItemState } from '../../reducers/active';
-import ActiveActions, { IActiveActions } from '../../actions/active';
 
 import * as angular from 'angular';
 
-interface IBibliographyModalComponentControllerState extends IActiveActions {
+interface IBibliographyModalComponentControllerState {
   active: IActiveState
 }
 

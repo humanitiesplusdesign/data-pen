@@ -1,4 +1,5 @@
 'use strict'
+import { SourcesActionService } from '../../actions/sources';
 import { Citable } from '../../models/citable';
 import { PrimaryEndpointConfiguration } from '../../services/project-service/primary-endpoint-configuration';
 import { Project } from '../../services/project-service/project';
@@ -9,7 +10,6 @@ import { ProjectState } from '../../reducers/project';
 import { IRootState } from '../../reducers';
 import { IFibraNgRedux } from 'reducers'
 import { ProjectService } from '../../services/project-service/project-service';
-import SourcesActions, { ISourcesActions } from '../../actions/sources';
 import { ProjectActionService } from '../../actions/project'
 
 import * as angular from 'angular';
@@ -17,7 +17,7 @@ import * as d3 from 'd3';
 import { DSVParsedArray } from 'd3';
 import { SparqlItemService } from 'services/sparql-item-service';
 
-interface IAddSourceComponentControllerState extends ISourcesActions {
+interface IAddSourceComponentControllerState {
   project: ProjectState
   sources: ISourcesState
 }
@@ -79,6 +79,7 @@ export class AddSourceComponentController {
   /* @ngInject */
   constructor(
     private projectService: ProjectService,
+    private sourcesActionService: SourcesActionService,
     private projectActionService: ProjectActionService,
     private $ngRedux: IFibraNgRedux,
     private $q: angular.IQService,
@@ -92,7 +93,7 @@ export class AddSourceComponentController {
           sources: state.sources
         }
       },
-      SourcesActions)(this.state)
+      null)(this.state)
     this.actions.unsubscribe = () => {
       stateUnsubscribe()
     }
@@ -132,7 +133,7 @@ export class AddSourceComponentController {
   private commit(): void {
 
     if (this.currentFile) {
-      this.state.uploadFile(
+      this.sourcesActionService.uploadFile(
         this.currentFileName,
         this.parsedFile,
         this.state.project.project.dataModel.classMap.get(this.uploadType),

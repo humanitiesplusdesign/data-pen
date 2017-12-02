@@ -1,4 +1,5 @@
 'use strict'
+import { ActiveActionService } from '../../actions/active';
 import { CNode, NamedNode, RDF, SKOS } from '../../models/rdf';
 import { IItemState } from '../../reducers/active';
 import { AutocompletionResults, Result, SparqlAutocompleteService } from '../../services/sparql-autocomplete-service';
@@ -6,11 +7,9 @@ import { SparqlItemService } from '../../services/sparql-item-service';
 import * as angular from 'angular';
 import { ProjectService } from 'services/project-service/project-service'
 import { ProjectActionService } from 'actions/project';
-import ActiveActions from 'actions/active';
 import { IFibraNgRedux } from 'reducers'
 import { Dispatch } from 'redux'
 import * as d3 from 'd3';
-import { IActiveActions } from 'actions/active'
 import { ProjectState } from 'reducers/project'
 import { IRootState } from 'reducers'
 import { IActiveState } from 'reducers/active'
@@ -19,7 +18,7 @@ import 'angular-ui-grid';
 import cmenu from 'circular-menu';
 import { IModalService } from 'angular-ui-bootstrap'
 
-interface IActiveComponentControllerState extends IActiveActions {
+interface IActiveComponentControllerState {
   project: ProjectState
   active: IActiveState
 }
@@ -60,12 +59,12 @@ export class ActiveComponentController {
 
   /* @ngInject */
   constructor(private projectActionService: ProjectActionService,
+              private activeActionService: ActiveActionService,
               private $scope: angular.IScope,
               private $q: angular.IQService,
               private $ngRedux: IFibraNgRedux,
               private $uibModal: IModalService,
               private sparqlAutocompleteService: SparqlAutocompleteService,
-              private sparqlItemService: SparqlItemService,
               private $document: angular.IDocumentService) {
     this.unsubscribe = $ngRedux.connect(
       (state: IRootState) => {
@@ -74,7 +73,7 @@ export class ActiveComponentController {
           active: state.active
         }
       },
-      ActiveActions)(this.state)
+      null)(this.state)
   }
 
   public $onDestroy(): void {
@@ -216,11 +215,9 @@ export class ActiveComponentController {
       leftOffset: this.nodeSearchOffsetLeft
     }
 
-    this.state.addItemToCurrentLayout(item, this.sparqlItemService).then(() => {
-        this.updateCanvas()
-        this.$scope.$apply(this.nodeSearchRemove.bind(this))
-      }
-    )
+    this.activeActionService.addItemToCurrentLayout(item)
+    this.updateCanvas()
+    this.$scope.$apply(this.nodeSearchRemove.bind(this))
 
     this.projectActionService.setActiveItemCount(this.state.active.activeLayout.items.length)
   }
@@ -318,9 +315,9 @@ export class ActiveComponentController {
           d.leftOffset = d3.event.x + this.dragOrigX
           d.topOffset = d3.event.y + this.dragOrigY
           if (d.topOffset < 20) { d.topOffset = 20 }
-          if (d.topOffset > window.innerHeight-75) { d.topOffset = window.innerHeight-75 }
+          if (d.topOffset > window.innerHeight - 75) { d.topOffset = window.innerHeight - 75 }
           if (d.leftOffset < 20) { d.leftOffset = 20 }
-          if (d.leftOffset > window.innerWidth-20) { d.leftOffset = window.innerWidth-20 }
+          if (d.leftOffset > window.innerWidth - 20) { d.leftOffset = window.innerWidth - 20 }
           this.dragOrigX = d.leftOffset
           this.dragOrigY = d.topOffset
           this.updateCanvas()
@@ -330,9 +327,9 @@ export class ActiveComponentController {
           d.leftOffset = d3.event.x + this.dragOrigX
           d.topOffset = d3.event.y + this.dragOrigY
           if (d.topOffset < 20) { d.topOffset = 20 }
-          if (d.topOffset > window.innerHeight-75) { d.topOffset = window.innerHeight-75 }
+          if (d.topOffset > window.innerHeight - 75) { d.topOffset = window.innerHeight - 75 }
           if (d.leftOffset < 20) { d.leftOffset = 20 }
-          if (d.leftOffset > window.innerWidth-20) { d.leftOffset = window.innerWidth-20 }
+          if (d.leftOffset > window.innerWidth - 20) { d.leftOffset = window.innerWidth - 20 }
           this.dragOrigX = null
           this.dragOrigY = null
           this.updateCanvas()
@@ -372,7 +369,7 @@ export class ActiveComponentController {
   private dragDivider(evt: DragEvent): void {
     this.menu.hide()
     let nativePercent: number = 100 * evt.clientX / window.innerWidth
-    this.state.setActiveDividerPercentage(nativePercent > 98 ? 100 : nativePercent < 2 ? 0 : nativePercent)
+    this.activeActionService.setActiveDividerPercentage(nativePercent > 98 ? 100 : nativePercent < 2 ? 0 : nativePercent)
   }
 
   private tableWidthStyle(): {} {
