@@ -218,6 +218,13 @@ active {
       padding-left: 19px
     }
 
+    .layer-description {
+      color: #a4a4a4
+      font-size: 0.8em
+      // margin-top: 3px
+      // padding-left: 19px
+    }
+
     .view-options-popover {
       .linked-text {
         font-weight: 500
@@ -328,10 +335,26 @@ active {
         // }
       }
 
+      @keyframes node-jiggle {
+        0% {
+          transform: scale(0.95, 1.05)
+        }
+        50% {
+          transform: scale(1.05, 0.95)
+        }
+        100% {
+          transform: scale(0.95, 1.05)
+        }
+      }
+
       .loading {
-        //stroke-dasharray: 15, 40
-        -webkit-animation: node-loading-animation 0.7s infinite linear;
-        animation: node-loading-animation 0.7s infinite linear;
+        -webkit-animation: node-loading-animation 0.7s infinite linear
+        animation: node-loading-animation 0.7s infinite linear
+      }
+
+      .jiggle {
+        webkit-animation: node-jiggle 0.4s infinite linear
+        animation: node-jiggle 0.4s infinite linear
       }
 
       .ghosted {

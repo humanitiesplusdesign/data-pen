@@ -1,5 +1,6 @@
 'use strict'
 import { ActiveActionService } from '../../actions/active';
+import { Class } from '../../services/project-service/data-model';
 import { CNode, NamedNode, RDF, SKOS } from '../../models/rdf';
 import { IItemState } from '../../reducers/active';
 import { AutocompletionResults, Result, SparqlAutocompleteService } from '../../services/sparql-autocomplete-service';
@@ -15,6 +16,7 @@ import { IRootState } from 'reducers'
 import { IActiveState } from 'reducers/active'
 import 'angular-drag-drop';
 import 'angular-ui-grid';
+import 'angular-bootstrap-toggle/dist/angular-bootstrap-toggle.js';
 import cmenu from 'circular-menu';
 import { IModalService } from 'angular-ui-bootstrap'
 
@@ -51,6 +53,7 @@ export class ActiveComponentController {
   private oldActiveLayoutItemState: IItemState[]
 
   private viewOptionsPopoverVisible: boolean = false
+  private layerPopoverVisible: boolean = false
   private snapshotsPopoverVisible: boolean = false
   private layoutsPopoverVisible: boolean = false
 
@@ -384,6 +387,17 @@ export class ActiveComponentController {
     return { 'left': this.state.active.dividerPercent + '%' }
   }
 
+  private allClasses(): Class[] {
+    return d3.keys(this.$ngRedux.getState().sources.sourceClassToggle).reduce(
+      (a, b) => {
+        let sourceClasses: string[] = d3.keys(this.$ngRedux.getState().sources.sourceClassToggle[b])
+          .filter(k => this.$ngRedux.getState().sources.sourceClassToggle[b][k])
+          .filter(k => a.indexOf(k) === -1)
+        return a.concat(sourceClasses)
+      },
+      []).map(c => this.state.project.project.dataModel.classMap.get(c))
+  }
+
   private setGridOptions(): void {
     let data: {}[] = this.state.active.activeLayout.items.map((item) => {
       let obj: {} = {}
@@ -413,5 +427,5 @@ export class ActiveComponent implements angular.IComponentOptions {
     public controller: any = ActiveComponentController
 }
 
-angular.module('fibra.components.active', ['ui.bootstrap', 'fibra.actions.project', 'filearts.dragDrop', 'ui.grid', 'ui.grid.emptyBaseLayer', 'ui.grid.resizeColumns', 'ui.grid.autoResize', 'ui.grid.edit'])
+angular.module('fibra.components.active', ['ui.bootstrap', 'fibra.actions.project', 'filearts.dragDrop', 'ui.grid', 'ui.grid.emptyBaseLayer', 'ui.grid.resizeColumns', 'ui.grid.autoResize', 'ui.grid.edit', 'ui.toggle'])
   .component('active', new ActiveComponent())
