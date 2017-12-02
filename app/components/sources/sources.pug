@@ -29,9 +29,12 @@
   .sources-right
     uib-tabset(type="tabs")
       uib-tab(ng-repeat="class in $ctrl.allClasses()" index="$index" heading="{{ class.labels | prefLang }}")
-        ul
-          li(ng-repeat="prop in $ctrl.sourcePropsForClass(class).properties") {{ prop.labels | prefLang }}
-        ul
-          li(ng-repeat="source in $ctrl.state.sources.authoritySources.concat($ctrl.state.sources.archiveSources)") {{ source.labels | prefLang }}
-            ul
-              li(ng-repeat="prop in $ctrl.sourcePropsForClass(class).properties") Value for {{prop.labels | prefLang}} : {{ 1 }}
+        .matrix
+          .matrix-property-container
+            .matrix-property(ng-repeat="prop in $ctrl.sourcePropsForClass(class).properties")
+              .matrix-property-label-container
+                .matrix-property-label {{ prop.labels | prefLang }}
+          .matrix-source-container(ng-repeat="source in $ctrl.state.sources.authoritySources.concat($ctrl.state.sources.archiveSources)")
+            .matrix-source
+              .matrix-source-label {{ source.labels | prefLang }}
+            .matrix-cell(ng-repeat="prop in $ctrl.sourcePropsForClass(class).properties") {{ 1 }}

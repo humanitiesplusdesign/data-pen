@@ -88,6 +88,70 @@ sources {
       width: 70%
       height: 100%
       background-color: white
+
+      .matrix {
+        border: 1px solid red
+
+        ul {
+          list-style: none
+        }
+
+        .matrix-property-container {
+          margin-left: 150px
+          height: 150px
+
+          .matrix-property {
+            border: 1px solid blue
+            display: inline-block
+            width: 50px
+            height: 150px
+
+            .matrix-property-label-container {
+              position: absolute
+              transform: rotate(-90deg)
+              margin-left: -105px
+
+              .matrix-property-label {
+                width: 130px
+                white-space: nowrap
+                margin-top: 125px
+                overflow-x: hidden
+                text-overflow: ellipsis
+              }
+            }
+          }
+        }
+
+        .matrix-source-container {
+          height: 50px
+
+          .matrix-source {
+            border: 1px solid blue
+            display: inline-block
+            width: 150px
+            height: 50px
+
+            .matrix-source-label {
+              display: inline-block
+              width: 150px
+              height: 50px
+              text-align: right
+              overflow-y: hidden
+              text-overflow: ellipsis
+              // vertical-align: middle
+              padding-right: 5px
+            }
+          }
+
+          .matrix-cell {
+            border: 1px solid blue
+            display: inline-block
+            width: 50px
+            height: 50px
+            vertical-align: top
+          }
+        }
+      }
     }
   }
 }
