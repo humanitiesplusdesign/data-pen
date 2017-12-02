@@ -71,7 +71,8 @@ export class SourcesComponentController {
           .filter(k => a.indexOf(k) === -1)
         return a.concat(sourceClasses)
       },
-      []).map(c => this.state.project.project.dataModel.classMap.get(c))
+      []).map(c => this.state.project.project ? this.state.project.project.dataModel.classMap.get(c) : null)
+        .filter(c => c)
   }
 
   private sourcePropsForClass(c: Class): any {
