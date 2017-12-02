@@ -4,10 +4,10 @@ import { PrimaryEndpointConfiguration } from '../../services/project-service/pri
 import { Project } from '../../services/project-service/project';
 import { ProjectSourceInfo } from '../project-sources-view/project-sources-view-component';
 import { RemoteEndpointConfiguration } from '../../services/project-service/remote-endpoint-configuration';
-import { ISourcesState } from '../../reducers/frontend/sources';
-import { ProjectState } from '../../reducers/frontend/project';
+import { ISourcesState } from '../../reducers/sources';
+import { ProjectState } from '../../reducers/project';
 import { IRootState } from '../../reducers';
-import { INgRedux } from 'ng-redux'
+import { IFibraNgRedux } from 'reducers'
 import { ProjectService } from '../../services/project-service/project-service';
 import SourcesActions, { ISourcesActions } from '../../actions/sources';
 import { ProjectActionService } from '../../actions/project'
@@ -80,7 +80,7 @@ export class AddSourceComponentController {
   constructor(
     private projectService: ProjectService,
     private projectActionService: ProjectActionService,
-    private $ngRedux: INgRedux,
+    private $ngRedux: IFibraNgRedux,
     private $q: angular.IQService,
     private $scope: angular.IScope,
     private sparqlItemService: SparqlItemService
@@ -88,8 +88,8 @@ export class AddSourceComponentController {
     let stateUnsubscribe: () => void = $ngRedux.connect(
       (state: IRootState) => {
         return {
-          project: state.frontend.project,
-          sources: state.frontend.sources
+          project: state.project,
+          sources: state.sources
         }
       },
       SourcesActions)(this.state)
@@ -133,6 +133,7 @@ export class AddSourceComponentController {
 
     if (this.currentFile) {
       this.state.uploadFile(
+        this.currentFileName,
         this.parsedFile,
         this.state.project.project.dataModel.classMap.get(this.uploadType),
         this.entityLabelColumn,

@@ -1,10 +1,10 @@
 'use strict'
 
 import {INode, ONodeSet, DataFactory} from '../models/rdf'
-import {WorkerService, WorkerWorkerService} from './worker-service/worker-service'
+import {WorkerService} from './worker-service/worker-service'
 import {FMap, EMap, StringSet} from 'components/collection-utils'
 import {FibraSparqlService} from './fibra-sparql-service'
-import {StateWorkerService} from './worker-service/worker-service'
+import {StateWorkerService, WorkerWorkerService} from './worker-service/worker-worker-service'
 import {DataModel} from './project-service/data-model'
 import {SparqlService, ISparqlBindingResult} from 'angular-sparql-service'
 import * as angular from 'angular'

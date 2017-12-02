@@ -1,8 +1,8 @@
 'use strict'
 import { IActiveActions } from '../../actions/active';
-import { ISourcesState } from '../../reducers/frontend/sources';
-import { ProjectState } from '../../reducers/frontend/project';
-import { IClassFilterTree, IFilterState, IFilter } from '../../reducers/frontend/filter';
+import { ISourcesState } from 'reducers/sources';
+import { ProjectState } from 'reducers/project';
+import { IClassFilterTree, IFilterState, IFilter } from 'reducers/filter';
 import { IRootState } from '../../reducers';
 import { Class, Property } from '../../services/project-service/data-model';
 import { ItemsService } from '../../services/items-service';
@@ -11,7 +11,7 @@ import * as angular from 'angular';
 import { ProjectService } from '../../services/project-service/project-service'
 import * as ProjectActions from '../../actions/project';
 import * as FilterActions from '../../actions/filter';
-import { INgRedux } from 'ng-redux'
+import { IFibraNgRedux } from 'reducers'
 import 'angular-drag-drop';
 import 'angular-ui-grid';
 import * as d3 from 'd3';
@@ -62,7 +62,7 @@ export class FilterComponentController {
               private itemsService: ItemsService,
               private $scope: angular.IScope,
               private $q: angular.IQService,
-              private $ngRedux: INgRedux,
+              private $ngRedux: IFibraNgRedux,
               private $document: angular.IDocumentService,
               private propertyService: PropertyService) {
     let unsub1: () => void = $ngRedux.connect(this.mapProjectToActions, ProjectActions)(this.actions)
@@ -71,9 +71,9 @@ export class FilterComponentController {
     let stateUnsubscribe: () => void = $ngRedux.connect(
       (state: IRootState) => {
         return {
-          project: state.frontend.project,
-          sources: state.frontend.sources,
-          filter: state.frontend.filter
+          project: state.project,
+          sources: state.sources,
+          filter: state.filter
         }
       })(this.state)
     this.actions.unsubscribe = () => {
@@ -124,13 +124,13 @@ export class FilterComponentController {
 
   private mapProjectToActions(state: any): any {
     return {
-      project: state.frontend.project
+      project: state.project
     }
   }
 
   private mapFilterToActions(state: any): any {
     return {
-      filter: state.frontend.filter
+      filter: state.filter
     }
   }
 

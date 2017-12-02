@@ -1,4 +1,4 @@
-import { Class, Property } from '../../../services/project-service/data-model';
+import { Class, Property } from 'services/project-service/data-model';
 import {
   CLEAR_FILTER_STATE,
   REMOVE_FILTER,
@@ -6,7 +6,7 @@ import {
   SET_FILTER_FOR_CLASS_AND_PROP,
   SET_FILTER_SELECTION,
   UPDATE_PROPERTY_ON_FILTER,
-} from '../../../actions/filter';
+} from 'actions/filter';
 import { BasicProperty, DetailedProperty } from 'services/property-service';
 
 export interface IFilter {

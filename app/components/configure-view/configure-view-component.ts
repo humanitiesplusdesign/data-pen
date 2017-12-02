@@ -4,21 +4,18 @@ import {Project} from '../../services/project-service/project'
 import {ProjectSourceInfo} from '../project-sources-view/project-sources-view-component'
 import {PrimaryEndpointConfiguration} from '../../services/project-service/primary-endpoint-configuration'
 import {RemoteEndpointConfiguration} from '../../services/project-service/remote-endpoint-configuration'
-import {TreeNode} from '../tree/tree-component'
 import {Schema} from '../../services/project-service/schema'
 import {ProjectService} from '../../services/project-service/project-service'
-import {FibraService} from '../../services/fibra-service'
 import {UUID} from '../misc-utils'
 import {DataFactory} from '../../models/rdf'
-import {SparqlTreeService} from '../../services/sparql-tree-service'
 import * as angular from 'angular'
+import { IFibraNgRedux } from 'reducers';
 
 export class ConfigureViewComponentController implements angular.IComponentController {
   public project: Project
   public projectSources: ProjectSourceInfo[]
   public projectSource: ProjectSourceInfo
   public primaryEndpointConfigurations: PrimaryEndpointConfiguration[] = []
-  public statistics: {[id: string]: TreeNode[]} = {}
   public selectedAuthorities: {[id: string]: boolean} = {
     'http://ldf.fi/fibra/geonamesCidocLiteEndpointConfiguration': true,
     'http://ldf.fi/fibra/viafCidocLiteEndpointConfiguration': true
@@ -31,21 +28,6 @@ export class ConfigureViewComponentController implements angular.IComponentContr
   public schemas: Schema[] = []
   public authorities: RemoteEndpointConfiguration[] = []
   public archives: RemoteEndpointConfiguration[] = []
-  public existingProjectOptions = [{
-    "id": "0",
-    "description": "1st project name.",
-    "name": "Project name 1"
-  },
-  {
-    "id": "1",
-    "description": "2nd project name.",
-    "name": "Project name 2"
-  },
-  {
-    "id": "2",
-    "description": "3rd project name.",
-    "name": "Project name 3"
-  }]
 
   public saveAndOpen(): void {
     this.project.authorityEndpoints = this.authorities.filter(a => this.selectedAuthorities[a.id])
@@ -72,7 +54,7 @@ export class ConfigureViewComponentController implements angular.IComponentContr
   }
 
   /* @ngInject */
-  constructor(private $q: angular.IQService, private projectService: ProjectService, fibraService: FibraService, private sparqlTreeService: SparqlTreeService, $stateParams: any, private $state: angular.ui.IStateService) {
+  constructor(private $q: angular.IQService, private projectService: ProjectService, $stateParams: any, private $ngRedux: IFibraNgRedux, private $state: angular.ui.IStateService) {
     this.projectSources = projectService.getProjectSources()
     this.projectSource = this.projectSources.find(ps => ps.id === $stateParams.sourceId)
     if ($stateParams.id) {
@@ -83,8 +65,8 @@ export class ConfigureViewComponentController implements angular.IComponentContr
     } else {
       let pid: string = 'http://ldf.fi/fibra/project_' + UUID()
       this.project = new Project(pid)
-      this.project.labels = [ DataFactory.literal('', fibraService.getState().language)]
-      this.project.descriptions = [ DataFactory.literal('', fibraService.getState().language)]
+      this.project.labels = [ DataFactory.literal('', $ngRedux.getState().general.language)]
+      this.project.descriptions = [ DataFactory.literal('', $ngRedux.getState().general.language)]
       this.project.source = this.projectSource
       this.project.endpoint = this.projectSource.sparqlEndpoint
       this.project.updateEndpoint = this.projectSource.updateEndpoint

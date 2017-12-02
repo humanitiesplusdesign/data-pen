@@ -9,7 +9,6 @@ import {CNode} from 'models/rdf'
 import {NamedNode} from 'models/rdf'
 import {Citable} from 'models/citable'
 import {FMap} from 'components/collection-utils'
-import {TreeNode} from 'components/tree/tree-component'
 import {PropertyAndValue, Item, PropertyToValues} from 'services/sparql-item-service'
 import {FullRichNodeFromNode} from 'models/richnode'
 import * as angular from 'angular'
@@ -25,7 +24,6 @@ angular.module('fibra.services.worker-service-prototype-mapping-configuration', 
         'FMap': FMap,
         'Class': Class,
         'Property': Property,
-        'TreeNode': TreeNode,
         'PrimaryEndpointConfiguration': PrimaryEndpointConfiguration,
         'RemoteEndpointConfiguration': RemoteEndpointConfiguration,
         'Schema': Schema,

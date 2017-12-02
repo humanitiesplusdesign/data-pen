@@ -1,10 +1,9 @@
 import * as angular from 'angular'
 
 // Register modules
-import {WorkerWorkerService, StateWorkerService} from 'services/worker-service/worker-service'
-import {ProjectWorkerService} from 'services/project-service/project-service'
+import {WorkerWorkerService, StateWorkerService} from 'services/worker-service/worker-worker-service'
+import {ProjectWorkerService} from 'services/project-service/project-worker-service'
 import {FibraSparqlService} from 'services/fibra-sparql-service'
-import {SparqlTreeWorkerService} from 'services/sparql-tree-service'
 import {SparqlItemWorkerService} from 'services/sparql-item-service'
 import {SparqlUpdateWorkerService} from 'services/sparql-update-service'
 import {SparqlAutocompleteWorkerService} from 'services/sparql-autocomplete-service'
@@ -20,7 +19,6 @@ m.config(($provide) => {
   $provide.service('projectWorkerService', ProjectWorkerService)
   $provide.service('stateWorkerService', StateWorkerService)
   $provide.service('workerWorkerService', WorkerWorkerService)
-  $provide.service('sparqlTreeWorkerService', SparqlTreeWorkerService)
   $provide.service('sparqlItemWorkerService', SparqlItemWorkerService)
   $provide.service('sparqlUpdateWorkerService', SparqlUpdateWorkerService)
   $provide.service('sparqlAutocompleteWorkerService', SparqlAutocompleteWorkerService)

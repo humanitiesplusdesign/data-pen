@@ -1,15 +1,16 @@
+import { ISourcesState } from './sources';
 import {combineReducers} from 'redux'
-import verify from './verify'
-import types from './types'
-import items from './items'
-import models from './models'
-import {IFrontendState} from 'reducers/frontend'
-import {Project} from 'services/project-service/project'
-import frontend from 'reducers/frontend'
-
-export interface IRootState {
-  frontend: IFrontendState
-}
+import {ProjectState} from 'reducers/project'
+import projectReducer from 'reducers/project'
+import {GeneralState} from 'reducers/general'
+import general from 'reducers/general'
+import {IFilterState} from 'reducers/filter'
+import filter from 'reducers/filter'
+import {IActiveState} from 'reducers/active'
+import active from 'reducers/active'
+import sources from 'reducers/sources'
+import { INgRedux } from 'ng-redux';
+import { Project } from 'services/project-service/project';
 
 export class BackendRootState {
   constructor(
@@ -20,14 +21,28 @@ export class BackendRootState {
 
 
 export function convertToBackendState(state: IRootState, oldState: BackendRootState): BackendRootState | null {
-  if (oldState.project === state.frontend.project.project) return null
-  return new BackendRootState(state.frontend.project.project)
+  if (oldState.project === state.project.project) return null
+  return new BackendRootState(state.project.project, state.general.language)
 }
 
 export default combineReducers({
-  verify,
-  types,
-  items,
-  models,
-  frontend
+  general,
+  project: projectReducer,
+  filter,
+  active,
+  sources
 })
+
+export interface IFibraNgRedux extends INgRedux {
+  dispatch<T>(action: T): T;
+  getState(): IRootState;
+}
+
+export interface IRootState {
+  general: GeneralState
+  project: ProjectState
+  filter: IFilterState
+  active: IActiveState
+  sources: ISourcesState
+}
+

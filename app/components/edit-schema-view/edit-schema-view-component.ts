@@ -1,22 +1,22 @@
 'use strict'
 
 import {EditCitableComponentController} from '../citable-editor/citable-editor-component'
-import {FibraService} from '../../services/fibra-service'
 import {ProjectService} from '../../services/project-service/project-service'
 import {Schema} from '../../services/project-service/schema'
 import {DataFactory} from '../../models/rdf'
 import * as angular from 'angular'
+import { IFibraNgRedux } from 'reducers';
 
 export class EditSchemaViewComponentController extends EditCitableComponentController<Schema> {
 
   /* @ngInject */
-  constructor($stateParams: any, fibraService: FibraService, projectService: ProjectService, toastr: angular.toastr.IToastrService) {
+  constructor($stateParams: any, $ngRedux: IFibraNgRedux, projectService: ProjectService, toastr: angular.toastr.IToastrService) {
     super($stateParams.sourceId, projectService, toastr)
     if ($stateParams.id) projectService.loadSchema(this.projectSource, $stateParams.id).then(ps => this.c = ps)
     else {
       this.c = new Schema()
-      this.c.labels = [ DataFactory.literal('', fibraService.getState().language)]
-      this.c.descriptions = [ DataFactory.literal('', fibraService.getState().language)]
+      this.c.labels = [ DataFactory.literal('', $ngRedux.getState().general.language)]
+      this.c.descriptions = [ DataFactory.literal('', $ngRedux.getState().general.language)]
       this.c.endpoint = this.projectSource.sparqlEndpoint
     }
   }

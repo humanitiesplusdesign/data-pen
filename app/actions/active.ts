@@ -1,8 +1,7 @@
 import { NamedNode } from '../models/rdf';
 import { SparqlItemService } from '../services/sparql-item-service';
-import { SparqlItemComponent } from '../components/sparql-item/sparql-item-component';
 
-import { IItemState } from 'reducers/frontend/active'
+import { IItemState } from 'reducers/active'
 import { Dispatch, Action } from 'redux'
 import { IRootState } from 'reducers'
 

@@ -1,39 +1,51 @@
 'use strict'
+import { FilterActionService } from '../../actions/filter';
 import { IActiveActions } from '../../actions/active';
 import { ItemsService } from 'services/items-service'
 import * as angular from 'angular';
 import { ProjectService } from 'services/project-service/project-service'
 import { ProjectActionService } from 'actions/project'
-import { INgRedux } from 'ng-redux'
+import { IFibraNgRedux } from 'reducers'
 import { IModalService } from 'angular-ui-bootstrap'
 import * as FilterActions from '../../actions/filter';
 import ActiveActions from 'actions/active';
+import { IActiveState } from 'reducers/active';
+import { ProjectState } from 'reducers/project';
+import { IRootState } from 'reducers';
+
+interface IProjectComponentControllerState extends IActiveActions {
+  project: ProjectState
+  active: IActiveState
+}
 
 export class ProjectComponentController {
 
-  private actions: any = {}
+  private state: IProjectComponentControllerState = <IProjectComponentControllerState>{}
+  private unsubscribe: () => void
   private currentView: string = 'sources'
 
   /* @ngInject */
   constructor(private projectActionService: ProjectActionService,
+              private filterActionService: FilterActionService,
               private itemsService: ItemsService,
               private $stateParams: any,
               private $state: any,
-              private $ngRedux: INgRedux,
+              private $ngRedux: IFibraNgRedux,
               private $document: angular.IDocumentService,
               private $uibModal: IModalService) {
-    let unsub1: () => void = $ngRedux.connect(this.mapProjectToActions, null)(this.actions)
-    let unsub2: () => void = $ngRedux.connect(this.mapFilterToActions, FilterActions)(this.actions)
-    let unsub3: () => void = $ngRedux.connect(this.mapActiveToActions, ActiveActions)(this.actions)
-    this.actions.unsubscribe = () => {
-      unsub1()
-      unsub2()
-      unsub3()
-    }
-
+    this.unsubscribe = $ngRedux.connect(
+      (state: IRootState) => {
+        console.log(state)
+        return {
+          project: state.project,
+          active: state.active,
+          filter: state.filter
+        }
+      },
+      ActiveActions)(this.state)
     // Put the project from $stateParams onto the state
     if ($stateParams.id && $stateParams.sparqlEndpoint && $stateParams.graph)
-      if (this.actions.project.id !== $stateParams.id)
+      if (this.state.project.id !== $stateParams.id)
         this.projectActionService.setProject($stateParams.id, $stateParams.sparqlEndpoint, $stateParams.graph)
 
     if ($stateParams.view) {
@@ -48,8 +60,8 @@ export class ProjectComponentController {
 
   public $postLink(): void {
     let setView: any = this.setView.bind(this)
-    let setFilterDividerPercentage: any = this.actions.setFilterDividerPercentage.bind(this)
-    let setActiveDividerPercentage: IActiveActions['setActiveDividerPercentage'] = this.actions.setActiveDividerPercentage.bind(this)
+    let setFilterDividerPercentage: any = this.filterActionService.setFilterDividerPercentage.bind(this)
+    let setActiveDividerPercentage: IActiveActions['setActiveDividerPercentage'] = this.state.setActiveDividerPercentage.bind(this)
     let ctrl: ProjectComponentController = this
     this.$document.bind('keydown', function (e: JQueryEventObject): void {
       if (e.ctrlKey && e.keyCode === 84) {
@@ -82,27 +94,27 @@ export class ProjectComponentController {
 
   private dataUsedProportion(): number {
     return this.currentView === 'filter' ?
-      this.actions.project.filteredItemsCount / this.actions.project.allItemsCount * 100 :
+      this.state.project.filteredItemsCount / this.state.project.allItemsCount * 100 :
       this.currentView === 'active' ?
-        this.actions.project.activeItemsCount / this.actions.project.filteredItemsCount * 100 :
+        this.state.project.activeItemsCount / this.state.project.filteredItemsCount * 100 :
         0
   }
 
   private mapProjectToActions(state: any): any {
     return {
-      project: state.frontend.project
+      project: state.project
     }
   }
 
   private mapFilterToActions(state: any): any {
     return {
-      filter: state.frontend.filter
+      filter: state.filter
     }
   }
 
   private mapActiveToActions(state: any): any {
     return {
-      active: state.frontend.active
+      active: state.active
     }
   }
 

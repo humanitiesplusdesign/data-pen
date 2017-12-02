@@ -2,10 +2,10 @@
 
 import {EditCitableComponentController} from '../citable-editor/citable-editor-component'
 import {RemoteEndpointConfiguration} from '../../services/project-service/remote-endpoint-configuration'
-import {FibraService} from '../../services/fibra-service'
 import {ProjectService} from '../../services/project-service/project-service'
 import {DataFactory} from '../../models/rdf'
 import * as angular from 'angular'
+import { IFibraNgRedux } from 'reducers';
 
 export class EditRemoteEndpointConfigurationViewComponentController extends EditCitableComponentController<RemoteEndpointConfiguration> {
 
@@ -17,13 +17,13 @@ export class EditRemoteEndpointConfigurationViewComponentController extends Edit
   }
 
   /* @ngInject */
-  constructor($stateParams: any, fibraService: FibraService, projectService: ProjectService, toastr: angular.toastr.IToastrService) {
+  constructor($stateParams: any, $ngRedux: IFibraNgRedux, projectService: ProjectService, toastr: angular.toastr.IToastrService) {
     super($stateParams.sourceId, projectService, toastr)
     if ($stateParams.id) projectService.loadRemoteEndpointConfiguration(this.projectSource, $stateParams.id).then(ps => this.c = ps)
     else {
       this.c = new RemoteEndpointConfiguration()
-      this.c.labels = [ DataFactory.literal('', fibraService.getState().language)]
-      this.c.descriptions = [ DataFactory.literal('', fibraService.getState().language)]
+      this.c.labels = [ DataFactory.literal('', $ngRedux.getState().general.language)]
+      this.c.descriptions = [ DataFactory.literal('', $ngRedux.getState().general.language)]
       this.c.types = [ DataFactory.namedNode('') ]
     }
   }

@@ -2,8 +2,8 @@
 import { NamedNode, RDF, SKOS } from '../../models/rdf';
 import { PropertyToValues, SparqlItemService } from '../../services/sparql-item-service';
 import { IRootState } from '../../reducers';
-import { INgRedux } from 'ng-redux';
-import { IActiveState, IItemState } from '../../reducers/frontend/active';
+import { IFibraNgRedux } from 'reducers';
+import { IActiveState, IItemState } from '../../reducers/active';
 import ActiveActions, { IActiveActions } from '../../actions/active';
 
 import * as angular from 'angular';

@@ -3,7 +3,6 @@ import * as angular from 'angular'
 
 import {ICitable, ICitableSource, CitableSource, Citable} from '../../models/citable'
 import {WorkerService} from '../../services/worker-service/worker-service'
-import {FibraService, UIState} from '../../services/fibra-service'
 import {Project} from './project'
 import {ProjectSourceInfo} from '../../components/project-sources-view/project-sources-view-component'
 import {SparqlService, IBindingsToObjectConfiguration, UniqueObjectTracker} from 'angular-sparql-service'
@@ -29,13 +28,8 @@ WHERE {
 # ENDGRAPH
 }`
 
-  public static orderCitables(citables: ICitable[]): void {
-    citables.sort((a, b) => (a['order'] ? a['order'] : Number.MAX_VALUE) - (b['order'] ? b['order'] : Number.MAX_VALUE))
-    citables.forEach(rh => delete rh['order'])
-  }
-
   /* @ngInject */
-  constructor(private workerService: WorkerService, private fibraService: FibraService, private fibraSparqlService: FibraSparqlService, private $localStorage: any) {
+  constructor(private workerService: WorkerService, private fibraSparqlService: FibraSparqlService, private $localStorage: any) {
     if (!$localStorage.projectSources)
       $localStorage.projectSources = []
     else $localStorage.projectSources.forEach(ps => { // upgrade of earlier format
@@ -45,14 +39,6 @@ WHERE {
         ps.graphStoreEndpoint = ps['endpoint']
       }
     })
-  }
-
-  public getCurrentProject(): Project {
-    return this.fibraService.getState().project
-  }
-
-  public setCurrentProject(project: Project): angular.IPromise<UIState> {
-    return this.fibraService.dispatchAction(this.fibraService.setProject(project))
   }
 
   public getProjectSources(): ProjectSourceInfo[] {
@@ -113,198 +99,15 @@ WHERE {
     let m: d3.Map<string> = new FMap<string>()
     let prefixes: {} = {}
     ps.toTurtle(m, prefixes)
-    console.log(ps, m, prefixes)
     return this.deleteObjects(updateEndpoint, m.keys(), ps.source.graph).then(() => this.fibraSparqlService.post(graphStoreEndpoint, toTurtle(prefixes, m), ps.source.graph))
   }
 
 }
 
-export class ProjectWorkerService {
-  constructor(private fibraSparqlService: FibraSparqlService, private $q: angular.IQService) {}
-
-  public loadPrimaryEndpointConfiguration(source: ICitableSource, templateId: string): angular.IPromise<PrimaryEndpointConfiguration> {
-    return this.runSingleQuery(source, PrimaryEndpointConfiguration.primaryEndpointConfigurationQuery, templateId, new PrimaryEndpointConfiguration(templateId, source))
-  }
-
-  public listPrimaryEndpointConfigurations(source: ICitableSource): angular.IPromise<PrimaryEndpointConfiguration[]> {
-    return this.runListQuery(source, PrimaryEndpointConfiguration.listPrimaryEndpointConfigurationsQuery, (id: string) => new PrimaryEndpointConfiguration(id, source))
-  }
-
-  public loadRemoteEndpointConfiguration(source: ICitableSource, templateId: string): angular.IPromise<RemoteEndpointConfiguration> {
-    return this.runSingleQuery(source, RemoteEndpointConfiguration.remoteEndpointConfigurationQuery, templateId, new RemoteEndpointConfiguration(templateId, source))
-  }
-
-  public listArchiveEndpointConfigurations(source: ICitableSource): angular.IPromise<RemoteEndpointConfiguration[]> {
-    return this.runListQuery(source, RemoteEndpointConfiguration.listArchiveEndpointConfigurationsQuery, (id: string) => new RemoteEndpointConfiguration(id, source))
-  }
-
-  public listAuthorityEndpointConfigurations(source: ICitableSource): angular.IPromise<RemoteEndpointConfiguration[]> {
-    return this.runListQuery(source, RemoteEndpointConfiguration.listAuthorityEndpointConfigurationsQuery, (id: string) => new RemoteEndpointConfiguration(id, source))
-  }
-
-  public listProjects(source: ICitableSource): angular.IPromise<Project[]> {
-    return this.runListQuery(source, Project.listProjectsQuery, (id: string) => new Project(id, source))
-  }
-
-  public listSchemas(source: ICitableSource): angular.IPromise<Schema[]> {
-    return this.runListQuery(source, Schema.listSchemasQuery, (id: string) => new Schema(id, source))
-  }
-
-  public loadSchema(source: ICitableSource, id: string): angular.IPromise<Schema> {
-    return this.runSingleQuery(source, Schema.schemaQuery, id, new Schema(id, source))
-  }
-
-  public loadDataModel(schemas: Schema[]): angular.IPromise<DataModel> {
-    let dataModel: DataModel = new DataModel()
-    let classes: IEMap<Class> = new EMap<Class>((id: string) => {
-      let cl: Class = new Class(DataFactory.namedNode(id))
-      dataModel.classMap.set(id, cl)
-      return cl
-    })
-    let properties: IEMap<Property> = new EMap<Property>((id: string) => {
-      let pr: Property = new Property(DataFactory.namedNode(id))
-      dataModel.propertyMap.set(id, pr)
-      return pr
-    })
-    let promises: angular.IPromise<void>[] = []
-    schemas.forEach(schema => {
-      promises.push(this.fibraSparqlService.query(schema.endpoint, schema.classQuery).then(response => {
-        let conf: IBindingsToObjectConfiguration = {
-          bindingTypes: { types: 'uniqueArray' },
-          bindingConverters: {
-            superClasses: (binding) => classes.goc(binding.value),
-            subClasses: (binding) => classes.goc(binding.value),
-            types: (binding) => classes.goc(binding.value),
-            labels: (binding) => DataFactory.nodeFromBinding(binding),
-            descriptions: (binding) => DataFactory.nodeFromBinding(binding),
-          }
-        }
-        let tracker: UniqueObjectTracker = new UniqueObjectTracker()
-        response.results.bindings.forEach(binding => SparqlService.bindingsToObject(binding, classes.goc(binding['id'].value), conf, tracker))
-      }))
-      promises.push(this.fibraSparqlService.query(schema.endpoint, schema.propertyQuery).then(response => {
-        let conf: IBindingsToObjectConfiguration = {
-          bindingTypes: { types: 'uniqueArray' },
-          bindingConverters: {
-            superProperties: (binding) => properties.goc(binding.value),
-            subProperties: (binding) => properties.goc(binding.value),
-            inverseProperty: (binding) => properties.goc(binding.value),
-            types: (binding) => classes.goc(binding.value),
-            domains: (binding) => classes.goc(binding.value),
-            ranges: (binding) => classes.goc(binding.value),
-            labels: (binding) => DataFactory.nodeFromBinding(binding),
-            descriptions: (binding) => DataFactory.nodeFromBinding(binding),
-          }
-        }
-        let tracker: UniqueObjectTracker = new UniqueObjectTracker()
-        response.results.bindings.forEach(binding => SparqlService.bindingsToObject(binding, properties.goc(binding['id'].value), conf, tracker))
-      }))
-    })
-    return this.$q.all(promises).then(() => {
-      classes.values().forEach(cl => {
-        cl.buildAsNodes()
-        cl.superClasses.filter(spr => !spr.subClasses.find(opr => opr === cl)).forEach(spr => spr.subClasses.push(cl))
-        cl.subClasses.filter(spr => !spr.superClasses.find(opr => opr === cl)).forEach(spr => spr.superClasses.push(cl))
-      })
-      classes.values().forEach(cl => {
-        if (cl.superClasses.length === 0) dataModel.rootClasses.push(cl)
-      })
-      properties.values().forEach(pr => {
-        pr.buildAsNodes()
-        if (pr.inverseProperty) pr.inverseProperty.inverseProperty = pr
-        pr.superProperties.filter(spr => !spr.subProperties.find(opr => opr === pr)).forEach(spr => spr.subProperties.push(pr))
-        pr.subProperties.filter(spr => !spr.superProperties.find(opr => opr === pr)).forEach(spr => spr.superProperties.push(pr))
-        pr.domains.forEach(dc => dc.properties.push(pr))
-        pr.ranges.forEach(rc => rc.inverseProperties.push(pr))
-      })
-      properties.values().forEach(pr => {
-        if (pr.superProperties.length === 0) dataModel.rootProperties.push(pr)
-      })
-      return dataModel
-    })
-  }
-
-  public loadProject(source: ICitableSource, id: string, loadFull: boolean): angular.IPromise<Project> {
-    let q: angular.IPromise<Project> = this.runSingleQuery(source, Project.projectQuery, id, new Project(id, source))
-    if (!loadFull) return q; else return q.then(p => {
-      let promises: angular.IPromise<any>[] = []
-      promises.push(this.$q.all(p.schemas.map(schema => this.loadSchema(schema.source, schema.id))).then(schemas => {
-        p.schemas = schemas
-        return this.loadDataModel(schemas).then(dm => p.dataModel = dm)
-      }))
-      let narche: RemoteEndpointConfiguration[] = []
-      let nauthe: RemoteEndpointConfiguration[] = []
-      p.archiveEndpoints.forEach(ae => promises.push(this.loadRemoteEndpointConfiguration(ae.source, ae.id).then(ae2 => narche.push(ae2))))
-      p.authorityEndpoints.forEach(ae => promises.push(this.loadRemoteEndpointConfiguration(ae.source, ae.id).then(ae2 => nauthe.push(ae2))))
-      return this.$q.all(promises).then(() => {
-        p.archiveEndpoints = narche
-        p.authorityEndpoints = nauthe
-        return p
-      })
-    })
-  }
-
-  private runSingleQuery<T extends ICitable>(source: ICitableSource, tq: string, id: string, ps: T): angular.IPromise<T> {
-    tq = source.graph ? tq.replace(/# STARTGRAPH/g, 'GRAPH <' + source.graph + '> {').replace(/# ENDGRAPH/g, '}') : tq.replace(/.*# STARTGRAPH\n/g, '').replace(/.*# ENDGRAPH\n/g, '')
-    tq = tq.replace(/<ID>/g, '<' + id + '>')
-    let deferred: angular.IDeferred<T> = this.$q.defer()
-    this.fibraSparqlService.query(source.sparqlEndpoint, tq).then(response => {
-      let conf: IBindingsToObjectConfiguration = {
-        bindingTypes: { rightsHolders: 'uniqueArray', schemas: 'uniqueArray', authorityEndpoints: 'uniqueArray', archiveEndpoints: 'uniqueArray'},
-        bindingConverters: {
-          dateCreated: (binding) => new Date(binding.value),
-          types: (binding) => DataFactory.nodeFromBinding(binding),
-          labels: (binding) => DataFactory.nodeFromBinding(binding),
-          descriptions: (binding) => DataFactory.nodeFromBinding(binding),
-          schemas: (binding) => new Schema(binding.value, CitableSource.clone(source)),
-          authorityEndpoints: (binding) => new RemoteEndpointConfiguration(binding.value, CitableSource.clone(source)),
-          archiveEndpoints: (binding) => new RemoteEndpointConfiguration(binding.value, CitableSource.clone(source)),
-          rightsHolders_labels: (binding) => DataFactory.nodeFromBinding(binding),
-          rightsHolders_descriptions: (binding) => DataFactory.nodeFromBinding(binding),
-          rightsHolders: (binding) => new Citable(binding.value, source)
-        }
-      }
-      let tracker: UniqueObjectTracker = new UniqueObjectTracker()
-      response.results.bindings.forEach(b => SparqlService.bindingsToObject(b, ps, conf, tracker))
-      ProjectService.orderCitables(ps.rightsHolders)
-      deferred.resolve(ps)
-    })
-    return deferred.promise
-  }
-
-  private runListQuery<T extends ICitable>(source: ICitableSource, lq: string, oc: (id: string) => T): angular.IPromise<T[]> {
-    lq = source.graph ? lq.replace(/# STARTGRAPH/g, 'GRAPH <' + source.graph + '> {').replace(/# ENDGRAPH/g, '}') : lq.replace(/.*# STARTGRAPH\n/g, '').replace(/.*# ENDGRAPH\n/g, '')
-    return this.fibraSparqlService.query(source.sparqlEndpoint, lq).then(
-      response => {
-        let projects: EMap<T> = new EMap<T>(oc)
-        let conf: IBindingsToObjectConfiguration = {
-          bindingTypes: { rightsHolders: 'uniqueArray', schemas: 'uniqueArray', authorityEndpoints: 'uniqueArray', archiveEndpoints: 'uniqueArray'},
-          bindingConverters: {
-            dateCreated: (binding) => new Date(binding.value),
-            types: (binding) => DataFactory.nodeFromBinding(binding),
-            labels: (binding) => DataFactory.nodeFromBinding(binding),
-            descriptions: (binding) => DataFactory.nodeFromBinding(binding),
-            schemas: (binding) => new Schema(binding.value, CitableSource.clone(source)),
-            authorityEndpoints: (binding) => new RemoteEndpointConfiguration(binding.value, CitableSource.clone(source)),
-            archiveEndpoints: (binding) => new RemoteEndpointConfiguration(binding.value, CitableSource.clone(source)),
-            rightsHolders_labels: (binding) => DataFactory.nodeFromBinding(binding),
-            rightsHolders_descriptions: (binding) => DataFactory.nodeFromBinding(binding),
-            rightsHolders: (binding) => new Citable(binding.value, source)
-          }
-        }
-        let tracker: UniqueObjectTracker = new UniqueObjectTracker()
-        response.results.bindings.forEach(binding => SparqlService.bindingsToObject(binding, projects.goc(binding['id'].value), conf, tracker))
-        projects.values().forEach(p => ProjectService.orderCitables(p.rightsHolders))
-        return projects.values()
-      })
-  }
-}
-
 angular.module('fibra.services.project-service', [
-  'fibra.services.fibra-service',
+  'fibra.services.worker-service',
   'fibra.services.fibra-sparql-service'
 ])
   .config(($provide) => {
     $provide.service('projectService', ProjectService)
-    $provide.service('projectWorkerService', ProjectWorkerService)
   })
