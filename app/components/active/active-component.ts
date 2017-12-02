@@ -452,7 +452,14 @@ export class ActiveComponentController {
           {
             field: 'description'
           }
-        ]
+        ],
+        onRegisterApi: (gridApi) => {
+          //set gridApi on scope
+          gridApi.edit.on.afterCellEdit(this.$scope, (rowEntity, colDef, newValue, oldValue) => {
+            console.log(rowEntity, colDef, newValue, oldValue)
+            this.$scope.$apply();
+          })
+        }
       }
     })
   }
