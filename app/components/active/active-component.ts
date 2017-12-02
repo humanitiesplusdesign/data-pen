@@ -225,7 +225,7 @@ export class ActiveComponentController {
   }
 
   private sanitizeId(id: string): string {
-    return id.replace(/\/|\:|\./g, '')
+    return id.replace(/\/|\:|\.|\(|\)|\%/g, '')
   }
 
   private nodeClick(d: IItemState, groups: SVGCircleElement[]): void {
@@ -452,7 +452,14 @@ export class ActiveComponentController {
           {
             field: 'description'
           }
-        ]
+        ],
+        onRegisterApi: (gridApi) => {
+          //set gridApi on scope
+          gridApi.edit.on.afterCellEdit(this.$scope, (rowEntity, colDef, newValue, oldValue) => {
+            console.log(rowEntity, colDef, newValue, oldValue)
+            this.$scope.$apply();
+          })
+        }
       }
     })
   }
