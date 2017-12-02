@@ -64,7 +64,7 @@ script(type="text/ng-template" id="layersPopover.html")
     p.description.layer-description Toggle layers off to hide nodes of that type, displaying them as links instead.
     hr
     .layer-toggle(ng-repeat="class in $ctrl.allClasses()")
-      toggle(ng-model="toggleValue" ng-change="changed()" size="btn-xs")
+      toggle(ng-model="toggleValue" on="Nodes" off="Links" ng-change="changed()" onstyle="custom" offstyle="custom")
       span.checkbox-title {{ class.labels | prefLang }}
 script(type="text/ng-template" id="snapshotsPopover.html")
   .snapshots-popover
