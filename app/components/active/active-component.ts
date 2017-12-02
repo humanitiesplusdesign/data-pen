@@ -54,6 +54,7 @@ export class ActiveComponentController {
   private oldActiveLayoutItemState: IItemState[]
 
   private viewOptionsPopoverVisible: boolean = false
+  private layerPopoverVisible: boolean = false
   private snapshotsPopoverVisible: boolean = false
   private layoutsPopoverVisible: boolean = false
 
