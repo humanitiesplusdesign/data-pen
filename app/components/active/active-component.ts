@@ -217,7 +217,7 @@ export class ActiveComponentController {
     }
 
     this.activeActionService.addItemToCurrentLayout(item)
-    this.updateCanvas()
+    // this.updateCanvas()
     // this.$scope.$apply(this.nodeSearchRemove.bind(this))
     this.nodeSearchRemove()
 
@@ -455,8 +455,6 @@ export class ActiveComponentController {
         ]
       }
     })
-
-    console.log(this.gridOptions)
   }
 }
 
