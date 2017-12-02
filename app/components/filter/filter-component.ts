@@ -11,7 +11,7 @@ import * as angular from 'angular';
 import { ProjectService } from '../../services/project-service/project-service'
 import * as ProjectActions from '../../actions/project';
 import * as FilterActions from '../../actions/filter';
-import { INgRedux } from 'ng-redux'
+import { IFibraNgRedux } from 'reducers'
 import 'angular-drag-drop';
 import 'angular-ui-grid';
 import * as d3 from 'd3';
@@ -62,7 +62,7 @@ export class FilterComponentController {
               private itemsService: ItemsService,
               private $scope: angular.IScope,
               private $q: angular.IQService,
-              private $ngRedux: INgRedux,
+              private $ngRedux: IFibraNgRedux,
               private $document: angular.IDocumentService,
               private propertyService: PropertyService) {
     let unsub1: () => void = $ngRedux.connect(this.mapProjectToActions, ProjectActions)(this.actions)

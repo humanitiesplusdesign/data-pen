@@ -5,7 +5,7 @@ import { Action, Dispatch } from 'redux'
 import {ProjectService} from 'services/project-service/project-service'
 import {Project} from 'services/project-service/project'
 import { IRootState } from 'reducers'
-import { INgRedux } from 'ng-redux'
+import { IFibraNgRedux } from 'reducers'
 import SourceActions from './sources'
 import * as angular from 'angular';
 
@@ -32,7 +32,7 @@ export interface ISetActiveItemCountAction extends Action {
 
 export class ProjectActionService {
   /* @ngInject */
-  constructor(private $ngRedux: INgRedux, private projectService: ProjectService) {
+  constructor(private $ngRedux: IFibraNgRedux, private projectService: ProjectService) {
   }
   public setProject(id: string, sparqlEndpoint: string, graph: string): angular.IPromise<IProjectLoadedAction> {
     this.$ngRedux.dispatch({

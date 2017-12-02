@@ -1,7 +1,7 @@
 'use strict'
 
 import * as angular from 'angular';
-import { INgRedux } from 'ng-redux'
+import { IFibraNgRedux } from 'reducers'
 import { Property } from 'services/project-service/data-model';
 import { FullRichNodeFromNode } from 'models/richnode';
 import { CNode } from 'models/rdf';
@@ -42,12 +42,12 @@ export class DetailedProperty extends BasicProperty {
 export class PropertyService {
 
   private $q: angular.IQService
-  private $ngRedux: INgRedux
+  private $ngRedux: IFibraNgRedux
 
   /* @ngInject */
   constructor(
     $q: angular.IQService,
-    $ngRedux: INgRedux
+    $ngRedux: IFibraNgRedux
   ) {
     this.$q = $q
     this.$ngRedux = $ngRedux

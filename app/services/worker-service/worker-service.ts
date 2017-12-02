@@ -3,8 +3,7 @@
 import * as angular from 'angular'
 import './prototype-mapping-configuration'
 import {WorkerServiceUtils, IMessage} from 'services/worker-service/worker-service-common'
-import {BackendRootState, convertToBackendState} from 'reducers'
-import {INgRedux} from 'ng-redux'
+import {BackendRootState, convertToBackendState, IFibraNgRedux} from 'reducers'
 
 export class WorkerServiceConfiguration {
   constructor(public appName: string, public workerThreads: number, public importScripts: string[]) {}
@@ -50,7 +49,7 @@ export class WorkerService {
   private oldState: BackendRootState = new BackendRootState()
 
   /* @ngInject */
-  constructor(workerServiceConfiguration: WorkerServiceConfiguration, private workerServicePrototypeMappingConfiguration: {[className: string]: Object}, $rootScope: angular.IRootScopeService, $window: angular.IWindowService, private $q: angular.IQService, private $ngRedux: INgRedux) {
+  constructor(workerServiceConfiguration: WorkerServiceConfiguration, private workerServicePrototypeMappingConfiguration: {[className: string]: Object}, $rootScope: angular.IRootScopeService, $window: angular.IWindowService, private $q: angular.IQService, private $ngRedux: IFibraNgRedux) {
     $ngRedux.subscribe(() => {
       let newState: BackendRootState = convertToBackendState(this.$ngRedux.getState(), this.oldState)
       if (newState !== null) {

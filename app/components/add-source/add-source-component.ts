@@ -7,7 +7,7 @@ import { RemoteEndpointConfiguration } from '../../services/project-service/remo
 import { ISourcesState } from '../../reducers/sources';
 import { ProjectState } from '../../reducers/project';
 import { IRootState } from '../../reducers';
-import { INgRedux } from 'ng-redux'
+import { IFibraNgRedux } from 'reducers'
 import { ProjectService } from '../../services/project-service/project-service';
 import SourcesActions, { ISourcesActions } from '../../actions/sources';
 import { ProjectActionService } from '../../actions/project'
@@ -80,7 +80,7 @@ export class AddSourceComponentController {
   constructor(
     private projectService: ProjectService,
     private projectActionService: ProjectActionService,
-    private $ngRedux: INgRedux,
+    private $ngRedux: IFibraNgRedux,
     private $q: angular.IQService,
     private $scope: angular.IScope,
     private sparqlItemService: SparqlItemService

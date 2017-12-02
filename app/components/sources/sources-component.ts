@@ -7,7 +7,7 @@ import { IActiveActions } from '../../actions/active';
 import * as angular from 'angular';
 import { ProjectService } from '../../services/project-service/project-service'
 import * as ProjectActions from '../../actions/project';
-import { INgRedux } from 'ng-redux'
+import { IFibraNgRedux } from 'reducers'
 import SourcesActions from '../../actions/sources'
 import { IModalService } from 'angular-ui-bootstrap'
 import * as d3 from 'd3';
@@ -27,7 +27,7 @@ export class SourcesComponentController {
 
   /* @ngInject */
   constructor(private projectService: ProjectService,
-              private $ngRedux: INgRedux,
+              private $ngRedux: IFibraNgRedux,
               private $uibModal: IModalService) {
     let unsub1: () => void = $ngRedux.connect(this.mapProjectToActions, ProjectActions)(this.actions)
     let stateUnsubscribe: () => void = $ngRedux.connect(

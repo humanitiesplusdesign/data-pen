@@ -1,6 +1,6 @@
 import { Action, Dispatch } from 'redux'
-import { INgRedux } from 'ng-redux'
 import * as angular from 'angular';
+import { IFibraNgRedux } from 'reducers';
 
 export const SET_LANGUAGE: string = 'SET_LANGUAGE'
 
@@ -16,7 +16,7 @@ class SetLanguageAction implements ISetLanguageAction {
 
 export class GeneralActionService {
   /* @ngInject */
-  constructor(private $ngRedux: INgRedux) {
+  constructor(private $ngRedux: IFibraNgRedux) {
   }
   public setLanguage(lang: string): ISetLanguageAction {
     return this.$ngRedux.dispatch(new SetLanguageAction(lang))

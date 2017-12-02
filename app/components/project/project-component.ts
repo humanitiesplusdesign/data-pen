@@ -5,7 +5,7 @@ import { ItemsService } from 'services/items-service'
 import * as angular from 'angular';
 import { ProjectService } from 'services/project-service/project-service'
 import { ProjectActionService } from 'actions/project'
-import { INgRedux } from 'ng-redux'
+import { IFibraNgRedux } from 'reducers'
 import { IModalService } from 'angular-ui-bootstrap'
 import * as FilterActions from '../../actions/filter';
 import ActiveActions from 'actions/active';
@@ -30,7 +30,7 @@ export class ProjectComponentController {
               private itemsService: ItemsService,
               private $stateParams: any,
               private $state: any,
-              private $ngRedux: INgRedux,
+              private $ngRedux: IFibraNgRedux,
               private $document: angular.IDocumentService,
               private $uibModal: IModalService) {
     this.unsubscribe = $ngRedux.connect(

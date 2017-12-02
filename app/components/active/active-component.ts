@@ -7,10 +7,9 @@ import * as angular from 'angular';
 import { ProjectService } from 'services/project-service/project-service'
 import { ProjectActionService } from 'actions/project';
 import ActiveActions from 'actions/active';
-import { INgRedux } from 'ng-redux'
+import { IFibraNgRedux } from 'reducers'
 import { Dispatch } from 'redux'
 import * as d3 from 'd3';
-import { SearchService, AutocompletionResult } from 'services/search-service'
 import { IActiveActions } from 'actions/active'
 import { ProjectState } from 'reducers/project'
 import { IRootState } from 'reducers'
@@ -63,9 +62,8 @@ export class ActiveComponentController {
   constructor(private projectActionService: ProjectActionService,
               private $scope: angular.IScope,
               private $q: angular.IQService,
-              private $ngRedux: INgRedux,
+              private $ngRedux: IFibraNgRedux,
               private $uibModal: IModalService,
-              private searchService: SearchService,
               private sparqlAutocompleteService: SparqlAutocompleteService,
               private sparqlItemService: SparqlItemService,
               private $document: angular.IDocumentService) {
@@ -177,7 +175,7 @@ export class ActiveComponentController {
   }
 
   private processResults(res: AutocompletionResults): Result[] {
-    let activeItemIds: string[] = this.$ngRedux.getState().frontend.active.activeLayout.items.map((d: IItemState) => d.ids.map((i) => i.value)).reduce((a, b) => a.concat(b), [])
+    let activeItemIds: string[] = this.$ngRedux.getState().active.activeLayout.items.map((d: IItemState) => d.ids.map((i) => i.value)).reduce((a, b) => a.concat(b), [])
     let ret: Result[] = []
     res.localMatchingResults.forEach(l => l.results.forEach(r => {
       if (activeItemIds.indexOf(r.ids[0].value) === -1) ret.push(r)
@@ -188,8 +186,8 @@ export class ActiveComponentController {
         // Class filter (TODO: Move server-side)
         && r.datasources.reduce(
             (p, c) => {
-              return this.$ngRedux.getState().frontend.sources.sourceClassToggle[c]
-                && this.$ngRedux.getState().frontend.sources.sourceClassToggle[c][r.additionalInformation.type[0].value]
+              return this.$ngRedux.getState().sources.sourceClassToggle[c]
+                && this.$ngRedux.getState().sources.sourceClassToggle[c][r.additionalInformation.type[0].value]
             },
             false)) {
           r.additionalInformation.typeDescriptions = this.state.project.project.dataModel.classMap.get(r.additionalInformation.type[0].value).labels
@@ -418,5 +416,5 @@ export class ActiveComponent implements angular.IComponentOptions {
     public controller: any = ActiveComponentController
 }
 
-angular.module('fibra.components.active', ['ui.bootstrap', 'fibra.actions.project', 'fibra.services.search-service', 'filearts.dragDrop', 'ui.grid', 'ui.grid.emptyBaseLayer', 'ui.grid.resizeColumns', 'ui.grid.autoResize', 'ui.grid.edit'])
+angular.module('fibra.components.active', ['ui.bootstrap', 'fibra.actions.project', 'filearts.dragDrop', 'ui.grid', 'ui.grid.emptyBaseLayer', 'ui.grid.resizeColumns', 'ui.grid.autoResize', 'ui.grid.edit'])
   .component('active', new ActiveComponent())

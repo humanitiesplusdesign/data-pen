@@ -8,7 +8,6 @@ import 'services/fibra-sparql-service'
 import 'services/sparql-item-service'
 import 'services/sparql-statistics-service'
 import 'services/sparql-autocomplete-service'
-import 'services/search-service'
 import 'services/items-service'
 import 'services/property-service'
 
@@ -20,7 +19,6 @@ angular.module('fibra.services', [
   'fibra.services.sparql-item-service',
   'fibra.services.sparql-statistics-service',
   'fibra.services.sparql-autocomplete-service',
-  'fibra.services.search-service',
   'fibra.services.items-service',
   'fibra.services.property-service'
 ])
