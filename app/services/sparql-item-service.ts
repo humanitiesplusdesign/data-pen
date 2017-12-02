@@ -103,10 +103,10 @@ SELECT ?id ?itemLabel ?property ?propertyLabel ?object ?objectLabel {
 }`
 
   public static coalesceIdsQuery: string = `PREFIX owl: <http://www.w3.org/2002/07/owl#>
-SELECT ?id ?oid {
+SELECT ?id ?id2 {
 # STARTGRAPH
-  VALUES (?id ?id2) { <IDPAIRS> }
-  ?id2 owl:sameAs ?oid
+  VALUES (?id ?oid) { <IDPAIRS> }
+  ?oid owl:sameAs ?id2
 # ENDGRAPH
 }
 `
@@ -156,7 +156,7 @@ WHERE {
   }
 
   public createNewItems(propertiess: IPropertyAndValue[][] = []): angular.IPromise<INode[]> {
-    return this.workerService.call('sparqlItemWorkerService', 'createNewItem', [propertiess.map(props => props.map(pv => pv.pruned()))])
+    return this.workerService.call('sparqlItemWorkerService', 'createNewItems', [propertiess.map(props => props.map(pv => pv.pruned()))])
   }
 
   public alterItem(id: INode, propertiesToAdd: IPropertyAndValue[], propertiesToRemove: IPropertyAndValue[] = []): angular.IPromise<string> {

@@ -36,3 +36,6 @@
               .matrix-source-label {{ source.labels | prefLang }}
             .matrix-cell(ng-repeat="prop in $ctrl.sourcePropsForClass(class).properties")
               input.matrix-cell-checkbox(type="checkbox")
+          .matrix-total-container
+            .matrix-total-cell(ng-repeat="prop in $ctrl.sourcePropsForClass(class).properties")
+              input.matrix-cell-checkbox(type="checkbox")
