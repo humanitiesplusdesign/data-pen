@@ -14,14 +14,23 @@ export class ClassStatistic {
 
 export class SparqlStatisticsService {
 
-  public static getClassStatisticsQuery: string = `PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
-PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-PREFIX sf: <http://ldf.fi/functions#>
-SELECT ?id ?instances {
+  public static getClassStatisticsQuery: string = `SELECT ?id ?instances {
 # STARTGRAPH
   {
     SELECT ?id (COUNT(*) AS ?instances) {
       ?s a ?id .
+      # CONSTRAINTS
+    }
+    GROUP BY ?id
+  }
+# ENDGRAPH
+}
+`
+  public static getPropertyStatisticsQuery: string = `SELECT ?id ?min ?max ?values {
+# STARTGRAPH
+  {
+    SELECT ?id (COUNT(*) AS ?values) (MIN(?value) AS ?min) (MAX(?value) AS ?max) {
+      ?s ?id ?value .
       # CONSTRAINTS
     }
     GROUP BY ?id
