@@ -4,14 +4,15 @@ import {Project} from 'services/project-service/project'
 import {PrimaryEndpointConfiguration} from 'services/project-service/primary-endpoint-configuration'
 import {RemoteEndpointConfiguration} from 'services/project-service/remote-endpoint-configuration'
 import {Schema} from 'services/project-service/schema'
-import {Class, Property} from 'services/project-service/data-model'
+import {Class, Property, DataModel} from 'services/project-service/data-model'
 import {CNode} from 'models/rdf'
 import {NamedNode} from 'models/rdf'
-import {Citable} from 'models/citable'
+import {Citable, CitableSource} from 'models/citable'
 import {FMap} from 'components/collection-utils'
 import {PropertyAndValue, Item, PropertyToValues} from 'services/sparql-item-service'
 import {FullRichNodeFromNode} from 'models/richnode'
 import * as angular from 'angular'
+import { ProjectSourceInfo } from 'components/project-sources-view/project-sources-view-component';
 
 angular.module('fibra.services.worker-service-prototype-mapping-configuration', [])
   .config(($provide) => {
@@ -26,7 +27,10 @@ angular.module('fibra.services.worker-service-prototype-mapping-configuration', 
         'Property': Property,
         'PrimaryEndpointConfiguration': PrimaryEndpointConfiguration,
         'RemoteEndpointConfiguration': RemoteEndpointConfiguration,
+        'CitableSource': CitableSource,
+        'ProjectSourceInfo': ProjectSourceInfo,
         'Schema': Schema,
+        'DataModel': DataModel,
         'PropertyAndValue': PropertyAndValue,
         'Item': Item,
         'PropertyToValues': PropertyToValues,

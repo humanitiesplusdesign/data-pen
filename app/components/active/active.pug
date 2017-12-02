@@ -32,7 +32,7 @@
     label No Results Found
 #circle-menu.circle-menu
 #properties-menu.circle-menu
-.active-tooltip
+.tooltips
 script(type="text/ng-template" id="resultTemplate.html")
   a
     span.resultType {{ match.model.additionalInformation.typeDescriptions | prefLang }}
@@ -48,7 +48,7 @@ script(type="text/ng-template" id="viewOptionsPopover.html")
   .view-options-popover
     h4 View options
     hr
-    input(type="checkbox", ng-model="$ctrl.viewOptionsShowLabels")
+    input(type="checkbox", ng-model="$ctrl.viewOptionsShowLabels" ng-click="$ctrl.viewOptionsShowLabels ? $ctrl.showTooltips() : $ctrl.hideTooltips()")
     span.checkbox-title Show node labels
     p.description.option-description Always display labels next to nodes.
     hr

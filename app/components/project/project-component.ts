@@ -34,7 +34,6 @@ export class ProjectComponentController {
               private $uibModal: IModalService) {
     this.unsubscribe = $ngRedux.connect(
       (state: IRootState) => {
-        console.log(state)
         return {
           project: state.project,
           active: state.active,
@@ -100,7 +99,7 @@ export class ProjectComponentController {
   }
 
   private openBibliographyModal(currentView: string): void {
-    //let deleteProject: (string, number, Citable) => void = this.deleteProject.bind(this)
+    // let deleteProject: (string, number, Citable) => void = this.deleteProject.bind(this)
     console.log(currentView)
     let modalInstance: any = this.$uibModal.open({
       animation: true,

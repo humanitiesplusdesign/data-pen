@@ -3,7 +3,7 @@ import { ActiveActionService } from '../../actions/active';
 import { Class } from '../../services/project-service/data-model';
 import { CNode, NamedNode, RDF, SKOS } from '../../models/rdf';
 import { IItemState } from '../../reducers/active';
-import { AutocompletionResults, Result, SparqlAutocompleteService } from '../../services/sparql-autocomplete-service';
+import { AutocompletionResults, Result, SparqlAutocompleteService, ResultGroup } from '../../services/sparql-autocomplete-service';
 import { SparqlItemService } from '../../services/sparql-item-service';
 import * as angular from 'angular';
 import { ProjectService } from 'services/project-service/project-service'
@@ -19,6 +19,8 @@ import 'angular-ui-grid';
 import 'angular-bootstrap-toggle/dist/angular-bootstrap-toggle.js';
 import cmenu from 'circular-menu';
 import { IModalService } from 'angular-ui-bootstrap'
+import { BaseType } from 'd3';
+import { HIDE_ITEM } from 'actions/items';
 
 interface IActiveComponentControllerState {
   project: ProjectState
@@ -87,7 +89,6 @@ export class ActiveComponentController {
     this.buildCanvas()
 
     this.nodeSearch = d3.select('.node-search')
-    this.tooltip = d3.select('.active-tooltip')
 
     this.menu = cmenu('#circle-menu').config({
       background: '#ffffff',
@@ -179,27 +180,25 @@ export class ActiveComponentController {
   private processResults(res: AutocompletionResults): Result[] {
     let activeItemIds: string[] = this.$ngRedux.getState().active.activeLayout.items.map((d: IItemState) => d.ids.map((i) => i.value)).reduce((a, b) => a.concat(b), [])
     let ret: Result[] = []
-    res.localMatchingResults.forEach(l => l.results.forEach(r => {
-      if (activeItemIds.indexOf(r.ids[0].value) === -1) ret.push(r)
-    }))
-    res.remoteResults.forEach(l => l.results.forEach(r => {
-      if (activeItemIds.indexOf(r.ids[0].value) === -1
-        && r.additionalInformation.type && r.additionalInformation.type[0]
-        // Class filter (TODO: Move server-side)
-        && r.datasources.reduce(
-            (p, c) => {
-              return this.$ngRedux.getState().sources.sourceClassToggle[c]
-                && this.$ngRedux.getState().sources.sourceClassToggle[c][r.additionalInformation.type[0].value]
-            },
-            false)) {
-          r.additionalInformation.typeDescriptions = this.state.project.project.dataModel.classMap.get(r.additionalInformation.type[0].value).labels
-          r.additionalInformation.dataSourceDescriptions = this.state.project.project.authorityEndpoints.concat(this.state.project.project.archiveEndpoints)
-            .filter((ae) => r.datasources.filter((rd) => ae.id === rd ).length > 0)
-            .map((ae) => ae.labels.find(la => la.language === 'en'))
-          ret.push(r)
-        }
-    }))
-    console.log(res, ret)
+    console.log(res)
+    let processMatchingResults: (results: ResultGroup, classRestrict: boolean) => void = (results, classRestrict) => results.results.forEach(r => {
+      if (activeItemIds.indexOf(r.ids[0].value) === -1 && r.additionalInformation.type && r.additionalInformation.type[0]
+      // Class filter (TODO: Move server-side)
+      && (!classRestrict || r.datasources.reduce(
+          (p, c) => {
+            return this.$ngRedux.getState().sources.sourceClassToggle[c]
+              && this.$ngRedux.getState().sources.sourceClassToggle[c][r.additionalInformation.type[0].value]
+          },
+          false))) {
+        r.additionalInformation.typeDescriptions = this.state.project.project.dataModel.classMap.get(r.additionalInformation.type[0].value).labels
+        r.additionalInformation.dataSourceDescriptions = this.state.project.project.authorityEndpoints.concat(this.state.project.project.archiveEndpoints)
+          .filter((ae) => r.datasources.filter((rd) => ae.id === rd ).length > 0)
+          .map((ae) => ae.labels.find(la => la.language === 'en'))
+        ret.push(r)
+      }
+    })
+    res.localMatchingResults.forEach((results) => processMatchingResults(results, false))
+    res.remoteResults.forEach((results) => processMatchingResults(results, true))
     return ret
   }
 
@@ -220,14 +219,19 @@ export class ActiveComponentController {
 
     this.activeActionService.addItemToCurrentLayout(item)
     this.updateCanvas()
-    this.$scope.$apply(this.nodeSearchRemove.bind(this))
+    // this.$scope.$apply(this.nodeSearchRemove.bind(this))
+    this.nodeSearchRemove()
 
     this.projectActionService.setActiveItemCount(this.state.active.activeLayout.items.length)
   }
 
+  private sanitizeId(id: string): string {
+    return id.replace(/\/|\:|\./g, '')
+  }
+
   private nodeClick(d: IItemState, groups: SVGCircleElement[]): void {
     this.currentMenuItem = d
-    this.tooltip.style('opacity', '0')
+    d3.select('#' + this.sanitizeId(d.ids[0].value)).style('opacity', '0')
     this.menu.hide()
     this.menu.show(this.getMenuPosition(d))
   }
@@ -237,6 +241,20 @@ export class ActiveComponentController {
       itemState.leftOffset + (this.state.active.dividerPercent / 100 * window.innerWidth),
       itemState.topOffset + this.circularMenuTopOffset
     ]
+  }
+
+  private showTooltips(): void {
+    console.log(d3.selectAll<HTMLDivElement, {}>('.active-tooltip'))
+    d3.selectAll<HTMLDivElement, {}>('.active-tooltip')
+      .style('top', (d: IItemState, i, grp) => (d.topOffset + 43) + 'px' )
+      .style('left', (d: IItemState, i, grp) => (d.leftOffset + 17) + 'px' )
+      .style('opacity', '1')
+      .text((d: IItemState) => d.description ? d.description : 'Loading...')
+  }
+
+  private hideTooltips(): void {
+    d3.selectAll<HTMLDivElement, {}>('.active-tooltip')
+      .style('opacity', '0')
   }
 
   private appendNode(sel: d3.Selection<SVGGElement, any, HTMLElement, any>, top: number, left: number, clss: string): d3.Selection<SVGGElement, IItemState, Element, {}> {
@@ -275,8 +293,20 @@ export class ActiveComponentController {
 
     let itemSelection: d3.Selection<SVGGElement, IItemState, Element, {}> = itemG.selectAll<SVGGElement, {}>('.item-node')
       .data(this.state.active.activeLayout.items, (it: IItemState) => {
-        return it.ids[0].toCanonical();
+        return it.ids[0].value;
       })
+
+    let tooltipSelection: d3.Selection<HTMLDivElement, IItemState, BaseType, {}> = d3.select('.tooltips')
+      .selectAll<HTMLDivElement, {}>('.active-tooltip')
+      .data<IItemState>(this.state.active.activeLayout.items, (it: IItemState) => {
+        return it.ids[0].value;
+      })
+
+    tooltipSelection.exit().remove()
+    tooltipSelection.enter()
+      .append('div')
+        .classed('active-tooltip', true)
+        .attr('id', (it) => this.sanitizeId(it.ids[0].value))
 
     let enterSel: d3.Selection<SVGGElement, IItemState, Element, {}> = itemSelection.enter()
       .append<SVGGElement>('g')
@@ -291,12 +321,12 @@ export class ActiveComponentController {
       })
       .on('mouseenter', (d: IItemState, i: number, grp: SVGCircleElement[]) => {
         if (d.item && !this.dragOrigX) {
-          this.tooltip.style('top', (grp[i].getBoundingClientRect().top - 5) + 'px')
+          d3.select('#' + this.sanitizeId(d.ids[0].value)).style('top', (grp[i].getBoundingClientRect().top - 5) + 'px')
           .style('left', (grp[i].getBoundingClientRect().left + 25) + 'px')
           .style('opacity', '1')
           .text(d.description)
         } else if (!this.dragOrigX) {
-          this.tooltip.style('top', (grp[i].getBoundingClientRect().top - 5) + 'px')
+          d3.select('#' + this.sanitizeId(d.ids[0].value)).style('top', (grp[i].getBoundingClientRect().top - 5) + 'px')
           .style('left', (grp[i].getBoundingClientRect().left + 25) + 'px')
           .style('opacity', '1')
           .text('Loading...')
@@ -304,12 +334,12 @@ export class ActiveComponentController {
       })
       .on('mouseout', (d: IItemState, i: number) => {
         if (!this.viewOptionsShowLabels) {
-          this.tooltip.style('opacity', '0')
+          d3.select('#' + this.sanitizeId(d.ids[0].value)).style('opacity', '0')
         }
       })
       .call(d3.drag()
         .on('start', (d: IItemState, i: number) => {
-          this.tooltip.style('opacity', '0')
+          d3.select('#' + this.sanitizeId(d.ids[0].value)).style('opacity', '0')
           this.dragOrigX = d.leftOffset
           this.dragOrigY = d.topOffset
         })

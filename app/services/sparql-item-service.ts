@@ -183,7 +183,11 @@ WHERE {
   }
 
   public createNewItem(properties: IPropertyAndValue[] = []): angular.IPromise<INode> {
-    return this.workerService.call('sparqlItemWorkerService', 'createNewItem', [properties.map(pv => pv.pruned())])
+    return this.createNewItems([properties]).then(r => r[0], null, r => r[0])
+  }
+
+  public createNewItems(propertiess: IPropertyAndValue[][] = []): angular.IPromise<INode[]> {
+    return this.workerService.call('sparqlItemWorkerService', 'createNewItem', [propertiess.map(props => props.map(pv => pv.pruned()))])
   }
 
   public alterItem(id: INode, propertiesToAdd: IPropertyAndValue[], propertiesToRemove: IPropertyAndValue[] = []): angular.IPromise<string> {
@@ -288,14 +292,19 @@ export class SparqlItemWorkerService {
     return this.sparqlUpdateWorkerService.updateGraphs(this.stateWorkerService.state.project.updateEndpoint, [new Graph(this.stateWorkerService.state.project.graph ? DataFactory.namedNode(this.stateWorkerService.state.project.graph) : DefaultGraph.instance, triplesToAdd)], [new Graph(this.stateWorkerService.state.project.graph ? DataFactory.namedNode(this.stateWorkerService.state.project.graph) : DefaultGraph.instance, triplesToRemove)])
   }
 
-  public createNewItem(properties: IPropertyAndValue[] = []): angular.IPromise<INode> {
-    let deferred: angular.IDeferred<INode> = this.$q.defer()
-    let subject: INode = new NamedNode(this.stateWorkerService.state.project.instanceNS + UUID())
-    deferred.notify(subject)
+  public createNewItems(propertiess: IPropertyAndValue[][] = []): angular.IPromise<INode[]> {
+    let deferred: angular.IDeferred<INode[]> = this.$q.defer()
+    let i: number = 0
     let triplesToAdd: ITriple[] = []
-    properties.forEach(property => triplesToAdd.push(new Triple(subject, property.property, property.object)))
+    let subjects: INode[] = []
+    propertiess.forEach(properties => {
+      let subject: INode = new NamedNode(this.stateWorkerService.state.project.instanceNS + UUID())
+      subjects.push(subject)
+      properties.forEach(property => triplesToAdd.push(new Triple(subject, property.property, property.object)))
+    })
+    deferred.notify(subjects)
     this.sparqlUpdateWorkerService.updateGraphs(this.stateWorkerService.state.project.updateEndpoint, [new Graph(this.stateWorkerService.state.project.graph ? DataFactory.namedNode(this.stateWorkerService.state.project.graph) : DefaultGraph.instance, triplesToAdd)]).then(
-      () => deferred.resolve(subject),
+      () => deferred.resolve(subjects),
       deferred.reject,
       deferred.notify
     )
