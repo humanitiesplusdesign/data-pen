@@ -4,7 +4,7 @@ import { Class } from '../../services/project-service/data-model';
 import { CNode, NamedNode, RDF, SKOS } from '../../models/rdf';
 import { IItemState } from '../../reducers/active';
 import { AutocompletionResults, Result, SparqlAutocompleteService, ResultGroup } from '../../services/sparql-autocomplete-service';
-import { SparqlItemService } from '../../services/sparql-item-service';
+import { SparqlItemService, PropertyToValues } from '../../services/sparql-item-service';
 import * as angular from 'angular';
 import { ProjectService } from 'services/project-service/project-service'
 import { ProjectActionService } from 'actions/project';
@@ -60,7 +60,7 @@ export class ActiveComponentController {
   private layoutsPopoverVisible: boolean = false
 
   private viewOptionsShowLabels: boolean = false
-  private gridOptions: {}
+  private gridOptions: {} = {}
 
   /* @ngInject */
   constructor(private projectActionService: ProjectActionService,
@@ -114,9 +114,8 @@ export class ActiveComponentController {
       if (this.oldActiveLayoutItemState !== this.state.active.activeLayout.items) {
         this.oldActiveLayoutItemState = this.state.active.activeLayout.items
         this.updateCanvas()
+        this.setGridOptions()
       }
-
-      this.setGridOptions()
     })
 
     this.updateCanvas()
@@ -425,30 +424,37 @@ export class ActiveComponentController {
           .filter(k => a.indexOf(k) === -1)
         return a.concat(sourceClasses)
       },
-      []).map(c => this.state.project.project.dataModel.classMap.get(c))
+      []).map(c => this.state.project.project ? this.state.project.project.dataModel.classMap.get(c) : null)
+        .filter(c => c)
   }
 
   private setGridOptions(): void {
     let data: {}[] = this.state.active.activeLayout.items.map((item) => {
       let obj: {} = {}
+      let typeProp: PropertyToValues = item.item ? item.item.localProperties.concat(item.item.remoteProperties).filter(p => p.value === RDF.type.value)[0] : null
       obj['id'] = item.ids[0].value
       obj['description'] = item.description
+      obj['types'] = typeProp ? typeProp.values : []
       return obj
     })
 
-    this.gridOptions = {
-      data: data,
-      enableFiltering: true,
-      columnDefs: [
-        {
-          field: 'id',
-          cellTemplate: '<div class="ui-grid-cell-contents"><a href="{{row.entity.id}}" target="_blank">{{row.entity.id}}</a></div>'
-        },
-        {
-          field: 'description'
-        }
-      ]
-    }
+    this.allClasses().forEach((c) => {
+      this.gridOptions[c.id.value] = {
+        data: data.filter((d) => { return d['types'] ? d['types'].map(v => v.value.value).indexOf(c.id.value) !== -1 : false }),
+        enableFiltering: true,
+        columnDefs: [
+          {
+            field: 'id',
+            cellTemplate: '<div class="ui-grid-cell-contents"><a href="{{row.entity.id}}" target="_blank">{{row.entity.id}}</a></div>'
+          },
+          {
+            field: 'description'
+          }
+        ]
+      }
+    })
+
+    console.log(this.gridOptions)
   }
 }
 
