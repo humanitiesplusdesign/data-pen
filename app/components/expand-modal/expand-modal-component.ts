@@ -1,14 +1,14 @@
 'use strict'
+import { ActiveActionService } from '../../actions/active';
 import { NamedNode, RDF, SKOS } from '../../models/rdf';
 import { PropertyToValues, SparqlItemService } from '../../services/sparql-item-service';
 import { IRootState } from '../../reducers';
 import { IFibraNgRedux } from 'reducers';
 import { IActiveState, IItemState } from '../../reducers/active';
-import ActiveActions, { IActiveActions } from '../../actions/active';
 
 import * as angular from 'angular';
 
-interface IExpandModalComponentControllerState extends IActiveActions {
+interface IExpandModalComponentControllerState {
   active: IActiveState
 }
 
@@ -28,7 +28,7 @@ export class ExpandModalComponentController {
   /* @ngInject */
   constructor(
     private $ngRedux: IFibraNgRedux,
-    private sparqlItemService: SparqlItemService
+    private activeActionService: ActiveActionService
   ) {
     let stateUnsubscribe: () => void = $ngRedux.connect(
       (state: IRootState) => {
@@ -36,13 +36,13 @@ export class ExpandModalComponentController {
           active: state.active
         }
       },
-      ActiveActions)(this.state)
+      null)(this.state)
     this.actions.unsubscribe = () => {
       stateUnsubscribe()
     }
   }
 
-  private $onInit(): void {
+  public $onInit(): void {
     this.itemState = this.resolve.item
     this.itemProperties = this.itemState.item.localProperties.concat(this.itemState.item.remoteProperties)
         .filter((p) => p.value !== RDF.type.value
@@ -59,15 +59,14 @@ export class ExpandModalComponentController {
       let leftOffset: number = this.itemState.leftOffset + (this.expandRadius * Math.cos(angle))
       let topOffset: number = this.itemState.topOffset + (this.expandRadius * Math.sin(angle))
 
-      this.state.addItemToCurrentLayout(
+      this.activeActionService.addItemToCurrentLayout(
         {
           ids: [new NamedNode(v.value.value)],
           item: null,
           description: null,
           topOffset: topOffset,
           leftOffset: leftOffset
-        },
-        this.sparqlItemService)
+        })
     })
     this.close()
   }
@@ -88,7 +87,7 @@ export class ExpandModalComponent implements angular.IComponentOptions {
     dismiss: '&'
   }
   public template: string = require('./expand-modal.pug')()
-  public controller: any = ExpandModalComponentController
+  public controller: (new (...args: any[]) => angular.IController) = ExpandModalComponentController
 }
 
 angular.module('fibra.components.expand-modal', [])

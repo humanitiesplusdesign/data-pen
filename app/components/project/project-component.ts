@@ -1,19 +1,17 @@
 'use strict'
-import { FilterActionService } from '../../actions/filter';
-import { IActiveActions } from '../../actions/active';
+import { ActiveActionService, ISetActiveDividerPercentage } from '../../actions/active';
+import { FilterActionService, ISetFilterDividerPercentage } from '../../actions/filter';
 import { ItemsService } from 'services/items-service'
 import * as angular from 'angular';
 import { ProjectService } from 'services/project-service/project-service'
 import { ProjectActionService } from 'actions/project'
 import { IFibraNgRedux } from 'reducers'
 import { IModalService } from 'angular-ui-bootstrap'
-import * as FilterActions from '../../actions/filter';
-import ActiveActions from 'actions/active';
 import { IActiveState } from 'reducers/active';
 import { ProjectState } from 'reducers/project';
 import { IRootState } from 'reducers';
 
-interface IProjectComponentControllerState extends IActiveActions {
+interface IProjectComponentControllerState {
   project: ProjectState
   active: IActiveState
 }
@@ -26,6 +24,7 @@ export class ProjectComponentController {
 
   /* @ngInject */
   constructor(private projectActionService: ProjectActionService,
+              private activeActionService: ActiveActionService,
               private filterActionService: FilterActionService,
               private itemsService: ItemsService,
               private $stateParams: any,
@@ -42,7 +41,7 @@ export class ProjectComponentController {
           filter: state.filter
         }
       },
-      ActiveActions)(this.state)
+      null)(this.state)
     // Put the project from $stateParams onto the state
     if ($stateParams.id && $stateParams.sparqlEndpoint && $stateParams.graph)
       if (this.state.project.id !== $stateParams.id)
@@ -60,8 +59,8 @@ export class ProjectComponentController {
 
   public $postLink(): void {
     let setView: any = this.setView.bind(this)
-    let setFilterDividerPercentage: any = this.filterActionService.setFilterDividerPercentage.bind(this)
-    let setActiveDividerPercentage: IActiveActions['setActiveDividerPercentage'] = this.state.setActiveDividerPercentage.bind(this)
+    let setFilterDividerPercentage: (percent: number) => ISetFilterDividerPercentage = this.filterActionService.setFilterDividerPercentage.bind(this)
+    let setActiveDividerPercentage: (percent: number) => ISetActiveDividerPercentage = this.activeActionService.setActiveDividerPercentage.bind(this)
     let ctrl: ProjectComponentController = this
     this.$document.bind('keydown', function (e: JQueryEventObject): void {
       if (e.ctrlKey && e.keyCode === 84) {
@@ -98,24 +97,6 @@ export class ProjectComponentController {
       this.currentView === 'active' ?
         this.state.project.activeItemsCount / this.state.project.filteredItemsCount * 100 :
         0
-  }
-
-  private mapProjectToActions(state: any): any {
-    return {
-      project: state.project
-    }
-  }
-
-  private mapFilterToActions(state: any): any {
-    return {
-      filter: state.filter
-    }
-  }
-
-  private mapActiveToActions(state: any): any {
-    return {
-      active: state.active
-    }
   }
 
   private openBibliographyModal(currentView: string): void {

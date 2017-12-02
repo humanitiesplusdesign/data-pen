@@ -1,5 +1,4 @@
 'use strict'
-import { IActiveActions } from '../../actions/active';
 import { ISourcesState } from 'reducers/sources';
 import { ProjectState } from 'reducers/project';
 import { IClassFilterTree, IFilterState, IFilter } from 'reducers/filter';

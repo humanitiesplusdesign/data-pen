@@ -23,8 +23,8 @@ export class EditSchemaViewComponentController extends EditCitableComponentContr
 }
 
 export class EditSchemaViewComponent implements angular.IComponentOptions {
-    public controller = EditSchemaViewComponentController
-    public template = require('./edit-schema-view.pug')
+    public controller: (new (...args: any[]) => angular.IController) = EditSchemaViewComponentController
+    public template: string = require('./edit-schema-view.pug')
 }
 
 angular.module('fibra.components.edit-schema-view', ['fibra.services'])

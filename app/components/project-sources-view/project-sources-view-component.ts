@@ -38,8 +38,8 @@ export class ProjectSourceInfo implements ICitableSource {
 }
 
 export class ProjectSourcesViewComponent implements angular.IComponentOptions {
-    public controller = ProjectSourcesViewComponentController // (new (...args: any[]) => angular.IController) = SelectViewComponentController
-    public template = require('./project-sources-view.pug')()
+    public controller: (new (...args: any[]) => angular.IController) = ProjectSourcesViewComponentController // (new (...args: any[]) => angular.IController) = SelectViewComponentController
+    public template: string = require('./project-sources-view.pug')()
 }
 
 angular.module('fibra.components.project-sources-view', ['fibra.services'])

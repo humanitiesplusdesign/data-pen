@@ -1,6 +1,8 @@
+import * as angular from 'angular';
+
 import { ISource } from '../reducers/sources';
 import { Dispatch } from 'redux';
-import { IRootState } from '../reducers';
+import { IFibraNgRedux, IRootState } from '../reducers';
 import { Action } from '../models/action'
 import { Class } from 'services/project-service/data-model';
 import { disconnect } from 'cluster';
@@ -25,59 +27,53 @@ export interface IAddSourceAction extends Action {
   payload: ISource
 }
 
-export interface ISourcesActions {
-  setSourceClassActive(source: string, clss: string, status: boolean): Promise<ISetSourceClassActiveAction>
-  addArchiveSource(source: ISource): Promise<IAddSourceAction>,
-  addAuthoritySource(source: ISource): Promise<IAddSourceAction>,
-  uploadFile(filename: string, parsedFile: d3.DSVParsedArray<{}>, type: Class, labelColumn: string, sparqlItemService: SparqlItemService): Promise<IAddSourceAction>
-}
+export class SourcesActionService {
+  constructor(private $ngRedux: IFibraNgRedux, private $q: angular.IQService) {}
 
-export default {
-  setSourceClassActive: function (source: string, clss: string, status: boolean): (dispatch: Dispatch<IRootState>) => Promise<ISetSourceClassActiveAction> {
-    return dispatch => {
-      return Promise.resolve(dispatch({
-        type: SET_SOURCE_CLASS_ACTIVE,
-        payload: {
-          source: source,
-          clss: clss,
-          status: status
-        }
-      }))
-    }
-  },
-  addArchiveSource: function(source: ISource): (dispatch: Dispatch<IRootState>) => Promise<IAddSourceAction> {
-    return dispatch => {
-      return Promise.resolve(dispatch({
-        type: ADD_ARCHIVE_SOURCE,
-        payload: source
-      }))
-    }
-  },
-  addAuthoritySource: function(source: ISource): (dispatch: Dispatch<IRootState>) => Promise<IAddSourceAction> {
-    return dispatch => {
-      return Promise.resolve(dispatch({
-        type: ADD_AUTHORITY_SOURCE,
-        payload: source
-      }))
-    }
-  },
-  uploadFile: (filename: string, parsedFile: d3.DSVParsedArray<{}>, type: Class, labelColumn: string, sparqlItemService: SparqlItemService): (dispatch: Dispatch<IRootState>) => Promise<IAddSourceAction> => {
-    return dispatch => {
+  public setSourceClassActive(source: string, clss: string, status: boolean): ISetSourceClassActiveAction {
+    return this.$ngRedux.dispatch({
+      type: SET_SOURCE_CLASS_ACTIVE,
+      payload: {
+        source: source,
+        clss: clss,
+        status: status
+      }
+    })
+  }
 
-      let localColumns: string[] = parsedFile.columns.slice().filter((c) => c !== labelColumn)
+  public addArchiveSource(source: ISource): IAddSourceAction {
+    return this.$ngRedux.dispatch({
+      type: ADD_ARCHIVE_SOURCE,
+      payload: source
+    })
+  }
 
-      return Promise.all(parsedFile.map((line) => {
-        return sparqlItemService.createNewItem([
-          new PropertyAndValue(SKOS.prefLabel, DataFactory.instance.literal(line[labelColumn])),
-          new PropertyAndValue(RDF.type, type.id),
-          new PropertyAndValue(FIBRA.sourceFile, DataFactory.instance.literal(filename))
-        ])
-      })).then(() => {
-        return dispatch({
-          type: UPLOAD_FILE,
-          payload: null
-        })
+  public addAuthoritySource(source: ISource): IAddSourceAction {
+    return this.$ngRedux.dispatch({
+      type: ADD_AUTHORITY_SOURCE,
+      payload: source
+    })
+  }
+
+  public uploadFile(filename: string, parsedFile: d3.DSVParsedArray<{}>, type: Class, labelColumn: string, sparqlItemService: SparqlItemService): angular.IPromise<IAddSourceAction> {
+    let localColumns: string[] = parsedFile.columns.slice().filter((c) => c !== labelColumn)
+
+    return this.$q.all(parsedFile.map((line) => {
+      return sparqlItemService.createNewItem([
+        new PropertyAndValue(SKOS.prefLabel, DataFactory.instance.literal(line[labelColumn])),
+        new PropertyAndValue(RDF.type, type.id),
+        new PropertyAndValue(FIBRA.sourceFile, DataFactory.instance.literal(filename))
+      ])
+    })).then(() => {
+      return this.$ngRedux.dispatch({
+        type: UPLOAD_FILE,
+        payload: null
       })
-    }
+    })
   }
 }
+
+angular.module('fibra.actions.sources', [])
+.config(($provide) => {
+  $provide.service('sourcesActionService', SourcesActionService)
+})
