@@ -6,12 +6,14 @@ import {SKOS, DCTerms, FOAF, FIBRA, RDF, XMLSchema} from 'models/rdf'
 export interface ICitableSource {
   sparqlEndpoint: string
   graph?: string
+  clone(): ICitableSource
 }
 
 export class CitableSource implements ICitableSource {
-  public static clone(source: ICitableSource): ICitableSource { return new CitableSource(source.sparqlEndpoint, source.graph) }
 
   constructor(public sparqlEndpoint: string, public graph?: string) {}
+
+  public clone(): ICitableSource { return new CitableSource(this.sparqlEndpoint, this.graph) }
 }
 
 export interface ICitable {
@@ -22,14 +24,14 @@ export interface ICitable {
   rightsHolders: ICitable[]
   source: ICitableSource
   dateCreated: Date
+  copyCitableTo(other: ICitable): void
+  clone(): ICitable
   toTurtle(fragmentsById: d3.Map<string>, prefixes: {[id: string]: string}): void
 }
 
 export class Citable implements ICitable {
   public id: string
-  public source: ICitableSource = {
-    sparqlEndpoint: null
-  }
+  public source: ICitableSource = new CitableSource(null)
   public static toTurtle(c: ICitable, fragmentsById: d3.Map<string>, prefixes: {[id: string]: string}): void {
     prefixes['skos'] = SKOS.ns
     prefixes['dcterms'] = DCTerms.ns
@@ -74,4 +76,16 @@ fibra:qualifiedAssertion [
     this.source = source
   }
   public toTurtle(fragmentsById: d3.Map<string>, prefixes: {[id: string]: string}): void { Citable.toTurtle(this, fragmentsById, prefixes) }
+  public copyCitableTo(other: ICitable): void {
+    other.id = this.id
+    other.source = this.source.clone()
+    other.labels = this.labels.slice(0)
+    other.url = this.url
+    other.descriptions = this.descriptions.slice(0)
+    other.rightsHolders = this.rightsHolders.map(rh => rh.clone())
+    other.dateCreated = this.dateCreated
+  }
+  public clone(): ICitable {
+    return new Citable(this.id, this.source, this.labels.slice(0), this.url, this.descriptions.slice(0), this.rightsHolders.map(rh => rh.clone()), this.dateCreated)
+  }
 }

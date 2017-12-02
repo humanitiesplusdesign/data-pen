@@ -7,6 +7,8 @@ import {Project} from 'services/project-service/project'
 import { IRootState } from 'reducers'
 import { IFibraNgRedux } from 'reducers'
 import * as angular from 'angular';
+import { ProjectSourceInfo } from 'components/project-sources-view/project-sources-view-component';
+import { CitableSource } from 'models/citable';
 
 export const SET_PROJECT: string = 'SET_PROJECT'
 export const SET_ALL_ITEM_COUNT: string = 'SET_ALL_ITEM_COUNT'
@@ -43,9 +45,8 @@ export class ProjectActionService {
     this.$ngRedux.dispatch({
       type: CLEAR_SOURCES_STATE
     })
-    return this.projectService.loadProject({ sparqlEndpoint: sparqlEndpoint, graph: graph }, id, true).then(
+    return this.projectService.loadProject(new CitableSource(sparqlEndpoint, graph), id, true).then(
         project => {
-          console.log(project)
           // TODO: Get the actual sources associated with each endpoint
           project.archiveEndpoints.forEach((ae) => {
             this.$ngRedux.dispatch({

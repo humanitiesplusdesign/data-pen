@@ -1,7 +1,7 @@
 'use strict'
 
 import {ProjectService} from '../../services/project-service/project-service'
-import {ICitableSource} from '../../models/citable'
+import {ICitableSource, CitableSource} from '../../models/citable'
 import * as angular from 'angular'
 
 type ProjectSourceParams = {
@@ -33,8 +33,10 @@ export class ProjectSourcesViewComponentController implements angular.IComponent
   }
 }
 
-export class ProjectSourceInfo implements ICitableSource {
-  constructor(public id: string, public sparqlEndpoint: string, public updateEndpoint: string, public graphStoreEndpoint: string, public graph: string, public type: string) {}
+export class ProjectSourceInfo extends CitableSource {
+  constructor(public id: string, sparqlEndpoint: string, public updateEndpoint: string, public graphStoreEndpoint: string, graph: string, public type: string) {
+    super(sparqlEndpoint, graph)
+  }
 }
 
 export class ProjectSourcesViewComponent implements angular.IComponentOptions {

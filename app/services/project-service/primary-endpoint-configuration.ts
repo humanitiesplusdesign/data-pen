@@ -98,6 +98,18 @@ SELECT ?labels ?descriptions ?compatibleEndpoints ?rightsHolders ?rightsHolders_
   public classStatisticsQuery: string = SparqlStatisticsService.getClassStatisticsQuery
   public classQuery: string = DataModel.classQuery
   public propertyQuery: string = DataModel.propertyQuery
+  public clone(): PrimaryEndpointConfiguration {
+    let clone: PrimaryEndpointConfiguration = new PrimaryEndpointConfiguration()
+    this.copyCitableTo(clone)
+    clone.compatibleEndpoints = this.compatibleEndpoints.slice(0)
+    clone.autocompletionQuery = this.autocompletionQuery
+    clone.itemQuery = this.itemQuery
+    clone.deleteItemQuery = this.deleteItemQuery
+    clone.classStatisticsQuery = this.classStatisticsQuery
+    clone.classQuery = this.classQuery
+    clone.propertyQuery = this.propertyQuery
+    return clone
+  }
   public toTurtle(fragmentsById: d3.Map<string>, prefixes: {[id: string]: string}): void {
     if (!fragmentsById.has(this.id)) {
       prefixes['fibra'] = FIBRA.ns
