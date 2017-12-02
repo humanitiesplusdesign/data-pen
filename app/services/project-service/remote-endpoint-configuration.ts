@@ -108,6 +108,19 @@ SELECT ?types ?schemaEndpoint ?compatibleSchemas ?labels ?descriptions ?rightsHo
   public classStatisticsQuery: string = SparqlStatisticsService.getClassStatisticsQuery
   public schemaEndpoint: string
   public endpoint: string
+  public clone(): RemoteEndpointConfiguration {
+    let clone: RemoteEndpointConfiguration = new RemoteEndpointConfiguration()
+    clone.types = this.types.slice(0)
+    clone.compatibleSchemas = this.compatibleSchemas.slice(0)
+    clone.autocompletionQuery = this.autocompletionQuery
+    clone.propertyQuery = this.propertyQuery
+    clone.classQuery = this.classQuery
+    clone.itemQuery = this.itemQuery
+    clone.classStatisticsQuery = this.classStatisticsQuery
+    clone.schemaEndpoint = this.schemaEndpoint
+    clone.endpoint = this.endpoint
+    return clone
+  }
   public toTurtle(fragmentsById: d3.Map<string>, prefixes: {[id: string]: string}): void {
     if (!fragmentsById.has(this.id)) {
       prefixes['fibra'] = FIBRA.ns

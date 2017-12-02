@@ -2,7 +2,7 @@
 
 import {Citable} from '../../models/citable'
 import {DataModel} from './data-model'
-import {FIBRA, VOID} from '../../models/rdf'
+import { FIBRA, ONodeSet, VOID } from '../../models/rdf';
 import {SparqlService} from 'angular-sparql-service'
 
 export class Schema extends Citable {
@@ -83,6 +83,13 @@ SELECT ?labels ?descriptions ?rightsHolders ?rightsHolders_labels ?rightsHolders
   public endpoint: string
   public classQuery: string = DataModel.classQuery
   public propertyQuery: string = DataModel.propertyQuery
+  public clone(): Schema {
+    let clone: Schema = new Schema()
+    clone.endpoint = this.endpoint
+    clone.classQuery = this.classQuery
+    clone.propertyQuery = this.propertyQuery
+    return clone
+  }
   public toTurtle(fragmentsById: d3.Map<string>, prefixes: {[id: string]: string}): void {
     if (!fragmentsById.has(this.id)) {
       prefixes['fibra'] = FIBRA.ns

@@ -167,9 +167,9 @@ export class ProjectWorkerService {
           types: (binding) => DataFactory.nodeFromBinding(binding),
           labels: (binding) => DataFactory.nodeFromBinding(binding),
           descriptions: (binding) => DataFactory.nodeFromBinding(binding),
-          schemas: (binding) => new Schema(binding.value, CitableSource.clone(source)),
-          authorityEndpoints: (binding) => new RemoteEndpointConfiguration(binding.value, CitableSource.clone(source)),
-          archiveEndpoints: (binding) => new RemoteEndpointConfiguration(binding.value, CitableSource.clone(source)),
+          schemas: (binding) => new Schema(binding.value, source.clone()),
+          authorityEndpoints: (binding) => new RemoteEndpointConfiguration(binding.value, source.clone()),
+          archiveEndpoints: (binding) => new RemoteEndpointConfiguration(binding.value, source.clone()),
           rightsHolders_labels: (binding) => DataFactory.nodeFromBinding(binding),
           rightsHolders_descriptions: (binding) => DataFactory.nodeFromBinding(binding),
           rightsHolders: (binding) => new Citable(binding.value, source),
@@ -188,7 +188,6 @@ export class ProjectWorkerService {
     lq = source.graph ? lq.replace(/# STARTGRAPH/g, 'GRAPH <' + source.graph + '> {').replace(/# ENDGRAPH/g, '}') : lq.replace(/.*# STARTGRAPH\n/g, '').replace(/.*# ENDGRAPH\n/g, '')
     return this.fibraSparqlService.query(source.sparqlEndpoint, lq).then(
       response => {
-        console.log(response)
         let projects: EMap<T> = new EMap<T>(oc)
         let conf: IBindingsToObjectConfiguration = {
           bindingTypes: { rightsHolders: 'uniqueArray', schemas: 'uniqueArray', compatibleSchemas: 'uniqueArray', authorityEndpoints: 'uniqueArray', archiveEndpoints: 'uniqueArray'},
@@ -197,9 +196,9 @@ export class ProjectWorkerService {
             types: (binding) => DataFactory.nodeFromBinding(binding),
             labels: (binding) => DataFactory.nodeFromBinding(binding),
             descriptions: (binding) => DataFactory.nodeFromBinding(binding),
-            schemas: (binding) => new Schema(binding.value, CitableSource.clone(source)),
-            authorityEndpoints: (binding) => new RemoteEndpointConfiguration(binding.value, CitableSource.clone(source)),
-            archiveEndpoints: (binding) => new RemoteEndpointConfiguration(binding.value, CitableSource.clone(source)),
+            schemas: (binding) => new Schema(binding.value, source.clone()),
+            authorityEndpoints: (binding) => new RemoteEndpointConfiguration(binding.value, source.clone()),
+            archiveEndpoints: (binding) => new RemoteEndpointConfiguration(binding.value, source.clone()),
             rightsHolders_labels: (binding) => DataFactory.nodeFromBinding(binding),
             rightsHolders_descriptions: (binding) => DataFactory.nodeFromBinding(binding),
             rightsHolders: (binding) => new Citable(binding.value, source),
@@ -209,7 +208,6 @@ export class ProjectWorkerService {
         let tracker: UniqueObjectTracker = new UniqueObjectTracker()
         response.results.bindings.forEach(binding => SparqlService.bindingsToObject(binding, projects.goc(binding['id'].value), conf, binding['id'].value, tracker))
         projects.values().forEach(p => ProjectWorkerService.orderCitables(p.rightsHolders))
-        console.log(projects.values())
         return projects.values()
       })
   }

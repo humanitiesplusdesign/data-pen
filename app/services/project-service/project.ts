@@ -175,6 +175,27 @@ SELECT ?labels ?descriptions ?url ?dateCreated ?rightsHolders ?rightsHolders_lab
     p.classQuery = this.classQuery
     return p
   }
+  public clone(): Project {
+    let clone: Project = new Project()
+    this.copyCitableTo(clone)
+    clone.instanceNS = this.instanceNS
+    clone.schemaNS = this.schemaNS
+    clone.dataModel = this.dataModel
+    clone.autocompletionQuery = this.autocompletionQuery
+    clone.classStatisticsQuery = this.classStatisticsQuery
+    clone.itemQuery = this.itemQuery
+    clone.deleteItemQuery = this.deleteItemQuery
+    clone.classQuery = this.classStatisticsQuery
+    clone.propertyQuery = this.propertyQuery
+    clone.endpoint = this.endpoint
+    clone.graphStoreEndpoint = this.graphStoreEndpoint
+    clone.updateEndpoint = this.updateEndpoint
+    clone.graph = this.graph
+    clone.authorityEndpoints = this.authorityEndpoints.map(re => re.clone())
+    clone.archiveEndpoints = this.archiveEndpoints.map(re => re.clone())
+    clone.schemas = this.schemas.map(sch => sch.clone())
+    return clone
+  }
   public toTurtle(fragmentsById: d3.Map<string>, prefixes: {[id: string]: string}): void {
     if (!fragmentsById.has(this.id)) {
       prefixes['fibra'] = FIBRA.ns

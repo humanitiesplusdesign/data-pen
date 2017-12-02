@@ -47,6 +47,21 @@ export class FMap<V> implements d3.Map<V> {
     for (let key in this.s) ret.push({ key, value: this.s[key] })
     return ret
   }
+  public map(f: (value: V, key: string, map: FMap<V>) => {value: V, key: string}): FMap<V> {
+    let ret: FMap<V> = new FMap<V>()
+    this.each((value: V, key: string) => {
+      let mapped: {value: V, key: string} = f(value, key, this)
+      ret.set(mapped.key, mapped.value)
+    })
+    return ret
+  }
+  public mapValues(f: (value: V, key: string, map: FMap<V>) => V): FMap<V> {
+    let ret: FMap<V> = new FMap<V>()
+    this.each((value: V, key: string) => {
+      ret.set(key, f(value, key, this))
+    })
+    return ret
+  }
   public each(func: (value: V, key: string, map: FMap<V>) => void): undefined {
     for (let key in this.s)
       func(this.s[key], key, this)
