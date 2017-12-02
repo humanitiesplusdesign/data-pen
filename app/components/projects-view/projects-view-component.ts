@@ -28,7 +28,7 @@ export class ProjectsViewComponentController implements angular.IComponentContro
 
   /* @ngInject */
   constructor(private projectService: ProjectService, socialAuthService: SocialAuthService, $localStorage: any, $document: angular.IDocumentService, private $uibModal: IModalService) {
-    let projectSources: ProjectSourceInfo[] = $localStorage['projectSources']
+    let projectSources: ProjectSourceInfo[] = $localStorage['projectSources'].map(ps => new ProjectSourceInfo(ps.id, ps.sparqlEndpoint, ps.updateEndpoint, ps.graphStoreEndpoint, ps.graph, ps.type))
     if (!projectSources || projectSources.length === 0) {
       projectSources = []
       // projectSources.push(new ProjectSourceInfo('Private projects in local browser storage', 'local:projects', 'local:projects', 'local:projects', '', 'http://ldf.fi/fibra/rdfstoreJSEndpoint'))
