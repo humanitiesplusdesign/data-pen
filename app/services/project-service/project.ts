@@ -180,7 +180,7 @@ SELECT ?labels ?descriptions ?url ?dateCreated ?rightsHolders ?rightsHolders_lab
     this.copyCitableTo(clone)
     clone.instanceNS = this.instanceNS
     clone.schemaNS = this.schemaNS
-    clone.dataModel = this.dataModel
+    clone.dataModel = this.dataModel.clone()
     clone.autocompletionQuery = this.autocompletionQuery
     clone.classStatisticsQuery = this.classStatisticsQuery
     clone.itemQuery = this.itemQuery
