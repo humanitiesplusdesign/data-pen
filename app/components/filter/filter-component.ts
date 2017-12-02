@@ -1,8 +1,8 @@
 'use strict'
 import { IActiveActions } from '../../actions/active';
-import { ISourcesState } from '../../reducers/sources';
-import { ProjectState } from '../../reducers/project';
-import { IClassFilterTree, IFilterState } from '../../reducers/filter';
+import { ISourcesState } from 'reducers/sources';
+import { ProjectState } from 'reducers/project';
+import { IClassFilterTree, IFilterState, IFilter } from 'reducers/filter';
 import { IRootState } from '../../reducers';
 import { Class, Property } from '../../services/project-service/data-model';
 import { ItemsService } from '../../services/items-service';
@@ -117,7 +117,7 @@ export class FilterComponentController {
 
   private getActiveClasses(): Class[] {
     let classes: Class[] = []
-    new Set(this.state.sources.sources.map((s) => d3.keys(this.state.sources.sourceClassToggle[s.id]))
+    new Set(this.state.sources.archiveSources.concat(this.state.sources.authoritySources).map((s) => d3.keys(this.state.sources.sourceClassToggle[s.id]))
       .reduce((a, b) => a.concat(b), [])).forEach((c) => classes.push(this.state.project.project.dataModel.classMap['s'][c]))
     return classes
   }
@@ -132,6 +132,27 @@ export class FilterComponentController {
     return {
       filter: state.filter
     }
+  }
+
+  private slideOptionsFromFilter(filter: IFilter): any {
+    let options: {} = {
+      draggableRange: true,
+      showTicks: filter.domain[1] / 10,
+      showTicksValues: true,
+      onEnd: this.setFilterSelection.bind(this, filter.clss, filter.prop)
+    }
+    switch (filter.prop['type']) {
+      case 'DateTime':
+        options['floor'] = d3.timeParse('%Y-%m-%d')(filter.prop['minimumValue'].value).getFullYear()
+        options['ceil'] = d3.timeParse('%Y-%m-%d')(filter.prop['maximumValue'].value).getFullYear()
+        break;
+      default:
+        options['floor'] = 0
+        options['ceil'] = 2550
+    }
+
+    options['showTicks'] = options['ceil'] / 10
+    return options
   }
 
   private dragDivider(evt: DragEvent): void {

@@ -196,6 +196,7 @@ export class FIBRA {
   public static ns: string = 'http://hdlab.stanford.edu/fibra/ontology#'
 
   public static Project: INamedNode = new NamedNode(FIBRA.ns + 'Project')
+  public static sourceFile: INamedNode = new NamedNode(FIBRA.ns + 'sourceFile')
   public static graph: INamedNode = new NamedNode(FIBRA.ns + 'graph')
   public static qualifiedAssertion: INamedNode = new NamedNode(FIBRA.ns + 'qualifiedAssertion')
   public static order: INamedNode = new NamedNode(FIBRA.ns + 'order')

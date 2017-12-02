@@ -13,6 +13,9 @@ import SourcesActions, { ISourcesActions } from '../../actions/sources';
 import { ProjectActionService } from '../../actions/project'
 
 import * as angular from 'angular';
+import * as d3 from 'd3';
+import { DSVParsedArray } from 'd3';
+import { SparqlItemService } from 'services/sparql-item-service';
 
 interface IAddSourceComponentControllerState extends ISourcesActions {
   project: ProjectState
@@ -21,65 +24,39 @@ interface IAddSourceComponentControllerState extends ISourcesActions {
 
 export class AddSourceComponentController {
 
-  private typeListOptions = [{
-    "id": "0",
-    "description": "1st class name.",
-    "name": "Person"
+  private typeListOptions: {}[] = [{
+    'id': '0',
+    'description': '1st class name.',
+    'name': 'Person',
+    'class': 'http://www.cidoc-crm.org/cidoc-crm/E21_Person'
   },
   {
-    "id": "1",
-    "description": "2nd class name.",
-    "name": "Place"
+    'id': '1',
+    'description': '2nd class name.',
+    'name': 'Place',
+    'class': 'http://www.cidoc-crm.org/cidoc-crm/E53_Place'
   },
   {
-    "id": "2",
-    "description": "3rd class name.",
-    "name": "Work"
+    'id': '2',
+    'description': '3rd class name.',
+    'name': 'Work',
+    'class': 'http://www.cidoc-crm.org/cidoc-crm/E22_Man-Made_Object'
   }]
-  private filePropertyOptions = [{
-    "id": "0",
-    "description": "1st column name.",
-    "name": "Name"
+
+  private sourcesListOptions: {}[] = [{
+    'id': '0',
+    'description': '1st source name.',
+    'name': 'VIAF'
   },
   {
-    "id": "1",
-    "description": "2nd column name.",
-    "name": "Hometown"
+    'id': '1',
+    'description': '2nd source name.',
+    'name': 'GeoNames'
   },
   {
-    "id": "2",
-    "description": "3rd column name.",
-    "name": "Place of death"
-  },
-  {
-    "id": "3",
-    "description": "4th column name.",
-    "name": "VIAF ID"
-  },
-  {
-    "id": "4",
-    "description": "5th column name.",
-    "name": "EE ID"
-  },
-  {
-    "id": "5",
-    "description": "6th column name.",
-    "name": "GeoNames ID"
-  }]
-  private sourcesListOptions = [{
-    "id": "0",
-    "description": "1st source name.",
-    "name": "VIAF"
-  },
-  {
-    "id": "1",
-    "description": "2nd source name.",
-    "name": "GeoNames"
-  },
-  {
-    "id": "2",
-    "description": "3rd source name.",
-    "name": "Electronic Enlightenment"
+    'id': '2',
+    'description': '3rd source name.',
+    'name': 'Electronic Enlightenment'
   }]
 
   private actions: any = {}
@@ -88,6 +65,11 @@ export class AddSourceComponentController {
   private archiveEndpoints: RemoteEndpointConfiguration[]
   private primarySource: ProjectSourceInfo =  new ProjectSourceInfo('Shared projects', 'http://ldf.fi/fibra/sparql', 'http://ldf.fi/fibra/update', 'http://ldf.fi/fibra/data', 'http://ldf.fi/fibra/shared-projects/', 'http://ldf.fi/fibra/fusekiEndpointWithTextIndexAndSecoFunctions')
   private userSource: ProjectSourceInfo
+  private currentFileName: string = 'No file chosen'
+  private currentFile: File
+  private parsedFile: d3.DSVParsedArray<{}>
+  private uploadType: string = 'http://www.cidoc-crm.org/cidoc-crm/E21_Person'
+  private entityLabelColumn: string = null
 
   private sourceSelections: {}
 
@@ -99,7 +81,9 @@ export class AddSourceComponentController {
     private projectService: ProjectService,
     private projectActionService: ProjectActionService,
     private $ngRedux: INgRedux,
-    private $q: angular.IQService
+    private $q: angular.IQService,
+    private $scope: angular.IScope,
+    private sparqlItemService: SparqlItemService
   ) {
     let stateUnsubscribe: () => void = $ngRedux.connect(
       (state: IRootState) => {
@@ -108,7 +92,7 @@ export class AddSourceComponentController {
           sources: state.sources
         }
       },
-      {})(this.state)
+      SourcesActions)(this.state)
     this.actions.unsubscribe = () => {
       stateUnsubscribe()
     }
@@ -130,7 +114,33 @@ export class AddSourceComponentController {
     })
   }
 
+  private fileChanged(inputElement: HTMLInputElement): void {
+    this.$scope.$apply(() => {
+      let files: FileList = inputElement.files
+      this.currentFileName = files[0] ? files[0].name : 'No file chosen'
+      this.currentFile = files[0]
+      let reader: FileReader = new FileReader()
+      reader.onload = () => {
+        this.$scope.$apply(() => {
+          this.parsedFile = d3.csvParse(reader.result)
+        })
+      }
+      reader.readAsText(this.currentFile)
+    })
+  }
+
   private commit(): void {
+
+    if (this.currentFile) {
+      this.state.uploadFile(
+        this.currentFileName,
+        this.parsedFile,
+        this.state.project.project.dataModel.classMap.get(this.uploadType),
+        this.entityLabelColumn,
+        this.sparqlItemService
+      )
+    }
+
     this.projectService.loadProject(this.userSource, this.state.project.project.id, true).then((p) => {
       p.labels = this.state.project.project.labels
       p.archiveEndpoints = this.archiveEndpoints.filter((ae) => this.sourceSelections[ae.id])

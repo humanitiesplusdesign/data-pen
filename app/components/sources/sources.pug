@@ -5,7 +5,19 @@
       span.edit-sources-icon.transition-200.glyphicon.glyphicon-cog(ng-click="$ctrl.openAddSourcesModal()")
               
     .sources-list
-      span(ng-repeat="source in $ctrl.state.sources.sources")
+      h4 Authorities
+      span(ng-repeat="source in $ctrl.state.sources.authoritySources")
+        h4(ng-click="$ctrl.projectsOpen[source.id] = !$ctrl.projectsOpen[source.id]")
+          i.glyphicon.glyphicon-triangle-right(ng-show="!$ctrl.projectsOpen[source.id]")
+          i.glyphicon.glyphicon-triangle-bottom(ng-show="$ctrl.projectsOpen[source.id]")
+          span.source-name {{source.labels | prefLang}}
+        .class-list(ng-show="$ctrl.projectsOpen[source.id] ? true : false")
+          label.checkbox-container(ng-repeat="clss in source.classes" ng-hide="clss.labels.length === 0") 
+            input(type="checkbox", ng-model="$ctrl.localSourceClassTree[source.id][clss.id.value]" ng-click="$ctrl.state.setSourceClassActive(source.id, clss.id.value, !$ctrl.getSourceClassStatus(source.id, clss.id.value))")
+            span {{clss.labels | prefLang}}
+    .sources-list
+      h4 Archives
+      span(ng-repeat="source in $ctrl.state.sources.archiveSources")
         h4(ng-click="$ctrl.projectsOpen[source.id] = !$ctrl.projectsOpen[source.id]")
           i.glyphicon.glyphicon-triangle-right(ng-show="!$ctrl.projectsOpen[source.id]")
           i.glyphicon.glyphicon-triangle-bottom(ng-show="$ctrl.projectsOpen[source.id]")
@@ -20,6 +32,6 @@
         ul
           li(ng-repeat="prop in $ctrl.sourcePropsForClass(class).properties") {{ prop.labels | prefLang }}
         ul
-          li(ng-repeat="source in $ctrl.state.sources.sources") {{ source.labels | prefLang }}
+          li(ng-repeat="source in $ctrl.state.sources.authoritySources.concat($ctrl.state.sources.archiveSources)") {{ source.labels | prefLang }}
             ul
               li(ng-repeat="prop in $ctrl.sourcePropsForClass(class).properties") Value for {{prop.labels | prefLang}} : {{ 1 }}

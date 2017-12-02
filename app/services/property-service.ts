@@ -35,6 +35,7 @@ export class DetailedProperty extends BasicProperty {
     super(prop)
     this.minimumValue = prop.minimumValue
     this.maximumValue = prop.maximumValue
+    this.type = prop.type
   }
 }
 
