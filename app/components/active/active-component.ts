@@ -243,10 +243,9 @@ export class ActiveComponentController {
   }
 
   private showTooltips(): void {
-    console.log(d3.selectAll<HTMLDivElement, {}>('.active-tooltip'))
     d3.selectAll<HTMLDivElement, {}>('.active-tooltip')
       .style('top', (d: IItemState, i, grp) => (d.topOffset + 43) + 'px' )
-      .style('left', (d: IItemState, i, grp) => (d.leftOffset + 17) + 'px' )
+      .style('left', (d: IItemState, i, grp) => (d.leftOffset + (this.state.active.dividerPercent / 100 * window.innerWidth) + 17) + 'px' )
       .style('opacity', '1')
       .text((d: IItemState) => d.description ? d.description : 'Loading...')
   }
@@ -373,6 +372,8 @@ export class ActiveComponentController {
       ctrl.maintainNode(d3.select(itemSelection.nodes()[i]), datum.leftOffset, datum.topOffset)
     })
 
+    if (this.viewOptionsShowLabels) this.showTooltips()
+
     // itemSelection
     //   .attr('transform', d => 'translate(' + d.xpos + ',' + d.ypos + ')')
 
@@ -402,6 +403,7 @@ export class ActiveComponentController {
     this.menu.hide()
     let nativePercent: number = 100 * evt.clientX / window.innerWidth
     this.activeActionService.setActiveDividerPercentage(nativePercent > 98 ? 100 : nativePercent < 2 ? 0 : nativePercent)
+    if (this.viewOptionsShowLabels) this.showTooltips()
   }
 
   private tableWidthStyle(): {} {
