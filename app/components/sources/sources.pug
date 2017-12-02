@@ -2,25 +2,22 @@
   .sources-left(ng-init="editSourcesStatus=''")
     .sources-head
       h3.pull-left Project sources
-      span.edit-sources-icon.transition-200.glyphicon.glyphicon-cog(ng-click="$ctrl.openAddSourcesModal()")
-              
-    .sources-list
-      h4 Authorities
+      img.edit-sources-icon.transition-200(src="./app/images/general/plus_dark.svg" ng-click="$ctrl.openAddSourcesModal()")
+    .sources-list(ng-show="$ctrl.state.sources.authoritySources.length != 0")
+      h4.sources-category-title Authorities
       span(ng-repeat="source in $ctrl.state.sources.authoritySources")
-        h4(ng-click="$ctrl.projectsOpen[source.id] = !$ctrl.projectsOpen[source.id]")
-          i.glyphicon.glyphicon-triangle-right(ng-show="!$ctrl.projectsOpen[source.id]")
-          i.glyphicon.glyphicon-triangle-bottom(ng-show="$ctrl.projectsOpen[source.id]")
+        h4.source-title(ng-click="$ctrl.projectsOpen[source.id] = !$ctrl.projectsOpen[source.id]")
+          i.glyphicon.glyphicon-triangle-right.transition-200(ng-class="{'triangle-rotated' : $ctrl.projectsOpen[source.id]}")
           span.source-name {{source.labels | prefLang}}
         .class-list(ng-show="$ctrl.projectsOpen[source.id] ? true : false")
           label.checkbox-container(ng-repeat="clss in source.classes" ng-hide="clss.labels.length === 0") 
             input(type="checkbox", ng-model="$ctrl.localSourceClassTree[source.id][clss.id.value]" ng-click="$ctrl.state.setSourceClassActive(source.id, clss.id.value, !$ctrl.getSourceClassStatus(source.id, clss.id.value))")
             span {{clss.labels | prefLang}}
-    .sources-list
-      h4 Archives
+    .sources-list(ng-show="$ctrl.state.sources.archiveSources.length != 0")
+      h4.sources-category-title Archives
       span(ng-repeat="source in $ctrl.state.sources.archiveSources")
-        h4(ng-click="$ctrl.projectsOpen[source.id] = !$ctrl.projectsOpen[source.id]")
-          i.glyphicon.glyphicon-triangle-right(ng-show="!$ctrl.projectsOpen[source.id]")
-          i.glyphicon.glyphicon-triangle-bottom(ng-show="$ctrl.projectsOpen[source.id]")
+        h4.source-title(ng-click="$ctrl.projectsOpen[source.id] = !$ctrl.projectsOpen[source.id]")
+          i.glyphicon.glyphicon-triangle-right.transition-200(ng-class="{'triangle-rotated' : $ctrl.projectsOpen[source.id]}")
           span.source-name {{source.labels | prefLang}}
         .class-list(ng-show="$ctrl.projectsOpen[source.id] ? true : false")
           label.checkbox-container(ng-repeat="clss in source.classes" ng-hide="clss.labels.length === 0") 
