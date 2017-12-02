@@ -79,41 +79,18 @@ export class SimpleConstraint implements IConstraint {
 
 export class SparqlItemService {
 
-  public static naiveGetLocalItemPropertiesQuery: string = `PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
-PREFIX mads: <http://www.loc.gov/mads/rdf/v1#>
-PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-PREFIX owl: <http://www.w3.org/2002/07/owl#>
-SELECT ?id ?itemLabel ?property ?propertyLabel ?object ?objectLabel {
-# STARTGRAPH
-  VALUES ?id { <IDS> }
-  ?id skos:prefLabel|mads:authoritativeLabel|rdfs:label ?itemLabel .
-  FILTER(LANG(?itemLabel)='' || LANG(?itemLabel)='<PREFLANG>')
-  ?id ?property ?object .
-  OPTIONAL {
-    ?property skos:prefLabel|rdfs:label ?propertyLabelP .
-    FILTER(LANG(?propertyLabelP)='' || LANG(?propertyLabelP)='<PREFLANG>')
-  }
-  BIND(COALESCE(?propertyLabelP,REPLACE(REPLACE(REPLACE(REPLACE(STR(?property),".*/",""),".*#",""),"_"," "),"([A-ZÅÄÖ])"," $1")) AS ?propertyLabel)
-  OPTIONAL {
-    ?object skos:prefLabel|rdfs:label ?objectLabelP .
-    FILTER(LANG(?objectLabelP)='' || LANG(?objectLabelP)='<PREFLANG>')
-  }
-  BIND (IF(ISIRI(?object),COALESCE(?objectLabelP,REPLACE(REPLACE(REPLACE(REPLACE(STR(?object),".*/",""),".*#",""),"_"," "),"([A-ZÅÄÖ])"," $1")),?object) AS ?objectLabel)
-# ENDGRAPH
-}`
-
-  public static getLocalItemPropertiesQuery: string = `PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+  public static getItemPropertiesQuery: string = `PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
 PREFIX mads: <http://www.loc.gov/mads/rdf/v1#>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX owl: <http://www.w3.org/2002/07/owl#>
 PREFIX sf: <http://ldf.fi/functions#>
 SELECT ?id ?itemLabel ?property ?propertyLabel ?object ?objectLabel {
 # STARTGRAPH
-  VALUES ?id { <IDS> }
-  { ?id ?property ?object . }
-  UNION
-  { ?object ?property ?id . }
-  ?id sf:preferredLanguageLiteral (skos:prefLabel mads:authoritativeLabel rdfs:label skos:altLabel mads:variantLabel '<PREFLANG>' '' ?itemLabel) .
+  VALUES (?id ?oid) { <IDPAIRS> }
+  ?oid ?property ?object .
+  OPTIONAL {
+    ?oid sf:preferredLanguageLiteral (skos:prefLabel mads:authoritativeLabel rdfs:label skos:altLabel mads:variantLabel '<PREFLANG>' '' ?itemLabel) .
+  }
   OPTIONAL {
     ?property sf:preferredLanguageLiteral (skos:prefLabel mads:authoritativeLabel rdfs:label skos:altLabel mads:variantLabel '<PREFLANG>' '' ?propertyLabelP)
   }
@@ -125,22 +102,12 @@ SELECT ?id ?itemLabel ?property ?propertyLabel ?object ?objectLabel {
 # ENDGRAPH
 }`
 
-  public static getRemoteItemPropertiesQuery: string = `PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
-PREFIX mads: <http://www.loc.gov/mads/rdf/v1#>
-PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-PREFIX owl: <http://www.w3.org/2002/07/owl#>
-PREFIX sf: <http://ldf.fi/functions#>
-SELECT ?id ?property ?propertyLabel ?object ?objectLabel {
-VALUES (?id ?oid) { <IDPAIRS> }
-?oid ?property ?object .
-OPTIONAL {
-  ?property sf:preferredLanguageLiteral (skos:prefLabel mads:authoritativeLabel rdfs:label skos:altLabel mads:variantLabel '<PREFLANG>' '' ?propertyLabelP)
-}
-BIND(COALESCE(?propertyLabelP,REPLACE(REPLACE(REPLACE(REPLACE(STR(?property),".*/",""),".*#",""),"_"," "),"([A-ZÅÄÖ])"," $1")) AS ?propertyLabel)
-OPTIONAL {
-  ?object sf:preferredLanguageLiteral (skos:prefLabel mads:authoritativeLabel rdfs:label skos:altLabel mads:variantLabel '<PREFLANG>' '' ?objectLabelP) .
-}
-BIND (IF(ISIRI(?object),COALESCE(?objectLabelP,REPLACE(REPLACE(REPLACE(REPLACE(STR(?object),".*/",""),".*#",""),"_"," "),"([A-ZÅÄÖ])"," $1")),?object) AS ?objectLabel)
+  public static coalesceIdsQuery: string = `PREFIX owl: <http://www.w3.org/2002/07/owl#>
+SELECT ?id ?oid {
+# STARTGRAPH
+  VALUES (?id ?id2) { <IDPAIRS> }
+  ?id2 owl:sameAs ?oid
+# ENDGRAPH
 }
 `
 
@@ -162,20 +129,22 @@ WHERE {
 
   /**
    * Get a single item from the local store
+   * @param ids item ids of the item
    * @param queryRemote whether to query remote endpoints for properties
    * @param canceller promise that can be resolved to cancel a remote fetch
    */
-  public getItem(id: INode, queryRemote: boolean = false, canceller?: angular.IPromise<any>): angular.IPromise<Item> {
-    return this.workerService.call('sparqlItemWorkerService', 'getItems', [[id.toCanonical()], queryRemote], canceller).then((items: Item[]) => items[0], null, (info: {endpointType: 'primary' | 'remote', endpoint: string, items: Item[]}) => { return { endpointType: info.endpointType, endpoint: info.endpoint, item: info.items[0] } })
+  public getItem(ids: INode[], queryRemote: boolean = false, canceller?: angular.IPromise<any>): angular.IPromise<Item> {
+    return this.workerService.call('sparqlItemWorkerService', 'getItems', [[ids.map(id => id.toCanonical())], queryRemote], canceller).then((items: Item[]) => items[0], null, (info: {endpointType: 'primary' | 'remote', endpoint: string, items: Item[]}) => { return { endpointType: info.endpointType, endpoint: info.endpoint, item: info.items[0] } })
   }
 
   /**
    * Get multiple items from the local store
+   * @param ids grouped item ids of the items
    * @param queryRemote whether to query remote endpoints for properties
    * @param canceller promise that can be resolved to cancel a remote fetch
    */
-  public getItems(ids: INode[], queryRemote: boolean = false, canceller?: angular.IPromise<any>): angular.IPromise<Item[]> {
-    return this.workerService.call('sparqlItemWorkerService', 'getItems', [ids.map(id => id.toCanonical()), queryRemote], canceller)
+  public getItems(idGroups: INode[][], queryRemote: boolean = false, canceller?: angular.IPromise<any>): angular.IPromise<Item[]> {
+    return this.workerService.call('sparqlItemWorkerService', 'getItems', [idGroups.map(ids => ids.map(id => id.toCanonical())), queryRemote], canceller)
   }
 
   public getAllItems(queryRemote: boolean = false, canceller?: angular.IPromise<any>): angular.IPromise<Item[]> {
@@ -224,10 +193,10 @@ export class SparqlItemWorkerService {
   /* @ngInject */
   constructor(private fibraSparqlService: FibraSparqlService, private $q: angular.IQService, private sparqlUpdateWorkerService: SparqlUpdateWorkerService, private stateWorkerService: StateWorkerService) {}
 
-  public getItems(ids: string[] | boolean, queryRemote: boolean = false, canceller?: angular.IPromise<any>): angular.IPromise<Item[]> {
+  public getItems(idGroups: string[][] | boolean, queryRemote: boolean = false, canceller?: angular.IPromise<any>): angular.IPromise<Item[]> {
     let queryTemplate: string = this.stateWorkerService.state.project.itemQuery
-    if (!ids) queryTemplate = queryTemplate.replace(/VALUES \?id { <IDS> }/g, '')
-    else queryTemplate = queryTemplate.replace(/<IDS>/g, (ids as string[]).join(''))
+    if (!idGroups) queryTemplate = queryTemplate.replace(/VALUES \(\?id \?oid\) { <IDPAIRS> }/g, '')
+    else queryTemplate = queryTemplate.replace(/<IDPAIRS>/g, (idGroups as string[][]).map(idGroup => Array.prototype.concat.apply([], idGroup.map(id => '(' + idGroup[0] + ' ' + id + ')'))).join(''))
     queryTemplate = queryTemplate.replace(/<PREFLANG>/g, this.stateWorkerService.state.language)
     let items: EMap<Item> = new EMap<Item>((id) => new Item(DataFactory.instance.namedNode(id)))
     let ret: angular.IDeferred<Item[]> = this.$q.defer()
@@ -253,7 +222,9 @@ export class SparqlItemWorkerService {
               seenIds.add(item2.toCanonical())
             }
           }
-          if (ids) for (let id of ids as string[]) if (!seenIds.has(id)) itemIdQuery += '(' + id + ' ' + id + ')'
+          if (idGroups) (idGroups as string[][]).forEach(ids => {
+            for (let id of ids as string[]) if (!seenIds.has(id)) itemIdQuery += '(' + id + ' ' + id + ')'
+          })
           this.$q.all(this.stateWorkerService.state.project.remoteEndpoints().map(endpoint => {
             let queryTemplate2: string = endpoint.itemQuery
             queryTemplate2 = queryTemplate2.replace(/<IDPAIRS>/g, itemIdQuery)

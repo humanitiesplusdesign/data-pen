@@ -104,7 +104,7 @@ SELECT ?types ?schemaEndpoint ?compatibleSchemas ?labels ?descriptions ?rightsHo
   public autocompletionQuery: string = SparqlAutocompleteService.defaultMatchQuery
   public propertyQuery: string = DataModel.propertyQuery
   public classQuery: string = DataModel.classQuery
-  public itemQuery: string = SparqlItemService.getRemoteItemPropertiesQuery
+  public itemQuery: string = SparqlItemService.getItemPropertiesQuery
   public classStatisticsQuery: string = SparqlStatisticsService.getClassStatisticsQuery
   public schemaEndpoint: string
   public endpoint: string
