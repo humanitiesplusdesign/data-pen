@@ -3,6 +3,7 @@
 import { ISparqlBinding, SparqlService } from 'angular-sparql-service'
 import { ITerm, INamedNode, ILiteral, IDefaultGraph, IUNDEF, IVariable, IBlankNode, IQuad, ITriple, IDataFactory} from 'models/rdfjs'
 import { IEMap, EMap, EOMap, IMap, FMap, OMap } from 'components/collection-utils'
+import { IRichNode, FullRichNodeFromNode } from 'models/richnode';
 
 export interface INode extends ITerm {
   language?: string
