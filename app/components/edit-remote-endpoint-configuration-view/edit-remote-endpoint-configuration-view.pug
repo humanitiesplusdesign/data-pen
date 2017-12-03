@@ -4,7 +4,7 @@
   citable-editor(citable="$ctrl.c")
   h4 Endpoint types
   .form-inline
-    .form-group(ng-repeat="type in $ctrl.c.types track by $index")
+    .form-group(ng-repeat="type in $ctrl.c.types.values() track by $index")
       button.pull-right.btn.btn-xs(ng-click="$ctrl.removeType($index)"): span.glyphicon.glyphicon-remove
       select(ng-model="type.value")
         option(value="http://hdlab.stanford.edu/fibra/ontology#AuthorityEndpointConfiguration") Authority
