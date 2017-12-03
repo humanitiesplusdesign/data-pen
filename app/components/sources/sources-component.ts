@@ -1,4 +1,5 @@
 'use strict'
+import { SourcesActionService } from '../../actions/sources';
 import { ProjectActionService } from '../../actions/project';
 import { IRootState } from '../../reducers';
 import { ISource, ISourceClassTree, ISourcesState } from '../../reducers/sources';
@@ -24,6 +25,7 @@ export class SourcesComponentController {
   /* @ngInject */
   constructor(private projectService: ProjectService,
               private projectActionService: ProjectActionService,
+              private sourcesActionService: SourcesActionService,
               private $ngRedux: IFibraNgRedux,
               private $uibModal: IModalService) {
     let stateUnsubscribe: () => void = $ngRedux.connect(
