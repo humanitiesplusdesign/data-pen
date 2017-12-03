@@ -5,10 +5,10 @@ import {PrimaryEndpointConfiguration} from 'services/project-service/primary-end
 import {RemoteEndpointConfiguration} from 'services/project-service/remote-endpoint-configuration'
 import {Schema} from 'services/project-service/schema'
 import {Class, Property, DataModel} from 'services/project-service/data-model'
-import {CNode} from 'models/rdf'
+import {CNode, ONodeSet, NodeMap} from 'models/rdf'
 import {NamedNode} from 'models/rdf'
 import {Citable, CitableSource} from 'models/citable'
-import {FMap} from 'components/collection-utils'
+import {FMap, StringSet} from 'components/collection-utils'
 import {PropertyAndValue, Item, PropertyToValues} from 'services/sparql-item-service'
 import {FullRichNodeFromNode} from 'models/richnode'
 import * as angular from 'angular'
@@ -30,6 +30,9 @@ angular.module('fibra.services.worker-service-prototype-mapping-configuration', 
         'CitableSource': CitableSource,
         'ProjectSourceInfo': ProjectSourceInfo,
         'Schema': Schema,
+        'ONodeSet': ONodeSet,
+        'StringSet': StringSet,
+        'NodeMap': NodeMap,
         'DataModel': DataModel,
         'PropertyAndValue': PropertyAndValue,
         'Item': Item,

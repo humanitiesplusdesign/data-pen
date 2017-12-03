@@ -12,7 +12,7 @@ export class BasicProperty extends Property {
   public type: 'DateTime' | 'Ordinal' | 'Coordinate' | 'Numeric' | 'Text'
 
   constructor(prop: Property) {
-    super(prop.id)
+    super(prop)
     this.domains = prop.domains
     this.ranges = prop.ranges
     this.superProperties = prop.superProperties

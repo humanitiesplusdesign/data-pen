@@ -5,6 +5,11 @@ import './prototype-mapping-configuration'
 import {WorkerServiceUtils, IMessage} from 'services/worker-service/worker-service-common'
 import {BackendRootState, convertToBackendState, IFibraNgRedux} from 'reducers'
 
+export interface ISerializable {
+  serialize(): any
+  deserialize(serialized: any): ISerializable
+}
+
 export class WorkerServiceConfiguration {
   constructor(public appName: string, public workerThreads: number, public importScripts: string[]) {}
 }

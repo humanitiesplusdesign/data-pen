@@ -1,4 +1,5 @@
 'use strict'
+import { getPrefLangString } from '../filters/preferred-language-filter';
 
 import {INode, ONodeSet, DataFactory} from '../models/rdf'
 import {WorkerService} from './worker-service/worker-service'
@@ -7,7 +8,7 @@ import {FibraSparqlService} from './fibra-sparql-service'
 import {StateWorkerService, WorkerWorkerService} from './worker-service/worker-worker-service'
 import {DataModel} from './project-service/data-model'
 import {SparqlService, ISparqlBindingResult} from 'angular-sparql-service'
-import * as angular from 'angular'
+import * as angular from 'angular';
 import { UnifyMap } from 'services/id-consolidation-utils';
 
 export class AutocompletionResults {
@@ -186,7 +187,7 @@ export class SparqlAutocompleteWorkerService {
           idSet.each(id2 => idToResult.set(id2, result))
           pd.idToGroupIdSet.get(id).each(gid =>
             groupIdToGroup.goc(gid, () => {
-              let glabel: string = dataModel.classMap.has(gid) ? dataModel.classMap.get(gid).getLabel(prefLang) :
+              let glabel: string = dataModel.classMap.has(gid) ? getPrefLangString(dataModel.classMap.get(gid).labels, prefLang) :
                 (pd.idToPrefLabelSet.has(gid) ? pd.idToPrefLabelSet.get(gid).values()[0].value : gid)
               let resultGroup: ResultGroup = new ResultGroup(glabel)
               res.push(resultGroup)

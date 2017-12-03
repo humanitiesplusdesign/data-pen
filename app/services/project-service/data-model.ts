@@ -3,82 +3,21 @@
 import {ILiteral} from '../../models/rdfjs'
 import {INode} from '../../models/rdf'
 import {IRichNode, FullRichNodeFromNode} from '../../models/richnode'
-import {StringSet, FMap} from '../../components/collection-utils'
+import {StringSet, FMap, IMap} from '../../components/collection-utils'
 
-class AsNodes {
-  public labels: ILiteral[] = []
-  public descriptions: ILiteral[] = []
-  public types: Class[] = []
-  public asNodes: {[lang: string]: IRichNode}
-  public copyAsNodesTo(other: AsNodes, classMap: {[id: string]: Class}, propertyMap: {[id: string]: Property}): void {
-    other.id = this.id
-    other.labels = this.labels.slice(0)
-    other.descriptions = this.descriptions.slice(0)
-    other.types = this.types.map(c => c.clone(classMap, propertyMap))
-    other.asNodes = Object.assign({}, this.asNodes)
-  }
-  public getLabel(prefLang: string): string {
-    return this.asNode(prefLang).label
-  }
-  public asNode(prefLang: string): IRichNode {
-    let ret: IRichNode = this.asNodes[prefLang]
-    if (ret) return ret
-    ret = this.asNodes['']
-    if (ret) return ret
-    for (let lang in this.asNodes) return this.asNodes[lang]
-    return undefined
-  }
-  public buildAsNodes(): void {
-    if (!this.asNodes) {
-      this.asNodes = {}
-      let langs: StringSet = new StringSet()
-      let llMap: FMap<string> = new FMap<string>()
-      let ldMap: FMap<string> = new FMap<string>()
-      let tlMap: FMap<FMap<string>> = new FMap<FMap<string>>()
-      this.labels.forEach(l => {
-        llMap.set(l.language, l.value)
-        if (!llMap.has('')) llMap.set('', l.value)
-        langs.add(l.language)
-      })
-      this.descriptions.forEach(d => {
-        ldMap.set(d.language, d.value)
-        if (!ldMap.has('')) ldMap.set('', d.value)
-        langs.add(d.language)
-      })
-      this.types.forEach(t => {
-        t.buildAsNodes()
-        let tlMap2: FMap<string> = new FMap<string>()
-        tlMap.set(t.id.value, tlMap2)
-        t.labels.forEach(tl => {
-          tlMap2.set(tl.language, tl.value)
-          if (!tlMap2.has('')) tlMap2.set('', tl.value)
-          langs.add(tl.language)
-        })
-      })
-      langs.each(l => {
-        let rn: IRichNode = new FullRichNodeFromNode(this.id)
-        rn.label = llMap.get(l)
-        if (!rn.label) rn.label = llMap.get('')
-        rn.description = ldMap.get(l)
-        if (!rn.description) rn.description = ldMap.get('')
-        rn.types = this.types.map(tc => tc.id === this.id ? rn : tc.asNode(l))
-        this.asNodes[l] = rn
-      })
-    }
-  }
-  constructor(public id: INode) { }
-}
-
-export class Class extends AsNodes {
+export class Class extends FullRichNodeFromNode {
   public superClasses: Class[] = []
   public subClasses: Class[] = []
   public properties: Property[] = []
   public inverseProperties: Property[] = []
   constructor(id: INode) { super(id) }
   public clone(classMap: {[id: string]: Class}, propertyMap: {[id: string]: Property}): Class {
-    if (classMap[this.id.value]) return classMap[this.id.value]
-    let clone: Class = new Class(this.id)
-    this.copyAsNodesTo(clone, classMap, propertyMap)
+    if (classMap[this.value]) return classMap[this.value]
+    let clone: Class = new Class(this)
+    clone.labels = this.labels
+    clone.descriptions = this.descriptions
+    clone.types = this.types
+    clone.sourceEndpoints = this.sourceEndpoints
     clone.superClasses = this.superClasses.map(c => c.clone(classMap, propertyMap))
     clone.subClasses = this.subClasses.map(c => c.clone(classMap, propertyMap))
     clone.properties = this.properties.map(p => p.clone(classMap, propertyMap))
@@ -87,7 +26,7 @@ export class Class extends AsNodes {
   }
 }
 
-export class Property extends AsNodes {
+export class Property extends FullRichNodeFromNode {
   public domains: Class[] = []
   public ranges: Class[] = []
   public superProperties: Property[] = []
@@ -95,8 +34,12 @@ export class Property extends AsNodes {
   public inverseProperty?: Property
   constructor(id: INode) { super(id) }
   public clone(classMap: {[id: string]: Class}, propertyMap: {[id: string]: Property}): Property {
-    if (classMap[this.id.value]) return propertyMap[this.id.value]
-    let clone: Property = new Property(this.id)
+    if (classMap[this.value]) return propertyMap[this.value]
+    let clone: Property = new Property(this)
+    clone.labels = this.labels
+    clone.descriptions = this.descriptions
+    clone.types = this.types
+    clone.sourceEndpoints = this.sourceEndpoints
     clone.domains = this.domains.map(d => d.clone(classMap, propertyMap))
     clone.ranges = this.ranges.map(r => r.clone(classMap, propertyMap))
     clone.superProperties = this.superProperties.map(p => p.clone(classMap, propertyMap))
@@ -157,8 +100,8 @@ SELECT ?id ?types ?labels ?descriptions ?superClasses ?subClasses {
   }
 # ENDGRAPH
 }`
-  public classMap: FMap<Class> = new FMap<Class>()
-  public propertyMap: FMap<Property> = new FMap<Property>()
+  public classMap: IMap<Class> = new FMap<Class>()
+  public propertyMap: IMap<Property> = new FMap<Property>()
   public rootClasses: Class[] = []
   public rootProperties: Property[] = []
   public static getFilter(types: INode[]): string {

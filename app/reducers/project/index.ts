@@ -39,7 +39,7 @@ export default function models(state: ProjectState = defaultState, action): Proj
         return {
           id: endpoint.id,
           description: endpoint.labels
-            .filter((label: CNode) => label.language === 'en')[0].value,
+            .find((label: CNode) => label.language === 'en').value,
           classList: [
             {
               description: 'Concept'
@@ -67,7 +67,7 @@ export default function models(state: ProjectState = defaultState, action): Proj
         project: project,
         id: action.payload.id,
         sources: sources,
-        description: action.payload.labels[0].value
+        description: action.payload.labels.values()[0].value
       })
 
     case SET_ALL_ITEM_COUNT:

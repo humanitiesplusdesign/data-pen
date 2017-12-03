@@ -7,7 +7,7 @@ import {RemoteEndpointConfiguration} from '../../services/project-service/remote
 import {Schema} from '../../services/project-service/schema'
 import {ProjectService} from '../../services/project-service/project-service'
 import {UUID} from '../misc-utils'
-import {DataFactory} from '../../models/rdf'
+import {DataFactory, NodeSet} from '../../models/rdf'
 import * as angular from 'angular'
 import { IFibraNgRedux } from 'reducers';
 
@@ -65,8 +65,8 @@ export class ConfigureViewComponentController implements angular.IComponentContr
     } else {
       let pid: string = 'http://ldf.fi/fibra/project_' + UUID()
       this.project = new Project(pid)
-      this.project.labels = [ DataFactory.literal('', $ngRedux.getState().general.language)]
-      this.project.descriptions = [ DataFactory.literal('', $ngRedux.getState().general.language)]
+      this.project.labels.add(DataFactory.literal('', $ngRedux.getState().general.language))
+      this.project.descriptions.add(DataFactory.literal('', $ngRedux.getState().general.language))
       this.project.source = this.projectSource
       this.project.endpoint = this.projectSource.sparqlEndpoint
       this.project.updateEndpoint = this.projectSource.updateEndpoint

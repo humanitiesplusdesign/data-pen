@@ -58,21 +58,21 @@ export class CitableEditorComponentController implements angular.IComponentContr
   public noRightsHolderIds: string
   public addRightsHolder(): void {
     let c: ICitable = new Citable('http://ldf.fi/fibra/citable_' + UUID())
-    c.labels = [ DataFactory.literal('', this.$ngRedux.getState().general.language)]
-    c.descriptions = [ DataFactory.literal('', this.$ngRedux.getState().general.language) ]
+    c.labels.add(DataFactory.literal('', this.$ngRedux.getState().general.language))
+    c.descriptions.add(DataFactory.literal('', this.$ngRedux.getState().general.language))
     this.citable.rightsHolders.push(c)
   }
   public addLabel(): void {
-    this.citable.labels.push(DataFactory.literal('', ''))
+    this.citable.labels.add(DataFactory.literal('', ''))
   }
   public addDescription(): void {
-    this.citable.descriptions.push(DataFactory.literal('', ''))
+    this.citable.descriptions.add(DataFactory.literal('', ''))
   }
   public removeLabel(index: number): void {
-    this.citable.labels.splice(index, 1)
+    this.citable.labels.removei(index)
   }
   public removeDescription(index: number): void {
-    this.citable.descriptions.splice(index, 1)
+    this.citable.descriptions.removei(index)
   }
   constructor(private $ngRedux: IFibraNgRedux) {
   }

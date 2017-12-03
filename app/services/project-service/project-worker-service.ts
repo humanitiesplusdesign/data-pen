@@ -11,8 +11,9 @@ import {RemoteEndpointConfiguration} from './remote-endpoint-configuration'
 import {Schema} from './schema'
 import {FMap, IEMap, EMap} from '../../components/collection-utils'
 import {toTurtle} from '../../components/misc-utils'
-import {DataFactory} from '../../models/rdf'
+import {DataFactory, ONodeSet} from '../../models/rdf'
 import {DataModel, Class, Property} from './data-model'
+import { ILiteral } from 'models/rdfjs';
 
 export class ProjectWorkerService {
   public static orderCitables(citables: ICitable[]): void {
@@ -67,17 +68,20 @@ export class ProjectWorkerService {
       return pr
     })
     let classConf: IBindingsToObjectConfiguration = {
-      bindingTypes: { types: 'uniqueArray' },
       bindingConverters: {
         superClasses: (binding) => classes.goc(binding.value),
         subClasses: (binding) => classes.goc(binding.value),
         types: (binding) => classes.goc(binding.value),
         labels: (binding) => DataFactory.nodeFromBinding(binding),
         descriptions: (binding) => DataFactory.nodeFromBinding(binding),
+      },
+      bindingHandlers: {
+        types: (obj, prop, val) => obj[prop].add(val),
+        labels: (obj, prop, val) => obj[prop].add(val),
+        descriptions: (obj, prop, val) => obj[prop].add(val)
       }
     }
     let propertyConf: IBindingsToObjectConfiguration = {
-      bindingTypes: { types: 'uniqueArray' },
       bindingConverters: {
         superProperties: (binding) => properties.goc(binding.value),
         subProperties: (binding) => properties.goc(binding.value),
@@ -87,6 +91,11 @@ export class ProjectWorkerService {
         ranges: (binding) => classes.goc(binding.value),
         labels: (binding) => DataFactory.nodeFromBinding(binding),
         descriptions: (binding) => DataFactory.nodeFromBinding(binding),
+      },
+      bindingHandlers: {
+        types: (obj, prop, val) => obj[prop].add(val),
+        labels: (obj, prop, val) => obj[prop].add(val),
+        descriptions: (obj, prop, val) => obj[prop].add(val)
       }
     }
     let promises: angular.IPromise<void>[] = []
@@ -113,7 +122,6 @@ export class ProjectWorkerService {
     })
     return this.$q.all(promises).then(() => {
       classes.values().forEach(cl => {
-        cl.buildAsNodes()
         cl.superClasses.filter(spr => !spr.subClasses.find(opr => opr === cl)).forEach(spr => spr.subClasses.push(cl))
         cl.subClasses.filter(spr => !spr.superClasses.find(opr => opr === cl)).forEach(spr => spr.superClasses.push(cl))
       })
@@ -121,7 +129,6 @@ export class ProjectWorkerService {
         if (cl.superClasses.length === 0) dataModel.rootClasses.push(cl)
       })
       properties.values().forEach(pr => {
-        pr.buildAsNodes()
         if (pr.inverseProperty) pr.inverseProperty.inverseProperty = pr
         pr.superProperties.filter(spr => !spr.subProperties.find(opr => opr === pr)).forEach(spr => spr.subProperties.push(pr))
         pr.subProperties.filter(spr => !spr.superProperties.find(opr => opr === pr)).forEach(spr => spr.superProperties.push(pr))
@@ -174,7 +181,12 @@ export class ProjectWorkerService {
           rightsHolders_descriptions: (binding) => DataFactory.nodeFromBinding(binding),
           rightsHolders: (binding) => new Citable(binding.value, source),
           compatibleSchemas: (binding) => DataFactory.nodeFromBinding(binding)
-        }
+        },
+        bindingHandlers: {
+          types: (obj, prop, value) => obj[prop].add(value),
+          labels: (obj, prop, value) => obj[prop].add(value),
+          descriptions: (obj, prop, value) => obj[prop].add(value)
+      }
       }
       let tracker: UniqueObjectTracker = new UniqueObjectTracker()
       response.results.bindings.forEach(b => SparqlService.bindingsToObject(b, ps, conf, id, tracker))
@@ -203,6 +215,11 @@ export class ProjectWorkerService {
             rightsHolders_descriptions: (binding) => DataFactory.nodeFromBinding(binding),
             rightsHolders: (binding) => new Citable(binding.value, source),
             compatibleSchemas: (binding) => DataFactory.nodeFromBinding(binding)
+          },
+          bindingHandlers: {
+            types: (obj, prop, value) => obj[prop].add(value),
+            labels: (obj, prop, value) => obj[prop].add(value),
+            descriptions: (obj, prop, value) => obj[prop].add(value)
           }
         }
         let tracker: UniqueObjectTracker = new UniqueObjectTracker()

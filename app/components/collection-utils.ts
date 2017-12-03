@@ -1,6 +1,15 @@
 'use strict'
 
-export class FMap<V> implements d3.Map<V> {
+export interface IMap<V> extends d3.Map<V> {
+  map(f: (value: V, key: string, map: IMap<V>) => {value: V, key: string}): IMap<V>
+  mapValues(f: (value: V, key: string, map: IMap<V>) => V): IMap<V>
+  some(f: (value: V, key: string, map: IMap<V>) => boolean): boolean
+  find(f: (value: V, key: string, map: IMap<V>) => boolean): {value: V, key: string}
+  clone(): IMap<V>
+  empty(): boolean
+}
+
+export class FMap<V> implements IMap<V> {
 
   public s: {[id: string]: V} = {}
 
@@ -55,17 +64,32 @@ export class FMap<V> implements d3.Map<V> {
     })
     return ret
   }
-  public mapValues(f: (value: V, key: string, map: FMap<V>) => V): FMap<V> {
-    let ret: FMap<V> = new FMap<V>()
+  public mapValues(f: (value: V, key: string, map: IMap<V>) => V): IMap<V> {
+    let ret: IMap<V> = new FMap<V>()
     this.each((value: V, key: string) => {
       ret.set(key, f(value, key, this))
     })
     return ret
   }
-  public each(func: (value: V, key: string, map: FMap<V>) => void): undefined {
+  public each(func: (value: V, key: string, map: IMap<V>) => void): undefined {
     for (let key in this.s)
       func(this.s[key], key, this)
     return undefined
+  }
+  public some(func: (value: V, key: string, map: IMap<V>) => boolean): boolean {
+    for (let key in this.s) if (func(this.s[key], key, this)) return true
+    return false
+  }
+  public find(func: (value: V, key: string, map: IMap<V>) => boolean): {value: V, key: string} {
+    for (let key in this.s) if (func(this.s[key], key, this)) return {value: this.s[key], key: key}
+    return null
+  }
+  public clone(): IMap<V> {
+    let ret: IMap<V> = new FMap<V>()
+    this.each((value: V, key: string) => {
+      ret.set(key, value)
+    })
+    return ret
   }
   public size(): number {
     let size: number = 0
@@ -75,11 +99,12 @@ export class FMap<V> implements d3.Map<V> {
     return size
   }
   public empty(): boolean {
-    return this.size() === 0
+    for (let key in this.s) return false
+    return true
   }
 }
 
-export interface IEMap<V> extends d3.Map<V> {
+export interface IEMap<V> extends IMap<V> {
   goc(key: string, create?: (key?: string) => V): V
 }
 
@@ -136,6 +161,22 @@ export class IdentitySet<V> {
   public values(): V[] {
     return this.a
   }
+  public map(f: (value: V, valueRepeat: V, set: IdentitySet<V>) => V): IdentitySet<V> {
+    let ret: IdentitySet<V> = new IdentitySet<V>()
+    this.each(value => ret.add(f(value, value, this)))
+    return ret
+  }
+  public some(f: (value: V, valueRepeat: V, set: IdentitySet<V>) => boolean): boolean {
+    for (let value of this.a)
+      if (f(value, value, this)) return true
+    return false
+  }
+  public find(f: (value: V, valueRepeat: V, set: IdentitySet<V>) => boolean): V {
+    for (let value of this.a)
+      if (f(value, value, this)) return value
+    return null
+  }
+
 }
 
 export class StringSet implements d3.Set {
@@ -176,23 +217,46 @@ export class StringSet implements d3.Set {
     /*tslint:enable no-unused-variable*/
     return size
   }
-  public empty(): boolean {
-    return this.size() === 0
-  }
   public values(): string[] {
     let ret: string[] = []
     for (let key in this.s) ret.push(key)
     return ret
   }
+  public map(f: (value: string, valueRepeat: string, set: StringSet) => string): StringSet {
+    let ret: StringSet = new StringSet()
+    this.each(value => ret.add(f(value, value, this)))
+    return ret
+  }
+  public some(f: (value: string, valueRepeat: string, set: StringSet) => boolean): boolean {
+    for (let value in this.s)
+      if (f(value, value, this)) return true
+    return false
+  }
+  public find(f: (value: string, valueRepeat: string, set: StringSet) => boolean): string {
+    for (let value in this.s)
+      if (f(value, value, this)) return value
+    return null
+  }
+  public clone(): StringSet {
+    let ret: StringSet = new StringSet()
+    this.each(value => ret.add(value))
+    return ret
+  }
+  public empty(): boolean {
+    for (let value in this.s) return false
+    return true
+  }
 }
 
 export class OMap<V> extends FMap<V> {
-  public a: V[] = []
+  public ka: string[] = []
+  public va: V[] = []
 
   public set(key: string, value: V): this {
     if (!this.has(key)) {
       super.set(key, value)
-      this.a.push(value)
+      this.ka.push(key)
+      this.va.push(value)
     }
     return this
   }
@@ -200,19 +264,33 @@ export class OMap<V> extends FMap<V> {
     let value: V = this.get(key)
     if (value !== undefined) {
       super.remove(key)
-      this.a.splice(this.a.indexOf(value), 1)
+      let index: number = this.ka.indexOf(key)
+      this.ka.splice(index, 1)
+      this.va.splice(index, 1)
     }
     return value !== undefined
   }
+  public removei(index: number): void {
+    super.remove(this.ka[index])
+    this.ka.splice(index, 1)
+    this.va.splice(index, 1)
+  }
   public size(): number {
-    return this.a.length
+    return this.ka.length
+  }
+  public empty(): boolean {
+    return this.ka.length !== 0
+  }
+  public keys(): string[] {
+    return this.ka
   }
   public values(): V[] {
-    return this.a
+    return this.va
   }
   public clear(): this {
     super.clear()
-    this.a = []
+    this.ka = []
+    this.va = []
     return this
   }
 }
@@ -245,6 +323,9 @@ export class OStringSet extends StringSet {
   }
   public size(): number {
     return this.a.length
+  }
+  public empty(): boolean {
+    return this.a.length !== 0
   }
   public values(): string[] {
     return this.a

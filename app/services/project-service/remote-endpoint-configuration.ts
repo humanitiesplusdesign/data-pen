@@ -1,9 +1,9 @@
 'use strict'
 
 import {Citable} from 'models/citable'
-import {INode, FIBRA, VOID, RDF} from 'models/rdf'
+import {INode, FIBRA, VOID, RDF, ONodeSet} from 'models/rdf'
 import {SparqlAutocompleteService} from 'services/sparql-autocomplete-service'
-import {DataModel} from 'services/project-service/data-model'
+import {DataModel, Class} from 'services/project-service/data-model'
 import {SparqlItemService} from 'services/sparql-item-service'
 import {SparqlStatisticsService} from 'services/sparql-statistics-service'
 import {SparqlService} from 'angular-sparql-service'
@@ -99,7 +99,7 @@ SELECT ?types ?schemaEndpoint ?compatibleSchemas ?labels ?descriptions ?rightsHo
   }
 # ENDGRAPH
 }`
-  public types: INode[] = []
+  public types: ONodeSet<Class> = new ONodeSet<Class>()
   public compatibleSchemas: INode[] = []
   public autocompletionQuery: string = SparqlAutocompleteService.defaultMatchQuery
   public propertyQuery: string = DataModel.propertyQuery
@@ -110,7 +110,7 @@ SELECT ?types ?schemaEndpoint ?compatibleSchemas ?labels ?descriptions ?rightsHo
   public endpoint: string
   public clone(): RemoteEndpointConfiguration {
     let clone: RemoteEndpointConfiguration = new RemoteEndpointConfiguration()
-    clone.types = this.types.slice(0)
+    clone.types = this.types.clone()
     clone.compatibleSchemas = this.compatibleSchemas.slice(0)
     clone.autocompletionQuery = this.autocompletionQuery
     clone.propertyQuery = this.propertyQuery
@@ -127,7 +127,7 @@ SELECT ?types ?schemaEndpoint ?compatibleSchemas ?labels ?descriptions ?rightsHo
       prefixes['void'] = VOID.ns
       prefixes['rdf'] = RDF.ns
       let f: string = `<${this.id}> a `
-      this.types.forEach(type => f = f + `${type.toCanonical()}, `)
+      this.types.each(type => f = f + `${type.toCanonical()}, `)
       f = f.substring(0, f.length - 2) + ' ;'
       if (this.compatibleSchemas.length > 0) {
         f = f + `
