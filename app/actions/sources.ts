@@ -1,3 +1,4 @@
+import { ARGUMENT_PROPERTIES } from 'tslint/lib/rules/completedDocsRule';
 import * as angular from 'angular';
 
 import { ISource } from '../reducers/sources';
@@ -6,8 +7,10 @@ import { IFibraNgRedux, IRootState } from '../reducers';
 import { Action } from '../models/action'
 import { Class } from 'services/project-service/data-model';
 import { disconnect } from 'cluster';
-import { SparqlItemService, PropertyAndValue } from 'services/sparql-item-service';
+import { SparqlItemService, PropertyAndValue, IPropertyAndValue } from 'services/sparql-item-service';
 import { SKOS, DataFactory, RDF, INode, FIBRA } from 'models/rdf';
+import { INamedNode } from 'models/rdfjs';
+import { UUID } from 'components/misc-utils';
 
 export const SET_SOURCE_CLASS_ACTIVE: string = 'SET_SOURCE_CLASS_ACTIVE'
 export const ADD_ARCHIVE_SOURCE: string = 'ADD_ARCHIVE_SOURCE'
@@ -57,13 +60,18 @@ export class SourcesActionService {
 
   public uploadFile(filename: string, parsedFile: d3.DSVParsedArray<{}>, type: Class, labelColumn: string, sparqlItemService: SparqlItemService): angular.IPromise<IAddSourceAction> {
     let localColumns: string[] = parsedFile.columns.slice().filter((c) => c !== labelColumn)
+    let localColumnProperties: INamedNode[] = localColumns.map((c) => DataFactory.instance.namedNode(this.$ngRedux.getState().project.project.schemaNS + encodeURI(c)))
+    return sparqlItemService.createNewItems(parsedFile.map((line) => {
+      let properties: IPropertyAndValue[] = []
+      properties.push(new PropertyAndValue(SKOS.prefLabel, DataFactory.instance.literal(line[labelColumn])))
+      properties.push(new PropertyAndValue(RDF.type, type.id))
+      properties.push(new PropertyAndValue(FIBRA.sourceFile, DataFactory.instance.literal(filename)))
 
-    return this.$q.all(parsedFile.map((line) => {
-      return sparqlItemService.createNewItem([
-        new PropertyAndValue(SKOS.prefLabel, DataFactory.instance.literal(line[labelColumn])),
-        new PropertyAndValue(RDF.type, type.id),
-        new PropertyAndValue(FIBRA.sourceFile, DataFactory.instance.literal(filename))
-      ])
+      localColumns.forEach((c, i) => {
+        properties.push(new PropertyAndValue(localColumnProperties[i], DataFactory.instance.literal(line[c])))
+      })
+
+      return properties
     })).then(() => {
       return this.$ngRedux.dispatch({
         type: UPLOAD_FILE,

@@ -142,22 +142,21 @@ export class AddSourceComponentController {
       )
     }
 
-    this.projectService.loadProject(this.userSource, this.state.project.project.id, true).then((p) => {
-      p.labels = this.state.project.project.labels
-      p.archiveEndpoints = this.archiveEndpoints.filter((ae) => this.sourceSelections[ae.id])
-      p.authorityEndpoints = this.authorityEndpoints.filter((ae) => this.sourceSelections[ae.id])
-      p.descriptions = this.state.project.project.descriptions
-      p.rightsHolders = this.state.project.project.rightsHolders
-      p.schemas = this.state.project.project.schemas
+    let p: Project = this.state.project.project // .clone()
+    p.labels = this.state.project.project.labels
+    p.archiveEndpoints = this.archiveEndpoints.filter((ae) => this.sourceSelections[ae.id])
+    p.authorityEndpoints = this.authorityEndpoints.filter((ae) => this.sourceSelections[ae.id])
+    p.descriptions = this.state.project.project.descriptions
+    p.rightsHolders = this.state.project.project.rightsHolders
+    p.schemas = this.state.project.project.schemas
 
-      this.projectService.saveCitable(this.userSource.updateEndpoint, this.userSource.graphStoreEndpoint, p)
-        .then(() => {
-          this.projectActionService.setProject(p.id, p.source.sparqlEndpoint, p.source.graph)
-            .then(() => {
-              this.close()
-            })
-        })
-    })
+    this.projectService.saveCitable(this.userSource.updateEndpoint, this.userSource.graphStoreEndpoint, p)
+      .then(() => {
+        this.projectActionService.setProject(p.id, p.source.sparqlEndpoint, p.source.graph)
+          .then(() => {
+            this.close()
+          })
+      })
   }
 
   private cancel(): void {
