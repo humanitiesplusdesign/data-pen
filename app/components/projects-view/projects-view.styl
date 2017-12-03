@@ -1,23 +1,20 @@
-projects-view {
+projects-view
 
-  .head {
+  .head
     margin-top: 150px
-  }
 
-  .message-text {
+  .message-text
     font-family: 'Roboto Mono', monospace
     text-align: center
     font-size: 1.3em
     line-height: 1.5em
     color: #AAA
-  }
 
-  .error-loading {
+  .error-loading
     position: relative
     margin-top: 100px
-  }
 
-  .sort-container {
+  .sort-container
     position: relative
     display: block
     float: right
@@ -28,11 +25,10 @@ projects-view {
     background: none
     overflow: hidden
 
-    .sort-label, select {
+    .sort-label, select
       font-size: 0.8
-    }
 
-    select {
+    select
       width: 100%
       height: 100%
       float: right
@@ -43,13 +39,11 @@ projects-view {
       cursor: pointer
       border: none
       direction: rtl
-    }
 
-    select::-ms-expand {
+    select::-ms-expand
       display: none
-    }
 
-    &::after {
+    &::after
       content: '\25be'
       position: absolute
       top: 0
@@ -59,10 +53,8 @@ projects-view {
       color: #3c3c3c
       background: none
       pointer-events: none
-    }
-  }
 
-  .new-project-button {
+  .new-project-button
     width: 175px
     height: 37px
     margin: 0 0 30px 0
@@ -83,24 +75,21 @@ projects-view {
     -moz-transition: .1s
     -o-transition: .1s
 
-    &:hover {
+    &:hover
       background-color: rgba(#456ad2, 0.8)
       cursor: pointer
-    }
 
-    &.none-position {
+    &.none-position
       position: relative
       margin-left: 50%
       margin-top: 10px
       transform: translateX(-50%)
-    }
-  }
 
-  .projects-list {
+  .projects-list
     margin: 0 -15px 120px -15px
     list-style: none
 
-    .project-cell {
+    .project-cell
       width: 100%
       text-align: left
       font-family: 'Roboto', sans-serif
@@ -114,59 +103,95 @@ projects-view {
       -o-transition: .1s
       z-index: -1
 
-      &:hover, a:hover {
-        background-color: rgba(#456ad2, 0.03)
+      &:hover, a:hover
+        //background-color: rgba(#456ad2, 0.03)
         text-decoration: none
-      }
-    }
 
-    li:last-child {
+    li:last-child
       border-bottom: 1px solid rgba(0, 0, 0, 0.1)
-    }
 
-    .citable-label {
+    .citable-label
       font-size: 1.3em
       font-weight: 400
       color: #3c3c3c
-    }
+      margin-bottom: 5px
 
-    .citable-date {
-      display: block
+    .citable-date
+      //display: block
       font-size: 0.9em
       color: #959595
       text-align: left
-      margin-top: 3px
-    }
 
-    .citable-description {
-      font-size: 1em
+    .citable-proj-date-range
+      font-style: italic
+
+    .citable-description
+      margin-top: 20px
+      font-size: 0.9em
       color: #3c3c3c
-    }
 
-    .citable-sources {
+    .project-draw, .project-filter, .project-sources
+      display: inline-block
+      max-width: 165px
+      margin-left: 20px
+      margin-top: 25px
+      vertical-align: top
+
+    .project-draw
+      margin-left: 70px
+
+      .draw-item-counts
+        display: inline-block
+        text-align: right
+
+      .draw-item-names
+        margin-left: 5px
+        display: inline-block
+
+    .project-details-list-container
+      padding: 20px
+      border-radius: 3px
+      &:hover
+        background-color: rgba(#000000, 0.04)
+        cursor: pointer
+
+      .project-details-list-title
+        font-size: 0.9em
+        font-weight: 500
+        color: #3c3c3c
+
+      .project-details-list
+        list-style: none
+        padding-left: 0
+
+        li
+          font-size: 0.9em
+          border: none !important
+          white-space: nowrap
+          overflow: hidden
+          text-overflow: ellipsis
+          color: #3c3c3c 
+
+    .citable-sources
       color: #879fbf
       //font-family: 'Roboto Mono', monospace
       font-size: 0.85em
 
-      label {
+      label
         text-transform: uppercase
         display: none
-      }
 
-      ul {
+      ul
         list-style: none
 
-        li {
+        li
           border: none !important
           margin-bottom: 5px
           white-space: nowrap
           overflow: hidden
           text-overflow: ellipsis
-        }
-      }
-    }
 
-    .project-options {
+    .project-options
       list-style: none
       display: inline-block
       float: right
@@ -175,7 +200,7 @@ projects-view {
       font-size: 0.85em
       line-height: 1.8em
       margin-right: 30px
-      top: 3px
+      margin-top: 40px
       opacity: 0
       color: rgba(#000, 1)
       transition: .2s
@@ -184,39 +209,31 @@ projects-view {
       -o-transition: 2s
       text-decoration: none
 
-      &.visible {
+      &.visible
         opacity: 1
-      }
 
-      li {
+      li
         opacity: .3
         border: none !important
         cursor: pointer
 
-        &:hover {
+        &:hover
           opacity: .8
-        }
-      }
 
-      .delete-project {
+      .delete-project
         color: #b80000
-      }
-    }
-  }
 
-  @keyframes spinner {
-    to {
+  @keyframes spinner
+    to
       transform: rotate(360deg)
-    }
-  }
 
-  .spinner {
+  .spinner
     display: inline-block
     width: 15px
     height: 15px
     margin-left: 10px
 
-    &:before {
+    &:before
       content: ''
       box-sizing: border-box
       position: absolute
@@ -230,13 +247,9 @@ projects-view {
       border: 2px solid rgba(#456ad2, 0.1)
       border-top-color: #456ad2
       animation: spinner 1s linear infinite
-    }
-  }
 
-  .no-projects {
+  .no-projects
     margin-top: 20px
     text-align: center
     padding: 50px 0 50px 0
     margin-bottom: 30px
-  }
-}
