@@ -7,11 +7,6 @@ import {Project} from 'services/project-service/project'
 import {RemoteEndpointConfiguration} from 'services/project-service/remote-endpoint-configuration'
 import {TreeNode} from 'models/treenode'
 
-export class ClassStatistic {
-  public id: string
-  public instances: number
-}
-
 export class SparqlStatisticsService {
 
   public static getClassStatisticsQuery: string = `SELECT ?id ?instances {
@@ -40,18 +35,26 @@ export class SparqlStatisticsService {
 `
   /* @ngInject */
   constructor(private workerService: WorkerService) {}
-  public getClassStatistics(endpointConfiguration: Project | RemoteEndpointConfiguration, canceller?: angular.IPromise<any>): angular.IPromise<ClassStatistic[]> {
+  public getClassStatistics(endpointConfiguration: Project | RemoteEndpointConfiguration, canceller?: angular.IPromise<any>): angular.IPromise<{[id: string]: number}> {
     return this.workerService.call('sparqlStatisticsWorkerService', 'getClassStatistics', [endpointConfiguration.endpoint, endpointConfiguration.classStatisticsQuery], canceller)
   }
 }
 
-export class SparqlTreeWorkerService {
+export class SparqlStatisticsWorkerService {
   /* @ngInject */
   constructor(private fibraSparqlService: FibraSparqlService) {}
-
+  public getClassStatistics(endpoint: string, query: string, canceller?: angular.IPromise<any>): angular.IPromise<{[id: string]: number}> {
+    return this.fibraSparqlService.query(endpoint, query, canceller).then(response => {
+      let ret:{[id: string]: number} = {}
+      for (let b of response.results.bindings)
+        ret[b['id'].value] = b['instances'].value
+      return ret
+    })
+  }
 }
 
 angular.module('fibra.services.sparql-statistics-service', [])
   .config(($provide) => {
     $provide.service('sparqlStatisticsService', SparqlStatisticsService)
+    $provide.service('sparqlStatisticsWorkerService', SparqlStatisticsWorkerService)
   })

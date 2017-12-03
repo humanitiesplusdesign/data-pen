@@ -8,6 +8,6 @@
     },
     "include": [
         "app/**/*.ts",
-        "node_modules/@types/*/*.d.ts"
+        "node_modules/**/*.d.ts"
     ]
 }
