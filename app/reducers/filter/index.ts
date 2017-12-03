@@ -48,8 +48,8 @@ export default function models(state: IFilterState = defaultState, action): IFil
     case SET_FILTER_FOR_CLASS_AND_PROP:
       return Object.assign({}, state, {
         filtersByClass: Object.assign({}, state.filtersByClass, {
-          [action.payload.clss.id.value]: Object.assign({}, state.filtersByClass[action.payload.clss.id.value], {
-            [action.payload.property.id.value]: {
+          [action.payload.clss.value]: Object.assign({}, state.filtersByClass[action.payload.clss.value], {
+            [action.payload.property.value]: {
               type: 'TIMELINE',
               description: 'Timeline',
               domain: [],
@@ -64,9 +64,9 @@ export default function models(state: IFilterState = defaultState, action): IFil
     case UPDATE_PROPERTY_ON_FILTER:
       return Object.assign({}, state, {
         filtersByClass: Object.assign({}, state.filtersByClass, {
-          [action.payload.clss.id.value]: Object.assign({}, state.filtersByClass[action.payload.clss.id.value], {
-            [action.payload.property.id.value]: Object.assign({}, state.filtersByClass[action.payload.clss.id.value][action.payload.property.id.value], {
-              domain: [action.payload.property.minimumValue ? action.payload.property.minimumValue : state.filtersByClass[action.payload.clss.id.value][action.payload.property.id.value].domain[0], action.payload.property.maximumValue ? action.payload.property.maximumValue : state.filtersByClass[action.payload.clss.id.value][action.payload.property.id.value].domain[1]],
+          [action.payload.clss.value]: Object.assign({}, state.filtersByClass[action.payload.clss.value], {
+            [action.payload.property.value]: Object.assign({}, state.filtersByClass[action.payload.clss.value][action.payload.property.value], {
+              domain: [action.payload.property.minimumValue ? action.payload.property.minimumValue : state.filtersByClass[action.payload.clss.value][action.payload.property.value].domain[0], action.payload.property.maximumValue ? action.payload.property.maximumValue : state.filtersByClass[action.payload.clss.value][action.payload.property.value].domain[1]],
               prop: action.payload.property
             })
           })
@@ -76,8 +76,8 @@ export default function models(state: IFilterState = defaultState, action): IFil
     case SET_FILTER_SELECTION:
       return Object.assign({}, state, {
         filtersByClass: Object.assign({}, state.filtersByClass, {
-          [action.payload.clss.id.value]: Object.assign({}, state.filtersByClass[action.payload.clss.id.value], {
-            [action.payload.property.id.value]: Object.assign({}, state.filtersByClass[action.payload.clss.id.value][action.payload.property.id.value], {
+          [action.payload.clss.value]: Object.assign({}, state.filtersByClass[action.payload.clss.value], {
+            [action.payload.property.value]: Object.assign({}, state.filtersByClass[action.payload.clss.value][action.payload.property.value], {
               selection: action.payload.selection
             })
           })
@@ -85,13 +85,13 @@ export default function models(state: IFilterState = defaultState, action): IFil
       })
 
     case REMOVE_FILTER:
-      let newPropMap: {} = Object.assign({}, state.filtersByClass[action.payload.clss.id.value], {
-        [action.payload.property.id.value]: null
+      let newPropMap: {} = Object.assign({}, state.filtersByClass[action.payload.clss.value], {
+        [action.payload.property.value]: null
       })
-      delete newPropMap[action.payload.property.id.value]
+      delete newPropMap[action.payload.property.value]
       return Object.assign({}, state, {
         filtersByClass: Object.assign({}, state.filtersByClass, {
-          [action.payload.clss.id.value]: newPropMap
+          [action.payload.clss.value]: newPropMap
         })
       })
 
