@@ -15,7 +15,7 @@
     .nav-element.nav-link.push-down(ng-class="{'nav-link-inactive': $ctrl.currentView !== 'active', 'nav-link-active': $ctrl.currentView === 'active'}", ng-click="$ctrl.setView('active')") Active
   .nav-element.search-container(ng-hide="$ctrl.currentView==='sources'")
     input.search-bar(placeholder="Search")
-    img.search-image(src="./app/images/nav_bar/search.svg" width="12px" height="auto")
+    img.search-image(src="./app/images/nav_bar/search.svg" width="auto" height="100%")
   .nav-element.bibliography-link
     img.bib-icon(src="./app/images/nav_bar/bibliography.svg" ng-click="$ctrl.openBibliographyModal($ctrl.currentView)")
   span.usage(ng-hide="$ctrl.currentView==='sources'")
