@@ -30,9 +30,13 @@ export class ActiveActionService {
   constructor(private $ngRedux: IFibraNgRedux, private sparqlItemService: SparqlItemService) {}
 
   public addItemToCurrentLayout(item: IItemState): IAddItemToCurrentLayoutAction {
-    // TODO: Fix to use the local item associated with this node
+    // Check that the item doesn't already exist
+    console.log(item.ids[0], this.$ngRedux.getState().active.activeLayout.items, this.$ngRedux.getState().active.activeLayout.items.find((i) => i.ids[0] === item.ids[0]))
+    if(this.$ngRedux.getState().active.activeLayout.items.find((i) => i.ids[0].value === item.ids[0].value)) {
+      return null
+    }
+
     this.sparqlItemService.getItem(item.ids, true).then((i) => {
-      console.log(item.ids, i)
       this.$ngRedux.dispatch({
         type: ADD_ITEM_TO_ITEM_STATE,
         payload: {
