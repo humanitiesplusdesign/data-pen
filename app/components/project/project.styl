@@ -14,20 +14,34 @@ project {
     box-shadow: 0px 1px 4px rgba(#000, 0.1)
     color: #444
     line-height: initial
+    font-size: 1.2em
 
     .nav-element {
       display: inline-block
-      margin-top: 1.3em
       margin-left: 1em
+      margin-top: 1.4em
+    }
+
+    .nav-link {
+      cursor: pointer
+      margin-left: 1.5em
+    }
+
+    .nav-link-active {
+      color: #466bd3
+      border-bottom: 1px solid #466bd3
+    }
+
+    .nav-link-inactive {
+      color: #969696
+      &:hover {
+        border-bottom: 1px solid #969696
+      }
     }
 
     .bibliography-link {
       float: right
       margin-right: 1em
-    }
-
-    .push-down {
-      margin-top: 1.5em
     }
 
     .bib-icon {
@@ -127,9 +141,5 @@ project {
       margin-left: 2em
       margin-right: 1em
     }
-  }
-
-  .nav-link {
-    cursor: pointer
   }
 }

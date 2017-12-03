@@ -1,16 +1,17 @@
 .container(ng-init="titleWarning=''")
-  h3.header-title Data Pen
-    span.header-subtitle New project
+  h4.header-title Data Pen
+    span.header-subtitle Create project
+    
   .project-setup-container.col-md-10.col-md-offset-1
     .row
       .header
-        h4.col-md-3.col-md-offset-1 Start a new project.
+        h3.col-md-3.col-md-offset-1 Start a new project.
     .left-side.col-md-4.col-md-offset-1
-      label.title-warning.transition-200(ng-class="titleWarning") Please enter a project title
+      p.title-warning.transition-200(ng-class="titleWarning") Please enter a project title
       citable-editor(citable="$ctrl.project",no-id)
-    .right-side.col-md-4.col-md-offset-1
+    .right-side.col-md-5.col-md-offset-1
       h5 Pull from an existing project
-      p Start with an existing sources and/or filter configuration from another Data Pen project (optional).
+      p Use another Data Pen project as a template to start from. Pull in a sources configuration or all data.
       .project-selection
         label.input-label Project:  
         .project-dropdown-container
@@ -18,13 +19,10 @@
             option(ng-repeat="option in data.availableOptions" value="{{option.id}}") {{option.name}}
         .project-pull-options
           .label-checkbox-container
-            label.input-label Sources
+            label Sources
               input(type="checkbox" checked)
           .label-checkbox-container
-            label.input-label Filters
-              input(type="checkbox" checked)
-          .label-checkbox-container
-            label.input-label Data
+            label All data
               input(type="checkbox" checked)
     .action-items
       button.save-project.text-button.transition-200(ng-class="{'button-disabled' : !$ctrl.projectTitleFilled()}" ng-click="$ctrl.projectTitleFilled() ? $ctrl.saveAndOpen() : titleWarning='visible'") Save and open
