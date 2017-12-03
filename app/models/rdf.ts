@@ -529,4 +529,10 @@ export class ONodeSet<N extends INode> extends NodeSet<N> {
     this.each(value => ret.add(value))
     return ret
   }
+  public first(): N {
+    return (this.m.imap as OMap<N>).firstValue()
+  }
+  public last(): N {
+    return (this.m.imap as OMap<N>).lastValue()
+  }
 }

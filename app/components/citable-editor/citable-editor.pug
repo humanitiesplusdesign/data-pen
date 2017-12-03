@@ -2,11 +2,11 @@
   .row
     label.input-label Title *
   .row
-    .form-group(ng-repeat="label in $ctrl.citable.labels")
+    .form-group(ng-repeat="label in $ctrl.citable.labels.values()")
       input.title-input(type="text", ng-model="label.value")
 .description
   .row
     label.input-label Description
   .row
-    .form-group(ng-repeat="descr in $ctrl.citable.descriptions")
+    .form-group(ng-repeat="descr in $ctrl.citable.descriptions.values()")
       textarea.description-input.form-control(ng-model="descr.value")

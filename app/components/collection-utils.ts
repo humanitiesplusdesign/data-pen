@@ -275,6 +275,18 @@ export class OMap<V> extends FMap<V> {
     this.ka.splice(index, 1)
     this.va.splice(index, 1)
   }
+  public firstKey(): string {
+    return this.ka[0]
+  }
+  public lastKey(): string {
+    return this.ka[this.ka.length - 1]
+  }
+  public firstValue(): V {
+    return this.va[0]
+  }
+  public lastValue(): V {
+    return this.va[this.va.length - 1]
+  }
   public size(): number {
     return this.ka.length
   }
@@ -329,6 +341,12 @@ export class OStringSet extends StringSet {
   }
   public values(): string[] {
     return this.a
+  }
+  public first(): string {
+    return this.a[0]
+  }
+  public last(): string {
+    return this.a[this.a.length - 1]
   }
   public clear(): this {
     super.clear()
