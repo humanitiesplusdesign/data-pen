@@ -15,8 +15,8 @@ export class EditSchemaViewComponentController extends EditCitableComponentContr
     if ($stateParams.id) projectService.loadSchema(this.projectSource, $stateParams.id).then(ps => this.c = ps)
     else {
       this.c = new Schema()
-      this.c.labels = [ DataFactory.literal('', $ngRedux.getState().general.language)]
-      this.c.descriptions = [ DataFactory.literal('', $ngRedux.getState().general.language)]
+      this.c.labels.add(DataFactory.literal('', $ngRedux.getState().general.language))
+      this.c.descriptions.add(DataFactory.literal('', $ngRedux.getState().general.language))
       this.c.endpoint = this.projectSource.sparqlEndpoint
     }
   }

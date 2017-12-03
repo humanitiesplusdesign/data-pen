@@ -11,8 +11,9 @@ import {RemoteEndpointConfiguration} from './remote-endpoint-configuration'
 import {Schema} from './schema'
 import {FMap, IEMap, EMap} from '../../components/collection-utils'
 import {toTurtle} from '../../components/misc-utils'
-import {DataFactory} from '../../models/rdf'
+import {DataFactory, ONodeSet} from '../../models/rdf'
 import {DataModel, Class, Property} from './data-model'
+import { ILiteral } from 'models/rdfjs';
 
 export class ProjectWorkerService {
   public static orderCitables(citables: ICitable[]): void {
@@ -31,15 +32,15 @@ export class ProjectWorkerService {
   }
 
   public loadRemoteEndpointConfiguration(source: ICitableSource, templateId: string): angular.IPromise<RemoteEndpointConfiguration> {
-    return this.runSingleQuery(source, RemoteEndpointConfiguration.remoteEndpointConfigurationQuery, templateId, new RemoteEndpointConfiguration(templateId, source))
+    return this.runSingleQuery(source, RemoteEndpointConfiguration.listRemoteEndpointConfigurationsQuery, templateId, new RemoteEndpointConfiguration(templateId, source))
   }
 
   public listArchiveEndpointConfigurations(source: ICitableSource): angular.IPromise<RemoteEndpointConfiguration[]> {
-    return this.runListQuery(source, RemoteEndpointConfiguration.listArchiveEndpointConfigurationsQuery, (id: string) => new RemoteEndpointConfiguration(id, source))
+    return this.runListQuery(source, RemoteEndpointConfiguration.listRemoteEndpointConfigurationsQuery.replace(/# TYPELIMIT/g, '?id a fibra:ArchiveEndpointConfiguration'), (id: string) => new RemoteEndpointConfiguration(id, source))
   }
 
   public listAuthorityEndpointConfigurations(source: ICitableSource): angular.IPromise<RemoteEndpointConfiguration[]> {
-    return this.runListQuery(source, RemoteEndpointConfiguration.listAuthorityEndpointConfigurationsQuery, (id: string) => new RemoteEndpointConfiguration(id, source))
+    return this.runListQuery(source, RemoteEndpointConfiguration.listRemoteEndpointConfigurationsQuery.replace(/# TYPELIMIT/g, '?id a fibra:AuthorityEndpointConfiguration'), (id: string) => new RemoteEndpointConfiguration(id, source))
   }
 
   public listProjects(source: ICitableSource): angular.IPromise<Project[]> {
@@ -67,17 +68,20 @@ export class ProjectWorkerService {
       return pr
     })
     let classConf: IBindingsToObjectConfiguration = {
-      bindingTypes: { types: 'uniqueArray' },
       bindingConverters: {
         superClasses: (binding) => classes.goc(binding.value),
         subClasses: (binding) => classes.goc(binding.value),
         types: (binding) => classes.goc(binding.value),
         labels: (binding) => DataFactory.nodeFromBinding(binding),
         descriptions: (binding) => DataFactory.nodeFromBinding(binding),
+      },
+      bindingHandlers: {
+        types: (obj, prop, val) => obj[prop].add(val),
+        labels: (obj, prop, val) => obj[prop].add(val),
+        descriptions: (obj, prop, val) => obj[prop].add(val)
       }
     }
     let propertyConf: IBindingsToObjectConfiguration = {
-      bindingTypes: { types: 'uniqueArray' },
       bindingConverters: {
         superProperties: (binding) => properties.goc(binding.value),
         subProperties: (binding) => properties.goc(binding.value),
@@ -87,6 +91,11 @@ export class ProjectWorkerService {
         ranges: (binding) => classes.goc(binding.value),
         labels: (binding) => DataFactory.nodeFromBinding(binding),
         descriptions: (binding) => DataFactory.nodeFromBinding(binding),
+      },
+      bindingHandlers: {
+        types: (obj, prop, val) => obj[prop].add(val),
+        labels: (obj, prop, val) => obj[prop].add(val),
+        descriptions: (obj, prop, val) => obj[prop].add(val)
       }
     }
     let promises: angular.IPromise<void>[] = []
@@ -113,7 +122,6 @@ export class ProjectWorkerService {
     })
     return this.$q.all(promises).then(() => {
       classes.values().forEach(cl => {
-        cl.buildAsNodes()
         cl.superClasses.filter(spr => !spr.subClasses.find(opr => opr === cl)).forEach(spr => spr.subClasses.push(cl))
         cl.subClasses.filter(spr => !spr.superClasses.find(opr => opr === cl)).forEach(spr => spr.superClasses.push(cl))
       })
@@ -121,7 +129,6 @@ export class ProjectWorkerService {
         if (cl.superClasses.length === 0) dataModel.rootClasses.push(cl)
       })
       properties.values().forEach(pr => {
-        pr.buildAsNodes()
         if (pr.inverseProperty) pr.inverseProperty.inverseProperty = pr
         pr.superProperties.filter(spr => !spr.subProperties.find(opr => opr === pr)).forEach(spr => spr.subProperties.push(pr))
         pr.subProperties.filter(spr => !spr.superProperties.find(opr => opr === pr)).forEach(spr => spr.superProperties.push(pr))
@@ -139,19 +146,10 @@ export class ProjectWorkerService {
     let q: angular.IPromise<Project> = this.runSingleQuery(source, Project.listProjectsQuery, id, new Project(id, source))
     if (!loadFull) return q; else return q.then(p => {
       let promises: angular.IPromise<any>[] = []
-      promises.push(this.$q.all(p.schemas.map(schema => this.loadSchema(schema.source, schema.id))).then(schemas => {
-        p.schemas = schemas
-        return this.loadDataModel(schemas, p.archiveEndpoints.concat(p.authorityEndpoints)).then(dm => p.dataModel = dm)
-      }))
-      let narche: RemoteEndpointConfiguration[] = []
-      let nauthe: RemoteEndpointConfiguration[] = []
-      p.archiveEndpoints.forEach(ae => promises.push(this.loadRemoteEndpointConfiguration(ae.source, ae.id).then(ae2 => narche.push(ae2))))
-      p.authorityEndpoints.forEach(ae => promises.push(this.loadRemoteEndpointConfiguration(ae.source, ae.id).then(ae2 => nauthe.push(ae2))))
-      return this.$q.all(promises).then(() => {
-        p.archiveEndpoints = narche
-        p.authorityEndpoints = nauthe
-        return p
-      })
+      promises.push(this.$q.all(p.schemas.map(schema => this.loadSchema(schema.source, schema.id))).then(schemas => p.schemas = schemas))
+      promises.push(this.$q.all(p.archiveEndpoints.map(ae => this.loadRemoteEndpointConfiguration(ae.source, ae.id))).then(aes => p.archiveEndpoints = aes))
+      promises.push(this.$q.all(p.authorityEndpoints.map(ae => this.loadRemoteEndpointConfiguration(ae.source, ae.id))).then(aes => p.authorityEndpoints = aes))
+      return this.$q.all(promises).then(() => this.loadDataModel(p.schemas, p.archiveEndpoints.concat(p.authorityEndpoints)).then(dm => p.dataModel = dm).then(() => p))
     })
   }
 
@@ -161,7 +159,7 @@ export class ProjectWorkerService {
     let deferred: angular.IDeferred<T> = this.$q.defer()
     this.fibraSparqlService.query(source.sparqlEndpoint, tq).then(response => {
       let conf: IBindingsToObjectConfiguration = {
-        bindingTypes: { rightsHolders: 'uniqueArray', schemas: 'uniqueArray', compatibleSchemas: 'uniqueArray', authorityEndpoints: 'uniqueArray', archiveEndpoints: 'uniqueArray'},
+        bindingTypes: { rightsHolders: 'uniqueArray', schemas: 'uniqueArray', authorityEndpoints: 'uniqueArray', archiveEndpoints: 'uniqueArray'},
         bindingConverters: {
           dateCreated: (binding) => new Date(binding.value),
           types: (binding) => DataFactory.nodeFromBinding(binding),
@@ -174,7 +172,12 @@ export class ProjectWorkerService {
           rightsHolders_descriptions: (binding) => DataFactory.nodeFromBinding(binding),
           rightsHolders: (binding) => new Citable(binding.value, source),
           compatibleSchemas: (binding) => DataFactory.nodeFromBinding(binding)
-        }
+        },
+        bindingHandlers: {
+          types: (obj, prop, value) => obj[prop].add(value),
+          labels: (obj, prop, value) => obj[prop].add(value),
+          descriptions: (obj, prop, value) => obj[prop].add(value)
+      }
       }
       let tracker: UniqueObjectTracker = new UniqueObjectTracker()
       response.results.bindings.forEach(b => SparqlService.bindingsToObject(b, ps, conf, id, tracker))
@@ -190,7 +193,7 @@ export class ProjectWorkerService {
       response => {
         let projects: EMap<T> = new EMap<T>(oc)
         let conf: IBindingsToObjectConfiguration = {
-          bindingTypes: { rightsHolders: 'uniqueArray', schemas: 'uniqueArray', compatibleSchemas: 'uniqueArray', authorityEndpoints: 'uniqueArray', archiveEndpoints: 'uniqueArray'},
+          bindingTypes: { rightsHolders: 'uniqueArray', schemas: 'uniqueArray', authorityEndpoints: 'uniqueArray', archiveEndpoints: 'uniqueArray'},
           bindingConverters: {
             dateCreated: (binding) => new Date(binding.value),
             types: (binding) => DataFactory.nodeFromBinding(binding),
@@ -203,6 +206,11 @@ export class ProjectWorkerService {
             rightsHolders_descriptions: (binding) => DataFactory.nodeFromBinding(binding),
             rightsHolders: (binding) => new Citable(binding.value, source),
             compatibleSchemas: (binding) => DataFactory.nodeFromBinding(binding)
+          },
+          bindingHandlers: {
+            types: (obj, prop, value) => obj[prop].add(value),
+            labels: (obj, prop, value) => obj[prop].add(value),
+            descriptions: (obj, prop, value) => obj[prop].add(value)
           }
         }
         let tracker: UniqueObjectTracker = new UniqueObjectTracker()

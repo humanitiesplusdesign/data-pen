@@ -1,7 +1,7 @@
 'use strict'
 
 import {ILiteral} from 'models/rdfjs'
-import {SKOS, DCTerms, FOAF, FIBRA, RDF, XMLSchema} from 'models/rdf'
+import {SKOS, DCTerms, FOAF, FIBRA, RDF, XMLSchema, NodeSet, ONodeSet} from 'models/rdf'
 
 export interface ICitableSource {
   sparqlEndpoint: string
@@ -18,8 +18,8 @@ export class CitableSource implements ICitableSource {
 
 export interface ICitable {
   id: string
-  labels: ILiteral[]
-  descriptions: ILiteral[]
+  labels: ONodeSet<ILiteral>
+  descriptions: ONodeSet<ILiteral>
   url?: string
   rightsHolders: ICitable[]
   source: ICitableSource
@@ -40,11 +40,11 @@ export class Citable implements ICitable {
     prefixes['rdf'] = RDF.ns
     prefixes['xsd'] = XMLSchema.ns
     let f: string = fragmentsById.get(c.id)
-    c.labels.forEach(label => { if (label.value) f = f + `
+    c.labels.each(label => { if (label.value) f = f + `
 skos:prefLabel ${label.toCanonical()} ;` })
     f = f + `
 dcterms:created "${c.dateCreated.toISOString()}"^^xsd:dateTime ;`
-    c.descriptions.forEach(descr => { if (descr.value) f = f + `
+    c.descriptions.each(descr => { if (descr.value) f = f + `
 dcterms:description ${descr.toCanonical()} ;` })
     if (c.url) f = f + `
 foaf:homepage <${c.url}> ;`
@@ -71,7 +71,7 @@ fibra:qualifiedAssertion [
     }
     fragmentsById.set(c.id, f)
   }
-  constructor(id?: string, source?: ICitableSource, public labels: ILiteral[] = [], public url?: string, public descriptions: ILiteral[] = [], public rightsHolders: ICitable[] = [], public dateCreated: Date = new Date()) {
+  constructor(id?: string, source?: ICitableSource, public labels: ONodeSet<ILiteral> = new ONodeSet<ILiteral>(), public url?: string, public descriptions: ONodeSet<ILiteral> = new ONodeSet<ILiteral>(), public rightsHolders: ICitable[] = [], public dateCreated: Date = new Date()) {
     this.id = id
     this.source = source
   }
@@ -79,13 +79,13 @@ fibra:qualifiedAssertion [
   public copyCitableTo(other: ICitable): void {
     other.id = this.id
     other.source = this.source.clone()
-    other.labels = this.labels.slice(0)
+    other.labels = this.labels.clone()
     other.url = this.url
-    other.descriptions = this.descriptions.slice(0)
+    other.descriptions = this.descriptions.clone()
     other.rightsHolders = this.rightsHolders.map(rh => rh.clone())
     other.dateCreated = this.dateCreated
   }
   public clone(): ICitable {
-    return new Citable(this.id, this.source, this.labels.slice(0), this.url, this.descriptions.slice(0), this.rightsHolders.map(rh => rh.clone()), this.dateCreated)
+    return new Citable(this.id, this.source, this.labels.clone(), this.url, this.descriptions.clone(), this.rightsHolders.map(rh => rh.clone()), this.dateCreated)
   }
 }

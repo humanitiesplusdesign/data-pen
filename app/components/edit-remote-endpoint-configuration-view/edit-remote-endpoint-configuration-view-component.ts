@@ -6,14 +6,15 @@ import {ProjectService} from '../../services/project-service/project-service'
 import {DataFactory} from '../../models/rdf'
 import * as angular from 'angular'
 import { IFibraNgRedux } from 'reducers';
+import { Class } from 'services/project-service/data-model';
 
 export class EditRemoteEndpointConfigurationViewComponentController extends EditCitableComponentController<RemoteEndpointConfiguration> {
 
   public addType(): void {
-    this.c.types.push(DataFactory.namedNode(''))
+    this.c.types.add(new Class(DataFactory.namedNode('')))
   }
   public removeType(index: number): void {
-    this.c.types.splice(index, 1)
+    this.c.types.removei(index)
   }
 
   /* @ngInject */
@@ -22,9 +23,9 @@ export class EditRemoteEndpointConfigurationViewComponentController extends Edit
     if ($stateParams.id) projectService.loadRemoteEndpointConfiguration(this.projectSource, $stateParams.id).then(ps => this.c = ps)
     else {
       this.c = new RemoteEndpointConfiguration()
-      this.c.labels = [ DataFactory.literal('', $ngRedux.getState().general.language)]
-      this.c.descriptions = [ DataFactory.literal('', $ngRedux.getState().general.language)]
-      this.c.types = [ DataFactory.namedNode('') ]
+      this.c.labels.add(DataFactory.literal('', $ngRedux.getState().general.language))
+      this.c.descriptions.add(DataFactory.literal('', $ngRedux.getState().general.language))
+      this.c.types.add(new Class(DataFactory.namedNode('')))
     }
   }
 }

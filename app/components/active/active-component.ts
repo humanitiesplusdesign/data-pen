@@ -192,7 +192,7 @@ export class ActiveComponentController {
               && this.$ngRedux.getState().sources.sourceClassToggle[c][r.additionalInformation.type[0].value]
           },
           false))) {
-        r.additionalInformation.typeDescriptions = this.state.project.project.dataModel.classMap.get(r.additionalInformation.type[0].value).labels
+        r.additionalInformation.typeDescriptions = this.state.project.project.dataModel.classMap.get(r.additionalInformation.type[0].value).labels.values()
         r.additionalInformation.dataSourceDescriptions = this.state.project.project.authorityEndpoints.concat(this.state.project.project.archiveEndpoints)
           .filter((ae) => r.datasources.filter((rd) => ae.id === rd ).length > 0)
           .map((ae) => ae.labels.find(la => la.language === 'en'))
@@ -459,8 +459,8 @@ export class ActiveComponentController {
     })
 
     this.allClasses().forEach((c) => {
-      this.gridOptions[c.id.value] = {
-        data: [{}].concat(data.filter((d) => { return d['types'] ? d['types'].map(v => v.value.value).indexOf(c.id.value) !== -1 : false })),
+      this.gridOptions[c.value] = {
+        data: [{}].concat(data.filter((d) => { return d['types'] ? d['types'].map(v => v.value.value).indexOf(c.value) !== -1 : false })),
         enableFiltering: true,
         columnDefs: [
           {

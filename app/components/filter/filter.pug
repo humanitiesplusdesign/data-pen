@@ -16,7 +16,7 @@
         li(ng-repeat="prop in clss.properties")
           a(ng-click="$ctrl.addFilter(clss, prop)") {{ prop.labels | prefLang }}
     hr
-    .filter(ng-repeat="(propId, filter) in $ctrl.localFilterTree[clss.id.value] track by propId+filter.domain[0]+filter.domain[1]" ng-show="filter.domain" ng-init="slideMin = $ctrl.slideOptionsFromFilter(filter).floor; slideMax=$ctrl.slideOptionsFromFilter(filter).ceil; slideOptions=$ctrl.slideOptionsFromFilter(filter)")
+    .filter(ng-repeat="(propId, filter) in $ctrl.localFilterTree[clss.value] track by propId+filter.domain[0]+filter.domain[1]" ng-show="filter.domain" ng-init="slideMin = $ctrl.slideOptionsFromFilter(filter).floor; slideMax=$ctrl.slideOptionsFromFilter(filter).ceil; slideOptions=$ctrl.slideOptionsFromFilter(filter)")
       .filter-container
         .filter-header
           .filter-title {{ filter.description }}: {{ $ctrl.state.project.project.dataModel.propertyMap.s[propId].labels | prefLang }}

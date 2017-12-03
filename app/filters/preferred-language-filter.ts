@@ -3,8 +3,9 @@
 import {ILiteral} from '../models/rdfjs'
 import * as angular from 'angular'
 import { IFibraNgRedux } from 'reducers';
+import { NodeSet, ONodeSet } from 'models/rdf';
 
-export function getPrefLangString(literals: ILiteral[], prefLang: string): string {
+export function getPrefLangString(literals: NodeSet<ILiteral>, prefLang: string): string {
   let dl: string = null
   let al: string = null
   let cl: ILiteral = literals.find(l => {
@@ -18,6 +19,6 @@ export function getPrefLangString(literals: ILiteral[], prefLang: string): strin
 }
 
 angular.module('fibra.filters.pref-lang', [])
-  .filter('prefLang', /* @ngInject */ ($ngRedux: IFibraNgRedux) => (literals: ILiteral[]) => {
+  .filter('prefLang', /* @ngInject */ ($ngRedux: IFibraNgRedux) => (literals: NodeSet<ILiteral>) => {
     return getPrefLangString(literals, $ngRedux.getState().general.language)
   })

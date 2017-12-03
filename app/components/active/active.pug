@@ -31,6 +31,7 @@
     .fake-typeahead
       label.cold-node(ng-click="$ctrl.addColdNode($ctrl.nodeSearchSelected)") Add "{{ $ctrl.nodeSearchSelected }}" as an unlinked node
       ul.list-style-none
+        li.cold-node Add "{{ $ctrl.nodeSearchSelected }}" as a new type
         li.result-type-container-loading(ng-repeat="type in ['Person', 'Place', 'Work'] | filter: $ctrl.nodeSearchSelected") 
           label.resultType TYPE
           label.resultActual {{ type }}
@@ -38,6 +39,7 @@
     .fake-typeahead
       label.cold-node(ng-click="$ctrl.addColdNode($ctrl.nodeSearchSelected)") Add "{{ $ctrl.nodeSearchSelected }}" as an unlinked node
       ul.list-style-none
+        li.cold-node Add "{{ $ctrl.nodeSearchSelected }}" as a new type
         li.result-type-container-loading(ng-repeat="type in ['Person', 'Place', 'Work'] | filter: $ctrl.nodeSearchSelected") 
           label.resultType TYPE
           label.resultActual {{ type }}
@@ -56,6 +58,7 @@ script(type="text/ng-template" id="resultTemplate.html")
 script(type="text/ng-template" id="resultPopupTemplate.html")
   .custom-popup-wrapper(ng-style="{top:position().top+'px', left: position().left+'px'}" style="display: block;" ng-show="isOpen() && !moveInProgress" aria-hidden="{{!isOpen()}}")
     label.cold-node(ng-click="$parent.$ctrl.addColdNode(query)") Add "{{ query }}" as an unlinked node
+    label.cold-node Add "{{ query }}" as a new type
     ul.dropdown-menu(role="listbox")
       li.uib-typeahead-match.result-type-container(ng-repeat="type in ['Person', 'Place', 'Work'] | filter: query") 
         div(uib-typeahead-match index="$index" match="type" query="query" template-url="templateUrl")

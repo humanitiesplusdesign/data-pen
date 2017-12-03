@@ -1,29 +1,32 @@
 'use strict'
 
-import {INode, NodeFromNode} from './rdf'
+import {INode, NodeFromNode, NodeSet, ONodeSet} from './rdf'
+import { ILiteral } from 'models/rdfjs';
+import { Class } from 'services/project-service/data-model';
+import { StringSet } from 'components/collection-utils';
 
 export interface IRichNode extends INode {
-  label?: string
-  description?: string
-  types?: IRichNode[]
-  sourceEndpoints?: string[]
+  labels?: ONodeSet<ILiteral>
+  descriptions?: ONodeSet<ILiteral>
+  types?: ONodeSet<Class>
+  sourceEndpoints?: StringSet
 }
 
 export class FullRichNodeFromNode extends NodeFromNode implements IRichNode {
-  constructor(node: INode, public label?: string, public description?: string, public types: IRichNode[] = [], public sourceEndpoints: string[] = []) {
+  constructor(node: INode, public labels: ONodeSet<ILiteral> = new ONodeSet<ILiteral>(), public descriptions: ONodeSet<ILiteral> = new ONodeSet<ILiteral>(), public types: ONodeSet<Class> = new ONodeSet<Class>(), public sourceEndpoints: StringSet = new StringSet()) {
     super(node)
   }
 }
 
 export class RichNodeFromRichNode extends NodeFromNode implements IRichNode {
-  public label?: string
-  public description?: string
-  public types?: IRichNode[]
-  public sourceEndpoints?: string[]
+  public labels?: ONodeSet<ILiteral>
+  public descriptions?: ONodeSet<ILiteral>
+  public types?: ONodeSet<Class>
+  public sourceEndpoints?: StringSet
   constructor(node: IRichNode) {
     super(node)
-    this.label = node.label
-    this.description = node.description
+    this.labels = node.labels
+    this.descriptions = node.descriptions
     this.types = node.types
     this.sourceEndpoints = node.sourceEndpoints
   }

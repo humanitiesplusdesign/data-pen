@@ -64,7 +64,7 @@ export class SourcesActionService {
     return sparqlItemService.createNewItems(parsedFile.map((line) => {
       let properties: IPropertyAndValue[] = []
       properties.push(new PropertyAndValue(SKOS.prefLabel, DataFactory.instance.literal(line[labelColumn])))
-      properties.push(new PropertyAndValue(RDF.type, type.id))
+      properties.push(new PropertyAndValue(RDF.type, type))
       properties.push(new PropertyAndValue(FIBRA.sourceFile, DataFactory.instance.literal(filename)))
 
       localColumns.forEach((c, i) => {

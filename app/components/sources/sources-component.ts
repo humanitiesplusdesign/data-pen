@@ -73,7 +73,7 @@ export class SourcesComponentController {
 
   private sourcePropsForClass(c: Class): any {
     let sources: string[] = d3.keys(this.localSourceClassTree)
-    let properties: Property[] = c.properties.map(p => p.id.value).map(p => this.state.project.project.dataModel.propertyMap.get(p))
+    let properties: Property[] = c.properties.map(p => p.value).map(p => this.state.project.project.dataModel.propertyMap.get(p))
     return {
       sources: sources,
       properties: properties

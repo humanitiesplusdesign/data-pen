@@ -2,7 +2,7 @@
 
 import { ISparqlBinding, SparqlService } from 'angular-sparql-service'
 import { ITerm, INamedNode, ILiteral, IDefaultGraph, IUNDEF, IVariable, IBlankNode, IQuad, ITriple, IDataFactory} from 'models/rdfjs'
-import { IEMap, EMap, EOMap } from 'components/collection-utils'
+import { IEMap, EMap, EOMap, IMap, FMap, OMap } from 'components/collection-utils'
 
 export interface INode extends ITerm {
   language?: string
@@ -144,6 +144,10 @@ export class DataFactory implements IDataFactory {
   }
   public static quad(subject: ITerm, predicate: ITerm, object: ITerm, graph?: ITerm): IQuad {
     return DataFactory.instance.quad(subject, predicate, object, graph)
+  }
+
+  public literalFromBinding(binding: ISparqlBinding): ILiteral {
+    return new Literal(binding.value, binding.language, binding.datatype)
   }
 
   public nodeFromBinding(binding: ISparqlBinding): INode {
@@ -301,44 +305,115 @@ export class GEOVOCAB {
   public static Feature: INamedNode = new NamedNode(GEOVOCAB.ns + 'Feature')
 }
 
-export class ENodeMap<V> {
-  constructor(private create: (key?: INode) => V = () => { return <V>{}}, private map: IEMap<V> = new EMap<V>()) {}
+export class NodeMap<V> {
+  constructor(public imap: IMap<V> = new FMap<V>()) {}
+  public get(key: INode): V {
+    return this.imap.get(key.toCanonical())
+  }
+  public remove(key: INode): boolean {
+    return this.imap.remove(key.toCanonical())
+  }
+  public each(f: (value: V, key: INode, map: NodeMap<V>) => void): void {
+    this.imap.each((value, key, map) => f(value, DataFactory.instance.nodeFromCanonicalRepresentation(key), this))
+  }
+  public map(f: (value: V, key: INode, map: NodeMap<V>) => {value: V, key: INode}): NodeMap<V> {
+    let ret: NodeMap<V> = new NodeMap<V>()
+    this.each((value: V, key: INode) => {
+      let mapped: {value: V, key: INode} = f(value, key, this)
+      ret.set(mapped.key, mapped.value)
+    })
+    return ret
+  }
+  public clone(): NodeMap<V> {
+    let ret: NodeMap<V> = new NodeMap<V>()
+    this.each((value: V, key: INode) => ret.set(key, value))
+    return ret
+  }
+  public mapValues(f: (value: V, key: INode, map: NodeMap<V>) => V): NodeMap<V> {
+    let ret: NodeMap<V> = new NodeMap<V>()
+    this.each((value: V, key: INode) => {
+      ret.set(key, f(value, key, this))
+    })
+    return ret
+  }
+  public some(f: (value: V, key: INode, map: NodeMap<V>) => boolean): boolean {
+    return this.imap.some((value, key, map) => f(value, DataFactory.instance.nodeFromCanonicalRepresentation(key), this))
+  }
+  public find(f: (value: V, key: INode, map: NodeMap<V>) => boolean): {value: V, key: INode} {
+    let ret: {key: string, value: V} = this.imap.find((value, key, map) => f(value, DataFactory.instance.nodeFromCanonicalRepresentation(key), this))
+    if (!ret) return null
+    return {key: DataFactory.instance.nodeFromCanonicalRepresentation(ret.key), value: ret.value }
+  }
+  public has(key: INode): boolean {
+    return this.imap.has(key.toCanonical())
+  }
+  public set(key: INode, value: V): NodeMap<V> {
+    this.imap.set(key.toCanonical(), value)
+    return this
+  }
+  get size(): number {
+    return this.imap.size()
+  }
+  public empty(): boolean {
+    return this.imap.empty()
+  }
+  public values(): V[] {
+    return this.imap.values()
+  }
+  public keys(): INode[] {
+    return this.imap.keys().map(k => DataFactory.instance.nodeFromCanonicalRepresentation(k))
+  }
+  public entries(): {key: INode, value: V}[] {
+    return this.imap.entries().map(o => { return { key: DataFactory.instance.nodeFromCanonicalRepresentation(o.key), value: o.value }})
+  }
+  public clear(): NodeMap<V> {
+    this.imap.clear()
+    return this
+  }
+}
+
+export class ENodeMap<V> extends NodeMap<V> {
+  constructor(private create: (key?: INode) => V = () => { return <V>{}}, public imap: IEMap<V> = new EMap<V>()) {
+    super(imap)
+  }
   public goc(key: INode, create?: (key?: INode) => V): V {
     if (!this.has(key))
       this.set(key, create ? create(key) : this.create(key))
     return this.get(key)
   }
-  public get(key: INode): V {
-    return this.map.get(key.toCanonical())
+  public clone(): ENodeMap<V> {
+    let ret: ENodeMap<V> = new ENodeMap<V>(this.create)
+    this.each((value: V, key: INode) => ret.set(key, value))
+    return ret
   }
-  public remove(key: INode): boolean {
-    return this.map.remove(key.toCanonical())
+}
+
+export class ONodeMap<V> extends NodeMap<V> {
+  constructor() {
+    super(new OMap<V>())
   }
-  public each(f: (value: V, key: INode, map: ENodeMap<V>) => void): void {
-    this.map.each((value, key, map) => f(value, DataFactory.instance.nodeFromCanonicalRepresentation(key), this))
+  public map(f: (value: V, key: INode, map: NodeMap<V>) => {value: V, key: INode}): ONodeMap<V> {
+    let ret: ONodeMap<V> = new ONodeMap<V>()
+    this.each((value: V, key: INode) => {
+      let mapped: {value: V, key: INode} = f(value, key, this)
+      ret.set(mapped.key, mapped.value)
+    })
+    return ret
   }
-  public has(key: INode): boolean {
-    return this.map.has(key.toCanonical())
+  public clone(): ONodeMap<V> {
+    let ret: ONodeMap<V> = new ONodeMap<V>()
+    this.each((value: V, key: INode) => ret.set(key, value))
+    return ret
   }
-  public set(key: INode, value: V): ENodeMap<V> {
-    this.map.set(key.toCanonical(), value)
-    return this
+  public mapValues(f: (value: V, key: INode, map: NodeMap<V>) => V): ONodeMap<V> {
+    let ret: ONodeMap<V> = new ONodeMap<V>()
+    this.each((value: V, key: INode) => {
+      ret.set(key, f(value, key, this))
+    })
+    return ret
   }
-  get size(): number {
-    return this.map.size()
-  }
-  public values(): V[] {
-    return this.map.values()
-  }
-  public keys(): INode[] {
-    return this.map.keys().map(k => DataFactory.instance.nodeFromCanonicalRepresentation(k))
-  }
-  public entries(): {key: INode, value: V}[] {
-    return this.map.entries().map(o => { return { key: DataFactory.instance.nodeFromCanonicalRepresentation(o.key), value: o.value }})
-  }
-  public clear(): ENodeMap<V> {
-    this.map.clear()
-    return this
+  public removei(index: number): void {
+    (this.imap as OMap<V>).removei(index)
   }
 }
 
@@ -346,12 +421,35 @@ export class EONodeMap<V> extends ENodeMap<V> {
   constructor(create?: (key?: INode) => V ) {
     super(create, new EOMap<V>())
   }
+  public map(f: (value: V, key: INode, map: ENodeMap<V>) => {value: V, key: INode}): EONodeMap<V> {
+    let ret: EONodeMap<V> = new EONodeMap<V>()
+    this.each((value: V, key: INode) => {
+      let mapped: {value: V, key: INode} = f(value, key, this)
+      ret.set(mapped.key, mapped.value)
+    })
+    return ret
+  }
+  public clone(): EONodeMap<V> {
+    let ret: EONodeMap<V> = new EONodeMap<V>()
+    this.each((value: V, key: INode) => ret.set(key, value))
+    return ret
+  }
+  public mapValues(f: (value: V, key: INode, map: EONodeMap<V>) => V): EONodeMap<V> {
+    let ret: EONodeMap<V> = new EONodeMap<V>()
+    this.each((value: V, key: INode) => {
+      ret.set(key, f(value, key, this))
+    })
+    return ret
+  }
+  public removei(index: number): void {
+    (this.imap as EOMap<V>).removei(index)
+  }
 }
 
 export class NodeSet<N extends INode> {
-  public m: ENodeMap<N>
-  constructor(map: IEMap<N> = new EMap<N>()) {
-    this.m = new ENodeMap<N>(undefined, map)
+  public m: NodeMap<N>
+  constructor(map: IMap<N> = new FMap<N>()) {
+    this.m = new NodeMap<N>(map)
   }
   public add(value: N): NodeSet<N> {
     this.m.set(value, value)
@@ -379,7 +477,6 @@ export class NodeSet<N extends INode> {
   public remove(value: N): boolean {
     return this.m.remove(value)
   }
-
   public values(): N[] {
     return this.m.values()
   }
@@ -388,13 +485,54 @@ export class NodeSet<N extends INode> {
     return this.m.size
   }
 
-  public each(f: (value: N, key: N, set: NodeSet<N>) => void): void {
+  public empty(): boolean {
+    return this.m.empty()
+  }
+
+  public each(f: (value: N, valueRepeat: N, set: NodeSet<N>) => void): void {
     this.m.each((value, key, map) => f(value, value, this))
+  }
+  public map(f: (value: N, valueRepeat: N, set: NodeSet<N>) => N): NodeSet<N> {
+    let ret: NodeSet<N> = new NodeSet<N>()
+    this.each(value => ret.add(f(value, value, this)))
+    return ret
+  }
+  public clone(): NodeSet<N> {
+    let ret: NodeSet<N> = new NodeSet<N>()
+    this.each(value => ret.add(value))
+    return ret
+  }
+  public some(f: (value: N, valueRepeat: N, set: NodeSet<N>) => boolean): boolean {
+    return this.m.some((value, key, map) => f(value, value, this))
+  }
+  public find(f: (value: N, valueRepeat: N, set: NodeSet<N>) => boolean): N {
+    let ret: {key: INode, value: N} =  this.m.find((value, key, map) => f(value, value, this))
+    if (!ret) return null
+    return ret.value
   }
 }
 
 export class ONodeSet<N extends INode> extends NodeSet<N> {
   constructor() {
-    super(new EOMap<N>())
+    super(new OMap<N>())
+  }
+  public removei(index: number): void {
+    (this.m.imap as OMap<N>).removei(index)
+  }
+  public map(f: (value: N, valueRepeat: N, set: NodeSet<N>) => N): ONodeSet<N> {
+    let ret: ONodeSet<N> = new ONodeSet<N>()
+    this.each(value => ret.add(f(value, value, this)))
+    return ret
+  }
+  public clone(): ONodeSet<N> {
+    let ret: ONodeSet<N> = new ONodeSet<N>()
+    this.each(value => ret.add(value))
+    return ret
+  }
+  public first(): N {
+    return (this.m.imap as OMap<N>).firstValue()
+  }
+  public last(): N {
+    return (this.m.imap as OMap<N>).lastValue()
   }
 }

@@ -11,7 +11,7 @@
           span.source-name {{source.labels | prefLang}}
         .class-list(ng-show="$ctrl.projectsOpen[source.id] ? true : false")
           label.checkbox-container(ng-repeat="clss in source.classes" ng-hide="clss.labels.length === 0") 
-            input(type="checkbox", ng-model="$ctrl.localSourceClassTree[source.id][clss.id.value]" ng-click="$ctrl.sourcesActionService.setSourceClassActive(source.id, clss.id.value, !$ctrl.getSourceClassStatus(source.id, clss.id.value))")
+            input(type="checkbox", ng-model="$ctrl.localSourceClassTree[source.id][clss.value]" ng-click="$ctrl.sourcesActionService.setSourceClassActive(source.id, clss.value, !$ctrl.getSourceClassStatus(source.id, clss.value))")
             span {{clss.labels | prefLang}}
     .sources-list(ng-show="$ctrl.state.sources.archiveSources.length != 0")
       h4.sources-category-title Archives
@@ -21,7 +21,7 @@
           span.source-name {{source.labels | prefLang}}
         .class-list(ng-show="$ctrl.projectsOpen[source.id] ? true : false")
           label.checkbox-container(ng-repeat="clss in source.classes" ng-hide="clss.labels.length === 0") 
-            input(type="checkbox", ng-model="$ctrl.localSourceClassTree[source.id][clss.id.value]" ng-click="$ctrl.sourcesActionService.setSourceClassActive(source.id, clss.id.value, !$ctrl.getSourceClassStatus(source.id, clss.id.value))")
+            input(type="checkbox", ng-model="$ctrl.localSourceClassTree[source.id][clss.value]" ng-click="$ctrl.sourcesActionService.setSourceClassActive(source.id, clss.value, !$ctrl.getSourceClassStatus(source.id, clss.value))")
             span {{clss.labels | prefLang}}
   .sources-right
     uib-tabset(type="tabs")
@@ -37,5 +37,7 @@
             .matrix-cell(ng-repeat="prop in $ctrl.sourcePropsForClass(class).properties")
               input.matrix-cell-checkbox(type="checkbox")
           .matrix-total-container
+            .matrix-total
+              .matrix-total-label Total
             .matrix-total-cell(ng-repeat="prop in $ctrl.sourcePropsForClass(class).properties")
               input.matrix-cell-checkbox(type="checkbox")

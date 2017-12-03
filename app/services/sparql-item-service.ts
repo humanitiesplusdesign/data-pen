@@ -11,6 +11,7 @@ import {ISparqlBinding} from 'angular-sparql-service'
 import {SparqlUpdateWorkerService} from 'services/sparql-update-service'
 import {StateWorkerService, WorkerWorkerService} from 'services/worker-service/worker-worker-service'
 import {UUID, flatten} from 'components/misc-utils'
+import { DataModel } from 'services/project-service/data-model';
 
 export interface IPropertyToValues extends IRichNode {
   values: IRichPropertyValue[]
@@ -170,23 +171,23 @@ WHERE {
 
 export class SparqlItemWorkerService {
 
-  private static processItemResult(properties: PropertyToValues[], propertyMap: EMap<PropertyToValues>, propertyValueMap: EMap<EMap<IRichNode>>, sameAses: INode[], endpoint: string, b: {[varId: string]: ISparqlBinding}): void {
+  private static processItemResult(properties: PropertyToValues[], dataModel: DataModel, propertyMap: EMap<PropertyToValues>, propertyValueMap: EMap<EMap<IRichNode>>, sameAses: INode[], endpoint: string, b: {[varId: string]: ISparqlBinding}): void {
     if (b['property']) {
       let n: IRichNode = propertyValueMap.goc(b['property'].value).goc(b['object'].value, () => {
         let propertyToValues: PropertyToValues = propertyMap.goc(b['property'].value, () => {
           let ret: PropertyToValues = new PropertyToValues(DataFactory.instance.nodeFromBinding(b['property']))
-          if (b['propertyLabel']) ret.label = b['propertyLabel'].value
+          if (b['propertyLabel']) ret.labels.add(DataFactory.instance.literalFromBinding(b['propertyLabel']))
           properties.push(ret)
           return ret
         })
         let oNode: IRichNode = new FullRichNodeFromNode(DataFactory.instance.nodeFromBinding(b['object']))
-        oNode.sourceEndpoints = []
+        oNode.sourceEndpoints = new StringSet()
         propertyToValues.values.push(new RichPropertyValue(oNode))
         if (OWL.sameAs.equals(propertyToValues)) sameAses.push(oNode)
         return oNode
       })
-      n.sourceEndpoints.push(endpoint)
-      if (b['objectLabel'] && !n.label) n.label = b['objectLabel'].value
+      n.sourceEndpoints.add(endpoint)
+      if (b['objectLabel'] && n.labels.empty()) n.labels.add(DataFactory.instance.literalFromBinding(b['objectLabel']))
     }
   }
 
@@ -207,8 +208,8 @@ export class SparqlItemWorkerService {
         let idSameAses: ENodeMap<INode[]> = new ENodeMap<INode[]>(() => [])
         for (let b of response.results.bindings) {
           let item: Item = items.goc(b['id'].value)
-          if (b['itemLabel']) item.label = b['itemLabel'].value
-          SparqlItemWorkerService.processItemResult(item.localProperties, idPropertyMap.goc(b['id'].value), idPropertyValueMap.goc(b['id'].value), idSameAses.goc(item), this.stateWorkerService.state.project.endpoint, b)
+          if (b['itemLabel']) item.labels = b['itemLabel'].value
+          SparqlItemWorkerService.processItemResult(item.localProperties,  this.stateWorkerService.state.project.dataModel, idPropertyMap.goc(b['id'].value), idPropertyValueMap.goc(b['id'].value), idSameAses.goc(item), this.stateWorkerService.state.project.endpoint, b)
         }
         if (queryRemote) {
           ret.notify({ endpointType: 'primary', endpoint: this.stateWorkerService.state.project.endpoint, items: items.values()})
@@ -234,7 +235,7 @@ export class SparqlItemWorkerService {
                 if (response2.results.bindings.length !== 0) {
                   for (let b of response2.results.bindings) {
                     let item: Item = items.goc(b['id'].value)
-                    SparqlItemWorkerService.processItemResult(item.remoteProperties, idPropertyMap.goc(b['id'].value), idPropertyValueMap.goc(b['id'].value), idSameAses.goc(item), endpoint.id, b)
+                    SparqlItemWorkerService.processItemResult(item.remoteProperties,  this.stateWorkerService.state.project.dataModel, idPropertyMap.goc(b['id'].value), idPropertyValueMap.goc(b['id'].value), idSameAses.goc(item), endpoint.id, b)
                   }
                   ret.notify({ endpointType: 'remote', endpoint: endpoint.id, items: items.values()})
                 }

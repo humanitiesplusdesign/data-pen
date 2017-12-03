@@ -23,8 +23,8 @@ export class EditPrimaryEndpointConfigurationViewComponentController  extends Ed
     else {
       this.c = new PrimaryEndpointConfiguration()
       this.c.id = $stateParams.id
-      this.c.labels = [ DataFactory.literal('', $ngRedux.getState().general.language)]
-      this.c.descriptions = [ DataFactory.literal('', $ngRedux.getState().general.language)]
+      this.c.labels.add(DataFactory.literal('', $ngRedux.getState().general.language))
+      this.c.descriptions.add(DataFactory.literal('', $ngRedux.getState().general.language))
     }
   }
 }
