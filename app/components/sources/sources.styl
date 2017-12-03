@@ -120,7 +120,7 @@ sources {
           height: 150px
 
           .matrix-property {
-            border: 1px solid blue
+            // border: 1px solid blue
             display: inline-block
             width: 50px
             height: 150px
@@ -145,7 +145,7 @@ sources {
           height: 50px
 
           .matrix-source {
-            border: 1px solid blue
+            // border: 1px solid blue
             display: inline-block
             width: 150px
             height: 50px
@@ -162,11 +162,15 @@ sources {
           }
 
           .matrix-cell {
-            border: 1px solid blue
+            border: 1px solid white
             display: inline-block
             width: 50px
             height: 50px
             vertical-align: top
+            background-color: rgba(0, 0, 0, 0.1)
+            box-sizing: border-box;
+            -moz-box-sizing: border-box;
+            -webkit-box-sizing: border-box;
 
             .matrix-cell-checkbox {
               margin-left: 18px
@@ -177,15 +181,36 @@ sources {
 
         .matrix-total-container {
           margin-top: 25px
-          margin-left: 150px
+          // margin-left: 150px
           height: 50px
 
+          .matrix-total {
+            // border: 1px solid blue
+            display: inline-block
+            width: 150px
+            height: 50px
+
+            .matrix-total-label {
+              display: inline-block
+              width: 150px
+              height: 50px
+              text-align: right
+              overflow-y: hidden
+              text-overflow: ellipsis
+              padding-right: 15px
+            }
+          }
+
           .matrix-total-cell {
-            border: 1px solid green
+            border: 1px solid white
+            background-color: rgba(0, 0, 0, 0.1)
             display: inline-block
             width: 50px
             height: 50px
             vertical-align: top
+            box-sizing: border-box;
+            -moz-box-sizing: border-box;
+            -webkit-box-sizing: border-box;
 
             .matrix-cell-checkbox {
               margin-left: 18px
