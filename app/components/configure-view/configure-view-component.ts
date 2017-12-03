@@ -45,7 +45,7 @@ export class ConfigureViewComponentController implements angular.IComponentContr
   }
 
   public projectTitleFilled(): boolean {
-    let projectTitleLength: number = this.project.labels.first().value.length
+    let projectTitleLength: number = this.project ? this.project.labels.first().value.length : 0
     if (projectTitleLength > 0) {
       return true
     } else {
