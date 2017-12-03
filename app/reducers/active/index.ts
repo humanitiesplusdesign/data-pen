@@ -60,7 +60,7 @@ export default function models(state: IActiveState = defaultState, action): IAct
       newItems2.splice(newItems2.indexOf(updateItem), 1)
       newItems2.push(Object.assign({}, updateItem, {
         description: !updateItem.description && fullItem && fullItem.remoteProperties.find((rp) => rp.property.value === SKOS.prefLabel.value) ?
-          getPrefLangString(fullItem.remoteProperties.find((rp) => rp.property.value === SKOS.prefLabel.value).values[0].value.labels, 'en') :
+          fullItem.remoteProperties.find((rp) => rp.property.value === SKOS.prefLabel.value).values[0].value.value :
           updateItem.description,
         item: fullItem
       }))

@@ -50,6 +50,7 @@ export class ExpandModalComponentController {
           && p.property.value !== SKOS.altLabel.value
           && p.property.value !== 'http://purl.org/dc/terms/identifier'
         )
+    console.log(this.itemProperties)
   }
 
   private expand(propValues: PropertyToValues): void {

@@ -3,7 +3,7 @@
 .modal-body#modal-body
   ul
     li(ng-repeat="propValues in $ctrl.itemProperties")
-      span.property-name {{ propValues.label }}
+      span.property-name {{ propValues.property.labels | prefLang }}
       span.property-results {{ propValues.values.length }}
       button.expand-button.text-button.transition-100(ng-click="$ctrl.expand(propValues)") Expand
 .modal-footer
