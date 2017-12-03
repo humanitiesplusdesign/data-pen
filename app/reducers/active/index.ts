@@ -1,4 +1,4 @@
-import { ADD_ITEM_TO_ITEM_STATE } from 'actions/active';
+import { ADD_ITEM_TO_ITEM_STATE, DELETE_ITEM_FROM_LAYOUT } from 'actions/active';
 import { Item } from 'services/sparql-item-service';
 import { INode, SKOS } from 'models/rdf';
 import { ADD_ITEM_TO_CURRENT_LAYOUT, SET_ACTIVE_DIVIDER_PERCENTAGE, CLEAR_ACTIVE_STATE } from 'actions/active'
@@ -40,6 +40,15 @@ export default function models(state: IActiveState = defaultState, action): IAct
       return Object.assign({}, state, {
         activeLayout: Object.assign({}, state.activeLayout, {
           items: newItems
+        })
+      })
+
+    case DELETE_ITEM_FROM_LAYOUT:
+      let newItems3: IItemState[] = state.activeLayout.items.slice(0)
+      newItems3.splice(newItems3.indexOf(action.payload), 1)
+      return Object.assign({}, state, {
+        activeLayout: Object.assign({}, state.activeLayout, {
+          items: newItems3
         })
       })
 

@@ -106,7 +106,11 @@ export class ActiveComponentController {
       }, {
         icon: 'reconcile-icon'
       }, {
-        icon: 'remove-icon'
+        icon: 'remove-icon',
+        click: () => {
+          this.activeActionService.deleteItemFromCurrentLayout(this.currentMenuItem)
+          this.updateCanvas()
+        }
       }]
     })
 
@@ -179,7 +183,6 @@ export class ActiveComponentController {
   private processResults(res: AutocompletionResults): Result[] {
     let activeItemIds: string[] = this.$ngRedux.getState().active.activeLayout.items.map((d: IItemState) => d.ids.map((i) => i.value)).reduce((a, b) => a.concat(b), [])
     let ret: Result[] = []
-    console.log(res)
     let processMatchingResults: (results: ResultGroup, classRestrict: boolean) => void = (results, classRestrict) => results.results.forEach(r => {
       if (activeItemIds.indexOf(r.ids[0].value) === -1 && r.additionalInformation.type && r.additionalInformation.type[0]
       // Class filter (TODO: Move server-side)
@@ -306,6 +309,8 @@ export class ActiveComponentController {
       .data(this.state.active.activeLayout.items, (it: IItemState) => {
         return it.ids[0].value;
       })
+
+    itemSelection.exit().remove()
 
     let tooltipSelection: d3.Selection<HTMLDivElement, IItemState, BaseType, {}> = d3.select('.tooltips')
       .selectAll<HTMLDivElement, {}>('.active-tooltip')

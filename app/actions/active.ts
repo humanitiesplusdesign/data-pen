@@ -11,7 +11,7 @@ export const ADD_ITEM_TO_CURRENT_LAYOUT: string = 'ADD_ITEM_TO_CURRENT_LAYOUT'
 export const SET_ACTIVE_DIVIDER_PERCENTAGE: string = 'SET_ACTIVE_DIVIDER_PERCENTAGE'
 export const CLEAR_ACTIVE_STATE: string = 'CLEAR_ACTIVE_STATE'
 export const ADD_ITEM_TO_ITEM_STATE: string = 'ADD_ITEM_TO_ITEM_STATE'
-export const CREATE_NEW_ITEM: string = 'CREATE_NEW_ITEM'
+export const DELETE_ITEM_FROM_LAYOUT: string = 'DELETE_ITEM_FROM_LAYOUT'
 
 export interface IAddItemToCurrentLayoutAction extends Action {
   payload: IItemState
@@ -19,6 +19,10 @@ export interface IAddItemToCurrentLayoutAction extends Action {
 
 export interface ISetActiveDividerPercentage extends Action {
   payload: number
+}
+
+export interface IDeleteItemFromCurrentLayoutAction extends Action {
+  payload: IItemState
 }
 
 export class ActiveActionService {
@@ -59,6 +63,13 @@ export class ActiveActionService {
     ]).then((node) => {
       item.ids = [node]
       return this.addItemToCurrentLayout(item)
+    })
+  }
+
+  public deleteItemFromCurrentLayout(item: IItemState): IDeleteItemFromCurrentLayoutAction {
+    return this.$ngRedux.dispatch({
+      type: DELETE_ITEM_FROM_LAYOUT,
+      payload: item
     })
   }
 }
