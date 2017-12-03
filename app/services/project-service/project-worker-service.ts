@@ -32,15 +32,15 @@ export class ProjectWorkerService {
   }
 
   public loadRemoteEndpointConfiguration(source: ICitableSource, templateId: string): angular.IPromise<RemoteEndpointConfiguration> {
-    return this.runSingleQuery(source, RemoteEndpointConfiguration.remoteEndpointConfigurationQuery, templateId, new RemoteEndpointConfiguration(templateId, source))
+    return this.runSingleQuery(source, RemoteEndpointConfiguration.listRemoteEndpointConfigurationsQuery, templateId, new RemoteEndpointConfiguration(templateId, source))
   }
 
   public listArchiveEndpointConfigurations(source: ICitableSource): angular.IPromise<RemoteEndpointConfiguration[]> {
-    return this.runListQuery(source, RemoteEndpointConfiguration.listArchiveEndpointConfigurationsQuery, (id: string) => new RemoteEndpointConfiguration(id, source))
+    return this.runListQuery(source, RemoteEndpointConfiguration.listRemoteEndpointConfigurationsQuery.replace(/# TYPELIMIT/g, '?id a fibra:ArchiveEndpointConfiguration'), (id: string) => new RemoteEndpointConfiguration(id, source))
   }
 
   public listAuthorityEndpointConfigurations(source: ICitableSource): angular.IPromise<RemoteEndpointConfiguration[]> {
-    return this.runListQuery(source, RemoteEndpointConfiguration.listAuthorityEndpointConfigurationsQuery, (id: string) => new RemoteEndpointConfiguration(id, source))
+    return this.runListQuery(source, RemoteEndpointConfiguration.listRemoteEndpointConfigurationsQuery.replace(/# TYPELIMIT/g, '?id a fibra:AuthorityEndpointConfiguration'), (id: string) => new RemoteEndpointConfiguration(id, source))
   }
 
   public listProjects(source: ICitableSource): angular.IPromise<Project[]> {
@@ -146,19 +146,10 @@ export class ProjectWorkerService {
     let q: angular.IPromise<Project> = this.runSingleQuery(source, Project.listProjectsQuery, id, new Project(id, source))
     if (!loadFull) return q; else return q.then(p => {
       let promises: angular.IPromise<any>[] = []
-      promises.push(this.$q.all(p.schemas.map(schema => this.loadSchema(schema.source, schema.id))).then(schemas => {
-        p.schemas = schemas
-        return this.loadDataModel(schemas, p.archiveEndpoints.concat(p.authorityEndpoints)).then(dm => p.dataModel = dm)
-      }))
-      let narche: RemoteEndpointConfiguration[] = []
-      let nauthe: RemoteEndpointConfiguration[] = []
-      p.archiveEndpoints.forEach(ae => promises.push(this.loadRemoteEndpointConfiguration(ae.source, ae.id).then(ae2 => narche.push(ae2))))
-      p.authorityEndpoints.forEach(ae => promises.push(this.loadRemoteEndpointConfiguration(ae.source, ae.id).then(ae2 => nauthe.push(ae2))))
-      return this.$q.all(promises).then(() => {
-        p.archiveEndpoints = narche
-        p.authorityEndpoints = nauthe
-        return p
-      })
+      promises.push(this.$q.all(p.schemas.map(schema => this.loadSchema(schema.source, schema.id))).then(schemas => p.schemas = schemas))
+      promises.push(this.$q.all(p.archiveEndpoints.map(ae => this.loadRemoteEndpointConfiguration(ae.source, ae.id))).then(aes => p.archiveEndpoints = aes))
+      promises.push(this.$q.all(p.authorityEndpoints.map(ae => this.loadRemoteEndpointConfiguration(ae.source, ae.id))).then(aes => p.authorityEndpoints = aes))
+      return this.$q.all(promises).then(() => this.loadDataModel(p.schemas, p.archiveEndpoints.concat(p.authorityEndpoints)).then(dm => p.dataModel = dm).then(() => p))
     })
   }
 
@@ -168,7 +159,7 @@ export class ProjectWorkerService {
     let deferred: angular.IDeferred<T> = this.$q.defer()
     this.fibraSparqlService.query(source.sparqlEndpoint, tq).then(response => {
       let conf: IBindingsToObjectConfiguration = {
-        bindingTypes: { rightsHolders: 'uniqueArray', schemas: 'uniqueArray', compatibleSchemas: 'uniqueArray', authorityEndpoints: 'uniqueArray', archiveEndpoints: 'uniqueArray'},
+        bindingTypes: { rightsHolders: 'uniqueArray', schemas: 'uniqueArray', authorityEndpoints: 'uniqueArray', archiveEndpoints: 'uniqueArray'},
         bindingConverters: {
           dateCreated: (binding) => new Date(binding.value),
           types: (binding) => DataFactory.nodeFromBinding(binding),
@@ -202,7 +193,7 @@ export class ProjectWorkerService {
       response => {
         let projects: EMap<T> = new EMap<T>(oc)
         let conf: IBindingsToObjectConfiguration = {
-          bindingTypes: { rightsHolders: 'uniqueArray', schemas: 'uniqueArray', compatibleSchemas: 'uniqueArray', authorityEndpoints: 'uniqueArray', archiveEndpoints: 'uniqueArray'},
+          bindingTypes: { rightsHolders: 'uniqueArray', schemas: 'uniqueArray', authorityEndpoints: 'uniqueArray', archiveEndpoints: 'uniqueArray'},
           bindingConverters: {
             dateCreated: (binding) => new Date(binding.value),
             types: (binding) => DataFactory.nodeFromBinding(binding),

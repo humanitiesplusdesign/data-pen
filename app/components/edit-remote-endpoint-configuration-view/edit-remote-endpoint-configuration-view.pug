@@ -20,6 +20,15 @@
     label Item query template
     yasqe(content="$ctrl.c.itemQuery",on-content-changed="$ctrl.c.itemQuery = content")
   .form-group
-    label Tree query template
-    yasqe(content="$ctrl.c.treeQuery",on-content-changed="$ctrl.c.treeQuery = content")
+    label Class statistics query template
+    yasqe(content="$ctrl.c.classStatisticsQuery",on-content-changed="$ctrl.c.classStatisticsQuery = content")
+  .form-group
+    label Schema endpoint
+    input.form-control(type="text",ng-model="$ctrl.c.schemaEndpoint")
+  .form-group
+    label Class query template
+    yasqe(content="$ctrl.c.classQuery",on-content-changed="$ctrl.c.classQuery = content")
+  .form-group
+    label Property query template
+    yasqe(content="$ctrl.c.propertyQuery",on-content-changed="$ctrl.c.propertyQuery = content")
   button.btn.btn-success(ng-click="$ctrl.save()",ng-disabled="$ctrl.disabled") Save to endpoint
