@@ -106,7 +106,11 @@ export class ActiveComponentController {
       }, {
         icon: 'reconcile-icon'
       }, {
-        icon: 'remove-icon'
+        icon: 'remove-icon',
+        click: () => {
+          this.activeActionService.deleteItemFromCurrentLayout(this.currentMenuItem)
+          this.updateCanvas()
+        }
       }]
     })
 
@@ -305,6 +309,8 @@ export class ActiveComponentController {
       .data(this.state.active.activeLayout.items, (it: IItemState) => {
         return it.ids[0].value;
       })
+
+    itemSelection.exit().remove()
 
     let tooltipSelection: d3.Selection<HTMLDivElement, IItemState, BaseType, {}> = d3.select('.tooltips')
       .selectAll<HTMLDivElement, {}>('.active-tooltip')
