@@ -1,6 +1,6 @@
 'use strict'
 import { ActiveActionService } from '../../actions/active';
-import { Class, IClass } from '../../services/project-service/data-model';
+import { Class, IClass, IProperty, Property } from '../../services/project-service/data-model';
 import { CNode, DataFactory, NamedNode, RDF, SKOS } from '../../models/rdf';
 import { IItemState } from '../../reducers/active';
 import { AutocompletionResults, Result, SparqlAutocompleteService, ResultGroup } from '../../services/sparql-autocomplete-service';
@@ -25,6 +25,12 @@ import { HIDE_ITEM } from 'actions/items';
 interface IActiveComponentControllerState {
   project: ProjectState
   active: IActiveState
+}
+
+export interface ILink {
+  source: IItemState,
+  target: IItemState,
+  prop: IProperty
 }
 
 export class ActiveComponentController {
@@ -299,11 +305,59 @@ export class ActiveComponentController {
     return sel
   }
 
+  private calculateLinks(): ILink[] {
+    let activeItemValues: string[] = this.state.active.activeLayout.items.filter(i => i.item).map(i => i.item.value)
+    let links: ILink[] = []
+
+    this.state.active.activeLayout.items.filter(i => i.item).forEach(i => {
+      i.item.localProperties.concat(i.item.remoteProperties).forEach(p => {
+        p.values.forEach(v => {
+          if (activeItemValues.indexOf(v.value.value) !== -1 && v.value.value !== i.item.value) {
+            links.push({
+              source: i,
+              target: this.state.active.activeLayout.items[activeItemValues.indexOf(v.value.value)],
+              prop: p.property
+            })
+          }
+        })
+      })
+    })
+
+    return links
+  }
+
   private updateCanvas(): void {
     let s: d3.Selection<Element, {}, HTMLElement, any> = d3.select('.main-svg')
     let g: d3.Selection<Element, {}, HTMLElement, any> = s.select('.main-g')
     let itemG: d3.Selection<SVGGElement, {}, HTMLElement, any> = g.select('.main-g-items')
+    let linkG: d3.Selection<SVGGElement, {}, HTMLElement, any> = g.select('.main-g-links')
     let ctrl: this = this
+
+    let linkSelection: d3.Selection<SVGGElement, ILink, Element, {}> = linkG.selectAll<SVGGElement, {}>('.item-link')
+      .data(this.calculateLinks(), (link: ILink) => {
+        return link.source.ids[0].value + link.target.ids[0].value + link.prop.value
+      })
+
+    linkSelection.exit().remove()
+
+    let linkEnterSel: d3.Selection<SVGGElement, ILink, Element, {}> = linkSelection.enter()
+      .append<SVGGElement>('g')
+      .classed('link', true)
+      .classed('item-link', true)
+
+    linkEnterSel.append<SVGLineElement>('line')
+      .classed('link-line', true)
+
+    linkSelection = linkSelection.merge(linkEnterSel)
+
+    linkSelection.attr('transform', (d) => { return 'translate(' + d.source.leftOffset + ',' + d.source.topOffset + ')' })
+
+    linkSelection
+      .select('line')
+        .attr('x1', d => 0 + 'px' )
+        .attr('y1', d => 0 + 'px' )
+        .attr('x2', d => ( d.target.leftOffset - d.source.leftOffset ) + 'px' )
+        .attr('y2', d => ( d.target.topOffset - d.source.topOffset ) + 'px' )
 
     let itemSelection: d3.Selection<SVGGElement, IItemState, Element, {}> = itemG.selectAll<SVGGElement, {}>('.item-node')
       .data(this.state.active.activeLayout.items, (it: IItemState) => {
