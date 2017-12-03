@@ -2,7 +2,7 @@
   uib-tabset(type="tabs")
     uib-tab(ng-repeat="class in $ctrl.allClasses()" index="$index" heading="{{ class.labels | prefLang }}")
       //- .main-grid(ui-grid="{ data: $ctrl.state.active.activeLayout.items, enableFiltering: true }" ng-hide="$ctrl.state.active.dividerPercent < 2" ui-grid-auto-resize ui-grid-edit ui-grid-resize-columns ui-grid-empty-base-layer)
-      .main-grid(id="{{ 'grid' + $index }}" ui-grid="$ctrl.gridOptions[class.id.value]" ng-hide="$ctrl.state.active.dividerPercent < 2" ui-grid-auto-resize ui-grid-edit ui-grid-resize-columns)
+      .main-grid(id="{{ 'grid' + $index }}" ui-grid="$ctrl.gridOptions[class.value]" ng-hide="$ctrl.state.active.dividerPercent < 2" ui-grid-auto-resize ui-grid-edit ui-grid-resize-columns)
 .main-canvas(ng-style="$ctrl.canvasWidthStyle()")
   .control-area
     button.active-circle-button(uib-popover-template="'viewOptionsPopover.html'" popover-trigger="'outsideClick'" popover-placement="auto left-top" popover-class="active-options-popover" popover-is-open="$ctrl.viewOptionsPopoverVisible" ng-class="{true: 'button-active', false: ''}[$ctrl.viewOptionsPopoverVisible]")

@@ -29,6 +29,8 @@ export class ConfigureViewComponentController implements angular.IComponentContr
   public authorities: RemoteEndpointConfiguration[] = []
   public archives: RemoteEndpointConfiguration[] = []
 
+  private $stateParams: any
+
   public saveAndOpen(): void {
     this.project.authorityEndpoints = this.authorities.filter(a => this.selectedAuthorities[a.id])
     this.project.archiveEndpoints = this.archives.filter(a => this.selectedArchives[a.id])
@@ -36,8 +38,12 @@ export class ConfigureViewComponentController implements angular.IComponentContr
     this.projectService.saveCitable(this.projectSource.updateEndpoint, this.projectSource.graphStoreEndpoint, this.project).then(() => this.$state.go('project', { id: this.project.id, sparqlEndpoint: this.project.source.sparqlEndpoint, graph: this.project.source.graph, view: 'active'}))
   }
 
-  public delete(): void {
-    this.projectService.deleteCitable(this.projectSource.updateEndpoint, this.project).then(() => this.$state.go('projects'))
+  public deleteIfNew(): void {
+    if (this.$stateParams.id) {
+      this.$state.go('projects')
+    } else {
+      this.projectService.deleteCitable(this.projectSource.updateEndpoint, this.project).then(() => this.$state.go('projects'))
+    }
   }
 
   public changeTemplate(): void {
@@ -45,7 +51,7 @@ export class ConfigureViewComponentController implements angular.IComponentContr
   }
 
   public projectTitleFilled(): boolean {
-    let projectTitleLength: number = this.project.labels.first().value.length
+    let projectTitleLength: number = this.project && this.project.labels ? this.project.labels.first().value.length : 0
     if (projectTitleLength > 0) {
       return true
     } else {
@@ -56,6 +62,7 @@ export class ConfigureViewComponentController implements angular.IComponentContr
   /* @ngInject */
   constructor(private $q: angular.IQService, private projectService: ProjectService, $stateParams: any, private $ngRedux: IFibraNgRedux, private $state: angular.ui.IStateService) {
     this.projectSources = projectService.getProjectSources()
+    this.$stateParams = $stateParams
     this.projectSource = this.projectSources.find(ps => ps.id === $stateParams.sourceId)
     if ($stateParams.id) {
       projectService.loadProject(this.projectSource, $stateParams.id, false).then(p => {

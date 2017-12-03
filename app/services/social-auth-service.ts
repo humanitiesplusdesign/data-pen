@@ -1,5 +1,6 @@
 'use strict'
 import * as angular from 'angular'
+import * as CryptoJS from 'crypto-js';
 
 export class SocialAuthService {
 
@@ -27,6 +28,10 @@ export class SocialAuthService {
     this.$localStorage.login_provider = null
     this.$localStorage.user_email = null
     this.$state.go('projects')
+  }
+
+  public getSourceID(): string {
+    return 'http://ldf.fi/fibra/user/' + CryptoJS.SHA256(this.loginState()) + '/projects/'
   }
 }
 

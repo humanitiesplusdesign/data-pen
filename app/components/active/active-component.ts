@@ -1,6 +1,6 @@
 'use strict'
 import { ActiveActionService } from '../../actions/active';
-import { Class } from '../../services/project-service/data-model';
+import { Class, IClass } from '../../services/project-service/data-model';
 import { CNode, DataFactory, NamedNode, RDF, SKOS } from '../../models/rdf';
 import { IItemState } from '../../reducers/active';
 import { AutocompletionResults, Result, SparqlAutocompleteService, ResultGroup } from '../../services/sparql-autocomplete-service';
@@ -436,7 +436,7 @@ export class ActiveComponentController {
     return { 'left': this.state.active.dividerPercent + '%' }
   }
 
-  private allClasses(): Class[] {
+  private allClasses(): IClass[] {
     return d3.keys(this.$ngRedux.getState().sources.sourceClassToggle).reduce(
       (a, b) => {
         let sourceClasses: string[] = d3.keys(this.$ngRedux.getState().sources.sourceClassToggle[b])
@@ -451,7 +451,7 @@ export class ActiveComponentController {
   private setGridOptions(): void {
     let data: {}[] = this.state.active.activeLayout.items.map((item) => {
       let obj: {} = {}
-      let typeProp: PropertyToValues = item.item ? item.item.localProperties.concat(item.item.remoteProperties).filter(p => p.value === RDF.type.value)[0] : null
+      let typeProp: PropertyToValues = item.item ? item.item.localProperties.concat(item.item.remoteProperties).filter(p => p.property.value === RDF.type.value)[0] : null
       obj['id'] = item.ids[0].value
       obj['description'] = item.description
       obj['types'] = typeProp ? typeProp.values : []

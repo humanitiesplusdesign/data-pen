@@ -1,4 +1,5 @@
 'use strict'
+import { SocialAuthService } from '../../services/social-auth-service';
 import { ActiveActionService, ISetActiveDividerPercentage } from '../../actions/active';
 import { FilterActionService, ISetFilterDividerPercentage } from '../../actions/filter';
 import { ItemsService } from 'services/items-service'
@@ -26,6 +27,7 @@ export class ProjectComponentController {
   constructor(private projectActionService: ProjectActionService,
               private activeActionService: ActiveActionService,
               private filterActionService: FilterActionService,
+              private socialAuthService: SocialAuthService,
               private itemsService: ItemsService,
               private $stateParams: any,
               private $state: any,

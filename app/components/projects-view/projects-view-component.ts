@@ -8,7 +8,6 @@ import { ProjectSourceInfo } from '../project-sources-view/project-sources-view-
 import { ProjectService } from '../../services/project-service/project-service'
 import { SocialAuthService } from '../../services/social-auth-service'
 import { IModalService } from 'angular-ui-bootstrap'
-import * as CryptoJS from 'crypto-js';
 import retina from 'retinajs'
 
 export class ProjectsViewComponentController implements angular.IComponentController {
@@ -40,8 +39,7 @@ export class ProjectsViewComponentController implements angular.IComponentContro
     }
 
     if (socialAuthService.isLoggedIn() && !projectSources.some(s => s.id === 'Projects')) {
-      let uid: string = CryptoJS.SHA256(socialAuthService.loginState())
-      projectSources.unshift(new ProjectSourceInfo('Projects', 'http://ldf.fi/fibra/sparql', 'http://ldf.fi/fibra/sparql', 'http://ldf.fi/fibra/sparql', 'http://ldf.fi/fibra/user/' + uid + '/projects/', 'http://ldf.fi/fibra/fusekiEndpointWithTextIndexAndSecoFunctions'))
+      projectSources.unshift(new ProjectSourceInfo('Projects', 'http://ldf.fi/fibra/sparql', 'http://ldf.fi/fibra/sparql', 'http://ldf.fi/fibra/sparql', socialAuthService.getSourceID(), 'http://ldf.fi/fibra/fusekiEndpointWithTextIndexAndSecoFunctions'))
     }
 
     projectSources.forEach(source => {

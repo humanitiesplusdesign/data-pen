@@ -5,6 +5,7 @@ export interface IMap<V> extends d3.Map<V> {
   mapValues(f: (value: V, key: string, map: IMap<V>) => V): IMap<V>
   some(f: (value: V, key: string, map: IMap<V>) => boolean): boolean
   find(f: (value: V, key: string, map: IMap<V>) => boolean): {value: V, key: string}
+  goe(key: string, orElse: (key: string) => V)
   clone(): IMap<V>
   empty(): boolean
 }
@@ -23,6 +24,9 @@ export class FMap<V> implements IMap<V> {
   }
   public get(key: string): V {
     return this.s[key]
+  }
+  public goe(key: string, orElse: (key: string) => V) {
+    return this.has(key) ? this.get(key) : orElse(key)
   }
   public remove(key: string): boolean {
     let contained: boolean = this.has(key)
