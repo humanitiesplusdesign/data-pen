@@ -26,23 +26,39 @@
       .spinner(ng-if="loadingSearchResults")
     input.form-control(type="text" ng-model="$ctrl.nodeSearchSelected" placeholder="Search" uib-typeahead="result as $ctrl.nodeSearchLabel(result) for result in $ctrl.nodeSearchResults($viewValue)" typeahead-popup-template-url="resultPopupTemplate.html" typeahead-template-url="resultTemplate.html" typeahead-loading="loadingSearchResults" typeahead-no-results="noResults" typeahead-on-select="$ctrl.nodeSearchSelect($item, $model, $label, $event)" typeahead-wait-ms="1000")
     .input-group-addon.addon-right(ng-click="$ctrl.nodeSearchRemove()")
-      //-i.glyphicon.glyphicon-remove
       img.dismiss-icon(src="./app/images/filter/remove.svg")
-  .no-results(ng-show="noResults")
-    label No Results Found
-    label.cold-node(ng-click="$ctrl.addColdNode($ctrl.nodeSearchSelected)") Add "{{ $ctrl.nodeSearchSelected }}" as an unlinked node 
+  .type-results-only(ng-show="!noResults && loadingSearchResults")
+    .fake-typeahead
+      label.cold-node(ng-click="$ctrl.addColdNode($ctrl.nodeSearchSelected)") Add "{{ $ctrl.nodeSearchSelected }}" as an unlinked node
+      ul.list-style-none
+        li.result-type-container-loading(ng-repeat="type in ['Person', 'Place', 'Work'] | filter: $ctrl.nodeSearchSelected") 
+          label.resultType TYPE
+          label.resultActual {{ type }}
+  .no-results-container(ng-show="noResults")
+    .fake-typeahead
+      label.cold-node(ng-click="$ctrl.addColdNode($ctrl.nodeSearchSelected)") Add "{{ $ctrl.nodeSearchSelected }}" as an unlinked node
+      ul.list-style-none
+        li.result-type-container-loading(ng-repeat="type in ['Person', 'Place', 'Work'] | filter: $ctrl.nodeSearchSelected") 
+          label.resultType TYPE
+          label.resultActual {{ type }}
+      label.no-results No Results Found!
 #circle-menu.circle-menu
 #properties-menu.circle-menu
 .tooltips
 script(type="text/ng-template" id="resultTemplate.html")
-  a
+  a(ng-if="match.model")
     span.resultType {{ match.model.additionalInformation.typeDescriptions | prefLang }}
     span.resultActual {{ match.label }}
     label.resultSource(ng-repeat="ds in match.model.additionalInformation.dataSourceDescriptions") {{ ds.value | makeAcronym }}
+  a(ng-if="!match.model")
+    label.resultType.type-label TYPE
+    label.resultActual {{ match }}
 script(type="text/ng-template" id="resultPopupTemplate.html")
   .custom-popup-wrapper(ng-style="{top:position().top+'px', left: position().left+'px'}" style="display: block;" ng-show="isOpen() && !moveInProgress" aria-hidden="{{!isOpen()}}")
     label.cold-node(ng-click="$parent.$ctrl.addColdNode(query)") Add "{{ query }}" as an unlinked node
     ul.dropdown-menu(role="listbox")
+      li.uib-typeahead-match.result-type-container(ng-repeat="type in ['Person', 'Place', 'Work'] | filter: query") 
+        div(uib-typeahead-match index="$index" match="type" query="query" template-url="templateUrl")
       li.uib-typeahead-match(ng-repeat="match in matches track by $index" ng-class="{active: isActive($index) }" ng-mouseenter="selectActive($index)" ng-click="selectMatch($index)" role="option" id="{{::match.id}}")
         div(uib-typeahead-match index="$index" match="match" query="query" template-url="templateUrl")
 script(type="text/ng-template" id="viewOptionsPopover.html")
