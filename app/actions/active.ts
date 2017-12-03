@@ -28,6 +28,7 @@ export class ActiveActionService {
   public addItemToCurrentLayout(item: IItemState): IAddItemToCurrentLayoutAction {
     // TODO: Fix to use the local item associated with this node
     this.sparqlItemService.getItem(item.ids, true).then((i) => {
+      console.log(item.ids, i)
       this.$ngRedux.dispatch({
         type: ADD_ITEM_TO_ITEM_STATE,
         payload: {
@@ -51,13 +52,11 @@ export class ActiveActionService {
   }
 
   public createNewItem(item: IItemState): angular.IPromise<IAddItemToCurrentLayoutAction> {
-    console.log('before')
     return this.sparqlItemService.createNewItem([
       new PropertyAndValue(SKOS.prefLabel, DataFactory.instance.literal(item.description)),
       new PropertyAndValue(RDF.type, DataFactory.instance.namedNode('http://www.cidoc-crm.org/cidoc-crm/E21_Person')),
       new PropertyAndValue(FIBRA.sourceFile, DataFactory.instance.literal('Manually entered'))
     ]).then((node) => {
-      console.log('after')
       item.ids = [node]
       return this.addItemToCurrentLayout(item)
     })

@@ -225,7 +225,7 @@ export class ActiveComponentController {
   }
 
   private addColdNode(query: string): void {
-    console.log('here')
+    this.nodeSearchRemove()
     let item: IItemState = {
       ids: [],
       item: null,
