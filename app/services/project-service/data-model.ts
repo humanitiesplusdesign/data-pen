@@ -5,13 +5,21 @@ import {INode} from '../../models/rdf'
 import {IRichNode, FullRichNodeFromNode} from '../../models/richnode'
 import {StringSet, FMap, IMap} from '../../components/collection-utils'
 
-export class Class extends FullRichNodeFromNode {
-  public superClasses: Class[] = []
-  public subClasses: Class[] = []
-  public properties: Property[] = []
-  public inverseProperties: Property[] = []
+export interface IClass extends IRichNode {
+  superClasses: IClass[]
+  subClasses: IClass[]
+  properties: IProperty[]
+  inverseProperties: IProperty[]
+  clone(classMap: {[id: string]: IClass}, propertyMap: {[id: string]: IProperty}): IClass
+}
+
+export class Class extends FullRichNodeFromNode implements IClass {
+  public superClasses: IClass[] = []
+  public subClasses: IClass[] = []
+  public properties: IProperty[] = []
+  public inverseProperties: IProperty[] = []
   constructor(id: INode) { super(id) }
-  public clone(classMap: {[id: string]: Class}, propertyMap: {[id: string]: Property}): Class {
+  public clone(classMap: {[id: string]: IClass}, propertyMap: {[id: string]: IProperty}): IClass {
     if (classMap[this.value]) return classMap[this.value]
     let clone: Class = new Class(this)
     clone.labels = this.labels
@@ -26,14 +34,23 @@ export class Class extends FullRichNodeFromNode {
   }
 }
 
-export class Property extends FullRichNodeFromNode {
-  public domains: Class[] = []
-  public ranges: Class[] = []
-  public superProperties: Property[] = []
-  public subProperties: Property[] = []
-  public inverseProperty?: Property
+export interface IProperty extends IRichNode {
+  domains?: IClass[]
+  ranges?: IClass[]
+  superProperties?: IProperty[]
+  subProperties?: IProperty[]
+  inverseProperty?: IProperty
+  clone?(classMap: {[id: string]: IClass}, propertyMap: {[id: string]: IProperty}): IProperty
+}
+
+export class Property extends FullRichNodeFromNode implements IProperty {
+  public domains: IClass[] = []
+  public ranges: IClass[] = []
+  public superProperties: IProperty[] = []
+  public subProperties: IProperty[] = []
+  public inverseProperty: IProperty
   constructor(id: INode) { super(id) }
-  public clone(classMap: {[id: string]: Class}, propertyMap: {[id: string]: Property}): Property {
+  public clone(classMap: {[id: string]: IClass}, propertyMap: {[id: string]: IProperty}): IProperty {
     if (classMap[this.value]) return propertyMap[this.value]
     let clone: Property = new Property(this)
     clone.labels = this.labels
@@ -100,10 +117,10 @@ SELECT ?id ?types ?labels ?descriptions ?superClasses ?subClasses {
   }
 # ENDGRAPH
 }`
-  public classMap: IMap<Class> = new FMap<Class>()
-  public propertyMap: IMap<Property> = new FMap<Property>()
-  public rootClasses: Class[] = []
-  public rootProperties: Property[] = []
+  public classMap: IMap<IClass> = new FMap<IClass>()
+  public propertyMap: IMap<IProperty> = new FMap<IProperty>()
+  public rootClasses: IClass[] = []
+  public rootProperties: IProperty[] = []
   public static getFilter(types: INode[]): string {
     if (types.length === 0)
       return ''
@@ -112,8 +129,8 @@ SELECT ?id ?types ?labels ?descriptions ?superClasses ?subClasses {
   }
   public clone(): DataModel {
     let clone: DataModel = new DataModel()
-    let classMap: {[id: string]: Class} = {}
-    let propertyMap: {[id: string]: Property} = {}
+    let classMap: {[id: string]: IClass} = {}
+    let propertyMap: {[id: string]: IProperty} = {}
     clone.classMap = this.classMap.mapValues(c => c.clone(classMap, propertyMap))
     clone.propertyMap = this.propertyMap.mapValues(c => c.clone(classMap, propertyMap))
     clone.rootClasses = this.rootClasses.map(c => c.clone(classMap, propertyMap))

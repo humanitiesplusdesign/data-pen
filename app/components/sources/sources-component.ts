@@ -9,7 +9,7 @@ import { ProjectService } from '../../services/project-service/project-service'
 import { IFibraNgRedux } from 'reducers'
 import { IModalService } from 'angular-ui-bootstrap'
 import * as d3 from 'd3';
-import { Class, Property } from 'services/project-service/data-model';
+import { Class, Property, IClass, IProperty } from 'services/project-service/data-model';
 
 interface ISourcesComponentControllerState {
   project: ProjectState
@@ -59,7 +59,7 @@ export class SourcesComponentController {
     });
   }
 
-  private allClasses(): Class[] {
+  private allClasses(): IClass[] {
     return d3.keys(this.localSourceClassTree).reduce(
       (a, b) => {
         let sourceClasses: string[] = d3.keys(this.localSourceClassTree[b])
@@ -73,7 +73,7 @@ export class SourcesComponentController {
 
   private sourcePropsForClass(c: Class): any {
     let sources: string[] = d3.keys(this.localSourceClassTree)
-    let properties: Property[] = c.properties.map(p => p.value).map(p => this.state.project.project.dataModel.propertyMap.get(p))
+    let properties: IProperty[] = c.properties.map(p => p.value).map(p => this.state.project.project.dataModel.propertyMap.get(p))
     return {
       sources: sources,
       properties: properties

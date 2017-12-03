@@ -45,10 +45,10 @@ export class ExpandModalComponentController {
   public $onInit(): void {
     this.itemState = this.resolve.item
     this.itemProperties = this.itemState.item.localProperties.concat(this.itemState.item.remoteProperties)
-        .filter((p) => p.value !== RDF.type.value
-          && p.value !== SKOS.prefLabel.value
-          && p.value !== SKOS.altLabel.value
-          && p.value !== 'http://purl.org/dc/terms/identifier'
+        .filter((p) => p.property.value !== RDF.type.value
+          && p.property.value !== SKOS.prefLabel.value
+          && p.property.value !== SKOS.altLabel.value
+          && p.property.value !== 'http://purl.org/dc/terms/identifier'
         )
   }
 

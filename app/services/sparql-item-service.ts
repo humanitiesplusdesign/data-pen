@@ -11,21 +11,22 @@ import {ISparqlBinding} from 'angular-sparql-service'
 import {SparqlUpdateWorkerService} from 'services/sparql-update-service'
 import {StateWorkerService, WorkerWorkerService} from 'services/worker-service/worker-worker-service'
 import {UUID, flatten} from 'components/misc-utils'
-import { DataModel } from 'services/project-service/data-model';
+import { DataModel, Property, IProperty } from 'services/project-service/data-model';
 
-export interface IPropertyToValues extends IRichNode {
+export interface IPropertyToValues {
+  property: IProperty
   values: IRichPropertyValue[]
   toPropertyAndValues(includePropertiesOfProperties: boolean): IPropertyAndValue[]
 }
 
 export interface IPropertyAndValue {
-  property: INode
+  property: IProperty
   object: INode
   pruned(): IPropertyAndValue
 }
 
 export class PropertyAndValue {
-  constructor(public property: INode, public object: INode, public properties: IPropertyAndValue[] = []) {}
+  constructor(public property: IProperty, public object: INode, public properties: IPropertyAndValue[] = []) {}
   public pruned(): IPropertyAndValue {
     return new PropertyAndValue(new PrunedRichNodeFromNode(this.property), new PrunedRichNodeFromNode(this.object), this.properties.map(p => p.pruned()))
   }
@@ -40,17 +41,15 @@ export class RichPropertyValue implements IRichPropertyValue {
   constructor(public value: IRichNode, public properties: IPropertyToValues[] = []) {}
 }
 
-export class PropertyToValues extends RichNodeFromRichNode implements IPropertyToValues {
+export class PropertyToValues implements IPropertyToValues {
   public values: IRichPropertyValue[] = []
 
   public static toPropertyAndValues(pv: IPropertyToValues, includePropertiesOfProperties: boolean): IPropertyAndValue[] {
-    return pv.values.map(v => new PropertyAndValue(pv, v.value, flatten(v.properties.map(pv2 =>
-      pv2.values.map(v2 => new PropertyAndValue(pv2, v2.value))
+    return pv.values.map(v => new PropertyAndValue(pv.property, v.value, flatten(v.properties.map(pv2 =>
+      pv2.values.map(v2 => new PropertyAndValue(pv2.property, v2.value))
     ))))
   }
-  constructor(property: IRichNode) {
-    super(property)
-  }
+  constructor(public property: IProperty) {}
   public toPropertyAndValues(includePropertiesOfProperties: boolean): IPropertyAndValue[] {
     return PropertyToValues.toPropertyAndValues(this, includePropertiesOfProperties)
   }
@@ -175,15 +174,15 @@ export class SparqlItemWorkerService {
     if (b['property']) {
       let n: IRichNode = propertyValueMap.goc(b['property'].value).goc(b['object'].value, () => {
         let propertyToValues: PropertyToValues = propertyMap.goc(b['property'].value, () => {
-          let ret: PropertyToValues = new PropertyToValues(DataFactory.instance.nodeFromBinding(b['property']))
-          if (b['propertyLabel']) ret.labels.add(DataFactory.instance.literalFromBinding(b['propertyLabel']))
+          let ret: PropertyToValues = new PropertyToValues(dataModel.propertyMap.goe(b['property'].value,() => new FullRichNodeFromNode(DataFactory.instance.nodeFromBinding(b['property']))))
+          if (b['propertyLabel']) ret.property.labels.add(DataFactory.instance.literalFromBinding(b['propertyLabel']))
           properties.push(ret)
           return ret
         })
         let oNode: IRichNode = new FullRichNodeFromNode(DataFactory.instance.nodeFromBinding(b['object']))
         oNode.sourceEndpoints = new StringSet()
         propertyToValues.values.push(new RichPropertyValue(oNode))
-        if (OWL.sameAs.equals(propertyToValues)) sameAses.push(oNode)
+        if (OWL.sameAs.equals(propertyToValues.property)) sameAses.push(oNode)
         return oNode
       })
       n.sourceEndpoints.add(endpoint)

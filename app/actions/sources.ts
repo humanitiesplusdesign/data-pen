@@ -5,7 +5,7 @@ import { ISource } from '../reducers/sources';
 import { Dispatch } from 'redux';
 import { IFibraNgRedux, IRootState } from '../reducers';
 import { Action } from '../models/action'
-import { Class } from 'services/project-service/data-model';
+import { Class, IClass } from 'services/project-service/data-model';
 import { disconnect } from 'cluster';
 import { SparqlItemService, PropertyAndValue, IPropertyAndValue } from 'services/sparql-item-service';
 import { SKOS, DataFactory, RDF, INode, FIBRA } from 'models/rdf';
@@ -58,7 +58,7 @@ export class SourcesActionService {
     })
   }
 
-  public uploadFile(filename: string, parsedFile: d3.DSVParsedArray<{}>, type: Class, labelColumn: string, sparqlItemService: SparqlItemService): angular.IPromise<IAddSourceAction> {
+  public uploadFile(filename: string, parsedFile: d3.DSVParsedArray<{}>, type: IClass, labelColumn: string, sparqlItemService: SparqlItemService): angular.IPromise<IAddSourceAction> {
     let localColumns: string[] = parsedFile.columns.slice().filter((c) => c !== labelColumn)
     let localColumnProperties: INamedNode[] = localColumns.map((c) => DataFactory.instance.namedNode(this.$ngRedux.getState().project.project.schemaNS + encodeURI(c)))
     return sparqlItemService.createNewItems(parsedFile.map((line) => {
