@@ -22,7 +22,7 @@ export class FibraSparqlService {
       return r.promise
     } else return this.$q.resolve(new RemoteInternalSparqlService(this.sparqlService, id))
   })
-  public query<T extends {[id: string]: ISparqlBinding}>(id: string, query: string, params?: {}): angular.IPromise<ISparqlBindingResult<T>> {
+  public query(id: string, query: string, params?: {}): angular.IPromise<ISparqlBindingResult<{[id: string]: ISparqlBinding}>> {
     return this.services.goc(id).then(s => s.query(query, params))
   }
   public update<T>(id: string, query: string, params?: {}): angular.IPromise<T> {
