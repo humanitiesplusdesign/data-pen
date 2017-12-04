@@ -1,7 +1,7 @@
 .sources-main
   .sources-left(ng-init="editSourcesStatus=''")
     .sources-head
-      h3.pull-left Project sources
+      h3.pull-left Types matrix
       img.edit-sources-icon.transition-200(src="./app/images/general/plus_dark.svg" ng-click="$ctrl.openAddSourcesModal()")
     .sources-list(ng-show="$ctrl.state.sources.authoritySources.length != 0")
       h4.sources-category-title Authorities
@@ -24,20 +24,25 @@
             input(type="checkbox", ng-model="$ctrl.localSourceClassTree[source.id][clss.value]" ng-click="$ctrl.sourcesActionService.setSourceClassActive(source.id, clss.value, !$ctrl.getSourceClassStatus(source.id, clss.value))")
             span {{clss.labels | prefLang}}
   .sources-right
+    .properties-head
+      h3 Properties matrix
     uib-tabset(type="tabs")
       uib-tab(ng-repeat="class in $ctrl.allClasses()" index="$index" heading="{{ class.labels | prefLang }}")
         .matrix
           .matrix-property-container
             .matrix-property(ng-repeat="prop in $ctrl.sourcePropsForClass(class).properties")
               .matrix-property-label-container
-                .matrix-property-label {{ prop.labels | prefLang }}
+                .matrix-property-label 
+                  label
+                    input.matrix-property-checkbox(type="checkbox")
+                    span.prop-label-span {{ prop.labels | prefLang }}
           .matrix-source-container(ng-repeat="source in $ctrl.state.sources.authoritySources.concat($ctrl.state.sources.archiveSources)")
             .matrix-source
               .matrix-source-label {{ source.labels | prefLang }}
             .matrix-cell(ng-repeat="prop in $ctrl.sourcePropsForClass(class).properties")
-              input.matrix-cell-checkbox(type="checkbox")
+              //- input.matrix-cell-checkbox(type="checkbox")
           .matrix-total-container
             .matrix-total
               .matrix-total-label Total
             .matrix-total-cell(ng-repeat="prop in $ctrl.sourcePropsForClass(class).properties")
-              input.matrix-cell-checkbox(type="checkbox")
+              //- input.matrix-cell-checkbox(type="checkbox")
