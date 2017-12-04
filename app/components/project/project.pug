@@ -9,7 +9,7 @@
     img.back-icon.transition-200(src="./app/images/nav_bar/back.svg" ui-sref="projects" uib-popover="Back to projects" popover-placement="bottom-left" popover-popup-delay="750" popover-trigger="'mouseenter'")
   .nav-element.project-description.push-down
     a(ui-sref="configure({id:$ctrl.state.project.id, sourceId: 'Projects' })" ) {{ $ctrl.state.project.description.length > 30 ? $ctrl.state.project.description.substr(0, 27) + '...' : $ctrl.state.project.description }}
-  .nav-element.vertical-divider.muted |
+  //-.nav-element.vertical-divider.muted |
   span.nav-links
     .nav-element.nav-link.push-down(ng-class="{muted: $ctrl.currentView !== 'sources', active: $ctrl.currentView === 'sources'}", ng-click="$ctrl.setView('sources')") Sources
     .nav-element.nav-link.push-down(ng-class="{muted: $ctrl.currentView !== 'filter', active: $ctrl.currentView === 'filter'}", ng-click="$ctrl.setView('filter')") Filter

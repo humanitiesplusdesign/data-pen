@@ -21,6 +21,34 @@ project {
       margin-left: 1em
     }
 
+    .project-description a {
+      color: #3e3e3e
+      transition: .2s
+      margin-right: 30px
+
+      &:after {
+        position: absolute
+        margin-top: 3px
+        padding-left: 15px
+        transition: .2s
+        content: "edit"
+        text-transform: uppercase
+        text-decoration: underline
+        font-weight: 500
+        font-size: 0.8em
+        opacity: 0
+        color: #446bd3
+      }
+
+      &:hover {
+        margin-right: 60px
+
+        &:after {
+          opacity: 1
+        }
+      }
+    }
+
     .bibliography-link {
       float: right
       margin-right: 1em
@@ -52,7 +80,6 @@ project {
       margin-right: 1em
       margin-left: 1em
       cursor: pointer
-
 
       &:hover {
         opacity: .5
