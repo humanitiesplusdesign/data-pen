@@ -563,6 +563,12 @@ export class ActiveComponentController {
         .filter(c => c)
   }
 
+  private allClassesFiltered(filterString: string): IClass[] {
+    return filterString ? this.allClasses().filter((c) => {
+      return c.labels.find((l) => l.value.toLowerCase().indexOf(filterString.toLowerCase()) !== -1)
+    }) : null
+  }
+
   private setGridOptions(): void {
     let generatedColumns: string[] = []
     let generatedColumnLabels: ONodeSet<ILiteral>[] = []
