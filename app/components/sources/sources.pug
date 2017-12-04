@@ -18,7 +18,7 @@
     //-       input.matrix-cell-checkbox(type="checkbox")
     .sources-list(ng-show="$ctrl.state.sources.authoritySources.length != 0")
       h6.sources-category-title Authorities
-      span(ng-repeat="source in $ctrl.state.sources.authoritySources")
+      span.source-title-container(ng-repeat="source in $ctrl.state.sources.authoritySources")
         label.source-title(ng-click="$ctrl.projectsOpen[source.id] = !$ctrl.projectsOpen[source.id]")
           i.glyphicon.glyphicon-triangle-right.transition-200(ng-class="{'triangle-rotated' : $ctrl.projectsOpen[source.id]}")
           span.source-name {{source.labels | prefLang}}
@@ -29,7 +29,7 @@
               span.type-entities {{ source.classStats.get(clss.id) | number }} entities
     .sources-list(ng-show="$ctrl.state.sources.archiveSources.length != 0")
       h6.sources-category-title Archives
-      span(ng-repeat="source in $ctrl.state.sources.archiveSources")
+      span.source-title-container(ng-repeat="source in $ctrl.state.sources.archiveSources")
         label.source-title(ng-click="$ctrl.projectsOpen[source.id] = !$ctrl.projectsOpen[source.id]")
           i.glyphicon.glyphicon-triangle-right.transition-200(ng-class="{'triangle-rotated' : $ctrl.projectsOpen[source.id]}")
           span.source-name {{source.labels | prefLang}}
