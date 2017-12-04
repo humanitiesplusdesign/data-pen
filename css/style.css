@@ -277,6 +277,10 @@ dark
   font-weight: 500;
 }
 
+.name a {
+  text-devcoration: none;
+}
+
 .institute {
   text-transform: uppercase;
   font-size: 0.75em;
