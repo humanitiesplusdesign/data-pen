@@ -55,5 +55,6 @@
                 ul.project-details-list
                   li(ng-repeat="source in $ctrl.getSources(project)") {{ source.labels | prefLang }}
           ul.project-options(ng-class="optionsVisibility")
-            li Edit
+            li 
+              a(ui-sref="configure({id:project.id, sourceId: 'Projects' })" ) Edit
             li.delete-project(ng-click="$ctrl.openDeleteProjectModal(project, $index, id)") Delete
