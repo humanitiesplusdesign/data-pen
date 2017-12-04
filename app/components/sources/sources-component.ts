@@ -1,4 +1,5 @@
 'use strict'
+import { SparqlStatisticsService } from '../../services/sparql-statistics-service';
 import { SourcesActionService } from '../../actions/sources';
 import { ProjectActionService } from '../../actions/project';
 import { IRootState } from '../../reducers';
@@ -26,6 +27,7 @@ export class SourcesComponentController {
   constructor(private projectService: ProjectService,
               private projectActionService: ProjectActionService,
               private sourcesActionService: SourcesActionService,
+              private sparqlStatisticsService: SparqlStatisticsService,
               private $ngRedux: IFibraNgRedux,
               private $uibModal: IModalService) {
     let stateUnsubscribe: () => void = $ngRedux.connect(
