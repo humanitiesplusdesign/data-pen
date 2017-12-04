@@ -5,15 +5,16 @@ import * as angular from 'angular'
 import { IFibraNgRedux } from 'reducers';
 import { NodeSet, ONodeSet } from 'models/rdf';
 
-export function getPrefLangString(literals: NodeSet<ILiteral>, prefLang: string): string {
-  if (!literals || literals.empty()) return '?'
+export function getPrefLangString(literals: NodeSet<ILiteral> | ILiteral[], prefLang: string): string {
+  if (!literals) return '?'
   let dl: string = null
-  let al: string = null
-  let cl: ILiteral = literals.find(l => {
+  let al: string = '?'
+  let p: (l) => boolean = l => {
     if (l.language === '') dl = l.value
     else al = l.value
     return l.language === prefLang
-  })
+  }
+  let cl: ILiteral = literals instanceof Array ? literals.find(p) : literals.find(p)
   if (cl) return cl.value
   if (dl) return dl
   return al
