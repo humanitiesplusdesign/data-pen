@@ -1,7 +1,7 @@
 .sources-main
   .sources-left(ng-init="editSourcesStatus=''")
     .sources-head
-      h4.pull-left Project sources
+      h5.pull-left.sources-list-title Project sources
       img.edit-sources-icon.transition-200(src="./app/images/general/plus_dark.svg" ng-click="$ctrl.openAddSourcesModal()")
     //- .matrix-left
     //-   .matrix-property-container
@@ -40,8 +40,8 @@
               span.type-entities {{ source.classStats.get(clss.id) | number }} entities
   .sources-right
     .properties-head
-      h3 Properties matrix
-    uib-tabset(type="tabs")
+      h5 Properties matrix
+    uib-tabset.matrix-tabs(type="pills")
       uib-tab(ng-repeat="class in $ctrl.allClasses()" index="$index" heading="{{ class.labels | prefLang }}")
         .matrix-right
           .matrix-border-box

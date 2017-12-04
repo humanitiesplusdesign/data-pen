@@ -1,15 +1,15 @@
-sources {
+sources
 
   display: inline-block
   height: 100%
   width: 100%
 
-  .sources-main {
+  .sources-main
     width: 100%
     height: 100%
     padding-bottom: 3em
 
-    .sources-left {
+    .sources-left
       display: inline-block
       position: absolute
       clear: left
@@ -20,39 +20,36 @@ sources {
       overflow-y: scroll
       padding-bottom: 3em
 
-      .matrix-left {
+      .matrix-left
         padding: 30px
         overflow-x: scroll
         white-space: nowrap
         height: 100%
 
-        ul {
+        ul
           list-style: none
-        }
 
-        .matrix-property-container {
+        .matrix-property-container
           margin-left: 200px
           height: 150px
 
-          .matrix-property-checkbox {
+          .matrix-property-checkbox
             margin-left: 18px
             transform: rotate(90deg)
-          }
 
-          .matrix-property {
+          .matrix-property
             // border: 1px solid blue
             display: inline-block
             width: 50px
             height: 150px
 
-            &:last-child {
+            &:last-child
               margin-right: 50px
-            }
 
-            .matrix-property-label-container {
+            .matrix-property-label-container
               transform: rotate(-90deg)
 
-              .matrix-property-label {
+              .matrix-property-label
                 width: 150px
                 white-space: nowrap
                 margin-top: 100px
@@ -60,7 +57,7 @@ sources {
                 text-overflow: ellipsis
                 margin-left: -15px
 
-                .prop-label-span {
+                .prop-label-span
                   margin-left: 10px
                   -webkit-touch-callout: none;
                   -webkit-user-select: none;
@@ -68,22 +65,17 @@ sources {
                   -moz-user-select: none;
                   -ms-user-select: none;
                   user-select: none;
-                }
-              }
-            }
-          }
-        }
 
-        .matrix-source-container {
+        .matrix-source-container
           height: 50px
 
-          .matrix-source {
+          .matrix-source
             // border: 1px solid blue
             display: inline-block
             width: 200px
             height: 50px
 
-            .matrix-source-label {
+            .matrix-source-label
               display: inline-block
               width: 100%
               height: 50px
@@ -92,10 +84,8 @@ sources {
               white-space: normal
               text-overflow: ellipsis
               padding-right: 15px
-            }
-          }
 
-          .matrix-cell {
+          .matrix-cell
             border: 1px solid white
             display: inline-block
             width: 50px
@@ -105,144 +95,151 @@ sources {
             -moz-box-sizing: border-box;
             -webkit-box-sizing: border-box;
 
-            .no-stat {
+            .no-stat
               width: 20px
               opacity: 0.2
-              margin-left: 14px
-              margin-top: 14px
-            }
+              margin-left: 50%;
+              margin-top: 50%;
+              transform: translate(-50%, -50%)
 
-            &:last-child {
+            &:last-child
               margin-right: 50px
-            }
 
-            .matrix-cell-checkbox {
+            .matrix-cell-checkbox
               margin-left: 18px
               margin-top: 18px
-            }
-          }
-        }
 
-        .matrix-total-container {
+        .matrix-total-container
           margin-top: 25px
           // margin-left: 150px
           height: 50px
-        }
-      }
 
-      .sources-head {
+      .sources-head
         position: relative
         width: 100%
         height: 80px
 
+        .sources-list-title
+          margin-top: 15px
 
-        .edit-sources-icon {
+        .edit-sources-icon
           width: 15px
           float: right
           margin-top: 20px
           font-size: 1.4em
-          opacity: .7
+          opacity: .6
 
-          &:hover {
-            opacity: .4
+          &:hover
+            opacity: .3
             cursor: pointer
-          }
-        }
-      }
 
-      .sources-category-title {
+      .sources-category-title
         //text-transform: uppercase
         color: #8b8b8b
-      }
 
-      .sources-list {
+      .sources-list
         margin-bottom: 40px
 
-        .source-title {
+        .source-title
           font-size: 1em
-        }
 
-        .checkbox-container {
+        .checkbox-container
           font-size: 1em
           font-weight: normal
           display: block
           margin-left: 2em
-        }
 
-        .glyphicon-triangle-right {
+        .glyphicon-triangle-right
           font-size: 1em
           opacity: .3
           transform: scale(1, 0.8)
           -webkit-transform: scale(1, 0.8)
 
-          &:hover {
+          &:hover
             pointer: cursor
-          }
-        }
 
-        .triangle-rotated {
+        .triangle-rotated
           transform: scale(0.8, 1) rotate(90deg)
           -webkit-transform: scale(0.8, 1) rotate(90deg)
-        }
 
-        .source-name {
+        .source-name
           margin-left: 0.5em
           font-size: 1.3em
-        }
 
-        .class-list {
+        .class-list
           margin-bottom: 20px
-        }
 
-        .type-name {
+        .type-name
           margin-left: 0.5em
           font-size: 1.1em
-        }
 
-        .type-entities {
+        .type-entities
           margin-left: 10px
           color: rgba(#000, 0.38)
-        }
-      }
-    }
 
-    .sources-right {
+    .sources-right
       display: inline-block
       position: absolute
       left: 30%
       clear: right
       width: 70%
       height: 100%
-      background-color: white
+      background-color: #fbfbfb
+      border-left: 1px solid #dfdfdf
       padding-top: 30px
 
-      .properties-head {
+      .properties-head
         position: relative
         width: 100%
         height: 80px
+        padding-left: 40px
+        padding-top: 5px
 
-        h3 {
-          font-size: 1.2em
-          margin-left: 30px
-        }
-      }
+      .matrix-tabs
+        ul
+          margin-left: 40px
 
-      .ng-isolate-scope {
+          li
+            a
+              font-size: 1.1em
+              background: none
+              text-align: center
+              margin: 0
+              padding: none !important
+              padding-left: 5px
+              padding-right: 5px
+              margin-right: 10px
+              color: #3c3c3c
+              opacity: .4
+              transition: .2s
+              -webkit-transition: .2s
+              -moz-transition: .2s
+              -o-transition: .2s
+
+              &:hover
+                opacity: 1
+
+        ul li.active > a
+          opacity: 1
+          color: #446bd3
+          text-decoration: underline
+
+      .ng-isolate-scope
         height: 100%
 
-        .tab-content {
+        .tab-content
           height: 100%
 
-          .tab-pane {
+          .tab-pane
             height: 100%
 
-            .matrix-right {
-              padding: 40px
+            .matrix-right
+              padding: 0 40px 40px 40px
               overflow-x: scroll
               white-space: nowrap
               height: 100%
 
-              .matrix-border-box {
+              .matrix-border-box
                 padding: 30px
                 display: inline-block
                 background-color: #ffffff
@@ -250,33 +247,31 @@ sources {
                 box-shadow: 0 1px 6px rgba(#000, 0.1)
                 border: 1px solid rgba(0, 0, 0, 0.1)
 
-                ul {
+                ul
                   list-style: none
-                }
 
-                .matrix-property-container {
+                .matrix-property-container
                   margin-left: 200px
                   height: 150px
 
-                  .matrix-property-checkbox {
+                  .matrix-property-checkbox
                     margin-left: 18px
                     transform: rotate(90deg)
-                  }
 
-                  .matrix-property {
+                  .matrix-property
                     // border: 1px solid blue
                     display: inline-block
                     width: 50px
                     height: 150px
 
-                    // &:last-child {
+                    // &:last-child
                     //   margin-right: 50px
-                    // }
+                    //
 
-                    .matrix-property-label-container {
+                    .matrix-property-label-container
                       transform: rotate(-90deg)
 
-                      .matrix-property-label {
+                      .matrix-property-label
                         width: 150px
                         white-space: nowrap
                         margin-top: 100px
@@ -284,7 +279,7 @@ sources {
                         text-overflow: ellipsis
                         margin-left: -15px
 
-                        .prop-label-span {
+                        .prop-label-span
                           margin-left: 10px
                           -webkit-touch-callout: none;
                           -webkit-user-select: none;
@@ -292,27 +287,20 @@ sources {
                           -moz-user-select: none;
                           -ms-user-select: none;
                           user-select: none;
-                        }
-                      }
-                    }
-                  }
-                }
-              }
 
-              .matrix-source-container {
+              .matrix-source-container
                 height: 50px
 
-                .ng-isolate-scope {
+                .ng-isolate-scope
                   height: 42px !important
-                }
 
-                .matrix-source {
+                .matrix-source
                   // border: 1px solid blue
                   display: inline-block
                   width: 200px
                   height: 50px
 
-                  .matrix-source-label {
+                  .matrix-source-label
                     display: inline-block
                     width: 100%
                     height: 50px
@@ -321,10 +309,8 @@ sources {
                     white-space: normal
                     text-overflow: ellipsis
                     padding-right: 15px
-                  }
-                }
 
-                .matrix-cell {
+                .matrix-cell
                   border: 1px solid white
                   display: inline-block
                   width: 50px
@@ -334,36 +320,36 @@ sources {
                   -moz-box-sizing: border-box;
                   -webkit-box-sizing: border-box;
 
-                  .no-stat {
-                    width: 20px
+                  .no-stat
+                    width: 15px
                     opacity: 0.2
                     margin-left: 14px
                     margin-top: 14px
-                  }
 
-                  // &:last-child {
+
+                  // &:last-child
                   //   margin-right: 50px
-                  // }
+                  //
 
-                  .matrix-cell-checkbox {
+                  .matrix-cell-checkbox
                     margin-left: 18px
                     margin-top: 18px
-                  }
-                }
-              }
 
-              .matrix-total-container {
+
+
+
+              .matrix-total-container
                 margin-top: 25px
                 // margin-left: 150px
                 height: 50px
 
-                .matrix-total {
+                .matrix-total
                   // border: 1px solid blue
                   display: inline-block
                   width: 200px
                   height: 50px
 
-                  .matrix-total-label {
+                  .matrix-total-label
                     display: inline-block
                     width: 100%
                     height: 50px
@@ -371,10 +357,8 @@ sources {
                     overflow-y: hidden
                     text-overflow: ellipsis
                     padding-right: 15px
-                  }
-                }
 
-                .matrix-total-cell {
+                .matrix-total-cell
                   border: 1px solid white
                   background-color: rgba(0, 0, 0, 0.1)
                   display: inline-block
@@ -385,16 +369,6 @@ sources {
                   -moz-box-sizing: border-box;
                   -webkit-box-sizing: border-box;
 
-                  .matrix-cell-checkbox {
+                  .matrix-cell-checkbox
                     margin-left: 18px
                     margin-top: 18px
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-}
