@@ -12,7 +12,7 @@
         .class-list(ng-show="$ctrl.projectsOpen[source.id] ? true : false")
           label.checkbox-container(ng-repeat="clss in source.classes" ng-hide="clss.labels.length === 0") 
             input(type="checkbox", ng-model="$ctrl.localSourceClassTree[source.id][clss.value]" ng-click="$ctrl.sourcesActionService.setSourceClassActive(source.id, clss.value, !$ctrl.getSourceClassStatus(source.id, clss.value))")
-            span {{clss.labels | prefLang}}
+            span {{clss.labels | prefLang}}  ({{ source.classStats[clss.id] | number }} entities)
     .sources-list(ng-show="$ctrl.state.sources.archiveSources.length != 0")
       h4.sources-category-title Archives
       span(ng-repeat="source in $ctrl.state.sources.archiveSources")
@@ -22,7 +22,7 @@
         .class-list(ng-show="$ctrl.projectsOpen[source.id] ? true : false")
           label.checkbox-container(ng-repeat="clss in source.classes" ng-hide="clss.labels.length === 0") 
             input(type="checkbox", ng-model="$ctrl.localSourceClassTree[source.id][clss.value]" ng-click="$ctrl.sourcesActionService.setSourceClassActive(source.id, clss.value, !$ctrl.getSourceClassStatus(source.id, clss.value))")
-            span {{clss.labels | prefLang}}
+            span {{clss.labels | prefLang}} ({{ source.classStats[clss.id] | number }} entities)
   .sources-right
     .properties-head
       h3 Properties matrix

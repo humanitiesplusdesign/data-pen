@@ -55,7 +55,8 @@ export class ProjectActionService {
                 payload: {
                   id: ae.id,
                   labels: ae.labels,
-                  classes: project.dataModel.classMap.values().filter(c => stats[c.value])
+                  classes: project.dataModel.classMap.values().filter(c => stats[c.value]),
+                  classStats: stats
                 }
               })
             })
@@ -67,7 +68,8 @@ export class ProjectActionService {
                 payload: {
                   id: ae.id,
                   labels: ae.labels,
-                  classes: project.dataModel.classMap.values().filter(c => stats[c.value])
+                  classes: project.dataModel.classMap.values().filter(c => stats[c.value]),
+                  classStats: stats
                 }
               })
             })
