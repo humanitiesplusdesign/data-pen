@@ -232,17 +232,19 @@ export class SparqlAutocompleteWorkerService {
         queryTemplate = queryTemplate.replace(/<LIMIT>/g, '' + limit)
         queryTemplate = queryTemplate.replace(/<PREFLANG>/g, this.stateWorkerService.state.language)
         return this.fibraSparqlService.query(endpointConfiguration.endpoint, queryTemplate, {timeout: canceller}).then(
-        (response) => {
-          if (response.results.bindings.length !== 0) {
-            primaryProcessed.then(() => {
-              pd.processAndConsolidate(response, endpointConfiguration.id)
-              results.remoteResults = SparqlAutocompleteWorkerService.buildResults(pd, localResults, this.stateWorkerService.state.project.dataModel, this.stateWorkerService.state.language)
-              d.notify({endpointType: 'remote', endpoint: endpointConfiguration.id, results: results})
-            })
-          }
-        },
-        (error) => d.notify({endpointType: 'remote', endpoint: endpointConfiguration.id, error: WorkerWorkerService.stripFunctions(error)})
-      )})).then(() => d.resolve(results))
+          (response) => {
+            if (response.results.bindings.length !== 0) {
+              return primaryProcessed.then(() => {
+                pd.processAndConsolidate(response, endpointConfiguration.id)
+                results.remoteResults = SparqlAutocompleteWorkerService.buildResults(pd, localResults, this.stateWorkerService.state.project.dataModel, this.stateWorkerService.state.language)
+                d.notify({endpointType: 'remote', endpoint: endpointConfiguration.id, results: results})
+              })
+            }
+          },
+          (error) => d.notify({endpointType: 'remote', endpoint: endpointConfiguration.id, error: WorkerWorkerService.stripFunctions(error)})
+      )})).then(() => {
+        d.resolve(results)
+      })
     }
     return d.promise
   }
