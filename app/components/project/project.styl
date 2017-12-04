@@ -176,7 +176,7 @@ project {
   }
 
   .interstitial {
-    position: absolute
+    position: fixed
     width: 100%
     height: 100%
     z-index: 5000
@@ -184,6 +184,18 @@ project {
     opacity: 0.9
     // transition: 0.5s
     pointer-events: default
+
+    .loading-logo {
+      position: fixed
+      width: 700px
+      height: auto
+      top: 50%
+      left: 50%
+      margin-left: -350px
+      margin-top: -350px
+      border: 1px solid red
+      opacity: .7
+    }
   }
 
   .hide-interstitial {

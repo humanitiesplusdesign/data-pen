@@ -13,6 +13,7 @@ import { IFibraNgRedux } from 'reducers';
 
 export class ConfigureViewComponentController implements angular.IComponentController {
   public project: Project
+  public projects: Project[]
   public projectSources: ProjectSourceInfo[]
   public projectSource: ProjectSourceInfo
   public primaryEndpointConfigurations: PrimaryEndpointConfiguration[] = []
@@ -59,11 +60,28 @@ export class ConfigureViewComponentController implements angular.IComponentContr
     }
   }
 
+  public editingMode(): boolean {
+    if (this.$stateParams.id) {
+      return true
+    } else {
+      return false
+    }
+  }
+
+  public noProjects(): boolean {
+    if (this.projects.length == 0) {
+      return true
+    } else {
+      return false
+    }
+  }
+
   /* @ngInject */
   constructor(private $q: angular.IQService, private projectService: ProjectService, $stateParams: any, private $ngRedux: IFibraNgRedux, private $state: angular.ui.IStateService) {
     this.projectSources = projectService.getProjectSources()
     this.$stateParams = $stateParams
     this.projectSource = this.projectSources.find(ps => ps.id === $stateParams.sourceId)
+    projectService.listProjects(this.projectSource).then(projects => this.projects = projects)
     if ($stateParams.id) {
       projectService.loadProject(this.projectSource, $stateParams.id, false).then(p => {
         this.project = p
@@ -98,7 +116,6 @@ export class ConfigureViewComponentController implements angular.IComponentContr
       projectService.listSchemas(ps).then(pt => this.schemas = this.schemas.concat(pt))
     })
   }
-
 }
 
 export class ConfigureViewComponent implements angular.IComponentOptions {

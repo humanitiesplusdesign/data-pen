@@ -1,16 +1,19 @@
 .container(ng-init="titleWarning=''")
   h3.header-title Data Pen
-    span.header-subtitle(ng-hide="$ctrl.$stateParams.id") New project
-    span.header-subtitle(ng-show="$ctrl.$stateParams.id") Edit project
-  .project-setup-container(ng-class="{'col-md-10 col-md-offset-1' : !$ctrl.$stateParams.id, 'col-md-6 col-md-offset-3' : $ctrl.$stateParams.id}")
+    span.header-subtitle(ng-hide="$ctrl.editingMode()") New project
+    span.header-subtitle(ng-show="$ctrl.editingMode()") Edit project
+  .spinner-container(ng-hide="$ctrl.projects")
+    .spinner
+    //-.spinner(ng-show="!$ctrl.projects")
+  .project-setup-container(ng-show="$ctrl.projects" ng-class="{'col-md-10 col-md-offset-1' : !$ctrl.editingMode() && !$ctrl.noProjects(), 'col-md-6 col-md-offset-3' : $ctrl.editingMode() || $ctrl.noProjects()}")
     .row
       .header
-        h3.col-md-3.col-md-offset-1(ng-hide="$ctrl.$stateParams.id") Start a new project
-        h3.col-md-10.col-md-offset-1(ng-show="$ctrl.$stateParams.id") Edit project details
-    .left-side(ng-class="{'col-md-4 col-md-offset-1' : !$ctrl.$stateParams.id, 'col-md-10 col-md-offset-1' : $ctrl.$stateParams.id}")
+        h3.col-md-10.col-md-offset-1(ng-hide="$ctrl.editingMode()") Start a new project
+        h3.col-md-10.col-md-offset-1(ng-show="$ctrl.editingMode()") Edit project details
+    .left-side(ng-class="{'col-md-4 col-md-offset-1' : !$ctrl.editingMode() && !$ctrl.noProjects(), 'col-md-10 col-md-offset-1' : $ctrl.editingMode() || $ctrl.noProjects()}")
       p.title-warning.transition-200(ng-class="titleWarning") Please enter a project title
       citable-editor(citable="$ctrl.project",no-id)
-    .right-side.col-md-5.col-md-offset-1(ng-hide="$ctrl.$stateParams.id")
+    .right-side.col-md-5.col-md-offset-1(ng-show="!$ctrl.editingMode() && !$ctrl.noProjects()")
       h5 Pull from an existing project
       p Use another Data Pen project as a template to start from. Pull in a sources configuration or all data.
       .project-selection
@@ -25,7 +28,7 @@
           .label-checkbox-container
             label All data
               input(type="checkbox" checked)
-    .action-items(ng-class="{'space-above' : $ctrl.$stateParams.id}")
-      button.save-project.text-button.transition-200(ng-hide="$ctrl.$stateParams.id" ng-class="{'button-disabled' : !$ctrl.projectTitleFilled()}" ng-click="$ctrl.projectTitleFilled() ? $ctrl.saveAndOpen() : titleWarning='visible'") Save and open
-      button.save-project.text-button.transition-200(ng-show="$ctrl.$stateParams.id") Save
+    .action-items(ng-class="{'space-above' : $ctrl.editingMode()}")
+      button.save-project.text-button.transition-200(ng-hide="$ctrl.editingMode()" ng-class="{'button-disabled' : !$ctrl.projectTitleFilled()}" ng-click="$ctrl.projectTitleFilled() ? $ctrl.saveAndOpen() : titleWarning='visible'") Save and open
+      button.save-project.text-button.transition-200(ng-show="$ctrl.editingMode()") Save
       button.cancel-project.text-button.push-left.transition-200(ng-click="$ctrl.deleteIfNew()") Cancel

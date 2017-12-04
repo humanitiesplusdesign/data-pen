@@ -12,7 +12,7 @@
     .error-loading.col-md-6.col-md-offset-3(ng-if="$ctrl.projectSourceState[id]=='error'")
       p.message-text Something went wrong while loading your projects. Check your internet connection and try a refresh?
 
-    .no-projects.col-md-6.col-md-offset-3(ng-if="$ctrl.projects.Projects.length === 0 && $ctrl.projectSourceState[id]=='ready'")
+    .no-projects.col-md-8.col-md-offset-2(ng-if="$ctrl.projects.Projects.length === 0 && $ctrl.projectSourceState[id]=='ready'")
       p.message-text A project contains a set of sources, filters, and active data, as well as tabular and graphical workspaces. Create a project to get started!
 
     a(ui-sref="configure({sourceId:id})" ng-if="$ctrl.projectSourceState[id]=='ready'" )
