@@ -564,7 +564,7 @@ export class ActiveComponentController {
   }
 
   private allClassesFiltered(filterString: string): IClass[] {
-    return filterString ? this.allClasses().filter((c) => {
+    return filterString ? this.state.project.project.dataModel.classMap.values().filter((c) => {
       return c.labels.find((l) => l.value.toLowerCase().indexOf(filterString.toLowerCase()) !== -1)
     }) : null
   }

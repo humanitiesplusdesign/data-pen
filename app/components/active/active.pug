@@ -62,7 +62,7 @@ script(type="text/ng-template" id="resultPopupTemplate.html")
     label.cold-node(ng-click="$parent.$ctrl.addColdNode(query)") Add "{{ query }}" as an unlinked node
     label.cold-node Add "{{ query }}" as a new type
     ul.dropdown-menu(role="listbox")
-      li.uib-typeahead-match.result-type-container(ng-repeat="type in $ctrl.allClassesFiltered(query)") 
+      li.uib-typeahead-match.result-type-container(ng-repeat="type in $parent.$ctrl.allClassesFiltered(query)")
         div(uib-typeahead-match index="$index" match="type" query="query" template-url="templateUrl")
       li.uib-typeahead-match(ng-repeat="match in matches track by $index" ng-class="{active: isActive($index) }" ng-mouseenter="selectActive($index)" ng-click="selectMatch($index)" role="option" id="{{::match.id}}")
         div(uib-typeahead-match index="$index" match="match" query="query" template-url="templateUrl")
