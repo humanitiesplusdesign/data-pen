@@ -79,6 +79,7 @@ export class ActiveComponentController {
               private $q: angular.IQService,
               private $ngRedux: IFibraNgRedux,
               private $uibModal: IModalService,
+              private $timeout: angular.ITimeoutService,
               private sparqlAutocompleteService: SparqlAutocompleteService,
               private $document: angular.IDocumentService) {
     this.unsubscribe = $ngRedux.connect(
@@ -199,6 +200,9 @@ export class ActiveComponentController {
         } else {
           this.nodeSearch.style('left', d3.event.offsetX + (this.state.active.dividerPercent / 100 * window.innerWidth) - 30 - 250 + 'px')
         }
+        this.$timeout(250).then(() => {
+          this.nodeSearch.select<HTMLInputElement>('input').node().focus()
+        })
       }
 
       this.currentlyAdding = true
