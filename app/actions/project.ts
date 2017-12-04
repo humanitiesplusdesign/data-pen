@@ -50,27 +50,33 @@ export class ProjectActionService {
         project => {
           project.archiveEndpoints.forEach(ae => {
             this.sparqlStatisticsService.getClassStatistics(ae).then(stats => {
-              this.$ngRedux.dispatch({
-                type: ADD_ARCHIVE_SOURCE,
-                payload: {
-                  id: ae.id,
-                  labels: ae.labels,
-                  classes: project.dataModel.classMap.values().filter(c => stats.has(c.value)),
-                  classStats: stats
-                }
-              })
+              this.sparqlStatisticsService.getPropertyStatistics(ae).then(propStats => {
+                this.$ngRedux.dispatch({
+                  type: ADD_ARCHIVE_SOURCE,
+                  payload: {
+                    id: ae.id,
+                    labels: ae.labels,
+                    classes: project.dataModel.classMap.values().filter(c => stats.has(c.value)),
+                    classStats: stats,
+                    propStats: propStats
+                  }
+                })
+              })  
             })
           })
           project.authorityEndpoints.forEach(ae => {
             this.sparqlStatisticsService.getClassStatistics(ae).then(stats => {
-              this.$ngRedux.dispatch({
-                type: ADD_AUTHORITY_SOURCE,
-                payload: {
-                  id: ae.id,
-                  labels: ae.labels,
-                  classes: project.dataModel.classMap.values().filter(c => stats.has(c.value)),
-                  classStats: stats
-                }
+              this.sparqlStatisticsService.getPropertyStatistics(ae).then(propStats => {
+                this.$ngRedux.dispatch({
+                  type: ADD_AUTHORITY_SOURCE,
+                  payload: {
+                    id: ae.id,
+                    labels: ae.labels,
+                    classes: project.dataModel.classMap.values().filter(c => stats.has(c.value)),
+                    classStats: stats,
+                    propStats: propStats
+                  }
+                })
               })
             })
           })
