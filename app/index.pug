@@ -20,6 +20,9 @@ html(lang="en",ng-app="fibra",ng-hint)
       .modal-header: h4.modal-title Authentication required
       .modal-body
         .form-group
+          label URL
+          input.form-control(type='text', ng-model="authInfo.url")
+        .form-group
           label Username:
           input.form-control(type='text', ng-model="authInfo.username")
         .form-group
