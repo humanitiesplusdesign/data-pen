@@ -21,7 +21,10 @@ export class ConfigureViewComponentController implements angular.IComponentContr
     'http://ldf.fi/fibra/geonamesCidocLiteEndpointConfiguration': true,
     'http://ldf.fi/fibra/viafCidocLiteEndpointConfiguration': true
   }
-  public selectedArchives: {[id: string]: boolean} = {}
+  public selectedArchives: {[id: string]: boolean} = {
+    'http://ldf.fi/fibra/sdfbCidocLiteEndpointConfiguration': true,
+    'http://ldf.fi/fibra/eeCidocLiteEndpointConfiguration': true
+  }
   public selectedSchemas: {[id: string]: boolean} = {
     'http://ldf.fi/fibra/cidocCRMSchema': true
   }
