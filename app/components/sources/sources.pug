@@ -1,7 +1,7 @@
 .sources-main
   .sources-left(ng-init="editSourcesStatus=''")
     .sources-head
-      h3.pull-left Project sources
+      h4.pull-left Project sources
       img.edit-sources-icon.transition-200(src="./app/images/general/plus_dark.svg" ng-click="$ctrl.openAddSourcesModal()")
     //- .matrix-left
     //-   .matrix-property-container
@@ -17,25 +17,27 @@
     //-     .matrix-cell(ng-repeat="source in $ctrl.state.sources.authoritySources.concat($ctrl.state.sources.archiveSources)")
     //-       input.matrix-cell-checkbox(type="checkbox")
     .sources-list(ng-show="$ctrl.state.sources.authoritySources.length != 0")
-      h4.sources-category-title Authorities
+      h6.sources-category-title Authorities
       span(ng-repeat="source in $ctrl.state.sources.authoritySources")
-        h4.source-title(ng-click="$ctrl.projectsOpen[source.id] = !$ctrl.projectsOpen[source.id]")
+        label.source-title(ng-click="$ctrl.projectsOpen[source.id] = !$ctrl.projectsOpen[source.id]")
           i.glyphicon.glyphicon-triangle-right.transition-200(ng-class="{'triangle-rotated' : $ctrl.projectsOpen[source.id]}")
           span.source-name {{source.labels | prefLang}}
         .class-list(ng-show="$ctrl.projectsOpen[source.id] ? true : false")
           label.checkbox-container(ng-repeat="clss in source.classes" ng-hide="clss.labels.length === 0") 
             input(type="checkbox", ng-model="$ctrl.localSourceClassTree[source.id][clss.value]" ng-click="$ctrl.sourcesActionService.setSourceClassActive(source.id, clss.value, !$ctrl.getSourceClassStatus(source.id, clss.value))")
-            span {{clss.labels | prefLang}}  ({{ source.classStats.get(clss.id) | number }} entities)
+            span.type-name {{clss.labels | prefLang}}
+              span.type-entities {{ source.classStats.get(clss.id) | number }} entities
     .sources-list(ng-show="$ctrl.state.sources.archiveSources.length != 0")
-      h4.sources-category-title Archives
+      h6.sources-category-title Archives
       span(ng-repeat="source in $ctrl.state.sources.archiveSources")
-        h4.source-title(ng-click="$ctrl.projectsOpen[source.id] = !$ctrl.projectsOpen[source.id]")
+        label.source-title(ng-click="$ctrl.projectsOpen[source.id] = !$ctrl.projectsOpen[source.id]")
           i.glyphicon.glyphicon-triangle-right.transition-200(ng-class="{'triangle-rotated' : $ctrl.projectsOpen[source.id]}")
           span.source-name {{source.labels | prefLang}}
         .class-list(ng-show="$ctrl.projectsOpen[source.id] ? true : false")
           label.checkbox-container(ng-repeat="clss in source.classes" ng-hide="clss.labels.length === 0") 
             input(type="checkbox", ng-model="$ctrl.localSourceClassTree[source.id][clss.value]" ng-click="$ctrl.sourcesActionService.setSourceClassActive(source.id, clss.value, !$ctrl.getSourceClassStatus(source.id, clss.value))")
-            span {{clss.labels | prefLang}} ({{ source.classStats.get(clss.id) | number }} entities)
+            span.type-name {{clss.labels | prefLang}}
+              span.type-entities {{ source.classStats.get(clss.id) | number }} entities
   .sources-right
     .properties-head
       h3 Properties matrix
