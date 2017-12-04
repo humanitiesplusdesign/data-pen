@@ -152,7 +152,7 @@ export class ActiveComponentController {
       this.activeActionService.addLink(item, i)
       link.remove()
     }
-    
+
     d3.select('.main-background')
       .on('mousemove', (d, i: number, grp) => {
         line.attr('x1', item.leftOffset)

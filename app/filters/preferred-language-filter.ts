@@ -6,6 +6,7 @@ import { IFibraNgRedux } from 'reducers';
 import { NodeSet, ONodeSet } from 'models/rdf';
 
 export function getPrefLangString(literals: NodeSet<ILiteral>, prefLang: string): string {
+  if (!literals || literals.empty()) return '?'
   let dl: string = null
   let al: string = null
   let cl: ILiteral = literals.find(l => {
