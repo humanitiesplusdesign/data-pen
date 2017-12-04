@@ -278,7 +278,7 @@ export class ActiveComponentController {
   }
 
   private sanitizeId(id: string): string {
-    return id.replace(/\/|\:|\.|\(|\)|\%|\#/g, '')
+    return id.replace(/\/|\:|\.|\(|\)|\%|\#|\+|\_/g, '')
   }
 
   private nodeClick(d: IItemState, groups: SVGCircleElement[]): void {
