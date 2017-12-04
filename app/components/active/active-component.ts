@@ -68,6 +68,9 @@ export class ActiveComponentController {
   private viewOptionsShowLabels: boolean = false
   private gridOptions: {} = {}
 
+  private linkMode: boolean = false
+  private linkEndFunction: (d: IItemState) => void
+
   /* @ngInject */
   constructor(private projectActionService: ProjectActionService,
               private activeActionService: ActiveActionService,
@@ -101,7 +104,10 @@ export class ActiveComponentController {
       backgroundHover: '#fafafa',
       diameter: 160,
       menus: [{
-        icon: 'ghost-icon'
+        icon: 'link-icon',
+        click: () => {
+          this.linkNode(this.currentMenuItem)
+        }
       }, {
         icon: 'properties-icon'
       }, {
@@ -129,6 +135,31 @@ export class ActiveComponentController {
     })
 
     this.updateCanvas()
+  }
+
+  private linkNode(item: IItemState): void {
+    let s: d3.Selection<Element, {}, HTMLElement, any> = d3.select('.main-svg')
+    let g: d3.Selection<Element, {}, HTMLElement, any> = s.select('.main-g')
+    let link: d3.Selection<SVGElement, {}, HTMLElement, any> = g.append<SVGGElement>('g')
+      .classed('link', true)
+      .classed('item-link', true)
+
+    let line = link.append('line')
+      .classed('link-line', true)
+
+    this.linkMode = true
+    this.linkEndFunction = (i: IItemState) => {
+      this.activeActionService.addLink(item, i)
+      link.remove()
+    }
+
+    d3.select('.main-background')
+      .on('mousemove', (d, i: number, grp) => {
+        line.attr('x1', item.leftOffset)
+        line.attr('y1', item.topOffset)
+        line.attr('x2', d3.event.offsetX)
+        line.attr('y2', d3.event.offsetY)
+      })
   }
 
   private buildAndDisplayPropertiesMenu(item: IItemState): void {
@@ -411,7 +442,12 @@ export class ActiveComponentController {
     enterSel.append<SVGCircleElement>('circle')
       .classed('node-circle', true)
       .on('click', (d: IItemState, i: number, groups: SVGCircleElement[]) => {
-        this.nodeClick(d, groups)
+        if(this.linkMode) {
+          this.linkEndFunction(d)
+          this.linkMode = false
+        } else {
+          this.nodeClick(d, groups)
+        }
       })
       .on('mouseenter', (d: IItemState, i: number, grp: SVGCircleElement[]) => {
         if (d.item && !this.dragOrigX) {

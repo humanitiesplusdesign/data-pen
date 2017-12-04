@@ -78,7 +78,9 @@ export class ProjectWorkerService {
       bindingHandlers: {
         types: (obj, prop, val) => obj[prop].add(val),
         labels: (obj, prop, val) => obj[prop].add(val),
-        descriptions: (obj, prop, val) => obj[prop].add(val)
+        descriptions: (obj, prop, val) => obj[prop].add(val),
+        superClasses: (obj, prop, val) => obj[prop].add(val),
+        subClasses: (obj, prop, val) => obj[prop].add(val)
       }
     }
     let propertyConf: IBindingsToObjectConfiguration = {
@@ -90,10 +92,14 @@ export class ProjectWorkerService {
         domains: (binding) => classes.goc(binding.value),
         ranges: (binding) => classes.goc(binding.value),
         labels: (binding) => DataFactory.nodeFromBinding(binding),
-        descriptions: (binding) => DataFactory.nodeFromBinding(binding),
+        descriptions: (binding) => DataFactory.nodeFromBinding(binding)
       },
       bindingHandlers: {
+        superProperties: (obj, prop, val) => obj[prop].add(val),
+        subProperties: (obj, prop, val) => obj[prop].add(val),
         types: (obj, prop, val) => obj[prop].add(val),
+        domains: (obj, prop, val) => obj[prop].add(val),
+        ranges: (obj, prop, val) => obj[prop].add(val),
         labels: (obj, prop, val) => obj[prop].add(val),
         descriptions: (obj, prop, val) => obj[prop].add(val)
       }
@@ -122,21 +128,21 @@ export class ProjectWorkerService {
     })
     return this.$q.all(promises).then(() => {
       classes.values().forEach(cl => {
-        cl.superClasses.filter(spr => !spr.subClasses.find(opr => opr === cl)).forEach(spr => spr.subClasses.push(cl))
-        cl.subClasses.filter(spr => !spr.superClasses.find(opr => opr === cl)).forEach(spr => spr.superClasses.push(cl))
+        cl.superClasses.values().filter(spr => !spr.subClasses.find(opr => opr === cl)).forEach(spr => spr.subClasses.add(cl))
+        cl.subClasses.values().filter(spr => !spr.superClasses.find(opr => opr === cl)).forEach(spr => spr.superClasses.add(cl))
       })
       classes.values().forEach(cl => {
-        if (cl.superClasses.length === 0) dataModel.rootClasses.push(cl)
+        if (cl.superClasses.empty()) dataModel.rootClasses.push(cl)
       })
       properties.values().forEach(pr => {
         if (pr.inverseProperty) pr.inverseProperty.inverseProperty = pr
-        pr.superProperties.filter(spr => !spr.subProperties.find(opr => opr === pr)).forEach(spr => spr.subProperties.push(pr))
-        pr.subProperties.filter(spr => !spr.superProperties.find(opr => opr === pr)).forEach(spr => spr.superProperties.push(pr))
-        pr.domains.forEach(dc => dc.properties.push(pr))
-        pr.ranges.forEach(rc => rc.inverseProperties.push(pr))
+        pr.superProperties.values().filter(spr => !spr.subProperties.find(opr => opr === pr)).forEach(spr => spr.subProperties.add(pr))
+        pr.subProperties.values().filter(spr => !spr.superProperties.find(opr => opr === pr)).forEach(spr => spr.superProperties.add(pr))
+        pr.domains.each(dc => dc.properties.add(pr))
+        pr.ranges.each(rc => rc.inverseProperties.add(pr))
       })
       properties.values().forEach(pr => {
-        if (pr.superProperties.length === 0) dataModel.rootProperties.push(pr)
+        if (pr.superProperties.empty()) dataModel.rootProperties.push(pr)
       })
       return dataModel
     })

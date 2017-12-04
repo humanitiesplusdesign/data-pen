@@ -20,6 +20,110 @@ sources {
       overflow-y: scroll
       padding-bottom: 3em
 
+      .matrix-left {
+        padding: 30px
+        overflow-x: scroll
+        white-space: nowrap
+        height: 100%
+
+        ul {
+          list-style: none
+        }
+
+        .matrix-property-container {
+          margin-left: 200px
+          height: 150px
+
+          .matrix-property-checkbox {
+            margin-left: 18px
+            transform: rotate(90deg)
+          }
+
+          .matrix-property {
+            // border: 1px solid blue
+            display: inline-block
+            width: 50px
+            height: 150px
+
+            &:last-child {
+              margin-right: 50px
+            }
+
+            .matrix-property-label-container {
+              transform: rotate(-90deg)
+
+              .matrix-property-label {
+                width: 150px
+                white-space: nowrap
+                margin-top: 100px
+                overflow-x: hidden
+                text-overflow: ellipsis
+                margin-left: -15px
+
+                .prop-label-span {
+                  margin-left: 10px
+                  -webkit-touch-callout: none;
+                  -webkit-user-select: none;
+                  -khtml-user-select: none;
+                  -moz-user-select: none;
+                  -ms-user-select: none;
+                  user-select: none;
+                }
+              }
+            }
+          }
+        }
+
+        .matrix-source-container {
+          height: 50px
+
+          .matrix-source {
+            // border: 1px solid blue
+            display: inline-block
+            width: 200px
+            height: 50px
+
+            .matrix-source-label {
+              display: inline-block
+              width: 100%
+              height: 50px
+              text-align: right
+              overflow-y: hidden
+              white-space: normal
+              text-overflow: ellipsis
+              padding-right: 15px
+            }
+          }
+
+          .matrix-cell {
+            border: 1px solid white
+            display: inline-block
+            width: 50px
+            height: 50px
+            vertical-align: top
+            background-color: rgba(0, 0, 0, 0.1)
+            box-sizing: border-box;
+            -moz-box-sizing: border-box;
+            -webkit-box-sizing: border-box;
+
+            &:last-child {
+              margin-right: 50px
+            }
+
+            .matrix-cell-checkbox {
+              margin-left: 18px
+              margin-top: 18px
+            }
+          }
+        }
+
+        .matrix-total-container {
+          margin-top: 25px
+          // margin-left: 150px
+          height: 50px
+        }
+      }
+
       .sources-head {
         position: relative
         width: 100%
@@ -107,6 +211,18 @@ sources {
       width: 70%
       height: 100%
       background-color: white
+      padding-top: 30px
+
+      .properties-head {
+        position: relative
+        width: 100%
+        height: 80px
+
+        h3 {
+          font-size: 1.2em
+          margin-left: 30px
+        }
+      }
 
       .ng-isolate-scope {
         height: 100%
@@ -117,35 +233,64 @@ sources {
           .tab-pane {
             height: 100%
 
-            .matrix {
-              padding: 30px
+            .matrix-right {
+              padding: 40px
               overflow-x: scroll
               white-space: nowrap
               height: 100%
 
-              ul {
-                list-style: none
-              }
+              .matrix-border-box {
+                padding: 30px
+                display: inline-block
+                background-color: #ffffff
+                border-radius: 5px
+                box-shadow: 0 1px 6px rgba(#000, 0.1)
+                border: 1px solid rgba(0, 0, 0, 0.1)
 
-              .matrix-property-container {
-                margin-left: 150px
-                height: 150px
+                ul {
+                  list-style: none
+                }
 
-                .matrix-property {
-                  // border: 1px solid blue
-                  display: inline-block
-                  width: 50px
+                .matrix-property-container {
+                  margin-left: 200px
                   height: 150px
 
-                  .matrix-property-label-container {
-                    transform: rotate(-90deg)
+                  .matrix-property-checkbox {
+                    margin-left: 18px
+                    transform: rotate(90deg)
+                  }
 
-                    .matrix-property-label {
-                      width: 130px
-                      white-space: nowrap
-                      margin-top: 100px
-                      overflow-x: hidden
-                      text-overflow: ellipsis
+                  .matrix-property {
+                    // border: 1px solid blue
+                    display: inline-block
+                    width: 50px
+                    height: 150px
+
+                    // &:last-child {
+                    //   margin-right: 50px
+                    // }
+
+                    .matrix-property-label-container {
+                      transform: rotate(-90deg)
+
+                      .matrix-property-label {
+                        width: 150px
+                        white-space: nowrap
+                        margin-top: 100px
+                        overflow-x: hidden
+                        text-overflow: ellipsis
+                        margin-left: -15px
+
+                        .prop-label-span {
+                          margin-left: 10px
+                          -webkit-touch-callout: none;
+                          -webkit-user-select: none;
+                          -khtml-user-select: none;
+                          -moz-user-select: none;
+                          -ms-user-select: none;
+                          user-select: none;
+                        }
+                      }
                     }
                   }
                 }
@@ -157,12 +302,12 @@ sources {
                 .matrix-source {
                   // border: 1px solid blue
                   display: inline-block
-                  width: 150px
+                  width: 200px
                   height: 50px
 
                   .matrix-source-label {
                     display: inline-block
-                    width: 150px
+                    width: 100%
                     height: 50px
                     text-align: right
                     overflow-y: hidden
@@ -183,6 +328,10 @@ sources {
                   -moz-box-sizing: border-box;
                   -webkit-box-sizing: border-box;
 
+                  // &:last-child {
+                  //   margin-right: 50px
+                  // }
+
                   .matrix-cell-checkbox {
                     margin-left: 18px
                     margin-top: 18px
@@ -198,12 +347,12 @@ sources {
                 .matrix-total {
                   // border: 1px solid blue
                   display: inline-block
-                  width: 150px
+                  width: 200px
                   height: 50px
 
                   .matrix-total-label {
                     display: inline-block
-                    width: 150px
+                    width: 100%
                     height: 50px
                     text-align: right
                     overflow-y: hidden

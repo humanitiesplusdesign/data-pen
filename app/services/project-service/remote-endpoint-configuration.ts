@@ -15,7 +15,7 @@ PREFIX dcterms: <http://purl.org/dc/terms/>
 PREFIX foaf: <http://xmlns.com/foaf/0.1/>
 PREFIX void: <http://rdfs.org/ns/void#>
 PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
-SELECT ?id ?types ?schemaEndpoint ?labels ?descriptions ?rightsHolders ?rightsHolders_labels ?rightsHolders_descriptions ?rightsHolders_url ?rightsHolders_order ?url ?endpoint ?autocompletionQuery ?itemQuery ?classStatisticsQuery ?propertyQuery ?classQuery {
+SELECT * {
 # STARTGRAPH
   # VALUE
   # TYPELIMIT
@@ -30,6 +30,9 @@ SELECT ?id ?types ?schemaEndpoint ?labels ?descriptions ?rightsHolders ?rightsHo
     ?id fibra:autocompletionQuery ?autocompletionQuery .
     ?id fibra:itemQuery ?itemQuery .
     ?id fibra:classStatisticsQuery ?classStatisticsQuery .
+    OPTIONAL {
+      ?id fibra:propertyStatisticsQuery ?propertyStatisticsQuery .
+    }
     ?id fibra:propertyQuery ?propertyQuery .
     ?id fibra:classQuery ?classQuery .
     OPTIONAL { ?id fibra:schemaEndpoint ?schemaEndpoint }
@@ -59,6 +62,7 @@ SELECT ?id ?types ?schemaEndpoint ?labels ?descriptions ?rightsHolders ?rightsHo
   public classQuery: string = DataModel.classQuery
   public itemQuery: string = SparqlItemService.getItemPropertiesQuery
   public classStatisticsQuery: string = SparqlStatisticsService.getClassStatisticsQuery
+  public propertyStatisticsQuery: string = SparqlStatisticsService.getPropertyStatisticsQuery
   public schemaEndpoint: string
   public endpoint: string
   public clone(): RemoteEndpointConfiguration {
@@ -69,6 +73,7 @@ SELECT ?id ?types ?schemaEndpoint ?labels ?descriptions ?rightsHolders ?rightsHo
     clone.classQuery = this.classQuery
     clone.itemQuery = this.itemQuery
     clone.classStatisticsQuery = this.classStatisticsQuery
+    clone.propertyStatisticsQuery = this.propertyStatisticsQuery
     clone.schemaEndpoint = this.schemaEndpoint
     clone.endpoint = this.endpoint
     return clone
@@ -90,6 +95,7 @@ void:sparqlEndpoint <${this.endpoint}> ;
 fibra:autocompletionQuery ${SparqlService.stringToSPARQLString(this.autocompletionQuery)} ;
 fibra:itemQuery ${SparqlService.stringToSPARQLString(this.itemQuery)} ;
 fibra:classStatisticsQuery ${SparqlService.stringToSPARQLString(this.classStatisticsQuery)} ;
+fibra:propertyStatisticsQuery ${SparqlService.stringToSPARQLString(this.propertyStatisticsQuery)} ;
 fibra:propertyQuery ${SparqlService.stringToSPARQLString(this.propertyQuery)} ;
 fibra:classQuery ${SparqlService.stringToSPARQLString(this.classQuery)} .`
       fragmentsById.set(this.id, f)

@@ -12,6 +12,7 @@ import 'services/worker-service/prototype-mapping-configuration'
 
 import 'angular-http-auth'
 import 'rdfstore'
+import { IHttpRequestTransformer } from 'angular';
 
 let m: angular.IModule = angular.module('fibra', ['fi.seco.sparql', 'http-auth-interceptor', 'fibra.services.worker-service-prototype-mapping-configuration', 'fibra.services.sparql-statistics-service'])
 
@@ -24,13 +25,28 @@ m.config(($provide) => {
   $provide.service('sparqlUpdateWorkerService', SparqlUpdateWorkerService)
   $provide.service('sparqlAutocompleteWorkerService', SparqlAutocompleteWorkerService)
 })
+
+// if we get a loginRequired event, broadcast it to the UI thread
 m.run(($rootScope: angular.IRootScopeService, workerWorkerService: WorkerWorkerService) => {
-  $rootScope.$on('event:auth-loginRequired', () => workerWorkerService.$broadcast('event:auth-loginRequired'))
+  $rootScope.$on('event:auth-loginRequired', (rejection) => workerWorkerService.$broadcast('event:auth-loginRequired', rejection))
+})
+
+let auths: {[url: string]: string} = {}
+
+m.config(($httpProvider: angular.IHttpProvider) => {
+  $httpProvider.interceptors.push(() => {
+    return {
+      request: (request) => {
+        if (auths[request.url]) request.headers['Authorization'] = auths[request.url]
+        return request
+      }
+    }
+  })
 })
 
 m.run(($rootScope: angular.IRootScopeService, authService: angular.httpAuth.IAuthService, $http: angular.IHttpService) => {
-  $rootScope.$on('main:auth-loginAuthInfo', (event: angular.IAngularEvent, authorization: string) => {
-    $http.defaults.headers!.common['Authorization'] = authorization
+  $rootScope.$on('main:auth-loginAuthInfo', (event: angular.IAngularEvent, authorizations: {[url: string]: string}) => {
+    auths = authorizations
     authService.loginConfirmed()
   })
 })

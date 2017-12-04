@@ -6,6 +6,7 @@ import { SparqlItemService, PropertyAndValue } from '../services/sparql-item-ser
 import { IItemState } from 'reducers/active'
 import { Dispatch, Action } from 'redux'
 import { IRootState, IFibraNgRedux } from 'reducers'
+import { Property } from 'services/project-service/data-model';
 
 export const ADD_ITEM_TO_CURRENT_LAYOUT: string = 'ADD_ITEM_TO_CURRENT_LAYOUT'
 export const SET_ACTIVE_DIVIDER_PERCENTAGE: string = 'SET_ACTIVE_DIVIDER_PERCENTAGE'
@@ -28,6 +29,31 @@ export interface IDeleteItemFromCurrentLayoutAction extends Action {
 export class ActiveActionService {
   /* @ngInject */
   constructor(private $ngRedux: IFibraNgRedux, private sparqlItemService: SparqlItemService) {}
+
+  public addLink(item1: IItemState, item2: IItemState) {
+    this.sparqlItemService.alterItem(item1.ids[0], [new PropertyAndValue(new Property(new NamedNode('aldjfkdj')), item2.ids[0])])
+      .then(() => {
+        this.sparqlItemService.getItem(item1.ids, true).then((i) => {
+          this.$ngRedux.dispatch({
+            type: ADD_ITEM_TO_ITEM_STATE,
+            payload: {
+              itemState: item1,
+              i
+            }
+          })
+        })
+    
+        this.sparqlItemService.getItem(item2.ids, true).then((i) => {
+          this.$ngRedux.dispatch({
+            type: ADD_ITEM_TO_ITEM_STATE,
+            payload: {
+              itemState: item2,
+              i
+            }
+          })
+        })
+      })
+  }
 
   public addItemToCurrentLayout(item: IItemState): IAddItemToCurrentLayoutAction {
     // Check that the item doesn't already exist

@@ -12,7 +12,8 @@ export interface ISourceClassTree {
 export interface ISource {
   id: string,
   labels: ILiteral[],
-  classes: Class[]
+  classes: Class[],
+  classStats: {classname: number}[]
 }
 
 export interface ISourcesState {
