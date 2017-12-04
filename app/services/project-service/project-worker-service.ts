@@ -78,7 +78,9 @@ export class ProjectWorkerService {
       bindingHandlers: {
         types: (obj, prop, val) => obj[prop].add(val),
         labels: (obj, prop, val) => obj[prop].add(val),
-        descriptions: (obj, prop, val) => obj[prop].add(val)
+        descriptions: (obj, prop, val) => obj[prop].add(val),
+        superClasses: (obj, prop, val) => obj[prop].add(val),
+        subClasses: (obj, prop, val) => obj[prop].add(val)
       }
     }
     let propertyConf: IBindingsToObjectConfiguration = {
@@ -90,10 +92,14 @@ export class ProjectWorkerService {
         domains: (binding) => classes.goc(binding.value),
         ranges: (binding) => classes.goc(binding.value),
         labels: (binding) => DataFactory.nodeFromBinding(binding),
-        descriptions: (binding) => DataFactory.nodeFromBinding(binding),
+        descriptions: (binding) => DataFactory.nodeFromBinding(binding)
       },
       bindingHandlers: {
+        superProperties: (obj, prop, val) => obj[prop].add(val),
+        subProperties: (obj, prop, val) => obj[prop].add(val),
         types: (obj, prop, val) => obj[prop].add(val),
+        domains: (obj, prop, val) => obj[prop].add(val),
+        ranges: (obj, prop, val) => obj[prop].add(val),
         labels: (obj, prop, val) => obj[prop].add(val),
         descriptions: (obj, prop, val) => obj[prop].add(val)
       }
