@@ -9,42 +9,74 @@
 @import url('https://fonts.googleapis.com/css?family=Roboto:400,400i,500,500i')
 @import url('https://fonts.googleapis.com/css?family=Roboto+Mono')
 
-data-pen-blue = rgb(47, 62, 203)
+@font-face
+ font-family: "Calibre";
+ font-weight: 400;
+ src: url("../fonts/calibre/CalibreTest-Regular.woff") format("woff");
 
-html {
+@font-face
+ font-family: "Calibre";
+ font-weight: 400;
+ font-style: italic;
+ src: url("../fonts/calibre/CalibreTest-RegularItalic.woff") format("woff");
+
+@font-face
+ font-family: "Calibre";
+ font-weight: 500;
+ src: url("../fonts/calibre/CalibreTest-Medium.woff") format("woff");
+
+@font-face
+ font-family: "Calibre";
+ font-weight: 500;
+ font-style: italic;
+ src: url("../fonts/calibre/CalibreTest-MediumItalic.woff") format("woff");
+
+html
   height:100%
-}
 
-body {
+body
   height:100%
   overflow-y: scroll
-	background-color: #f5f5f5
-	font-family: 'Roboto', sans-serif
+  background-color: #f5f5f5
+  font-family: 'Calibre', sans-serif
+  font-weight: 300
   color: #3c3c3c
-}
 
-h1, h2, h3, h4, h5, h6, p {
-	font-family: 'Roboto', sans-serif
-  font-weight: normal
-}
+h1, h2, h3, h4, h5, h6
+  font-family: 'Calibre', sans-serif
+  font-weight: 500
 
-p.description {
-  font-size: 0.9em
-}
+h5
+  font-size: 1.3em
 
-label {
-  font-size: 1em
+h4
+  font-size: 1.7em
+
+h3
+  font-size: 1.9em
+
+p
+  font-size: 1.1em
+
+label
   font-weight: 400
-}
 
-label.input-label {
-  font-family: 'Roboto Mono', monospace
-  font-size: 0.85em
+label.input-label
+  font-size: 1.05em
+  font-weight: 400
+  letter-spacing: 0.04em
   color: #838383
   margin-bottom: 10px
-}
 
-select {
+input
+  font-size: 1.1em
+
+.mandatory-asterisk
+  color: #ff0000
+  margin-left: 5px
+  font-size: 1.1em
+
+select
   -webkit-appearance: none;
   -moz-appearance: none;
   -ms-appearance: none;
@@ -52,114 +84,91 @@ select {
   outline: 0;
   border-radius: 0;
   background: none;
-}
 
-a {
+a
   color: #1581e6
-}
 
-a:hover {
+a:hover
   text-decoration: none
   color: #1581e6
-}
 
-.bold {
+.bold
   font-weight: 500
-}
 
-.red-text {
+.red-text
   color: #d24545
-}
 
-.blue-text {
+.blue-text
   color: #466bd3
-}
 
-.header-title {
+.header-title
   margin-top: 50px
 
-  .header-subtitle {
-    font-family: 'Roboto Mono', monospace
-    font-size: 0.5em
+  .header-subtitle
+    font-size: 0.7em
+    font-weight: 400
     color: #466bd3
-    margin-left: 20px
-  }
-}
+    margin-left: 15px
 
-.visible {
+.visible
   opacity: 1
-}
 
-.keyline {
+.keyline
   border-color: rgba(0, 0, 0, 0.2)
   margin: 0 -15px 0 -15px
-}
 
-#test-input {
+#test-input
 	width: 50px
 	height: 30px
-}
 
-.links line {
+.links line
   stroke: gray
   stroke-width: 1px
-}
 
-.links line {
+.links line
   stroke: black
-}
 
-.links line:hover, {
+.links line:hover,
   stroke-width: 5px
-
   transition: .5s
-}
 
-.relevant {
+.relevant
   stroke: black !important
   transition: .25s
   stroke-width: 2.5px !important
-}
 
-.navbar {
+.navbar
   height: 10px
   border-bottom: none
   position: absolute
   background-color: #262626
-}
 
-#middle-column {
+#middle-column
   position: absolute
   left: 0
   padding: 0px
-}
 
-body::-webkit-scrollbar {
+body::-webkit-scrollbar
  display: none
-}
 
-.main {
+.main
   height: 100%
-}
 
-main {
+main
   height: 100%
-}
 
-#tabcontainer {
+#tabcontainer
   margin-top: 10px
   text-align: center
   margin-bottom: 20px
-}
 
-.widthcontainer {
-width: 100%
-height: 100%
-overflow: auto
-border: 2px solid #f2f2f2
-}
+.widthcontainer
+  width: 100%
+  height: 100%
+  overflow: auto
+  border: 2px solid #f2f2f2
 
-#tabcontainer a {
+#tabcontainer a
   margin: 20px
   border: 1px solid white
   border-radius: 2px
@@ -167,104 +176,83 @@ border: 2px solid #f2f2f2
   color: black
   margin-bottom: 20px
   cursor: pointer
-}
 
-#tabcontainer a.active {
+#tabcontainer a.active
  border: 1px solid black
-}
 
-#layout-choice, #link-options {
+#layout-choice, #link-options
   display: inline-block
   margin-left: 2em
-}
 
 .row.no-gutter [class*='col-']:not(:first-child),
-.row.no-gutter [class*='col-']:not(:last-child) {
+.row.no-gutter [class*='col-']:not(:last-child)
   padding-right: 0
   padding-left: 0
-}
 
-[tree] li {
+[tree] li
   list-style-type: none
-}
 
-ul {
+ul
   padding-left: 15px
-}
 
-.group-label {
+.group-label
   font-weight: bold
-}
 
-div.checkbox {
+div.checkbox
   margin-top: 3px
   margin-bottom: 3px
-}
 
-.popover {
+.popover
 z-index: 1000
 position: absolute
-}
 
-/* Sunburst */
-
-.sunburst-cell {
+.sunburst-cell
   fill: #aaa
-}
 
-.sunburst-cell:hover {
+.sunburst-cell:hover
   fill: #999
-}
 
-.auth-text {
+.auth-text
   float: right
   margin: 50px 0 -70px 0
   color: rgba(0, 0, 0, 0.7)
-  font-size: 0.9em
-}
+  font-size: 1em
 
-.border {
+.border
   border: 1px solid rgba(#000, 0.1)
-}
 
-.transition-100 {
+.transition-100
   transition: .1s
   -webkit-transition: .1s
   -moz-transition: .1s
   -o-transition: .1s
-}
 
-.transition-200 {
+.transition-200
   transition: .2s
   -webkit-transition: .2s
   -moz-transition: .2s
   -o-transition: .2s
-}
 
-.modal-backdrop {
+.modal-backdrop
   background-color: #868686
-}
 
-.modal-content {
+.modal-content
   border: none
   box-shadow: 0 1px 10px rgba(#000, 0.2)
   padding: 40px
   border-radius: 3px
 
-  .modal-header, .modal-body, .modal-footer {
+  .modal-header, .modal-body, .modal-footer
     padding: 0
     border: none
-  }
 
-  .description {
+  .description
     width: 300px
-    margin-top: 15px
-  }
-}
+    margin-top: 30px
 
-.modal-tabs {
-  li {
-    a {
+.modal-tabs
+  li
+    a
       background: none
       text-align: center
       background-color: rgba(#000000, 0.05)
@@ -279,33 +267,27 @@ position: absolute
       -moz-transition: .2s
       -o-transition: .2s
 
-      &:hover {
+      &:hover
         opacity: 1
-      }
-    }
-  }
 
-  ul > li.active > a {
+  ul > li.active > a
       background-color: #466bd3 !important
       opacity: 1
       box-shadow: 0px 1px 2px rgba(#000, 0.2)
       border-bottom: 1px solid rgba(#000000, 0.3)
       color: #fff !important
-  }
-}
 
-.text-button {
+.text-button
   appearance: none
   border: none
   background: none
   outline: none
+  font-size: 1.1em
+  margin-left: 15px
 
-  &:hover {
+  &:hover
     opacity: .4;
-  }
-}
 
-.button-disabled {
+.button-disabled
   cursor: default
   opacity: .3 !important
-}

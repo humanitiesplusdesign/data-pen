@@ -15,11 +15,29 @@ project {
     box-shadow: 0px 1px 4px rgba(#000, 0.1)
     color: #444
     line-height: initial
+    font-size: 1.2em
 
     .nav-element {
       display: inline-block
-      margin-top: 1.3em
       margin-left: 1em
+      margin-top: 1.4em
+    }
+
+    .nav-link {
+      cursor: pointer
+      margin-left: 1.5em
+    }
+
+    .nav-link-active {
+      color: #466bd3
+      border-bottom: 1px solid #466bd3
+    }
+
+    .nav-link-inactive {
+      color: #969696
+      &:hover {
+        border-bottom: 1px solid #969696
+      }
     }
 
     .project-description a {
@@ -53,10 +71,7 @@ project {
     .bibliography-link {
       float: right
       margin-right: 1em
-    }
-
-    .push-down {
-      margin-top: 1.5em
+      margin-top: 1.3em
     }
 
     .bib-icon {
@@ -68,10 +83,10 @@ project {
       -moz-transition: .1s
       -o-transition: .1s
       cursor: pointer
-    }
 
-    .bib-icon:hover {
-      opacity: .5
+      &:hover {
+        opacity: .5
+      }
     }
 
     .back-icon {
@@ -98,7 +113,7 @@ project {
       width: 250px
       height: 20px
       float: right;
-      margin: 1em 1em 0 1em
+      margin: 1.1em 1em 0 1em
 
       .search-bar {
         outline: 0
@@ -114,10 +129,9 @@ project {
 
       .search-image {
         position: absolute
-        top: 8px
+        top: 6px
         left: 10px
         width: 12px
-        height: auto
         opacity: .5
       }
     }
@@ -162,7 +176,7 @@ project {
   }
 
   .interstitial {
-    position: absolute
+    position: fixed
     width: 100%
     height: 100%
     z-index: 5000
@@ -170,6 +184,18 @@ project {
     opacity: 0.9
     // transition: 0.5s
     pointer-events: default
+
+    .loading-logo {
+      position: fixed
+      width: 700px
+      height: auto
+      top: 50%
+      left: 50%
+      margin-left: -350px
+      margin-top: -350px
+      border: 1px solid red
+      opacity: .7
+    }
   }
 
   .hide-interstitial {

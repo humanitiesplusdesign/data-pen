@@ -1,5 +1,5 @@
 .container
-  h3.header-title Data Pen
+  h4.header-title Data Pen
     span.header-subtitle Projects
 
   div.head(ng-repeat="(id,projectSource) in $ctrl.projectSources track by $index",ng-if="id=='Projects'")
@@ -12,7 +12,7 @@
     .error-loading.col-md-6.col-md-offset-3(ng-if="$ctrl.projectSourceState[id]=='error'")
       p.message-text Something went wrong while loading your projects. Check your internet connection and try a refresh?
 
-    .no-projects.col-md-6.col-md-offset-3(ng-if="$ctrl.projects.Projects.length === 0 && $ctrl.projectSourceState[id]=='ready'")
+    .no-projects.col-md-8.col-md-offset-2(ng-if="$ctrl.projects.Projects.length === 0 && $ctrl.projectSourceState[id]=='ready'")
       p.message-text A project contains a set of sources, filters, and active data, as well as tabular and graphical workspaces. Create a project to get started!
 
     a(ui-sref="configure({sourceId:id})" ng-if="$ctrl.projectSourceState[id]=='ready'" )
@@ -20,6 +20,7 @@
 
     ul.projects-list
       li.project-cell(ng-if="$ctrl.projectSourceState[id]=='ready'",ng-repeat="project in $ctrl.projects[id] track by $index" ng-init="optionsVisibility=''" ng-mouseenter="optionsVisibility='visible'" ng-mouseleave="optionsVisibility=''")
+        //-.row(ui-sref="project({id:project.id,sparqlEndpoint:project.source.sparqlEndpoint,graph:project.source.graph, view: 'active'})")
         .row
           .citable-content: citable(citable="project",no-link)
           .project-draw
@@ -44,8 +45,10 @@
                 label.project-details-list-title Filters
                 ul.project-details-list
                   //-li(ng-repeat="source in $ctrl.getSources(project)") {{ source.labels | prefLang }}
-                  li 1700&ndash;1750
-                  li Paris
+                  //-li 1700&ndash;1750
+                  //-li Paris
+                  li none
+                  li really long name omg wow this is
                 
           .project-sources
             a(ui-sref="project({id:project.id,sparqlEndpoint:project.source.sparqlEndpoint,graph:project.source.graph, view: 'sources'})")

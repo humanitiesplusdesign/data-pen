@@ -1,6 +1,7 @@
 .title
   .row
-    label.input-label Title *
+    label.input-label Title
+      span.mandatory-asterisk *
   .row
     .form-group(ng-repeat="label in $ctrl.citable.labels.values()")
       input.title-input(type="text", ng-model="label.value")

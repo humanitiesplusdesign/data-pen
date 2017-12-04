@@ -1,5 +1,5 @@
 .col-md-4
-  h4.citable-label(ng-if="!$ctrl.citable.url",title="{{$ctrl.citable.labels | prefLang}}") {{$ctrl.citable.labels | prefLang}}
+  h3.citable-label(ng-if="!$ctrl.citable.url",title="{{$ctrl.citable.labels | prefLang}}") {{$ctrl.citable.labels | prefLang}}
   p.citable-date {{ $ctrl.parseDate($ctrl.citable.dateCreated) | date : 'd MMMM, yyyy' }}
   p.citable-description
     span.citable-proj-date-range 1685&ndash;1815. 
