@@ -576,8 +576,15 @@ export class ActiveComponentController {
       
       if(item.item) {
         item.item.localProperties.concat(item.item.remoteProperties).forEach((p) => {
-          obj[p.property.value] = p.values.map((v) => v.value.labels.values && v.value.labels.values()[0] ? v.value.labels.values()[0].value : v.value.value).join(',')
-          if(generatedColumns.indexOf(p.property.value) === -1) {
+          let propValue = p.values.map((v) => {
+            return v.value.labels.values && v.value.labels.values() && v.value.labels.values()[0] ?
+              v.value.labels.values()[0].value :
+              // v.value.labels.values ? 
+                // v.value.labels.values[0] :
+                v.value.value
+          }).join(',')
+          obj[this.sanitizeId(p.property.value)] = propValue
+          if(generatedColumns.indexOf(p.property.value) === -1 && p.property.value !== RDF.type.value && p.property.value !== SKOS.prefLabel.value) {
             generatedColumns.push(p.property.value)
             generatedColumnLabels.push(p.property.labels)
           }
@@ -590,16 +597,19 @@ export class ActiveComponentController {
       let columnDefs: {}[] = [
         {
           field: 'id',
+          name: 'id',
           cellTemplate: '<div class="ui-grid-cell-contents"><a href="{{row.entity.id}}" target="_blank">{{row.entity.id}}</a></div>'
         },
         {
-          field: 'description'
+          field: 'description',
+          name: 'description'
         }
       ]
 
       generatedColumns.forEach((c, i) => {
         columnDefs.push({
-          field: c,
+          name: c,
+          field: this.sanitizeId(c),
           displayName: generatedColumnLabels[i].values ? generatedColumnLabels[i].values()[0].value : ''
         })
       })
@@ -616,7 +626,6 @@ export class ActiveComponentController {
           })
         }
       }
-      console.log(this.gridOptions)
     })
   }
 }
