@@ -25,7 +25,7 @@ project {
 
     .nav-link {
       cursor: pointer
-      margin-left: 1.5em
+      margin-left: 1em
     }
 
     .nav-link-active {
@@ -52,11 +52,11 @@ project {
         transition: .2s
         content: "edit"
         text-transform: uppercase
-        text-decoration: underline
         font-weight: 500
+        letter-spacing: 0.02em
         font-size: 0.8em
         opacity: 0
-        color: #446bd3
+        color: #aaaaaa
       }
 
       &:hover {
@@ -166,8 +166,9 @@ project {
     }
 
     .vertical-divider {
-      margin-left: 2em
-      margin-right: 1em
+      font-size: 0.8em
+      margin-left: 0.4em
+      margin-right: 1.4em
     }
   }
 
@@ -180,26 +181,36 @@ project {
     width: 100%
     height: 100%
     z-index: 5000
-    background-color: white
-    opacity: 0.9
-    // transition: 0.5s
+    background-color: #f5f5f5
+    opacity: 0.8
     pointer-events: default
 
     .loading-logo {
       position: fixed
-      width: 700px
+      width: 80px
       height: auto
       top: 50%
       left: 50%
-      margin-left: -350px
-      margin-top: -350px
-      border: 1px solid red
-      opacity: .7
+      margin-left: -40px
+      margin-top: -40px
+      animation: fade-in 2s ease
     }
   }
 
   .hide-interstitial {
     opacity: 0
     pointer-events: none
+  }
+
+  @keyframes fade-in {
+    0% {
+      opacity: 0
+    }
+    50% {
+      opacity: 0
+    }
+    100% {
+      opacity: .8
+    }
   }
 }
