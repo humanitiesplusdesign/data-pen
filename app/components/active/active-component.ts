@@ -104,7 +104,7 @@ export class ActiveComponentController {
       backgroundHover: '#fafafa',
       diameter: 160,
       menus: [{
-        icon: 'ghost-icon',
+        icon: 'link-icon',
         click: () => {
           this.linkNode(this.currentMenuItem)
         }
