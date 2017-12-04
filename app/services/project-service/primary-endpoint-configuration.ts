@@ -15,7 +15,7 @@ PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
 PREFIX dcterms: <http://purl.org/dc/terms/>
 PREFIX foaf: <http://xmlns.com/foaf/0.1/>
 PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
-SELECT ?id ?labels ?descriptions ?compatibleEndpoints ?coalesceIdsQuery ?rightsHolders ?rightsHolders_labels ?rightsHolders_descriptions ?rightsHolders_url ?rightsHolders_order ?url ?autocompletionQuery ?itemQuery ?deleteItemQuery ?classStatisticsQuery ?properyQuery ?classQuery {
+SELECT * {
 # STARTGRAPH
   # VALUE
   ?id a fibra:PrimaryEndpointConfiguration .
@@ -32,6 +32,7 @@ SELECT ?id ?labels ?descriptions ?compatibleEndpoints ?coalesceIdsQuery ?rightsH
     ?id fibra:itemQuery ?itemQuery .
     ?id fibra:deleteItemQuery ?deleteItemQuery .
     ?id fibra:classStatisticsQuery ?classStatisticsQuery .
+    OPTIONAL { ?id fibra:propertyStatisticsQuery ?propertyStatisticsQuery }
     ?id fibra:propertyQuery ?propertyQuery .
     ?id fibra:classQuery ?classQuery .
     OPTIONAL { ?id foaf:homepage ?url }
@@ -60,6 +61,7 @@ SELECT ?id ?labels ?descriptions ?compatibleEndpoints ?coalesceIdsQuery ?rightsH
   public coalesceIdsQuery: string = SparqlItemService.coalesceIdsQuery
   public deleteItemQuery: string = SparqlItemService.deleteItemQuery
   public classStatisticsQuery: string = SparqlStatisticsService.getClassStatisticsQuery
+  public propertyStatisticsQuery: string = SparqlStatisticsService.getPropertyStatisticsQuery
   public classQuery: string = DataModel.classQuery
   public propertyQuery: string = DataModel.propertyQuery
   public clone(): PrimaryEndpointConfiguration {
@@ -71,6 +73,7 @@ SELECT ?id ?labels ?descriptions ?compatibleEndpoints ?coalesceIdsQuery ?rightsH
     clone.coalesceIdsQuery = this.coalesceIdsQuery
     clone.deleteItemQuery = this.deleteItemQuery
     clone.classStatisticsQuery = this.classStatisticsQuery
+    clone.propertyStatisticsQuery = this.propertyStatisticsQuery
     clone.classQuery = this.classQuery
     clone.propertyQuery = this.propertyQuery
     return clone
@@ -91,6 +94,7 @@ fibra:compatibleEndpoint `
       f = f + `
 fibra:autocompletionQuery ${SparqlService.stringToSPARQLString(this.autocompletionQuery)} ;
 fibra:classStatisticsQuery ${SparqlService.stringToSPARQLString(this.classStatisticsQuery)} ;
+fibra:propertyStatisticsQuery ${SparqlService.stringToSPARQLString(this.propertyStatisticsQuery)} ;
 fibra:propertyQuery ${SparqlService.stringToSPARQLString(this.propertyQuery)} ;
 fibra:classQuery ${SparqlService.stringToSPARQLString(this.classQuery)} ;
 fibra:itemQuery ${SparqlService.stringToSPARQLString(this.itemQuery)} ;
@@ -115,6 +119,9 @@ fibra:deleteItemQuery ${SparqlService.stringToSPARQLString(this.deleteItemQuery)
     aq = this.classStatisticsQuery
     aq = p.graph ? aq.replace(/# STARTGRAPH/g, 'GRAPH <' + p.graph + '> {').replace(/# ENDGRAPH/g, '}') : aq.replace(/.*# STARTGRAPH\n/g, '').replace(/.*# ENDGRAPH\n/g, '')
     p.classStatisticsQuery = aq
+    aq = this.propertyStatisticsQuery
+    aq = p.graph ? aq.replace(/# STARTGRAPH/g, 'GRAPH <' + p.graph + '> {').replace(/# ENDGRAPH/g, '}') : aq.replace(/.*# STARTGRAPH\n/g, '').replace(/.*# ENDGRAPH\n/g, '')
+    p.propertyStatisticsQuery = aq
     aq = this.propertyQuery
     aq = p.graph ? aq.replace(/# STARTGRAPH/g, 'GRAPH <' + p.graph + '> {').replace(/# ENDGRAPH/g, '}') : aq.replace(/.*# STARTGRAPH\n/g, '').replace(/.*# ENDGRAPH\n/g, '')
     p.propertyQuery = aq
