@@ -108,6 +108,12 @@ p.break {
 
 h6.section-title {}
 
+#data-pen-logo {
+  width: 320px;
+  height: auto;
+  opacity: 0.9;
+}
+
 #sketch-container {
   position: absolute;
   width: 100%;

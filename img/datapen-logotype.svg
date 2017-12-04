@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 22.0.1, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 width="373.6px" height="109.7px" viewBox="0 0 373.6 109.7" style="enable-background:new 0 0 373.6 109.7;" xml:space="preserve"
+	>
+<style type="text/css">
+	.st0{fill:none;}
+	.st1{font-family:'Calibre-Medium';}
+	.st2{font-size:80px;}
+	.st3{letter-spacing:-3;}
+	.st4{letter-spacing:-1;}
+	.st5{fill:none;stroke:#000000;stroke-width:3;stroke-miterlimit:10;}
+	.st6{fill:#FFFFFF;}
+	.st7{fill:none;stroke:#FFFFFF;stroke-width:3;stroke-miterlimit:10;}
+</style>
+<rect x="95.2" y="25.9" class="st0" width="284.9" height="65.1"/>
+<text transform="matrix(1 0 0 1 95.1555 77.8576)"><tspan x="0" y="0" class="st1 st2">Data </tspan><tspan x="166.7" y="0" class="st1 st2 st3">P</tspan><tspan x="207.1" y="0" class="st1 st2 st4">e</tspan><tspan x="242.5" y="0" class="st1 st2">n</tspan></text>
+<g>
+	<circle cx="27.9" cy="91.9" r="7.5"/>
+	<circle cx="80.1" cy="101.3" r="7.5"/>
+	<line class="st5" x1="27.9" y1="91.9" x2="80.1" y2="101.3"/>
+	<line class="st5" x1="27.9" y1="91.9" x2="52.6" y2="71.7"/>
+	<g>
+		<path d="M54.6,70.4c0,0-5.1-9-7.4-21.1C44.9,37.1,47,28.8,47,28.8L21.7,3.5l-10.2,6.9L1.3,17.2l13.7,33c0,0,8.5,1.2,18.9,7.9
+			S50.7,73,50.7,73L54.6,70.4z"/>
+		<circle class="st6" cx="24.5" cy="29.8" r="7.5"/>
+		<line class="st7" x1="52.6" y1="71.7" x2="24.5" y2="29.8"/>
+	</g>
+	<circle cx="52.6" cy="71.7" r="7.5"/>
+</g>
+</svg>
