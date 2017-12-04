@@ -101,10 +101,16 @@ sources {
             width: 50px
             height: 50px
             vertical-align: top
-            background-color: rgba(0, 0, 0, 0.1)
             box-sizing: border-box;
             -moz-box-sizing: border-box;
             -webkit-box-sizing: border-box;
+
+            .no-stat {
+              width: 20px
+              opacity: 0.2
+              margin-left: 14px
+              margin-top: 14px
+            }
 
             &:last-child {
               margin-right: 50px
@@ -299,6 +305,10 @@ sources {
               .matrix-source-container {
                 height: 50px
 
+                .ng-isolate-scope {
+                  height: 42px !important
+                }
+
                 .matrix-source {
                   // border: 1px solid blue
                   display: inline-block
@@ -323,10 +333,16 @@ sources {
                   width: 50px
                   height: 50px
                   vertical-align: top
-                  background-color: rgba(0, 0, 0, 0.1)
                   box-sizing: border-box;
                   -moz-box-sizing: border-box;
                   -webkit-box-sizing: border-box;
+
+                  .no-stat {
+                    width: 20px
+                    opacity: 0.2
+                    margin-left: 14px
+                    margin-top: 14px
+                  }
 
                   // &:last-child {
                   //   margin-right: 50px
