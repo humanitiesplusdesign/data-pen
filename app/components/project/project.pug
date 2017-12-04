@@ -1,3 +1,4 @@
+.interstitial(ng-class="{ 'hide-interstitial' : $ctrl.state.project.description }")
 .main-area(ng-show="$ctrl.currentView==='active'")
   active
 .main-area(ng-show="$ctrl.currentView==='filter'")
@@ -13,7 +14,7 @@
   span.nav-links
     .nav-element.nav-link.push-down(ng-class="{muted: $ctrl.currentView !== 'sources', active: $ctrl.currentView === 'sources'}", ng-click="$ctrl.setView('sources')") Sources
     .nav-element.nav-link.push-down(ng-class="{muted: $ctrl.currentView !== 'filter', active: $ctrl.currentView === 'filter'}", ng-click="$ctrl.setView('filter')") Filter
-    .nav-element.nav-link.push-down(ng-class="{muted: $ctrl.currentView !== 'active', active: $ctrl.currentView === 'active'}", ng-click="$ctrl.setView('active')") Active
+    .nav-element.nav-link.push-down(ng-class="{muted: $ctrl.currentView !== 'active', active: $ctrl.currentView === 'active'}", ng-click="$ctrl.setView('active')") Draw
   .nav-element.search-container(ng-hide="$ctrl.currentView==='sources'")
     input.search-bar(placeholder="Search")
     img.search-image(src="./app/images/nav_bar/search.svg" width="12px" height="auto")
