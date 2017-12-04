@@ -44,7 +44,7 @@
   .sources-right
     .properties-head
       h5 Properties matrix
-    uib-tabset.matrix-tabs(type="pills")
+    uib-tabset.matrix-tabs(type="pills" ng-init="ps = $ctrl.propStatistics()")
       uib-tab(ng-repeat="class in $ctrl.allClasses()" index="$index" heading="{{ class.labels | prefLang }}")
         .matrix-right
           .matrix-border-box
@@ -71,5 +71,5 @@
             .matrix-total-container
               .matrix-total
                 .matrix-total-label Total
-              .matrix-total-cell(ng-repeat="prop in $ctrl.sourcePropsForClass(class).properties")
+              .matrix-total-cell(ng-repeat="prop in $ctrl.sourcePropsForClass(class).properties") {{ ps.get(prop.value).values }}
                 //- input.matrix-cell-checkbox(type="checkbox")

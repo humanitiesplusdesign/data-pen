@@ -1,7 +1,9 @@
+import { IMap } from '../../components/collection-utils';
 import { ILiteral } from 'models/rdfjs';
 import { Class } from 'services/project-service/data-model';
 import { RemoteEndpointConfiguration } from 'services/project-service/remote-endpoint-configuration';
 import { CLEAR_SOURCES_STATE, SET_SOURCE_CLASS_ACTIVE, ADD_ARCHIVE_SOURCE, ADD_AUTHORITY_SOURCE } from 'actions/sources';
+import { PropertyStatistics } from 'services/sparql-statistics-service';
 
 export interface ISourceClassTree {
   [source: string]: {
@@ -14,6 +16,7 @@ export interface ISource {
   labels: ILiteral[],
   classes: Class[],
   classStats: {classname: number}[]
+  propStats: IMap<PropertyStatistics>
 }
 
 export interface ISourcesState {

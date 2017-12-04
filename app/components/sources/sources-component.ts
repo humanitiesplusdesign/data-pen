@@ -1,5 +1,5 @@
 'use strict'
-import { SparqlStatisticsService } from '../../services/sparql-statistics-service';
+import { PropertyStatistics, SparqlStatisticsService } from '../../services/sparql-statistics-service';
 import { SourcesActionService } from '../../actions/sources';
 import { ProjectActionService } from '../../actions/project';
 import { IRootState } from '../../reducers';
@@ -75,10 +75,32 @@ export class SourcesComponentController {
 
   private sourcePropsForClass(c: Class): any {
     let sources: string[] = d3.keys(this.localSourceClassTree)
+    let propStatistics: Map<string, PropertyStatistics> = this.propStatistics()
     return {
       sources: sources,
-      properties: c.properties.values()
+      properties: c.properties.values().filter(p => { return propStatistics.has(p.value) && propStatistics.get(p.value).values > 0 }).sort((a, b) => {
+        return +propStatistics.get(a.value).values < +propStatistics.get(b.value).values ? 1 : -1
+      })
     }
+  }
+
+  private propStatistics(): Map<string, PropertyStatistics> {
+    let propMap: Map<string, PropertyStatistics> = new Map<string, PropertyStatistics>()
+    this.state.sources.archiveSources.concat(this.state.sources.authoritySources)
+      .forEach((ae) => {
+        ae.propStats.entries().forEach((kv) => {
+          if(!propMap.has(kv.key)) {
+            propMap.set(kv.key, kv.value)
+          } else {
+            propMap.set(kv.key, {
+              values: +propMap.get(kv.key).values + kv.value.values,
+              min: propMap.get(kv.key).min < kv.value.min ? propMap.get(kv.key).min : kv.value.min,
+              max: propMap.get(kv.key).max > kv.value.max ? propMap.get(kv.key).max : kv.value.max
+            })
+          }
+        })
+      })
+    return propMap
   }
 
   private getSourceClassStatus(source: string, clss: string): boolean {
