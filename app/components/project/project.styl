@@ -6,6 +6,7 @@ project {
     padding-top: 4em
     background-color: #f4f4f4
   }
+
   .top-nav {
     position: fixed
     width: 100%
@@ -36,6 +37,34 @@ project {
       color: #969696
       &:hover {
         border-bottom: 1px solid #969696
+      }
+    }
+
+    .project-description a {
+      color: #3e3e3e
+      transition: .2s
+      margin-right: 30px
+
+      &:after {
+        position: absolute
+        margin-top: 3px
+        padding-left: 15px
+        transition: .2s
+        content: "edit"
+        text-transform: uppercase
+        text-decoration: underline
+        font-weight: 500
+        font-size: 0.8em
+        opacity: 0
+        color: #446bd3
+      }
+
+      &:hover {
+        margin-right: 60px
+
+        &:after {
+          opacity: 1
+        }
       }
     }
 
@@ -140,5 +169,25 @@ project {
       margin-left: 2em
       margin-right: 1em
     }
+  }
+
+  .nav-link {
+    cursor: pointer
+  }
+
+  .interstitial {
+    position: absolute
+    width: 100%
+    height: 100%
+    z-index: 5000
+    background-color: white
+    opacity: 0.9
+    // transition: 0.5s
+    pointer-events: default
+  }
+
+  .hide-interstitial {
+    opacity: 0
+    pointer-events: none
   }
 }

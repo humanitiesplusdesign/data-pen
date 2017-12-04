@@ -16,6 +16,7 @@
   svg.main-svg
     g.main-g
       rect.main-background
+      g.main-g-links
       g.main-g-items
 .draggable-divider(drag-container="true" on-drag-end="dragging = false; $ctrl.dragDivider($event)" on-drag="$ctrl.dragDivider($event)" ng-style="$ctrl.dragTabLeftStyle()")
   .drag-tab(ng-hide="$ctrl.state.active.dividerPercent > 2 && $ctrl.state.active.dividerPercent < 98")
@@ -47,6 +48,7 @@
 #circle-menu.circle-menu
 #properties-menu.circle-menu
 .tooltips
+.link-tooltips
 script(type="text/ng-template" id="resultTemplate.html")
   a(ng-if="match.model")
     span.resultType {{ match.model.additionalInformation.typeDescriptions | prefLang }}
@@ -65,7 +67,7 @@ script(type="text/ng-template" id="resultPopupTemplate.html")
       li.uib-typeahead-match(ng-repeat="match in matches track by $index" ng-class="{active: isActive($index) }" ng-mouseenter="selectActive($index)" ng-click="selectMatch($index)" role="option" id="{{::match.id}}")
         div(uib-typeahead-match index="$index" match="match" query="query" template-url="templateUrl")
 script(type="text/ng-template" id="viewOptionsPopover.html")
-  .view-options-popover
+  .view-options-popover.pop-on-top
     h4 View options
     hr
     input(type="checkbox", ng-model="$ctrl.viewOptionsShowLabels" ng-click="$ctrl.viewOptionsShowLabels ? $ctrl.showTooltips() : $ctrl.hideTooltips()")
@@ -81,7 +83,7 @@ script(type="text/ng-template" id="viewOptionsPopover.html")
       span.unlinked-text unlinked
       |  status.
 script(type="text/ng-template" id="layersPopover.html")
-  .layers-popover
+  .layers-popover.pop-on-top
     h4 Layers
     p.description.layer-description Toggle layers off to hide nodes of that type, displaying them as links instead.
     hr
@@ -89,10 +91,10 @@ script(type="text/ng-template" id="layersPopover.html")
       toggle(ng-model="toggleValue" on="Nodes" off="Links" ng-change="changed()" onstyle="custom" offstyle="custom")
       span.checkbox-title {{ class.labels | prefLang }}
 script(type="text/ng-template" id="snapshotsPopover.html")
-  .snapshots-popover
+  .snapshots-popover.pop-on-top
     h4 Snapshots
     hr
 script(type="text/ng-template" id="layoutsPopover.html")
-  .layouts-popover
+  .layouts-popover.pop-on-top
     h4 Layouts
     hr

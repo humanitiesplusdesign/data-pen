@@ -1,3 +1,4 @@
+import { SparqlStatisticsService } from '../services/sparql-statistics-service';
 import { CLEAR_FILTER_STATE } from './filter';
 import { CLEAR_ACTIVE_STATE } from './active';
 import { CLEAR_SOURCES_STATE, ADD_ARCHIVE_SOURCE, ADD_AUTHORITY_SOURCE } from './sources';
@@ -33,7 +34,7 @@ export interface ISetActiveItemCountAction extends Action {
 
 export class ProjectActionService {
   /* @ngInject */
-  constructor(private $ngRedux: IFibraNgRedux, private projectService: ProjectService) {
+  constructor(private $ngRedux: IFibraNgRedux, private projectService: ProjectService, private sparqlStatisticsService: SparqlStatisticsService) {
   }
   public setProject(id: string, sparqlEndpoint: string, graph: string): angular.IPromise<IProjectLoadedAction> {
     this.$ngRedux.dispatch({
@@ -47,25 +48,28 @@ export class ProjectActionService {
     })
     return this.projectService.loadProject(new CitableSource(sparqlEndpoint, graph), id, true).then(
         project => {
-          // TODO: Get the actual sources associated with each endpoint
-          project.archiveEndpoints.forEach((ae) => {
-            this.$ngRedux.dispatch({
-              type: ADD_ARCHIVE_SOURCE,
-              payload: {
-                id: ae.id,
-                labels: ae.labels,
-                classes: project.dataModel.classMap.values()
-              }
+          project.archiveEndpoints.forEach(ae => {
+            this.sparqlStatisticsService.getClassStatistics(ae).then(stats => {
+              this.$ngRedux.dispatch({
+                type: ADD_ARCHIVE_SOURCE,
+                payload: {
+                  id: ae.id,
+                  labels: ae.labels,
+                  classes: project.dataModel.classMap.values().filter(c => stats[c.value])
+                }
+              })
             })
           })
-          project.authorityEndpoints.forEach((ae) => {
-            this.$ngRedux.dispatch({
-              type: ADD_AUTHORITY_SOURCE,
-              payload: {
-                id: ae.id,
-                labels: ae.labels,
-                classes: project.dataModel.classMap.values()
-              }
+          project.authorityEndpoints.forEach(ae => {
+            this.sparqlStatisticsService.getClassStatistics(ae).then(stats => {
+              this.$ngRedux.dispatch({
+                type: ADD_AUTHORITY_SOURCE,
+                payload: {
+                  id: ae.id,
+                  labels: ae.labels,
+                  classes: project.dataModel.classMap.values().filter(c => stats[c.value])
+                }
+              })
             })
           })
           return this.$ngRedux.dispatch({

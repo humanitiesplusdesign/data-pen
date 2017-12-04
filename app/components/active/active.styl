@@ -4,6 +4,10 @@ active {
   height: 100%
   width: 100%
 
+  .pop-on-top {
+    z-index: 100
+  }
+
   .active-tooltip {
     position: absolute
     z-index: 20
@@ -16,10 +20,7 @@ active {
     padding-right: 6px
     border-radius: 2px
     opacity: 0
-    transition: .1s
-    -webkit-transition: .1s
-    -moz-transition: .1s
-    -o-transition: .1s
+    pointer-events: none
   }
 
   .circular-menu {
@@ -338,6 +339,11 @@ active {
             background-color: red
           }
         }
+      }
+
+      .link {
+        stroke-width: 2px
+        stroke: black
       }
 
       @keyframes node-loading-animation {
