@@ -32,7 +32,7 @@ WHERE {
   constructor(private workerService: WorkerService, private fibraSparqlService: FibraSparqlService, private $localStorage: any) {
     if (!$localStorage.projectSources)
       $localStorage.projectSources = []
-   this.$localStorage['projectSources'] = this.$localStorage['projectSources'].map(ps => new ProjectSourceInfo(ps.id, ps.sparqlEndpoint, ps.updateEndpoint, ps.graphStoreEndpoint, ps.graph, ps.type))      
+    this.$localStorage['projectSources'] = this.$localStorage['projectSources'].map(ps => new ProjectSourceInfo(ps.id, ps.sparqlEndpoint, ps.updateEndpoint, ps.graphStoreEndpoint, ps.graph, ps.type))
   }
 
   public getProjectSources(): ProjectSourceInfo[] {
