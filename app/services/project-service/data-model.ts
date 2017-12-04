@@ -1,23 +1,23 @@
 'use strict'
 
 import {ILiteral} from '../../models/rdfjs'
-import {INode} from '../../models/rdf'
+import { INode, ONodeSet } from '../../models/rdf';
 import {IRichNode, FullRichNodeFromNode} from '../../models/richnode'
 import {StringSet, FMap, IMap} from '../../components/collection-utils'
 
 export interface IClass extends IRichNode {
-  superClasses: IClass[]
-  subClasses: IClass[]
-  properties: IProperty[]
-  inverseProperties: IProperty[]
+  superClasses: ONodeSet<IClass>
+  subClasses: ONodeSet<IClass>
+  properties: ONodeSet<IProperty>
+  inverseProperties: ONodeSet<IProperty>
   clone(classMap: {[id: string]: IClass}, propertyMap: {[id: string]: IProperty}): IClass
 }
 
 export class Class extends FullRichNodeFromNode implements IClass {
-  public superClasses: IClass[] = []
-  public subClasses: IClass[] = []
-  public properties: IProperty[] = []
-  public inverseProperties: IProperty[] = []
+  public superClasses: ONodeSet<IClass> = new ONodeSet<IClass>()
+  public subClasses: ONodeSet<IClass> = new ONodeSet<IClass>()
+  public properties: ONodeSet<IProperty> = new ONodeSet<IProperty>()
+  public inverseProperties: ONodeSet<IProperty> = new ONodeSet<IProperty>()
   constructor(id: INode) { super(id) }
   public clone(classMap: {[id: string]: IClass}, propertyMap: {[id: string]: IProperty}): IClass {
     if (classMap[this.value]) return classMap[this.value]
@@ -35,19 +35,19 @@ export class Class extends FullRichNodeFromNode implements IClass {
 }
 
 export interface IProperty extends IRichNode {
-  domains?: IClass[]
-  ranges?: IClass[]
-  superProperties?: IProperty[]
-  subProperties?: IProperty[]
+  domains?: ONodeSet<IClass>
+  ranges?: ONodeSet<IClass>
+  superProperties?: ONodeSet<IProperty>
+  subProperties?: ONodeSet<IProperty>
   inverseProperty?: IProperty
   clone?(classMap: {[id: string]: IClass}, propertyMap: {[id: string]: IProperty}): IProperty
 }
 
 export class Property extends FullRichNodeFromNode implements IProperty {
-  public domains: IClass[] = []
-  public ranges: IClass[] = []
-  public superProperties: IProperty[] = []
-  public subProperties: IProperty[] = []
+  public domains: ONodeSet<IClass> = new ONodeSet<IClass>()
+  public ranges: ONodeSet<IClass> = new ONodeSet<IClass>()
+  public superProperties: ONodeSet<IProperty> = new ONodeSet<IProperty>()
+  public subProperties: ONodeSet<IProperty> = new ONodeSet<IProperty>()
   public inverseProperty: IProperty
   constructor(id: INode) { super(id) }
   public clone(classMap: {[id: string]: IClass}, propertyMap: {[id: string]: IProperty}): IProperty {
