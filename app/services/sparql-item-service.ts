@@ -196,7 +196,8 @@ export class SparqlItemWorkerService {
   public getItems(idGroups: string[][] | boolean, queryRemote: boolean = false, canceller?: angular.IPromise<any>): angular.IPromise<Item[]> {
     let queryTemplate: string = this.stateWorkerService.state.project.itemQuery
     if (!idGroups) queryTemplate = queryTemplate.replace(/VALUES \(\?id \?oid\) { <IDPAIRS> }/g, '')
-    else queryTemplate = queryTemplate.replace(/<IDPAIRS>/g, (idGroups as string[][]).map(idGroup => Array.prototype.concat.apply([], idGroup.map(id => '(' + idGroup[0] + ' ' + id + ')'))).join(''))
+    else queryTemplate = queryTemplate.replace(/<IDPAIRS>/g, (idGroups as string[][]).map(idGroup => Array.prototype.concat.apply([], idGroup.map(id => '(' + idGroup[0] + ' ' + id + ')')).join('')).join(''))
+    console.log((idGroups as string[][]).map(idGroup => Array.prototype.concat.apply([], idGroup.map(id => '(' + idGroup[0] + ' ' + id + ')'))).join(''))
     queryTemplate = queryTemplate.replace(/<PREFLANG>/g, this.stateWorkerService.state.language)
     let items: EMap<Item> = new EMap<Item>((id) => new Item(DataFactory.instance.namedNode(id)))
     let ret: angular.IDeferred<Item[]> = this.$q.defer()

@@ -45,10 +45,8 @@
                 label.project-details-list-title Filters
                 ul.project-details-list
                   //-li(ng-repeat="source in $ctrl.getSources(project)") {{ source.labels | prefLang }}
-                  //-li 1700&ndash;1750
-                  //-li Paris
-                  li none
-                  li really long name omg wow this is
+                  li 1700&ndash;1750
+                  li Paris
                 
           .project-sources
             a(ui-sref="project({id:project.id,sparqlEndpoint:project.source.sparqlEndpoint,graph:project.source.graph, view: 'sources'})")
@@ -57,5 +55,6 @@
                 ul.project-details-list
                   li(ng-repeat="source in $ctrl.getSources(project)") {{ source.labels | prefLang }}
           ul.project-options(ng-class="optionsVisibility")
-            li Edit
+            li 
+              a(ui-sref="configure({id:project.id, sourceId: 'Projects' })" ) Edit
             li.delete-project(ng-click="$ctrl.openDeleteProjectModal(project, $index, id)") Delete

@@ -1,7 +1,8 @@
 'use strict'
+import { ILiteral } from '../../models/rdfjs';
 import { ActiveActionService } from '../../actions/active';
 import { Class, IClass, IProperty, Property } from '../../services/project-service/data-model';
-import { CNode, DataFactory, NamedNode, RDF, SKOS } from '../../models/rdf';
+import { CNode, DataFactory, NamedNode, ONodeSet, RDF, SKOS } from '../../models/rdf';
 import { IItemState } from '../../reducers/active';
 import { AutocompletionResults, Result, SparqlAutocompleteService, ResultGroup } from '../../services/sparql-autocomplete-service';
 import { SparqlItemService, PropertyToValues } from '../../services/sparql-item-service';
@@ -278,7 +279,7 @@ export class ActiveComponentController {
   }
 
   private sanitizeId(id: string): string {
-    return id.replace(/\/|\:|\.|\(|\)|\%|\#/g, '')
+    return id.replace(/\/|\:|\.|\(|\)|\%|\#|\+|\_/g, '')
   }
 
   private nodeClick(d: IItemState, groups: SVGCircleElement[]): void {
@@ -522,7 +523,7 @@ export class ActiveComponentController {
     r.style('height', h)
     r.style('width', w)
   }
-
+  
   private getCanvasSize(): { height: number, width: number } {
     let s: d3.Selection<Element, {}, HTMLElement, any> = d3.select('.main-svg')
     return {
@@ -563,28 +564,60 @@ export class ActiveComponentController {
   }
 
   private setGridOptions(): void {
+    let generatedColumns: string[] = []
+    let generatedColumnLabels: ONodeSet<ILiteral>[] = []
+
     let data: {}[] = this.state.active.activeLayout.items.map((item) => {
       let obj: {} = {}
       let typeProp: PropertyToValues = item.item ? item.item.localProperties.concat(item.item.remoteProperties).filter(p => p.property.value === RDF.type.value)[0] : null
       obj['id'] = item.ids[0].value
       obj['description'] = item.description
       obj['types'] = typeProp ? typeProp.values : []
+      
+      if(item.item) {
+        item.item.localProperties.concat(item.item.remoteProperties).forEach((p) => {
+          let propValue = p.values.map((v) => {
+            return v.value.labels.values && v.value.labels.values() && v.value.labels.values()[0] ?
+              v.value.labels.values()[0].value :
+              // v.value.labels.values ? 
+                // v.value.labels.values[0] :
+                v.value.value
+          }).join(',')
+          obj[this.sanitizeId(p.property.value)] = propValue
+          if(generatedColumns.indexOf(p.property.value) === -1 && p.property.value !== RDF.type.value && p.property.value !== SKOS.prefLabel.value) {
+            generatedColumns.push(p.property.value)
+            generatedColumnLabels.push(p.property.labels)
+          }
+        })
+      }
       return obj
     })
 
     this.allClasses().forEach((c) => {
+      let columnDefs: {}[] = [
+        {
+          field: 'id',
+          name: 'id',
+          cellTemplate: '<div class="ui-grid-cell-contents"><a href="{{row.entity.id}}" target="_blank">{{row.entity.id}}</a></div>'
+        },
+        {
+          field: 'description',
+          name: 'description'
+        }
+      ]
+
+      generatedColumns.forEach((c, i) => {
+        columnDefs.push({
+          name: c,
+          field: this.sanitizeId(c),
+          displayName: generatedColumnLabels[i].values ? generatedColumnLabels[i].values()[0].value : ''
+        })
+      })
+
       this.gridOptions[c.value] = {
         data: [{}].concat(data.filter((d) => { return d['types'] ? d['types'].map(v => v.value.value).indexOf(c.value) !== -1 : false })),
         enableFiltering: true,
-        columnDefs: [
-          {
-            field: 'id',
-            cellTemplate: '<div class="ui-grid-cell-contents"><a href="{{row.entity.id}}" target="_blank">{{row.entity.id}}</a></div>'
-          },
-          {
-            field: 'description'
-          }
-        ],
+        columnDefs: columnDefs,
         onRegisterApi: (gridApi) => {
           //set gridApi on scope
           gridApi.edit.on.afterCellEdit(this.$scope, (rowEntity, colDef, newValue, oldValue) => {

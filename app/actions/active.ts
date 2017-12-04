@@ -13,6 +13,7 @@ export const SET_ACTIVE_DIVIDER_PERCENTAGE: string = 'SET_ACTIVE_DIVIDER_PERCENT
 export const CLEAR_ACTIVE_STATE: string = 'CLEAR_ACTIVE_STATE'
 export const ADD_ITEM_TO_ITEM_STATE: string = 'ADD_ITEM_TO_ITEM_STATE'
 export const DELETE_ITEM_FROM_LAYOUT: string = 'DELETE_ITEM_FROM_LAYOUT'
+export const UPDATE_ITEM_DESCRIPTION: string = 'UPDATE_ITEM_DESCRIPTION'
 
 export interface IAddItemToCurrentLayoutAction extends Action {
   payload: IItemState
@@ -63,13 +64,24 @@ export class ActiveActionService {
     }
 
     this.sparqlItemService.getItem(item.ids, true).then((i) => {
-      this.$ngRedux.dispatch({
-        type: ADD_ITEM_TO_ITEM_STATE,
-        payload: {
-          itemState: item,
-          fullItem: i
-        }
-      })
+      if(i) {
+        this.$ngRedux.dispatch({
+          type: ADD_ITEM_TO_ITEM_STATE,
+          payload: {
+            itemState: item,
+            fullItem: i
+          }
+        })
+      } else {
+        // ID doesn't exist
+        this.$ngRedux.dispatch({
+          type: UPDATE_ITEM_DESCRIPTION,
+          payload: {
+            itemState: item,
+            newDescription: item.ids[0]
+          }
+        })
+      }
     })
 
     return this.$ngRedux.dispatch({

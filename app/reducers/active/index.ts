@@ -1,5 +1,6 @@
+import { DESCRIPTOR_LOCATIONS } from 'tslint/lib/rules/completedDocsRule';
 import { getPrefLangString } from '../../filters/preferred-language-filter';
-import { ADD_ITEM_TO_ITEM_STATE, DELETE_ITEM_FROM_LAYOUT } from 'actions/active';
+import { ADD_ITEM_TO_ITEM_STATE, DELETE_ITEM_FROM_LAYOUT, UPDATE_ITEM_DESCRIPTION } from 'actions/active';
 import { Item } from 'services/sparql-item-service';
 import { INode, SKOS } from 'models/rdf';
 import { ADD_ITEM_TO_CURRENT_LAYOUT, SET_ACTIVE_DIVIDER_PERCENTAGE, CLEAR_ACTIVE_STATE } from 'actions/active'
@@ -67,6 +68,19 @@ export default function models(state: IActiveState = defaultState, action): IAct
       return Object.assign({}, state, {
         activeLayout: Object.assign({}, state.activeLayout, {
           items: newItems2
+        })
+      })
+
+    case UPDATE_ITEM_DESCRIPTION:
+      let newItems4: IItemState[] = state.activeLayout.items.slice(0)
+      let updateItem4: IItemState = action.payload.itemState
+      newItems4.splice(newItems4.indexOf(updateItem4), 1)
+      newItems4.push(Object.assign({}, updateItem4, {
+        description: action.payload.newDescription
+      }))
+      return Object.assign({}, state, {
+        activeLayout: Object.assign({}, state.activeLayout, {
+          items: newItems4
         })
       })
 
