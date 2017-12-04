@@ -33,17 +33,17 @@
       label.cold-node(ng-click="$ctrl.addColdNode($ctrl.nodeSearchSelected)") Add "{{ $ctrl.nodeSearchSelected }}" as an unlinked node
       ul.list-style-none
         li.cold-node Add "{{ $ctrl.nodeSearchSelected }}" as a new type
-        li.result-type-container-loading(ng-repeat="type in ['Person', 'Place', 'Work'] | filter: $ctrl.nodeSearchSelected") 
+        li.result-type-container-loading(ng-repeat="type in $ctrl.allClassesFiltered($ctrl.nodeSearchSelected)") 
           label.resultType TYPE
-          label.resultActual {{ type }}
+          label.resultActual {{ type.labels | prefLang }}
   .no-results-container(ng-show="noResults")
     .fake-typeahead
       label.cold-node(ng-click="$ctrl.addColdNode($ctrl.nodeSearchSelected)") Add "{{ $ctrl.nodeSearchSelected }}" as an unlinked node
       ul.list-style-none
         li.cold-node Add "{{ $ctrl.nodeSearchSelected }}" as a new type
-        li.result-type-container-loading(ng-repeat="type in ['Person', 'Place', 'Work'] | filter: $ctrl.nodeSearchSelected") 
+        li.result-type-container-loading(ng-repeat="type in $ctrl.allClassesFiltered($ctrl.nodeSearchSelected)") 
           label.resultType TYPE
-          label.resultActual {{ type }}
+          label.resultActual {{ type.labels | prefLang }}
       label.no-results No Results Found!
 #circle-menu.circle-menu
 #properties-menu.circle-menu
@@ -56,13 +56,13 @@ script(type="text/ng-template" id="resultTemplate.html")
     label.resultSource(ng-repeat="ds in match.model.additionalInformation.dataSourceDescriptions") {{ ds.value | makeAcronym }}
   a(ng-if="!match.model")
     label.resultType.type-label TYPE
-    label.resultActual {{ match }}
+    label.resultActual {{ match.labels | prefLang }}
 script(type="text/ng-template" id="resultPopupTemplate.html")
   .custom-popup-wrapper(ng-style="{top:position().top+'px', left: position().left+'px'}" style="display: block;" ng-show="isOpen() && !moveInProgress" aria-hidden="{{!isOpen()}}")
     label.cold-node(ng-click="$parent.$ctrl.addColdNode(query)") Add "{{ query }}" as an unlinked node
     label.cold-node Add "{{ query }}" as a new type
     ul.dropdown-menu(role="listbox")
-      li.uib-typeahead-match.result-type-container(ng-repeat="type in ['Person', 'Place', 'Work'] | filter: query") 
+      li.uib-typeahead-match.result-type-container(ng-repeat="type in $ctrl.allClassesFiltered(query)") 
         div(uib-typeahead-match index="$index" match="type" query="query" template-url="templateUrl")
       li.uib-typeahead-match(ng-repeat="match in matches track by $index" ng-class="{active: isActive($index) }" ng-mouseenter="selectActive($index)" ng-click="selectMatch($index)" role="option" id="{{::match.id}}")
         div(uib-typeahead-match index="$index" match="match" query="query" template-url="templateUrl")
