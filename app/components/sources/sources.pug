@@ -25,22 +25,22 @@
         .class-list(ng-show="$ctrl.projectsOpen[source.id] ? true : false")
           label.checkbox-container(ng-repeat="clss in source.classes" ng-hide="clss.labels.length === 0") 
             input(type="checkbox", ng-model="$ctrl.localSourceClassTree[source.id][clss.value]" ng-click="$ctrl.sourcesActionService.setSourceClassActive(source.id, clss.value, !$ctrl.getSourceClassStatus(source.id, clss.value))")
-            span {{clss.labels | prefLang}}  ({{ source.classStats[clss.id] | number }} entities)
+            span {{clss.labels | prefLang}}  ({{ source.classStats.get(clss.id) | number }} entities)
     .sources-list(ng-show="$ctrl.state.sources.archiveSources.length != 0")
       h4.sources-category-title Archives
       span(ng-repeat="source in $ctrl.state.sources.archiveSources")
         h4.source-title(ng-click="$ctrl.projectsOpen[source.id] = !$ctrl.projectsOpen[source.id]")
           i.glyphicon.glyphicon-triangle-right.transition-200(ng-class="{'triangle-rotated' : $ctrl.projectsOpen[source.id]}")
           span.source-name {{source.labels | prefLang}}
-        .class-list(ng-show="$ctrl.projectsOpen[source.id] ? true : false")
           label.checkbox-container(ng-repeat="clss in source.classes" ng-hide="clss.labels.length === 0") 
             input(type="checkbox", ng-model="$ctrl.localSourceClassTree[source.id][clss.value]" ng-click="$ctrl.sourcesActionService.setSourceClassActive(source.id, clss.value, !$ctrl.getSourceClassStatus(source.id, clss.value))")
-            span {{clss.labels | prefLang}} ({{ source.classStats[clss.id] | number }} entities)
+            span {{clss.labels | prefLang}} ({{ source.classStats.get(clss.id) | number }} entities)
   .sources-right
     .properties-head
       h3 Properties matrix
     uib-tabset(type="tabs")
       uib-tab(ng-repeat="class in $ctrl.allClasses()" index="$index" heading="{{ class.labels | prefLang }}")
+<<<<<<< HEAD
         .matrix-right
           .matrix-border-box
             .matrix-property-container
@@ -61,3 +61,23 @@
                 .matrix-total-label Total
               .matrix-total-cell(ng-repeat="prop in $ctrl.sourcePropsForClass(class).properties")
                 //- input.matrix-cell-checkbox(type="checkbox")
+=======
+        .matrix
+          .matrix-property-container
+            .matrix-property(ng-repeat="prop in $ctrl.sourcePropsForClass(class).properties")
+              .matrix-property-label-container
+                .matrix-property-label 
+                  label
+                    input.matrix-property-checkbox(type="checkbox")
+                    span.prop-label-span {{ prop.labels | prefLang }}
+          .matrix-source-container(ng-repeat="source in $ctrl.state.sources.authoritySources.concat($ctrl.state.sources.archiveSources)" ng-if="source.classStats.has(class.id)")
+            .matrix-source
+              .matrix-source-label {{ source.labels | prefLang }}  ({{ source.classStats.get(class.id) | number }} entities)
+            .matrix-cell(ng-repeat="prop in $ctrl.sourcePropsForClass(class).properties")
+              //- input.matrix-cell-checkbox(type="checkbox")
+          .matrix-total-container
+            .matrix-total
+              .matrix-total-label Total
+            .matrix-total-cell(ng-repeat="prop in $ctrl.sourcePropsForClass(class).properties")
+              //- input.matrix-cell-checkbox(type="checkbox")
+>>>>>>> 77e707c7e6eecf2c731bbd4d5c2594d7dfb2aed1

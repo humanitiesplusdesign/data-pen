@@ -19,7 +19,7 @@ PREFIX dcterms: <http://purl.org/dc/terms/>
 PREFIX foaf: <http://xmlns.com/foaf/0.1/>
 PREFIX void: <http://rdfs.org/ns/void#>
 PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
-SELECT ?id ?labels ?descriptions ?coalesceIdsQuery ?url ?dateCreated ?rightsHolders ?rightsHolders_labels ?rightsHolders_descriptions ?rightsHolder_surl ?rightsHolders_order ?instanceNS ?schemaNS ?endpoint ?graphStoreEndpoint ?updateEndpoint ?graph ?autocompletionQuery ?classStatisticsQuery ?itemQuery ?deleteItemQuery ?authorityEndpoints ?authorityEndpoints_source_graph ?authorityEndpoints_source_sparqlEndpoint ?archiveEndpoints ?archiveEndpoints_source_graph ?archiveEndpoints_source_sparqlEndpoint ?schemas ?schemas_source_graph ?schemas_source_sparqlEndpoint {
+SELECT * {
 # STARTGRAPH
 # VALUE
   ?id a fibra:Project .
@@ -33,6 +33,7 @@ SELECT ?id ?labels ?descriptions ?coalesceIdsQuery ?url ?dateCreated ?rightsHold
     ?id fibra:graphStoreEndpoint ?graphStoreEndpoint .
     ?id fibra:autocompletionQuery ?autocompletionQuery .
     ?id fibra:classStatisticsQuery ?classStatisticsQuery .
+    OPTIONAL { ?id fibra:propertyStatisticsQuery ?propertyStatisticsQuery }
     ?id fibra:itemQuery ?itemQuery .
     ?id fibra:deleteItemQuery ?deleteItemQuery .
     OPTIONAL { ?id fibra:graph ?graph }
@@ -87,6 +88,7 @@ SELECT ?id ?labels ?descriptions ?coalesceIdsQuery ?url ?dateCreated ?rightsHold
   public dataModel: DataModel = new DataModel()
   public autocompletionQuery: string = SparqlAutocompleteService.defaultMatchQuery
   public classStatisticsQuery: string = SparqlStatisticsService.getClassStatisticsQuery
+  public propertyStatisticsQuery: string = SparqlStatisticsService.getPropertyStatisticsQuery
   public itemQuery: string = SparqlItemService.getItemPropertiesQuery
   public coalesceIdsQuery: string = SparqlItemService.coalesceIdsQuery
   public deleteItemQuery: string = SparqlItemService.deleteItemQuery
@@ -108,6 +110,7 @@ SELECT ?id ?labels ?descriptions ?coalesceIdsQuery ?url ?dateCreated ?rightsHold
     p.itemQuery = this.itemQuery
     p.deleteItemQuery = this.deleteItemQuery
     p.classStatisticsQuery = this.classStatisticsQuery
+    p.propertyStatisticsQuery = this.propertyStatisticsQuery
     p.coalesceIdsQuery = this.coalesceIdsQuery
     p.propertyQuery = this.propertyQuery
     p.classQuery = this.classQuery
@@ -121,6 +124,7 @@ SELECT ?id ?labels ?descriptions ?coalesceIdsQuery ?url ?dateCreated ?rightsHold
     clone.dataModel = this.dataModel.clone()
     clone.autocompletionQuery = this.autocompletionQuery
     clone.classStatisticsQuery = this.classStatisticsQuery
+    clone.propertyStatisticsQuery = this.propertyStatisticsQuery
     clone.itemQuery = this.itemQuery
     clone.coalesceIdsQuery = this.coalesceIdsQuery
     clone.deleteItemQuery = this.deleteItemQuery
@@ -207,6 +211,7 @@ fibra:graph <${this.graph}> ;`
       f = f + `
 fibra:autocompletionQuery ${SparqlService.stringToSPARQLString(this.autocompletionQuery)} ;
 fibra:classStatisticsQuery ${SparqlService.stringToSPARQLString(this.classStatisticsQuery)} ;
+fibra:propertyStatisticsQuery ${SparqlService.stringToSPARQLString(this.propertyStatisticsQuery)} ;
 fibra:itemQuery ${SparqlService.stringToSPARQLString(this.itemQuery)} ;
 fibra:coalesceIdsQuery ${SparqlService.stringToSPARQLString(this.coalesceIdsQuery)} ;
 fibra:deleteItemQuery ${SparqlService.stringToSPARQLString(this.deleteItemQuery)} ;
