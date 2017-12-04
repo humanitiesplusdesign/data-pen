@@ -31,14 +31,14 @@ export class ActiveActionService {
   constructor(private $ngRedux: IFibraNgRedux, private sparqlItemService: SparqlItemService) {}
 
   public addLink(item1: IItemState, item2: IItemState) {
-    this.sparqlItemService.alterItem(item1.ids[0], [new PropertyAndValue(new Property(new NamedNode('aldjfkdj')), item2.ids[0])])
+    this.sparqlItemService.alterItem(item1.ids[0], [new PropertyAndValue(new Property(new NamedNode('DataPenLink')), item2.ids[0])])
       .then(() => {
         this.sparqlItemService.getItem(item1.ids, true).then((i) => {
           this.$ngRedux.dispatch({
             type: ADD_ITEM_TO_ITEM_STATE,
             payload: {
               itemState: item1,
-              i
+              fullItem: i
             }
           })
         })
@@ -48,7 +48,7 @@ export class ActiveActionService {
             type: ADD_ITEM_TO_ITEM_STATE,
             payload: {
               itemState: item2,
-              i
+              fullItem: i
             }
           })
         })
