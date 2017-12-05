@@ -72,7 +72,7 @@ export default function models(state: ProjectState = defaultState, action): Proj
       })
 
     case SET_SOURCE_CLASS_ACTIVE:
-      let newProject1 = state.project.clone()
+      let newProject1 = state.project//.clone()
       newProject1.sourceClassSettings = Object.assign({}, state.project.sourceClassSettings, {
         [action.payload.source]: Object.assign({}, state.project.sourceClassSettings[action.payload.source], {
           [action.payload.clss]: action.payload.status
