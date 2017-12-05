@@ -109,7 +109,6 @@ SELECT * {
       'http://www.cidoc-crm.org/cidoc-crm/E53_Place': true
     },
     'http://ldf.fi/fibra/geonamesCidocLiteEndpointConfiguration': {
-      'http://www.cidoc-crm.org/cidoc-crm/E21_Person': true,
       'http://www.cidoc-crm.org/cidoc-crm/E53_Place': true
     }
   }
