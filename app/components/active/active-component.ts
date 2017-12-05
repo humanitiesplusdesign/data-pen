@@ -42,12 +42,14 @@ export class ActiveComponentController {
   private radius: number = 8
   private radiusBounce: number = 12
   private nodeSearchTopOffset: number = 39
+  private nodeSearchTypeaheadHeight: number = 400
   private circularMenuTopOffset: number = 55
   private currentlyAdding: boolean = false
 
   private menu: any
 
   private nodeSearch: d3.Selection<Element, {}, HTMLElement, any>
+  private nodeSearchTypeahead: d3.Selection<Element, {}, HTMLElement, any>
   private tooltip: d3.Selection<HTMLDivElement, {}, HTMLElement, undefined>
   private nodeSearchSelected: string|{}
   private nodeSearchOffsetTop: number
@@ -200,12 +202,21 @@ export class ActiveComponentController {
         } else {
           this.nodeSearch.style('left', d3.event.offsetX + (this.state.active.dividerPercent / 100 * window.innerWidth) - 30 - 250 + 'px')
         }
+
+        this.nodeSearchTypeahead = d3.select('.custom-popup-wrapper')
+        if (window.innerHeight - d3.event.offsetY < this.nodeSearchTypeaheadHeight) {
+          this.nodeSearchTypeahead.style('max-height', (window.innerHeight - d3.event.offsetY - 100) + 'px')
+        } else {
+          this.nodeSearchTypeahead.style('max-height', this.nodeSearchTypeaheadHeight + 'px')
+        }
+
         this.$timeout(250).then(() => {
           this.nodeSearch.select<HTMLInputElement>('input').node().focus()
         })
       }
 
       this.currentlyAdding = true
+
     })
   }
 
@@ -223,6 +234,9 @@ export class ActiveComponentController {
   }
 
   private processResults(res: AutocompletionResults): Result[] {
+
+
+
     let activeItemIds: string[] = this.$ngRedux.getState().active.activeLayout.items.map((d: IItemState) => d.ids.map((i) => i.value)).reduce((a, b) => a.concat(b), [])
     let ret: Result[] = []
     let processMatchingResults: (results: ResultGroup, classRestrict: boolean) => void = (results, classRestrict) => results.results.forEach(r => {
@@ -527,7 +541,7 @@ export class ActiveComponentController {
     r.style('height', h)
     r.style('width', w)
   }
-  
+
   private getCanvasSize(): { height: number, width: number } {
     let s: d3.Selection<Element, {}, HTMLElement, any> = d3.select('.main-svg')
     return {
@@ -583,13 +597,13 @@ export class ActiveComponentController {
       obj['id'] = item.ids[0].value
       obj['description'] = item.description
       obj['types'] = typeProp ? typeProp.values : []
-      
+
       if(item.item) {
         item.item.localProperties.concat(item.item.remoteProperties).forEach((p) => {
           let propValue = p.values.map((v) => {
             return v.value.labels.values && v.value.labels.values() && v.value.labels.values()[0] ?
               v.value.labels.values()[0].value :
-              // v.value.labels.values ? 
+              // v.value.labels.values ?
                 // v.value.labels.values[0] :
                 v.value.value
           }).join(',')
