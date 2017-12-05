@@ -2,8 +2,6 @@
   img.loading-logo(src="./app/images/logo/datapen-logo.svg")
 .main-area(ng-show="$ctrl.currentView==='active'")
   active
-.main-area(ng-show="$ctrl.currentView==='filter'")
-  filter
 .main-area(ng-show="$ctrl.currentView==='sources'")
   sources
 .top-nav
@@ -14,7 +12,6 @@
   .nav-element.vertical-divider.muted •
   span.nav-links
     .nav-element.nav-link.push-down(ng-class="{'nav-link-inactive': $ctrl.currentView !== 'sources', 'nav-link-active': $ctrl.currentView === 'sources'}", ng-click="$ctrl.setView('sources')") Sources
-    .nav-element.nav-link.push-down(ng-class="{'nav-link-inactive': $ctrl.currentView !== 'filter', 'nav-link-active': $ctrl.currentView === 'filter'}", ng-click="$ctrl.setView('filter')") Filter
     .nav-element.nav-link.push-down(ng-class="{'nav-link-inactive': $ctrl.currentView !== 'active', 'nav-link-active': $ctrl.currentView === 'active'}", ng-click="$ctrl.setView('active')") Draw
   .nav-element.search-container(ng-hide="$ctrl.currentView==='sources'")
     input.search-bar(placeholder="Search")

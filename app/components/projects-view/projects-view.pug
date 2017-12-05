@@ -39,14 +39,14 @@
                     li Publication
                     li Persimmon
                   
-          .project-filter
-            a(ui-sref="project({id:project.id,sparqlEndpoint:project.source.sparqlEndpoint,graph:project.source.graph, view: 'filter'})")
-              .project-details-list-container.transition-100
-                label.project-details-list-title Filters
-                ul.project-details-list
-                  //-li(ng-repeat="source in $ctrl.getSources(project)") {{ source.labels | prefLang }}
-                  li 1700&ndash;1750
-                  li Paris
+          //- .project-filter
+          //-   a(ui-sref="project({id:project.id,sparqlEndpoint:project.source.sparqlEndpoint,graph:project.source.graph, view: 'filter'})")
+          //-     .project-details-list-container.transition-100
+          //-       label.project-details-list-title Filters
+          //-       ul.project-details-list
+          //-         //-li(ng-repeat="source in $ctrl.getSources(project)") {{ source.labels | prefLang }}
+          //-         li 1700&ndash;1750
+          //-         li Paris
                 
           .project-sources
             a(ui-sref="project({id:project.id,sparqlEndpoint:project.source.sparqlEndpoint,graph:project.source.graph, view: 'sources'})")
