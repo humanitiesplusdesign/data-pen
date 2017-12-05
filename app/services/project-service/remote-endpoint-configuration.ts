@@ -68,6 +68,7 @@ SELECT * {
   public endpoint: string
   public clone(): RemoteEndpointConfiguration {
     let clone: RemoteEndpointConfiguration = new RemoteEndpointConfiguration()
+    this.copyCitableTo(clone)
     clone.types = this.types.clone()
     clone.autocompletionQuery = this.autocompletionQuery
     clone.propertyQuery = this.propertyQuery

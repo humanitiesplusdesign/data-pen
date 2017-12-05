@@ -86,6 +86,7 @@ SELECT ?labels ?descriptions ?rightsHolders ?rightsHolders_labels ?rightsHolders
   public propertyQuery: string = DataModel.propertyQuery
   public clone(): Schema {
     let clone: Schema = new Schema()
+    this.copyCitableTo(clone)
     clone.endpoint = this.endpoint
     clone.classQuery = this.classQuery
     clone.propertyQuery = this.propertyQuery

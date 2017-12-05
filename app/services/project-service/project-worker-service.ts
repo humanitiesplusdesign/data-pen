@@ -14,6 +14,7 @@ import {toTurtle} from '../../components/misc-utils'
 import {DataFactory, ONodeSet} from '../../models/rdf'
 import {DataModel, Class, Property} from './data-model'
 import { ILiteral } from 'models/rdfjs';
+import { SerializationService } from 'services/worker-service/serialization-service';
 
 export class ProjectWorkerService {
   public static orderCitables(citables: ICitable[]): void {
@@ -21,7 +22,7 @@ export class ProjectWorkerService {
     citables.forEach(rh => delete rh['order'])
   }
 
-  constructor(private fibraSparqlService: FibraSparqlService, private $q: angular.IQService) {}
+  constructor(private fibraSparqlService: FibraSparqlService, private serializationService: SerializationService, private $q: angular.IQService) {}
 
   public loadPrimaryEndpointConfiguration(source: ICitableSource, templateId: string): angular.IPromise<PrimaryEndpointConfiguration> {
     return this.runSingleQuery(source, PrimaryEndpointConfiguration.listPrimaryEndpointConfigurationsQuery, templateId, new PrimaryEndpointConfiguration(templateId, source))
@@ -155,7 +156,9 @@ export class ProjectWorkerService {
       promises.push(this.$q.all(p.schemas.map(schema => this.loadSchema(schema.source, schema.id))).then(schemas => p.schemas = schemas))
       promises.push(this.$q.all(p.archiveEndpoints.map(ae => this.loadRemoteEndpointConfiguration(ae.source, ae.id))).then(aes => p.archiveEndpoints = aes))
       promises.push(this.$q.all(p.authorityEndpoints.map(ae => this.loadRemoteEndpointConfiguration(ae.source, ae.id))).then(aes => p.authorityEndpoints = aes))
-      return this.$q.all(promises).then(() => this.loadDataModel(p.schemas, p.archiveEndpoints.concat(p.authorityEndpoints)).then(dm => p.dataModel = dm).then(() => p))
+      return this.$q.all(promises).then(() => this.loadDataModel(p.schemas, p.archiveEndpoints.concat(p.authorityEndpoints)).then(dm => p.dataModel = dm).then(() => {
+        console.log(p, p.clone())
+        return p}))
     })
   }
 
@@ -165,7 +168,7 @@ export class ProjectWorkerService {
     let deferred: angular.IDeferred<T> = this.$q.defer()
     this.fibraSparqlService.query(source.sparqlEndpoint, tq).then(response => {
       let conf: IBindingsToObjectConfiguration = {
-        bindingTypes: { rightsHolders: 'uniqueArray', schemas: 'uniqueArray', authorityEndpoints: 'uniqueArray', archiveEndpoints: 'uniqueArray'},
+        bindingTypes: { rightsHolders: 'uniqueArray', sourceClassSettings: 'single', schemas: 'uniqueArray', authorityEndpoints: 'uniqueArray', archiveEndpoints: 'uniqueArray'},
         bindingConverters: {
           dateCreated: (binding) => new Date(binding.value),
           types: (binding) => DataFactory.nodeFromBinding(binding),
@@ -177,7 +180,8 @@ export class ProjectWorkerService {
           rightsHolders_labels: (binding) => DataFactory.nodeFromBinding(binding),
           rightsHolders_descriptions: (binding) => DataFactory.nodeFromBinding(binding),
           rightsHolders: (binding) => new Citable(binding.value, source),
-          compatibleSchemas: (binding) => DataFactory.nodeFromBinding(binding)
+          compatibleSchemas: (binding) => DataFactory.nodeFromBinding(binding),
+          sourceClassSettings: (binding) => this.serializationService.fromJson(binding.value)
         },
         bindingHandlers: {
           types: (obj, prop, value) => obj[prop].add(value),
@@ -199,7 +203,7 @@ export class ProjectWorkerService {
       response => {
         let projects: EMap<T> = new EMap<T>(oc)
         let conf: IBindingsToObjectConfiguration = {
-          bindingTypes: { rightsHolders: 'uniqueArray', schemas: 'uniqueArray', authorityEndpoints: 'uniqueArray', archiveEndpoints: 'uniqueArray'},
+          bindingTypes: { rightsHolders: 'uniqueArray', sourceClassSettings: 'single', schemas: 'uniqueArray', authorityEndpoints: 'uniqueArray', archiveEndpoints: 'uniqueArray'},
           bindingConverters: {
             dateCreated: (binding) => new Date(binding.value),
             types: (binding) => DataFactory.nodeFromBinding(binding),
@@ -211,7 +215,8 @@ export class ProjectWorkerService {
             rightsHolders_labels: (binding) => DataFactory.nodeFromBinding(binding),
             rightsHolders_descriptions: (binding) => DataFactory.nodeFromBinding(binding),
             rightsHolders: (binding) => new Citable(binding.value, source),
-            compatibleSchemas: (binding) => DataFactory.nodeFromBinding(binding)
+            compatibleSchemas: (binding) => DataFactory.nodeFromBinding(binding),
+            sourceClassSettings: (binding) => this.serializationService.fromJson(binding.value)
           },
           bindingHandlers: {
             types: (obj, prop, value) => obj[prop].add(value),
