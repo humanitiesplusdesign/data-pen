@@ -49,6 +49,7 @@ SELECT * {
     ?id fibra:autocompletionQuery ?autocompletionQuery .
     ?id fibra:classStatisticsQuery ?classStatisticsQuery .
     OPTIONAL { ?id fibra:sourceClassSettings ?sourceClassSettings }
+    OPTIONAL { ?id fibra:layouts ?layouts }
     OPTIONAL { ?id fibra:propertyStatisticsQuery ?propertyStatisticsQuery }
     ?id fibra:itemQuery ?itemQuery .
     ?id fibra:deleteItemQuery ?deleteItemQuery .
@@ -161,6 +162,7 @@ SELECT * {
     clone.updateEndpoint = this.updateEndpoint
     clone.graph = this.graph
     clone.sourceClassSettings = this.sourceClassSettings
+    clone.layouts = this.layouts
     clone.authorityEndpoints = this.authorityEndpoints.map(re => re.clone())
     clone.archiveEndpoints = this.archiveEndpoints.map(re => re.clone())
     clone.schemas = this.schemas.map(sch => sch.clone())
@@ -249,6 +251,7 @@ fibra:updateEndpoint <${this.updateEndpoint}> ;
 fibra:graphStoreEndpoint <${this.graphStoreEndpoint}> ;
 fibra:schemaNS ${SparqlService.stringToSPARQLString(this.schemaNS)} ;
 fibra:sourceClassSettings ${SparqlService.stringToSPARQLString(SerializationService.toJson(this.sourceClassSettings))} ;
+fibra:layouts ${SparqlService.stringToSPARQLString(SerializationService.toJson(this.layouts))} ;
 fibra:instanceNS ${SparqlService.stringToSPARQLString(this.instanceNS)} .`
       tb.fragmentsById.set(this.id, f)
     }

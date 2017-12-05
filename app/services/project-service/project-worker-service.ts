@@ -168,7 +168,7 @@ export class ProjectWorkerService {
     let deferred: angular.IDeferred<T> = this.$q.defer()
     this.fibraSparqlService.query(source.sparqlEndpoint, tq).then(response => {
       let conf: IBindingsToObjectConfiguration = {
-        bindingTypes: { rightsHolders: 'uniqueArray', sourceClassSettings: 'single', schemas: 'uniqueArray', authorityEndpoints: 'uniqueArray', archiveEndpoints: 'uniqueArray'},
+        bindingTypes: { rightsHolders: 'uniqueArray', sourceClassSettings: 'single', layouts: 'single', schemas: 'uniqueArray', authorityEndpoints: 'uniqueArray', archiveEndpoints: 'uniqueArray'},
         bindingConverters: {
           dateCreated: (binding) => new Date(binding.value),
           types: (binding) => DataFactory.nodeFromBinding(binding),
@@ -181,7 +181,8 @@ export class ProjectWorkerService {
           rightsHolders_descriptions: (binding) => DataFactory.nodeFromBinding(binding),
           rightsHolders: (binding) => new Citable(binding.value, source),
           compatibleSchemas: (binding) => DataFactory.nodeFromBinding(binding),
-          sourceClassSettings: (binding) => this.serializationService.fromJson(binding.value)
+          sourceClassSettings: (binding) => this.serializationService.fromJson(binding.value),
+          layouts: (binding) => this.serializationService.fromJson(binding.value)
         },
         bindingHandlers: {
           types: (obj, prop, value) => obj[prop].add(value),
@@ -203,7 +204,7 @@ export class ProjectWorkerService {
       response => {
         let projects: EMap<T> = new EMap<T>(oc)
         let conf: IBindingsToObjectConfiguration = {
-          bindingTypes: { rightsHolders: 'uniqueArray', sourceClassSettings: 'single', schemas: 'uniqueArray', authorityEndpoints: 'uniqueArray', archiveEndpoints: 'uniqueArray'},
+          bindingTypes: { rightsHolders: 'uniqueArray', sourceClassSettings: 'single', layouts: 'single', schemas: 'uniqueArray', authorityEndpoints: 'uniqueArray', archiveEndpoints: 'uniqueArray'},
           bindingConverters: {
             dateCreated: (binding) => new Date(binding.value),
             types: (binding) => DataFactory.nodeFromBinding(binding),
@@ -216,7 +217,8 @@ export class ProjectWorkerService {
             rightsHolders_descriptions: (binding) => DataFactory.nodeFromBinding(binding),
             rightsHolders: (binding) => new Citable(binding.value, source),
             compatibleSchemas: (binding) => DataFactory.nodeFromBinding(binding),
-            sourceClassSettings: (binding) => this.serializationService.fromJson(binding.value)
+            sourceClassSettings: (binding) => this.serializationService.fromJson(binding.value),
+            layouts: (binding) => this.serializationService.fromJson(binding.value)
           },
           bindingHandlers: {
             types: (obj, prop, value) => obj[prop].add(value),
