@@ -65,11 +65,10 @@
                       | entities
               .matrix-cell(ng-repeat="prop in $ctrl.sourcePropsForClass(class).properties" ng-style="{'background-color':'rgba(69, 106, 210, '+source.propStats.get(prop.value).values/source.classStats.get(class.id)+')'}" uib-popover="{{ source.propStats.get(prop.value).values }} / {{ source.classStats.get(class.id) }} ({{ source.propStats.get(prop.value).values / source.classStats.get(class.id) * 100 | number : 2 }}%)" popover-placement="bottom" popover-popup-delay="250" popover-trigger="'mouseenter'")
                 .stats.stats-available(ng-show="source.propStats.get(prop.value).values")
-                  label(ng-class="{'text-white' : (source.propStats.get(prop.value).values / source.classStats.get(class.id) * 100 | number : 0) > 50}") {{ source.propStats.get(prop.value).values / source.classStats.get(class.id) * 100 | number : 0 }}%
+                  label(ng-class="{'text-white' : (source.propStats.get(prop.value).values / source.classStats.get(class.id) * 100 | number : 0) > 50}") {{ $ctrl.floor(source.propStats.get(prop.value).values / source.classStats.get(class.id) * 100) | number : 0 }}%
                 .stats.stats-unavailable(ng-show="!source.propStats.get(prop.value).values")
                   //- label 
             .matrix-total-container
               .matrix-total
                 .matrix-total-label Total
               .matrix-total-cell(ng-repeat="prop in $ctrl.sourcePropsForClass(class).properties") {{ ps.get(prop.value).values }}
-                //- input.matrix-cell-checkbox(type="checkbox")

@@ -116,6 +116,10 @@ export class SourcesComponentController {
       project: state.project
     }
   }
+
+  private floor(value: number): number {
+    return Math.floor(value)
+  }
 }
 
 export class SourcesComponent implements angular.IComponentOptions {
