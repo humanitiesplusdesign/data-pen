@@ -3,10 +3,11 @@
 import {Citable} from 'models/citable'
 import {INode, FIBRA, VOID, RDF, ONodeSet} from 'models/rdf'
 import {SparqlAutocompleteService} from 'services/sparql-autocomplete-service'
-import {DataModel, Class} from 'services/project-service/data-model'
+import {DataModel, Class, IClass} from 'services/project-service/data-model'
 import {SparqlItemService} from 'services/sparql-item-service'
 import {SparqlStatisticsService} from 'services/sparql-statistics-service'
 import {SparqlService} from 'angular-sparql-service'
+import { TurtleBuilder } from 'components/misc-utils';
 
 export class RemoteEndpointConfiguration extends Citable {
   public static listRemoteEndpointConfigurationsQuery: string = `PREFIX fibra: <http://hdlab.stanford.edu/fibra/ontology#>
@@ -56,7 +57,7 @@ SELECT * {
   }
 # ENDGRAPH
 }`
-  public types: ONodeSet<Class> = new ONodeSet<Class>()
+  public types: ONodeSet<IClass> = new ONodeSet<IClass>()
   public autocompletionQuery: string = SparqlAutocompleteService.defaultMatchQuery
   public propertyQuery: string = DataModel.propertyQuery
   public classQuery: string = DataModel.classQuery
@@ -78,17 +79,17 @@ SELECT * {
     clone.endpoint = this.endpoint
     return clone
   }
-  public toTurtle(fragmentsById: d3.Map<string>, prefixes: {[id: string]: string}): void {
-    if (!fragmentsById.has(this.id)) {
-      prefixes['fibra'] = FIBRA.ns
-      prefixes['void'] = VOID.ns
-      prefixes['rdf'] = RDF.ns
+  public toTurtle(tb: TurtleBuilder): void {
+    if (!tb.fragmentsById.has(this.id)) {
+      tb.prefixes['fibra'] = FIBRA.ns
+      tb.prefixes['void'] = VOID.ns
+      tb.prefixes['rdf'] = RDF.ns
       let f: string = `<${this.id}> a `
       this.types.each(type => f = f + `${type.toCanonical()}, `)
       f = f.substring(0, f.length - 2) + ' ;'
-      fragmentsById.set(this.id, f)
-      super.toTurtle(fragmentsById, prefixes)
-      f  = fragmentsById.get(this.id)
+      tb.fragmentsById.set(this.id, f)
+      super.toTurtle(tb)
+      f  = tb.fragmentsById.get(this.id)
       f = f + `
 fibra:schemaEndpoint <${this.schemaEndpoint}> ;
 void:sparqlEndpoint <${this.endpoint}> ;
@@ -98,7 +99,7 @@ fibra:classStatisticsQuery ${SparqlService.stringToSPARQLString(this.classStatis
 fibra:propertyStatisticsQuery ${SparqlService.stringToSPARQLString(this.propertyStatisticsQuery)} ;
 fibra:propertyQuery ${SparqlService.stringToSPARQLString(this.propertyQuery)} ;
 fibra:classQuery ${SparqlService.stringToSPARQLString(this.classQuery)} .`
-      fragmentsById.set(this.id, f)
+      tb.fragmentsById.set(this.id, f)
     }
   }
 }

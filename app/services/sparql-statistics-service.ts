@@ -33,7 +33,7 @@ export class SparqlStatisticsService {
   public static getPropertyStatisticsQuery: string = `SELECT ?id ?min ?max ?values {
 # STARTGRAPH
   {
-    SELECT ?id (COUNT(*) AS ?values) (MIN(?value) AS ?min) (MAX(?value) AS ?max) {
+    SELECT ?id (COUNT(*) AS ?values) (COUNT(DISTINCT ?s) AS ?subjects) (MIN(?value) AS ?min) (MAX(?value) AS ?max) {
       ?s ?id ?value .
       # CONSTRAINTS
     }

@@ -1,23 +1,24 @@
-import * as angular from 'angular'
+import { SparqlService } from 'angular-sparql-service/dist/sparql-service';
+import * as angular from 'angular';
 
-import 'angular-http-auth'
-import 'angular-ui-router'
-import 'angular-animate'
-import 'angular-ui-bootstrap'
-import 'angular-toastr'
-import 'angular-file-saver'
+import 'angular-http-auth';
+import 'angular-ui-router';
+import 'angular-animate';
+import 'angular-ui-bootstrap';
+import 'angular-toastr';
+import 'angular-file-saver';
 
-import 'styles/main.styl'
+import 'styles/main.styl';
 // Register modules
-import 'actions'
-import 'services'
-import 'components'
-import 'filters'
+import 'actions';
+import 'services';
+import 'components';
+import 'filters';
 
-import 'ng-redux'
-import 'angular-yasqe-component'
-import 'ngstorage'
-import 'angular-ui-codemirror'
+import 'ng-redux';
+import 'angular-yasqe-component';
+import 'ngstorage';
+import 'angular-ui-codemirror';
 import { INgReduxProvider } from 'ng-redux';
 import { createLogger } from 'redux-logger'
 import thunkMiddleware from 'redux-thunk'
@@ -27,7 +28,10 @@ import rootReducer from 'reducers'
 import {SocialAuthService} from 'services/social-auth-service'
 import {ProjectService} from 'services/project-service/project-service'
 import {WorkerService} from 'services/worker-service/worker-service'
-import { IHttpRequestTransformer } from 'angular';
+import { IHttpRequestTransformer } from 'angular'
+import { RemoteEndpointConfiguration } from 'services/project-service/remote-endpoint-configuration'
+import { ONodeSet, XMLSchema, VOID } from 'models/rdf'
+import { IClass } from 'services/project-service/data-model'
 
 let m: angular.IModule = angular.module('fibra', [
   'fibra.services',

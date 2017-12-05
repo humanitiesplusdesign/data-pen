@@ -1,4 +1,5 @@
 'use strict'
+import { SerializationService } from './worker-service/serialization-service';
 import { getPrefLangString } from '../filters/preferred-language-filter';
 
 import {INode, ONodeSet, DataFactory} from '../models/rdf'
@@ -241,7 +242,7 @@ export class SparqlAutocompleteWorkerService {
               })
             }
           },
-          (error) => d.notify({endpointType: 'remote', endpoint: endpointConfiguration.id, error: WorkerWorkerService.stripFunctions(error)})
+          (error) => d.notify({endpointType: 'remote', endpoint: endpointConfiguration.id, error: SerializationService.stripFunctions(error)})
       )})).then(() => {
         d.resolve(results)
       })

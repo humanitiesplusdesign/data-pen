@@ -10,6 +10,7 @@ import {PrimaryEndpointConfiguration} from 'services/project-service/primary-end
 import {Schema} from 'services/project-service/schema'
 import {FIBRA, VOID} from 'models/rdf'
 import { SparqlStatisticsService } from 'services/sparql-statistics-service';
+import { TurtleBuilder } from 'components/misc-utils';
 
 export class Project extends Citable {
 
@@ -139,13 +140,13 @@ SELECT * {
     clone.schemas = this.schemas.map(sch => sch.clone())
     return clone
   }
-  public toTurtle(fragmentsById: d3.Map<string>, prefixes: {[id: string]: string}): void {
-    if (!fragmentsById.has(this.id)) {
-      prefixes['fibra'] = FIBRA.ns
-      prefixes['void'] = VOID.ns
-      fragmentsById.set(this.id, `<${this.id}> a fibra:Project ;`)
-      super.toTurtle(fragmentsById, prefixes)
-      let f: string = fragmentsById.get(this.id)
+  public toTurtle(tb: TurtleBuilder): void {
+    if (!tb.fragmentsById.has(this.id)) {
+      tb.prefixes['fibra'] = FIBRA.ns
+      tb.prefixes['void'] = VOID.ns
+      tb.fragmentsById.set(this.id, `<${this.id}> a fibra:Project ;`)
+      super.toTurtle(tb)
+      let f: string = tb.fragmentsById.get(this.id)
       if (this.schemas.length > 0) {
         f = f + `
 fibra:schema `
@@ -222,7 +223,7 @@ fibra:updateEndpoint <${this.updateEndpoint}> ;
 fibra:graphStoreEndpoint <${this.graphStoreEndpoint}> ;
 fibra:schemaNS ${SparqlService.stringToSPARQLString(this.schemaNS)} ;
 fibra:instanceNS ${SparqlService.stringToSPARQLString(this.instanceNS)} .`
-      fragmentsById.set(this.id, f)
+      tb.fragmentsById.set(this.id, f)
     }
   }
 }
