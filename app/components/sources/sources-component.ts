@@ -38,15 +38,15 @@ export class SourcesComponentController {
         }
       })(this.state)
 
-    this.localSourceClassTree = angular.copy(this.state.sources.sourceClassToggle)
+    this.localSourceClassTree = angular.copy(this.state.project.project.sourceClassSettings)
 
-    let oldSourceClassTree: ISourceClassTree = this.state.sources.sourceClassToggle
+    let oldSourceClassTree: ISourceClassTree = this.state.project.project.sourceClassSettings
 
     // Because we need to keep a local copy of the state to mutate, we have to observe it for changes.
     $ngRedux.subscribe(() => {
-      if (this.state.sources.sourceClassToggle !== oldSourceClassTree) {
-        this.localSourceClassTree = angular.copy(this.state.sources.sourceClassToggle)
-        oldSourceClassTree = this.state.sources.sourceClassToggle
+      if (this.state.project.project.sourceClassSettings !== oldSourceClassTree) {
+        this.localSourceClassTree = angular.copy(this.state.project.project.sourceClassSettings)
+        oldSourceClassTree = this.state.project.project.sourceClassSettings
       }
     })
   }
@@ -104,8 +104,8 @@ export class SourcesComponentController {
   }
 
   private getSourceClassStatus(source: string, clss: string): boolean {
-    if (this.state.sources.sourceClassToggle[source] && this.state.sources.sourceClassToggle[source][clss]) {
-      return this.state.sources.sourceClassToggle[source][clss]
+    if (this.state.project.project.sourceClassSettings[source] && this.state.project.project.sourceClassSettings[source][clss]) {
+      return this.state.project.project.sourceClassSettings[source][clss]
     } else {
       return false
     }

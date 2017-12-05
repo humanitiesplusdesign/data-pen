@@ -4,6 +4,7 @@ import { SET_PROJECT, SET_ACTIVE_ITEM_COUNT, SET_ALL_ITEM_COUNT, SET_FILTERED_IT
 import {Project} from 'services/project-service/project'
 import {RemoteEndpointConfiguration} from 'services/project-service/remote-endpoint-configuration'
 import {CNode} from 'models/rdf'
+import { SET_SOURCE_CLASS_ACTIVE } from 'actions/sources';
 
 export interface IProjectClass {
   description: string
@@ -68,6 +69,18 @@ export default function models(state: ProjectState = defaultState, action): Proj
         id: action.payload.id,
         sources: sources,
         description: action.payload.labels.values()[0].value
+      })
+
+    case SET_SOURCE_CLASS_ACTIVE:
+      let newProject1 = state.project.clone()
+      newProject1.sourceClassSettings = Object.assign({}, state.project.sourceClassSettings, {
+        [action.payload.source]: Object.assign({}, state.project.sourceClassSettings[action.payload.source], {
+          [action.payload.clss]: action.payload.status
+        })
+      })
+
+      return Object.assign({}, state, {
+        project: newProject1  
       })
 
     case SET_ALL_ITEM_COUNT:

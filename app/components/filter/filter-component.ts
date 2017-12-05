@@ -110,7 +110,7 @@ export class FilterComponentController {
 
   private getActiveClasses(): Class[] {
     let classes: Class[] = []
-    new Set(this.state.sources.archiveSources.concat(this.state.sources.authoritySources).map((s) => d3.keys(this.state.sources.sourceClassToggle[s.id]))
+    new Set(this.state.sources.archiveSources.concat(this.state.sources.authoritySources).map((s) => d3.keys(this.state.project.project.sourceClassSettings[s.id]))
       .reduce((a, b) => a.concat(b), [])).forEach((c) => classes.push(this.state.project.project.dataModel.classMap['s'][c]))
     return classes
   }

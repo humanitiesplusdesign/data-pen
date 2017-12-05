@@ -1,4 +1,5 @@
 'use strict'
+import { ISourceClassTree } from '../../reducers/sources';
 
 import {Citable} from 'models/citable'
 import {DataModel} from 'services/project-service/data-model'
@@ -102,6 +103,16 @@ SELECT * {
   public authorityEndpoints: RemoteEndpointConfiguration[] = []
   public archiveEndpoints: RemoteEndpointConfiguration[] = []
   public schemas: Schema[] = []
+  public sourceClassSettings: ISourceClassTree = {
+    'http://ldf.fi/fibra/viafCidocLiteEndpointConfiguration': {
+      'http://www.cidoc-crm.org/cidoc-crm/E21_Person': true,
+      'http://www.cidoc-crm.org/cidoc-crm/E53_Place': true
+    },
+    'http://ldf.fi/fibra/geonamesCidocLiteEndpointConfiguration': {
+      'http://www.cidoc-crm.org/cidoc-crm/E21_Person': true,
+      'http://www.cidoc-crm.org/cidoc-crm/E53_Place': true
+    }
+  }
   public remoteEndpoints(): RemoteEndpointConfiguration[] {
     return this.archiveEndpoints.concat(this.authorityEndpoints)
   }

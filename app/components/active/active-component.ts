@@ -244,8 +244,8 @@ export class ActiveComponentController {
       // Class filter (TODO: Move server-side)
       && (!classRestrict || r.datasources.reduce(
           (p, c) => {
-            return this.$ngRedux.getState().sources.sourceClassToggle[c]
-              && this.$ngRedux.getState().sources.sourceClassToggle[c][r.additionalInformation.type[0].value]
+            return this.$ngRedux.getState().project.project.sourceClassSettings[c]
+              && this.$ngRedux.getState().project.project.sourceClassSettings[c][r.additionalInformation.type[0].value]
           },
           false))) {
         r.additionalInformation.typeDescriptions = this.state.project.project.dataModel.classMap.get(r.additionalInformation.type[0].value).labels.values()
@@ -570,15 +570,19 @@ export class ActiveComponentController {
   }
 
   private allClasses(): IClass[] {
-    return d3.keys(this.$ngRedux.getState().sources.sourceClassToggle).reduce(
-      (a, b) => {
-        let sourceClasses: string[] = d3.keys(this.$ngRedux.getState().sources.sourceClassToggle[b])
-          .filter(k => this.$ngRedux.getState().sources.sourceClassToggle[b][k])
-          .filter(k => a.indexOf(k) === -1)
-        return a.concat(sourceClasses)
-      },
-      []).map(c => this.state.project.project ? this.state.project.project.dataModel.classMap.get(c) : null)
-        .filter(c => c)
+    if(this.$ngRedux.getState().project.project) {
+      return d3.keys(this.$ngRedux.getState().project.project.sourceClassSettings).reduce(
+        (a, b) => {
+          let sourceClasses: string[] = d3.keys(this.$ngRedux.getState().project.project.sourceClassSettings[b])
+            .filter(k => this.$ngRedux.getState().project.project.sourceClassSettings[b][k])
+            .filter(k => a.indexOf(k) === -1)
+          return a.concat(sourceClasses)
+        },
+        []).map(c => this.state.project.project ? this.state.project.project.dataModel.classMap.get(c) : null)
+          .filter(c => c)
+    } else {
+      return []
+    }
   }
 
   private allClassesFiltered(filterString: string): IClass[] {

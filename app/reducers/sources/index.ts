@@ -22,22 +22,11 @@ export interface ISource {
 export interface ISourcesState {
   archiveSources: ISource[]
   authoritySources: ISource[]
-  sourceClassToggle: ISourceClassTree
 }
 
 let defaultState: ISourcesState = {
   archiveSources: [],
-  authoritySources: [],
-  sourceClassToggle: {
-    'http://ldf.fi/fibra/viafCidocLiteEndpointConfiguration': {
-      'http://www.cidoc-crm.org/cidoc-crm/E21_Person': true,
-      'http://www.cidoc-crm.org/cidoc-crm/E53_Place': true
-    },
-    'http://ldf.fi/fibra/geonamesCidocLiteEndpointConfiguration': {
-      'http://www.cidoc-crm.org/cidoc-crm/E21_Person': true,
-      'http://www.cidoc-crm.org/cidoc-crm/E53_Place': true
-    }
-  }
+  authoritySources: []
 }
 
 export default function models(state: ISourcesState = defaultState, action): ISourcesState {
@@ -45,15 +34,6 @@ export default function models(state: ISourcesState = defaultState, action): ISo
 
     case CLEAR_SOURCES_STATE:
       return defaultState
-
-    case SET_SOURCE_CLASS_ACTIVE:
-      return Object.assign({}, state, {
-        sourceClassToggle: Object.assign({}, state.sourceClassToggle, {
-          [action.payload.source]: Object.assign({}, state.sourceClassToggle[action.payload.source], {
-            [action.payload.clss]: action.payload.status
-          })
-        })
-      })
 
     case ADD_ARCHIVE_SOURCE:
       let newArchiveSources: ISource[] = state.archiveSources.slice()

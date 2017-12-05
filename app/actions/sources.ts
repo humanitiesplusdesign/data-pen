@@ -1,3 +1,4 @@
+import { ProjectService } from '../services/project-service/project-service';
 import { ARGUMENT_PROPERTIES } from 'tslint/lib/rules/completedDocsRule';
 import * as angular from 'angular';
 
@@ -31,10 +32,10 @@ export interface IAddSourceAction extends Action {
 }
 
 export class SourcesActionService {
-  constructor(private $ngRedux: IFibraNgRedux, private $q: angular.IQService) {}
+  constructor(private $ngRedux: IFibraNgRedux, private $q: angular.IQService, private projectService: ProjectService) {}
 
   public setSourceClassActive(source: string, clss: string, status: boolean): ISetSourceClassActiveAction {
-    return this.$ngRedux.dispatch({
+    let ret = this.$ngRedux.dispatch({
       type: SET_SOURCE_CLASS_ACTIVE,
       payload: {
         source: source,
@@ -42,6 +43,12 @@ export class SourcesActionService {
         status: status
       }
     })
+
+    let updatedProject = this.$ngRedux.getState().project.project
+
+    this.projectService.saveCitable(updatedProject.updateEndpoint, updatedProject.graphStoreEndpoint, updatedProject)
+
+    return ret
   }
 
   public addArchiveSource(source: ISource): IAddSourceAction {
