@@ -1,4 +1,5 @@
 'use strict'
+import { INode } from '../../models/rdf';
 import { ISourceClassTree } from '../../reducers/sources';
 
 import {Citable} from 'models/citable'
@@ -13,6 +14,17 @@ import {FIBRA, VOID} from 'models/rdf'
 import { SparqlStatisticsService } from 'services/sparql-statistics-service';
 import { TurtleBuilder } from 'components/misc-utils';
 import { SerializationService } from 'services/worker-service/serialization-service';
+
+export type IItemState = {
+  ids: INode[],
+  topOffset: number,
+  leftOffset: number
+}
+
+export type ILayoutState = {
+  items: IItemState[],
+  active: boolean
+}
 
 export class Project extends Citable {
 
@@ -114,6 +126,7 @@ SELECT * {
       'http://www.cidoc-crm.org/cidoc-crm/E53_Place': true
     }
   }
+  public layouts: ILayoutState[] = []
   public remoteEndpoints(): RemoteEndpointConfiguration[] {
     return this.archiveEndpoints.concat(this.authorityEndpoints)
   }
