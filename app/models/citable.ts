@@ -32,7 +32,6 @@ export interface ICitable {
 
 export class Citable implements ICitable {
   public id: string
-  public source: ICitableSource = new CitableSource(null)
   public static toTurtle(c: ICitable, tb: TurtleBuilder): void {
     tb.prefixes['skos'] = SKOS.ns
     tb.prefixes['dcterms'] = DCTerms.ns
@@ -72,7 +71,7 @@ fibra:qualifiedAssertion [
     }
     tb.fragmentsById.set(c.id, f)
   }
-  constructor(id?: string, source?: ICitableSource, public labels: ONodeSet<ILiteral> = new ONodeSet<ILiteral>(), public url?: string, public descriptions: ONodeSet<ILiteral> = new ONodeSet<ILiteral>(), public rightsHolders: ICitable[] = [], public dateCreated: Date = new Date()) {
+  constructor(id?: string, public source: ICitableSource = new CitableSource(null), public labels: ONodeSet<ILiteral> = new ONodeSet<ILiteral>(), public url?: string, public descriptions: ONodeSet<ILiteral> = new ONodeSet<ILiteral>(), public rightsHolders: ICitable[] = [], public dateCreated: Date = new Date()) {
     this.id = id
     this.source = source
   }
@@ -87,6 +86,6 @@ fibra:qualifiedAssertion [
     other.dateCreated = this.dateCreated
   }
   public clone(): ICitable {
-    return new Citable(this.id, this.source, this.labels.clone(), this.url, this.descriptions.clone(), this.rightsHolders.map(rh => rh.clone()), this.dateCreated)
+    return new Citable(this.id, this.source.clone(), this.labels.clone(), this.url, this.descriptions.clone(), this.rightsHolders.map(rh => rh.clone()), this.dateCreated)
   }
 }

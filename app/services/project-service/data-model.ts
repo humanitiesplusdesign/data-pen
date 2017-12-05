@@ -22,6 +22,7 @@ export class Class extends FullRichNodeFromNode implements IClass {
   public clone(classMap: {[id: string]: IClass}, propertyMap: {[id: string]: IProperty}): IClass {
     if (classMap[this.value]) return classMap[this.value]
     let clone: Class = new Class(this)
+    classMap[this.value] = clone
     clone.labels = this.labels
     clone.descriptions = this.descriptions
     clone.types = this.types
@@ -51,8 +52,9 @@ export class Property extends FullRichNodeFromNode implements IProperty {
   public inverseProperty: IProperty
   constructor(id: INode) { super(id) }
   public clone(classMap: {[id: string]: IClass}, propertyMap: {[id: string]: IProperty}): IProperty {
-    if (classMap[this.value]) return propertyMap[this.value]
+    if (propertyMap[this.value]) return propertyMap[this.value]
     let clone: Property = new Property(this)
+    propertyMap[this.value] = clone
     clone.labels = this.labels
     clone.descriptions = this.descriptions
     clone.types = this.types
@@ -62,6 +64,7 @@ export class Property extends FullRichNodeFromNode implements IProperty {
     clone.superProperties = this.superProperties.map(p => p.clone(classMap, propertyMap))
     clone.subProperties = this.subProperties.map(p => p.clone(classMap, propertyMap))
     clone.inverseProperty = this.inverseProperty ? this.inverseProperty.clone(classMap, propertyMap) : undefined
+    return clone
   }
 }
 

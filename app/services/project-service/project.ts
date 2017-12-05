@@ -12,6 +12,7 @@ import {Schema} from 'services/project-service/schema'
 import {FIBRA, VOID} from 'models/rdf'
 import { SparqlStatisticsService } from 'services/sparql-statistics-service';
 import { TurtleBuilder } from 'components/misc-utils';
+import { SerializationService } from 'services/worker-service/serialization-service';
 
 export class Project extends Citable {
 
@@ -35,6 +36,7 @@ SELECT * {
     ?id fibra:graphStoreEndpoint ?graphStoreEndpoint .
     ?id fibra:autocompletionQuery ?autocompletionQuery .
     ?id fibra:classStatisticsQuery ?classStatisticsQuery .
+    OPTIONAL { ?id fibra:sourceClassSettings ?sourceClassSettings }
     OPTIONAL { ?id fibra:propertyStatisticsQuery ?propertyStatisticsQuery }
     ?id fibra:itemQuery ?itemQuery .
     ?id fibra:deleteItemQuery ?deleteItemQuery .
@@ -145,6 +147,7 @@ SELECT * {
     clone.graphStoreEndpoint = this.graphStoreEndpoint
     clone.updateEndpoint = this.updateEndpoint
     clone.graph = this.graph
+    clone.sourceClassSettings = this.sourceClassSettings
     clone.authorityEndpoints = this.authorityEndpoints.map(re => re.clone())
     clone.archiveEndpoints = this.archiveEndpoints.map(re => re.clone())
     clone.schemas = this.schemas.map(sch => sch.clone())
@@ -232,6 +235,7 @@ void:sparqlEndpoint <${this.endpoint}> ;
 fibra:updateEndpoint <${this.updateEndpoint}> ;
 fibra:graphStoreEndpoint <${this.graphStoreEndpoint}> ;
 fibra:schemaNS ${SparqlService.stringToSPARQLString(this.schemaNS)} ;
+fibra:sourceClassSettings ${SparqlService.stringToSPARQLString(SerializationService.toJson(this.sourceClassSettings))} ;
 fibra:instanceNS ${SparqlService.stringToSPARQLString(this.instanceNS)} .`
       tb.fragmentsById.set(this.id, f)
     }
