@@ -105,6 +105,12 @@ export class SourcesComponentController {
     return propMap
   }
 
+  private grandTotal(clss: string): number {
+    return this.state.sources.archiveSources.concat(this.state.sources.authoritySources)
+        .map(ae => +ae.classStats[clss])
+        .reduce((a,b) => a + b, 0)
+  }
+
   private getSourceClassStatus(source: string, clss: string): boolean {
     if (this.state.project.project.sourceClassSettings[source] && this.state.project.project.sourceClassSettings[source][clss]) {
       return this.state.project.project.sourceClassSettings[source][clss]

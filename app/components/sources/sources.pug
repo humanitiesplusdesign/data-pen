@@ -70,5 +70,5 @@
                   //- label 
             .matrix-total-container
               .matrix-total
-                .matrix-total-label Total
+                .matrix-total-label Total {{ $ctrl.grandTotal(class.id) }}
               .matrix-total-cell(ng-repeat="prop in $ctrl.sourcePropsForClass(class).properties") {{ ps.get(prop.value).values }}
