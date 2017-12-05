@@ -1,19 +1,25 @@
 'use strict'
 import {ICitable} from '../models/citable'
-import {FMap} from './collection-utils'
+import {FMap, IMap} from './collection-utils'
+import { SparqlService } from 'angular-sparql-service/dist/sparql-service'
+import * as cjson from 'circular-json'
 
-export function toTurtle(prefixes: {}, m: d3.Map<string>): string {
+export function toTurtle(tb: TurtleBuilder): string {
   let s: string = ''
-  for (let key in prefixes) s = s + '@prefix ' + key + ': <' + prefixes[key] + '> .\n'
-  m.values().forEach(str => s = s + str.substring(0, str.length - 2) + ' .\n\n')
+  for (let key in tb.prefixes) s = s + '@prefix ' + key + ': <' + tb.prefixes[key] + '> .\n'
+  tb.fragmentsById.values().forEach(str => s = s + str.substring(0, str.length - 2) + ' .\n\n')
   return s
 }
 
+export class TurtleBuilder {
+  public prefixes: {[prefix: string]: string} = {}
+  public fragmentsById: IMap<string> = new FMap<string>()
+}
+
 export function citableToTurtle(c: ICitable): string {
-  let prefixes: {} = {}
-  let m: d3.Map<string> = new FMap<string>()
-  c.toTurtle(m, prefixes)
-  return toTurtle(prefixes, m)
+  let tb: TurtleBuilder = new TurtleBuilder()
+  c.toTurtle(tb)
+  return toTurtle(tb)
 }
 
 let lut: string[] = []

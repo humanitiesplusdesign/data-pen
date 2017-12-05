@@ -12,6 +12,7 @@ import {SparqlUpdateWorkerService} from 'services/sparql-update-service'
 import {StateWorkerService, WorkerWorkerService} from 'services/worker-service/worker-worker-service'
 import {UUID, flatten} from 'components/misc-utils'
 import { DataModel, Property, IProperty } from 'services/project-service/data-model';
+import { SerializationService } from 'services/worker-service/serialization-service';
 
 export interface IPropertyToValues {
   property: IProperty
@@ -240,7 +241,7 @@ export class SparqlItemWorkerService {
                   ret.notify({ endpointType: 'remote', endpoint: endpoint.id, items: items.values()})
                 }
               },
-              (error) => ret.notify({ endpointType: 'remote', endpoint: endpoint.id, error: WorkerWorkerService.stripFunctions(error) })
+              (error) => ret.notify({ endpointType: 'remote', endpoint: endpoint.id, error: SerializationService.stripFunctions(error) })
             )
           })).then(() => ret.resolve(items.values()))
         } else ret.resolve(items.values())

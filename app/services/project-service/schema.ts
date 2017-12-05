@@ -4,6 +4,7 @@ import {Citable} from '../../models/citable'
 import {DataModel} from './data-model'
 import { FIBRA, ONodeSet, VOID } from '../../models/rdf';
 import {SparqlService} from 'angular-sparql-service'
+import { TurtleBuilder } from 'components/misc-utils';
 
 export class Schema extends Citable {
   public static listSchemasQuery: string = `PREFIX fibra: <http://hdlab.stanford.edu/fibra/ontology#>
@@ -90,18 +91,18 @@ SELECT ?labels ?descriptions ?rightsHolders ?rightsHolders_labels ?rightsHolders
     clone.propertyQuery = this.propertyQuery
     return clone
   }
-  public toTurtle(fragmentsById: d3.Map<string>, prefixes: {[id: string]: string}): void {
-    if (!fragmentsById.has(this.id)) {
-      prefixes['fibra'] = FIBRA.ns
-      prefixes['void'] = VOID.ns
-      fragmentsById.set(this.id, `<${this.id}> a fibra:Schema ;`)
-      super.toTurtle(fragmentsById, prefixes)
-      let f: string = fragmentsById.get(this.id)
+  public toTurtle(tb: TurtleBuilder): void {
+    if (!tb.fragmentsById.has(this.id)) {
+      tb.prefixes['fibra'] = FIBRA.ns
+      tb.prefixes['void'] = VOID.ns
+      tb.fragmentsById.set(this.id, `<${this.id}> a fibra:Schema ;`)
+      super.toTurtle(tb)
+      let f: string = tb.fragmentsById.get(this.id)
       f = f + `
 void:sparqlEndpoint <${this.endpoint}> ;
 fibra:classQuery ${SparqlService.stringToSPARQLString(this.classQuery)} ;
 fibra:propertyQuery ${SparqlService.stringToSPARQLString(this.propertyQuery)} .`
-      fragmentsById.set(this.id, f)
+      tb.fragmentsById.set(this.id, f)
     }
   }
 }

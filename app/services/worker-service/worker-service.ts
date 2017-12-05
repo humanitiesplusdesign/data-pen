@@ -1,8 +1,7 @@
 'use strict'
 
 import * as angular from 'angular'
-import './prototype-mapping-configuration'
-import {WorkerServiceUtils, IMessage} from 'services/worker-service/worker-service-common'
+import {IMessage, SerializationService} from 'services/worker-service/serialization-service'
 import {BackendRootState, convertToBackendState, IFibraNgRedux} from 'reducers'
 
 export interface ISerializable {
@@ -54,12 +53,12 @@ export class WorkerService {
   private oldState: BackendRootState = new BackendRootState()
 
   /* @ngInject */
-  constructor(workerServiceConfiguration: WorkerServiceConfiguration, private workerServicePrototypeMappingConfiguration: {[className: string]: Object}, $rootScope: angular.IRootScopeService, $window: angular.IWindowService, private $q: angular.IQService, private $ngRedux: IFibraNgRedux) {
+  constructor(workerServiceConfiguration: WorkerServiceConfiguration, serializationService: SerializationService, $rootScope: angular.IRootScopeService, $window: angular.IWindowService, private $q: angular.IQService, private $ngRedux: IFibraNgRedux) {
     $ngRedux.subscribe(() => {
       let newState: BackendRootState = convertToBackendState(this.$ngRedux.getState(), this.oldState)
       if (newState !== null) {
         this.oldState = newState
-        WorkerServiceUtils.savePrototypes(newState)
+        SerializationService.savePrototypes(newState)
         this.callAll('stateWorkerService', 'setState', [newState])
       }
     })
@@ -74,19 +73,19 @@ export class WorkerService {
       this.workers[i].addEventListener('message', (e: MessageEvent) => {
         let eventId: string = e.data.event;
         if (eventId === 'broadcast') {
-          $rootScope.$broadcast(e.data.name, this.restorePrototypes(e.data.args))
+          $rootScope.$broadcast(e.data.name, serializationService.restorePrototypes(e.data.args))
           $rootScope.$apply()
         } else {
           let deferred: angular.IDeferred<any> = this.deferreds[e.data.id]
           if (deferred) {
             if (eventId === 'success') {
               delete this.deferreds[e.data.id]
-              deferred.resolve(this.restorePrototypes(e.data.data))
+              deferred.resolve(serializationService.restorePrototypes(e.data.data))
             } else if (eventId === 'failure') {
               delete this.deferreds[e.data.id]
-              deferred.reject(this.restorePrototypes(e.data.data))
+              deferred.reject(serializationService.restorePrototypes(e.data.data))
             } else
-              deferred.notify(this.restorePrototypes(e.data.data))
+              deferred.notify(serializationService.restorePrototypes(e.data.data))
           }
         }
       })
@@ -94,7 +93,7 @@ export class WorkerService {
   }
 
   public $broadcast(name: string, args: any[]): void {
-    this.workers.forEach(w => w.postMessage({name: name, args: WorkerServiceUtils.savePrototypes(args)}))
+    this.workers.forEach(w => w.postMessage({name: name, args: SerializationService.savePrototypes(args)}))
   }
 
   public callAll<T>(service: string, method: string, args: any[] = [], canceller?: angular.IPromise<any>): angular.IPromise<T> {
@@ -105,7 +104,7 @@ export class WorkerService {
       id: id,
       service: service,
       method: method,
-      args: WorkerServiceUtils.savePrototypes(args)
+      args: SerializationService.savePrototypes(args)
     }
     if (canceller) canceller.then(() => {
       this.workers.forEach(worker => worker.postMessage({
@@ -134,36 +133,14 @@ export class WorkerService {
       id: id,
       service: service,
       method: method,
-      args: WorkerServiceUtils.savePrototypes(args)
+      args: SerializationService.savePrototypes(args)
     })
     return deferred.promise
   }
 
-  public restorePrototypes(args: any): any {
-    this.restorePrototypesInternal(args)
-    WorkerServiceUtils.stripMarks(args)
-    return args
-  }
-
-  private restorePrototypesInternal(args: any): void {
-    if (!args || args.__mark || typeof args !== 'object') return
-    args.__mark = true
-    if (args instanceof Array) args.forEach(arg => this.restorePrototypesInternal(arg))
-    else {
-      if (args.__className) {
-        let prototype: Object = this.workerServicePrototypeMappingConfiguration[args.__className]
-        if (!prototype) throw 'Unknown prototype ' + args.__className
-        args.__proto__ =  prototype
-        delete args.__className
-      }
-      for (let key in args) if (args.hasOwnProperty(key))
-        this.restorePrototypesInternal(args[key])
-    }
-  }
-
 }
 
-angular.module('fibra.services.worker-service', ['fibra.services.worker-service-prototype-mapping-configuration'])
+angular.module('fibra.services.worker-service', ['fibra.services.serialization-service'])
   .config(($provide) => {
     $provide.service('workerService', WorkerService)
   })

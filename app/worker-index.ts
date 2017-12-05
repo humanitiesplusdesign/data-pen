@@ -8,13 +8,13 @@ import {SparqlItemWorkerService} from 'services/sparql-item-service'
 import {SparqlUpdateWorkerService} from 'services/sparql-update-service'
 import {SparqlAutocompleteWorkerService} from 'services/sparql-autocomplete-service'
 import 'services/sparql-statistics-service'
-import 'services/worker-service/prototype-mapping-configuration'
+import 'services/worker-service/serialization-service'
 
 import 'angular-http-auth'
 import 'rdfstore'
 import { IHttpRequestTransformer } from 'angular';
 
-let m: angular.IModule = angular.module('fibra', ['fi.seco.sparql', 'http-auth-interceptor', 'fibra.services.worker-service-prototype-mapping-configuration', 'fibra.services.sparql-statistics-service'])
+let m: angular.IModule = angular.module('fibra', ['fi.seco.sparql', 'http-auth-interceptor', 'fibra.services.serialization-service', 'fibra.services.sparql-statistics-service'])
 
 m.config(($provide) => {
   $provide.service('fibraSparqlService', FibraSparqlService)

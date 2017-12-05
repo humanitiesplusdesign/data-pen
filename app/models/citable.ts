@@ -2,6 +2,7 @@
 
 import {ILiteral} from 'models/rdfjs'
 import {SKOS, DCTerms, FOAF, FIBRA, RDF, XMLSchema, NodeSet, ONodeSet} from 'models/rdf'
+import { TurtleBuilder } from 'components/misc-utils';
 
 export interface ICitableSource {
   sparqlEndpoint: string
@@ -26,20 +27,20 @@ export interface ICitable {
   dateCreated: Date
   copyCitableTo(other: ICitable): void
   clone(): ICitable
-  toTurtle(fragmentsById: d3.Map<string>, prefixes: {[id: string]: string}): void
+  toTurtle(tb: TurtleBuilder): void
 }
 
 export class Citable implements ICitable {
   public id: string
   public source: ICitableSource = new CitableSource(null)
-  public static toTurtle(c: ICitable, fragmentsById: d3.Map<string>, prefixes: {[id: string]: string}): void {
-    prefixes['skos'] = SKOS.ns
-    prefixes['dcterms'] = DCTerms.ns
-    prefixes['foaf'] = FOAF.ns
-    prefixes['fibra'] = FIBRA.ns
-    prefixes['rdf'] = RDF.ns
-    prefixes['xsd'] = XMLSchema.ns
-    let f: string = fragmentsById.get(c.id)
+  public static toTurtle(c: ICitable, tb: TurtleBuilder): void {
+    tb.prefixes['skos'] = SKOS.ns
+    tb.prefixes['dcterms'] = DCTerms.ns
+    tb.prefixes['foaf'] = FOAF.ns
+    tb.prefixes['fibra'] = FIBRA.ns
+    tb.prefixes['rdf'] = RDF.ns
+    tb.prefixes['xsd'] = XMLSchema.ns
+    let f: string = tb.fragmentsById.get(c.id)
     c.labels.each(label => { if (label.value) f = f + `
 skos:prefLabel ${label.toCanonical()} ;` })
     f = f + `
@@ -53,9 +54,9 @@ foaf:homepage <${c.url}> ;`
 dcterms:rightsHolder `
       c.rightsHolders.forEach(rh => {
         f = f + `<${rh.id}>, `
-        if (!fragmentsById.has(rh.id)) {
-          fragmentsById.set(rh.id, `<${rh.id}> a foaf:Agent ;`)
-          rh.toTurtle(fragmentsById, prefixes)
+        if (!tb.fragmentsById.has(rh.id)) {
+          tb.fragmentsById.set(rh.id, `<${rh.id}> a foaf:Agent ;`)
+          rh.toTurtle(tb)
         }
       })
       f = f.substring(0, f.length - 2) + ' ;'
@@ -69,13 +70,13 @@ fibra:qualifiedAssertion [
 ] ;`
         })
     }
-    fragmentsById.set(c.id, f)
+    tb.fragmentsById.set(c.id, f)
   }
   constructor(id?: string, source?: ICitableSource, public labels: ONodeSet<ILiteral> = new ONodeSet<ILiteral>(), public url?: string, public descriptions: ONodeSet<ILiteral> = new ONodeSet<ILiteral>(), public rightsHolders: ICitable[] = [], public dateCreated: Date = new Date()) {
     this.id = id
     this.source = source
   }
-  public toTurtle(fragmentsById: d3.Map<string>, prefixes: {[id: string]: string}): void { Citable.toTurtle(this, fragmentsById, prefixes) }
+  public toTurtle(tb: TurtleBuilder): void { Citable.toTurtle(this, tb) }
   public copyCitableTo(other: ICitable): void {
     other.id = this.id
     other.source = this.source.clone()

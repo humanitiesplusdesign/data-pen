@@ -8,6 +8,7 @@ import {FIBRA} from '../../models/rdf'
 import {Project} from '../project-service/project'
 import {SparqlService} from 'angular-sparql-service'
 import { SparqlStatisticsService } from 'services/sparql-statistics-service';
+import { TurtleBuilder } from 'components/misc-utils';
 
 export class PrimaryEndpointConfiguration extends Citable {
   public static listPrimaryEndpointConfigurationsQuery: string = `PREFIX fibra: <http://hdlab.stanford.edu/fibra/ontology#>
@@ -78,12 +79,12 @@ SELECT * {
     clone.propertyQuery = this.propertyQuery
     return clone
   }
-  public toTurtle(fragmentsById: d3.Map<string>, prefixes: {[id: string]: string}): void {
-    if (!fragmentsById.has(this.id)) {
-      prefixes['fibra'] = FIBRA.ns
-      fragmentsById.set(this.id, `<${this.id}> a fibra:PrimaryEndpointConfiguration ;`)
-      super.toTurtle(fragmentsById, prefixes)
-      let f: string = fragmentsById.get(this.id)
+  public toTurtle(tb: TurtleBuilder): void {
+    if (!tb.fragmentsById.has(this.id)) {
+      tb.prefixes['fibra'] = FIBRA.ns
+      tb.fragmentsById.set(this.id, `<${this.id}> a fibra:PrimaryEndpointConfiguration ;`)
+      super.toTurtle(tb)
+      let f: string = tb.fragmentsById.get(this.id)
       let nece: string[] = this.compatibleEndpoints.filter(e => e)
       if (nece.length !== 0) {
         f = f + `
@@ -100,7 +101,7 @@ fibra:classQuery ${SparqlService.stringToSPARQLString(this.classQuery)} ;
 fibra:itemQuery ${SparqlService.stringToSPARQLString(this.itemQuery)} ;
 fibra:coalesceIdsQuery ${SparqlService.stringToSPARQLString(this.coalesceIdsQuery)} ;
 fibra:deleteItemQuery ${SparqlService.stringToSPARQLString(this.deleteItemQuery)} .`
-      fragmentsById.set(this.id, f)
+      tb.fragmentsById.set(this.id, f)
     }
   }
   public copyToProject(p: Project): void {

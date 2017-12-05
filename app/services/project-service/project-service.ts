@@ -11,9 +11,10 @@ import {PrimaryEndpointConfiguration} from './primary-endpoint-configuration'
 import {RemoteEndpointConfiguration} from './remote-endpoint-configuration'
 import {Schema} from './schema'
 import {FMap, IEMap, EMap} from '../../components/collection-utils'
-import {toTurtle} from '../../components/misc-utils'
-import {DataFactory} from '../../models/rdf'
+import {toTurtle, TurtleBuilder} from '../../components/misc-utils'
+import {DataFactory, FIBRA} from '../../models/rdf'
 import {DataModel, Class, Property} from './data-model'
+import { SerializationService } from 'services/worker-service/serialization-service';
 
 export class ProjectService {
 
@@ -29,7 +30,7 @@ WHERE {
 }`
 
   /* @ngInject */
-  constructor(private workerService: WorkerService, private fibraSparqlService: FibraSparqlService, private $localStorage: any) {
+  constructor(private workerService: WorkerService, private fibraSparqlService: FibraSparqlService, private $localStorage: any, private serializationService: SerializationService) {
     if (!$localStorage.projectSources)
       $localStorage.projectSources = []
     this.$localStorage['projectSources'] = this.$localStorage['projectSources'].map(ps => new ProjectSourceInfo(ps.id, ps.sparqlEndpoint, ps.updateEndpoint, ps.graphStoreEndpoint, ps.graph, ps.type))
@@ -90,10 +91,9 @@ WHERE {
   }
 
   public saveCitable(updateEndpoint: string, graphStoreEndpoint: string, ps: ICitable): angular.IPromise<{}> {
-    let m: d3.Map<string> = new FMap<string>()
-    let prefixes: {} = {}
-    ps.toTurtle(m, prefixes)
-    return this.deleteObjects(updateEndpoint, m.keys(), ps.source.graph).then(() => this.fibraSparqlService.post(graphStoreEndpoint, toTurtle(prefixes, m), ps.source.graph))
+    let tb: TurtleBuilder = new TurtleBuilder()
+    ps.toTurtle(tb)
+    return this.deleteObjects(updateEndpoint, tb.fragmentsById.keys(), ps.source.graph).then(() => this.fibraSparqlService.post(graphStoreEndpoint, toTurtle(tb), ps.source.graph))
   }
 
 }
