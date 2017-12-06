@@ -8,6 +8,10 @@ active {
     z-index: 100
   }
 
+  .popover {
+    max-width: 600px
+  }
+
   .active-tooltip {
     position: absolute
     z-index: 20
@@ -270,7 +274,45 @@ active {
     }
 
     .snapshots-popover {
+      width: 300px
 
+      .snapshot-name-input {
+        width: 195px
+        outline: 0
+        padding-left: 10px
+        border: 1px solid rgba(#000, 0.3)
+        border-radius: 3px
+        box-shadow: 0 1px 1px rgba(#000, 0.05)
+        margin-right: 10px
+
+        &:focus {
+          border: 1px solid rgba(#466bd3, 1)
+        }
+      }
+
+      .snapshot-save-button {
+        color: #466bd3;
+        border-bottom: 1px solid #466bd3;
+        transition: 0.1s
+
+        &:hover {
+          opacity: 0.7
+        }
+      }
+
+      .snapshot-list {
+        .snapshot-row {
+          .snapshot-name-label {
+            display: inline-block
+          }
+
+          .snapshot-option {
+            display: inline-block
+            float: right
+            margin-left: 15px
+          }
+        }
+      }
     }
 
     .layouts-popover {
