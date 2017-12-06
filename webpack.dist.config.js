@@ -13,7 +13,8 @@ commonConf.output.path = path.join(__dirname + '/dist')
 module.exports = [ Object.assign({
   name: 'ui',
   entry: {
-    ui: './app/index.ts'
+    ui: './app/index.ts',
+    worker: './app/worker-index.ts'
   },
   plugins: [
     new HtmlWebpackPlugin({
@@ -26,6 +27,7 @@ module.exports = [ Object.assign({
     new webpack.optimize.CommonsChunkPlugin({
       name: "common",
       filename: "common-bundle.js"
+      
     }),
     new webpack.optimize.UglifyJsPlugin(),
     new webpack.DefinePlugin({'process.env.NODE_ENV':  '"production"'}),
@@ -35,18 +37,5 @@ module.exports = [ Object.assign({
       title: "Fibra UI Webpack Distribution Build"
     })
   ]
-}, commonConf), Object.assign({
-  name: 'worker',
-  entry: {
-    worker: './app/worker-index.ts'
-  },
-  target: 'webworker',
-  plugins: [
-    new webpack.optimize.UglifyJsPlugin(),
-    new webpack.DefinePlugin({'process.env.NODE_ENV': '"production"'}),
-    new webpack.NoEmitOnErrorsPlugin(),
-    new WebpackBuildNotifierPlugin({
-      title: "Fibra WebWorker Webpack Distribution Build"
-    })
-  ]}, commonConf)
+}, commonConf)
 ];
