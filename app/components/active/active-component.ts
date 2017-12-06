@@ -626,11 +626,13 @@ export class ActiveComponentController {
         {
           field: 'id',
           name: 'id',
-          cellTemplate: '<div class="ui-grid-cell-contents"><a href="{{row.entity.id}}" target="_blank">{{row.entity.id}}</a></div>'
+          cellTemplate: '<div class="ui-grid-cell-contents"><a href="{{row.entity.id}}" target="_blank">{{row.entity.id}}</a></div>',
+          width: 200
         },
         {
           field: 'description',
-          name: 'description'
+          name: 'description',
+          width: 200
         }
       ]
 
@@ -638,7 +640,8 @@ export class ActiveComponentController {
         columnDefs.push({
           name: c,
           field: this.sanitizeId(c),
-          displayName: generatedColumnLabels[i].values ? generatedColumnLabels[i].values()[0].value : ''
+          displayName: generatedColumnLabels[i].values ? generatedColumnLabels[i].values()[0].value : '',
+          width: 200
         })
       })
 
@@ -663,5 +666,5 @@ export class ActiveComponent implements angular.IComponentOptions {
     public controller: any = ActiveComponentController
 }
 
-angular.module('fibra.components.active', ['ui.bootstrap', 'fibra.actions.project', 'filearts.dragDrop', 'ui.grid', 'ui.grid.emptyBaseLayer', 'ui.grid.resizeColumns', 'ui.grid.autoResize', 'ui.grid.edit', 'ui.toggle'])
+angular.module('fibra.components.active', ['ui.bootstrap', 'fibra.actions.project', 'filearts.dragDrop', 'ui.grid', 'ui.grid.emptyBaseLayer', 'ui.grid.resizeColumns', 'ui.grid.edit', 'ui.toggle'])
   .component('active', new ActiveComponent())
