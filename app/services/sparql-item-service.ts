@@ -184,10 +184,10 @@ export class SparqlItemWorkerService {
         oNode.sourceEndpoints = new StringSet()
         propertyToValues.values.push(new RichPropertyValue(oNode))
         if (OWL.sameAs.equals(propertyToValues.property)) sameAses.push(oNode)
+        if (b['objectLabel']) oNode.labels.add(DataFactory.instance.literalFromBinding(b['objectLabel']))
         return oNode
       })
       n.sourceEndpoints.add(endpoint)
-      if (b['objectLabel'] && n.labels.empty()) n.labels.add(DataFactory.instance.literalFromBinding(b['objectLabel']))
     }
   }
 
