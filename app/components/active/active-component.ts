@@ -582,6 +582,7 @@ export class ActiveComponentController {
     this.activeActionService.setActiveDividerPercentage(nativePercent > 98 ? 100 : nativePercent < 2 ? 0 : nativePercent)
     this.$timeout(0).then(() => d3.values(this.gridApis).forEach((gapi) => gapi.core.handleWindowResize()))
     if (this.viewOptionsShowLabels) this.showTooltips()
+    if (this.viewOptionsShowLinkLabels) this.$timeout(0).then(() => this.showLinkTooltips())
   }
 
   private tableWidthStyle(): {} {
