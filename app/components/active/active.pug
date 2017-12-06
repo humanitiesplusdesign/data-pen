@@ -88,7 +88,6 @@ script(type="text/ng-template" id="viewOptionsPopover.html")
 script(type="text/ng-template" id="layersPopover.html")
   .layers-popover.pop-on-top
     h4 Layers
-    p.description.layer-description Toggle layers off to hide nodes of that type, displaying them as links instead.
     hr
     .layer-toggle(ng-repeat="class in $ctrl.allClasses()")
       toggle(ng-model="toggleValue" on="Nodes" off="Links" ng-change="changed()" onstyle="custom" offstyle="custom")
@@ -96,7 +95,16 @@ script(type="text/ng-template" id="layersPopover.html")
 script(type="text/ng-template" id="snapshotsPopover.html")
   .snapshots-popover.pop-on-top
     h4 Snapshots
+    //- save snapshot, list of snapshots to return to
     hr
+    input.snapshot-name-input(type="text")
+    span.snapshot-save-button Save snapshot
+    hr
+    .snapshot-list
+      .snapshot-row
+        label.snapshot-name-label Donzellini central
+        label.snapshot-option Delete
+        label.snapshot-option Load
 script(type="text/ng-template" id="layoutsPopover.html")
   .layouts-popover.pop-on-top
     h4 Layouts
