@@ -317,7 +317,7 @@ export class ActiveComponentController {
   }
 
   private showTooltips(): void {
-    d3.selectAll<HTMLDivElement, {}>('.active-tooltip')
+    d3.selectAll<HTMLDivElement, {}>('.tooltips > .active-tooltip')
       .style('top', (d: IFullItemState, i, grp) => (d.topOffset + 43) + 'px' )
       .style('left', (d: IFullItemState, i, grp) => (d.leftOffset + (this.state.active.dividerPercent / 100 * window.innerWidth) + 17) + 'px' )
       .style('opacity', '1')
@@ -407,9 +407,9 @@ export class ActiveComponentController {
           .text(link.prop.labels.values()[0] ? link.prop.labels.values()[0].value : 'Loading...')
       })
       .on('mouseout', (link: ILink, i: number) => {
-        if (!this.viewOptionsShowLabels) {
+        // if (!this.viewOptionsShowLabels) {
           d3.select('#' + this.sanitizeId(link.source.ids[0].value + link.target.ids[0].value + link.prop.value)).style('opacity', '0')
-        }
+        // }
       })
 
     linkSelection = linkSelection.merge(linkEnterSel)
