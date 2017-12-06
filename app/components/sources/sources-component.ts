@@ -107,8 +107,9 @@ export class SourcesComponentController {
 
   private grandTotal(clss: string): number {
     return this.state.sources.archiveSources.concat(this.state.sources.authoritySources)
-        .map(ae => +ae.classStats[clss])
-        .reduce((a,b) => a + b, 0)
+      .map(ae => ae.classStats.get(clss))
+      .filter((tot) => !isNaN(tot))
+      .reduce((a,b) => +a + +b, 0)
   }
 
   private getSourceClassStatus(source: string, clss: string): boolean {

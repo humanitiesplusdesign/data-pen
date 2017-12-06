@@ -244,8 +244,8 @@ export class ActiveComponentController {
       // Class filter (TODO: Move server-side)
       && (!classRestrict || r.datasources.reduce(
           (p, c) => {
-            return this.$ngRedux.getState().project.project.sourceClassSettings[c]
-              && this.$ngRedux.getState().project.project.sourceClassSettings[c][r.additionalInformation.type[0].value]
+            return (this.$ngRedux.getState().project.project.sourceClassSettings[c]
+              && this.$ngRedux.getState().project.project.sourceClassSettings[c][r.additionalInformation.type[0].value]) || p
           },
           false))) {
         r.additionalInformation.typeDescriptions = this.state.project.project.dataModel.classMap.get(r.additionalInformation.type[0].value).labels.values()
