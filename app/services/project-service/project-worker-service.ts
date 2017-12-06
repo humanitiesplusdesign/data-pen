@@ -156,9 +156,7 @@ export class ProjectWorkerService {
       promises.push(this.$q.all(p.schemas.map(schema => this.loadSchema(schema.source, schema.id))).then(schemas => p.schemas = schemas))
       promises.push(this.$q.all(p.archiveEndpoints.map(ae => this.loadRemoteEndpointConfiguration(ae.source, ae.id))).then(aes => p.archiveEndpoints = aes))
       promises.push(this.$q.all(p.authorityEndpoints.map(ae => this.loadRemoteEndpointConfiguration(ae.source, ae.id))).then(aes => p.authorityEndpoints = aes))
-      return this.$q.all(promises).then(() => this.loadDataModel(p.schemas, p.archiveEndpoints.concat(p.authorityEndpoints)).then(dm => p.dataModel = dm).then(() => {
-        console.log(p, p.clone())
-        return p}))
+      return this.$q.all(promises).then(() => this.loadDataModel(p.schemas, p.archiveEndpoints.concat(p.authorityEndpoints)).then(dm => p.dataModel = dm).then(() =>p))
     })
   }
 

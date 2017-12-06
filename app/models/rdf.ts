@@ -148,7 +148,7 @@ export class DataFactory implements IDataFactory {
   }
 
   public literalFromBinding(binding: ISparqlBinding): ILiteral {
-    return new Literal(binding.value, binding.language, binding.datatype)
+    return new Literal(binding.value, binding.language, binding.datatype ? new NamedNode(binding.datatype) : ((binding['xml:lang'] ? binding['xml:lang'] : '') !== '' ? RDF.langString : XMLSchema.string))
   }
 
   public nodeFromBinding(binding: ISparqlBinding): INode {

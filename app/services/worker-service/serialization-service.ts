@@ -58,19 +58,8 @@ export class SerializationService {
     }
   }
 
-  public static stripPrototypes(args: any): void {
-    if (!args || !args.__className || typeof args !== 'object') return
-    delete args.__className
-    if (args instanceof Array) args.forEach(arg => SerializationService.stripPrototypes(arg))
-    else {
-      for (let key in args) if (args.hasOwnProperty(key))
-        SerializationService.stripPrototypes(args[key])
-    }
-  }
-
   public static savePrototypes(args: any): any {
-    SerializationService.stripPrototypes(args)
-    SerializationService.savePrototypesInternal(args)
+    SerializationService.savePrototypesInternal(args, new Set<any>())
     return args
   }
 
@@ -78,9 +67,10 @@ export class SerializationService {
     return cjson.stringify(SerializationService.savePrototypes(obj))
   }
 
-  private static savePrototypesInternal(args: any): void {
-    if (!args || args.__className || typeof args !== 'object') return
-    if (args instanceof Array) args.forEach(arg => SerializationService.savePrototypesInternal(arg))
+  private static savePrototypesInternal(args: any, seen: Set<any>): void {
+    if (!args || seen.has(args) || typeof args !== 'object') return
+    seen.add(args)
+    if (args instanceof Array) args.forEach(arg => SerializationService.savePrototypesInternal(arg, seen))
     else {
       if (args.constructor.__name || args.constructor.name !== 'Object') {
         let currentPrototype: {} = Object.getPrototypeOf(args)
@@ -96,7 +86,7 @@ export class SerializationService {
         if (!args.__className) args.__className = 'Object'
       }
       for (let key in args) if (args.hasOwnProperty(key))
-        SerializationService.savePrototypesInternal(args[key])
+        SerializationService.savePrototypesInternal(args[key], seen)
     }
   }
 

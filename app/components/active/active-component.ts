@@ -615,16 +615,18 @@ export class ActiveComponentController {
                 v.value.value
           }).join(',')
           obj[this.sanitizeId(p.property.value)] = propValue
-          typeProp.values.forEach(v => {
-            if(!generatedColumns.has(v.value.value)) {
-              generatedColumns.set(v.value.value, [])
-              generatedColumnLabels.set(v.value.value, [])
-            }
-            if(generatedColumns.get(v.value.value).indexOf(p.property.value) === -1 && p.property.value !== RDF.type.value && p.property.value !== SKOS.prefLabel.value) {
-              generatedColumns.get(v.value.value).push(p.property.value)
-              generatedColumnLabels.get(v.value.value).push(p.property.labels)
-            }
-          })
+          if(typeProp) {
+            typeProp.values.forEach(v => {
+              if(!generatedColumns.has(v.value.value)) {
+                generatedColumns.set(v.value.value, [])
+                generatedColumnLabels.set(v.value.value, [])
+              }
+              if(generatedColumns.get(v.value.value).indexOf(p.property.value) === -1 && p.property.value !== RDF.type.value && p.property.value !== SKOS.prefLabel.value) {
+                generatedColumns.get(v.value.value).push(p.property.value)
+                generatedColumnLabels.get(v.value.value).push(p.property.labels)
+              }
+            })
+          }
         })
       }
       return obj
@@ -670,6 +672,8 @@ export class ActiveComponentController {
         }
       }
     })
+
+    console.log(this.gridOptions)
   }
 }
 

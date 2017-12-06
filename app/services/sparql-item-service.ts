@@ -135,7 +135,7 @@ WHERE {
    * @param canceller promise that can be resolved to cancel a remote fetch
    */
   public getItem(ids: INode[], queryRemote: boolean = false, canceller?: angular.IPromise<any>): angular.IPromise<Item> {
-    return this.workerService.call('sparqlItemWorkerService', 'getItems', [[ids.map(id => id.toCanonical())], queryRemote], canceller).then((items: Item[]) => items[0], null, (info: {endpointType: 'primary' | 'remote', endpoint: string, items: Item[]}) => { return { endpointType: info.endpointType, endpoint: info.endpoint, item: info.items[0] } })
+    return this.getItems([ids], queryRemote, canceller).then((items: Item[]) => items[0], null, (info: {endpointType: 'primary' | 'remote', endpoint: string, items: Item[]}) => { return { endpointType: info.endpointType, endpoint: info.endpoint, item: info.items[0] } })
   }
 
   /**
@@ -175,7 +175,7 @@ export class SparqlItemWorkerService {
     if (b['property']) {
       let n: IRichNode = propertyValueMap.goc(b['property'].value).goc(b['object'].value, () => {
         let propertyToValues: PropertyToValues = propertyMap.goc(b['property'].value, () => {
-          let ret: PropertyToValues = new PropertyToValues(dataModel.propertyMap.goe(b['property'].value,() => new FullRichNodeFromNode(DataFactory.instance.nodeFromBinding(b['property']))))
+          let ret: PropertyToValues = new PropertyToValues(dataModel.propertyMap.goe(b['property'].value, () => new Property(DataFactory.instance.nodeFromBinding(b['property']))))
           if (b['propertyLabel']) ret.property.labels.add(DataFactory.instance.literalFromBinding(b['propertyLabel']))
           properties.push(ret)
           return ret
@@ -184,10 +184,10 @@ export class SparqlItemWorkerService {
         oNode.sourceEndpoints = new StringSet()
         propertyToValues.values.push(new RichPropertyValue(oNode))
         if (OWL.sameAs.equals(propertyToValues.property)) sameAses.push(oNode)
+        if (b['objectLabel']) oNode.labels.add(DataFactory.instance.literalFromBinding(b['objectLabel']))
         return oNode
       })
       n.sourceEndpoints.add(endpoint)
-      if (b['objectLabel'] && n.labels.empty()) n.labels.add(DataFactory.instance.literalFromBinding(b['objectLabel']))
     }
   }
 
@@ -197,8 +197,7 @@ export class SparqlItemWorkerService {
   public getItems(idGroups: string[][] | boolean, queryRemote: boolean = false, canceller?: angular.IPromise<any>): angular.IPromise<Item[]> {
     let queryTemplate: string = this.stateWorkerService.state.project.itemQuery
     if (!idGroups) queryTemplate = queryTemplate.replace(/VALUES \(\?id \?oid\) { <IDPAIRS> }/g, '')
-    else queryTemplate = queryTemplate.replace(/<IDPAIRS>/g, (idGroups as string[][]).map(idGroup => Array.prototype.concat.apply([], idGroup.map(id => '(' + idGroup[0] + ' ' + id + ')')).join('')).join(''))
-    console.log((idGroups as string[][]).map(idGroup => Array.prototype.concat.apply([], idGroup.map(id => '(' + idGroup[0] + ' ' + id + ')'))).join(''))
+    else queryTemplate = queryTemplate.replace(/<IDPAIRS>/g, (idGroups as string[][]).map(idGroup => idGroup.map(id => '(' + idGroup[0] + ' ' + id + ')').join('')).join(''))
     queryTemplate = queryTemplate.replace(/<PREFLANG>/g, this.stateWorkerService.state.language)
     let items: EMap<Item> = new EMap<Item>((id) => new Item(DataFactory.instance.namedNode(id)))
     let ret: angular.IDeferred<Item[]> = this.$q.defer()
@@ -225,7 +224,7 @@ export class SparqlItemWorkerService {
             }
           }
           if (idGroups) (idGroups as string[][]).forEach(ids => {
-            for (let id of ids as string[]) if (!seenIds.has(id)) itemIdQuery += '(' + id + ' ' + id + ')'
+            for (let id of ids as string[]) if (!seenIds.has(id)) itemIdQuery += '(' + ids[0] + ' ' + id + ')'
           })
           this.$q.all(this.stateWorkerService.state.project.remoteEndpoints().map(endpoint => {
             let queryTemplate2: string = endpoint.itemQuery
