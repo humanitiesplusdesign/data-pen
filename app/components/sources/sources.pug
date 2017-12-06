@@ -45,7 +45,7 @@
     .properties-head
       h5 Properties matrix
     uib-tabset.matrix-tabs(type="pills" ng-init="ps = $ctrl.propStatistics()")
-      uib-tab(ng-repeat="class in $ctrl.allClasses()" index="$index" heading="{{ class.labels | prefLang }}")
+      uib-tab(ng-repeat="class in $ctrl.allClasses() track by $index" index="$index" heading="{{ class.labels | prefLang }}")
         .matrix-right
           .matrix-border-box
             .matrix-property-container
