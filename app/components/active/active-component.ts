@@ -69,6 +69,8 @@ export class ActiveComponentController {
   private layoutsPopoverVisible: boolean = false
 
   private viewOptionsShowLabels: boolean = false
+  private viewOptionsShowLinks: boolean = true
+  private viewOptionsShowLinkLabels: boolean = false
   private gridOptions: {} = {}
 
   private linkMode: boolean = false
@@ -325,7 +327,24 @@ export class ActiveComponentController {
   }
 
   private hideTooltips(): void {
-    d3.selectAll<HTMLDivElement, {}>('.active-tooltip')
+    d3.selectAll<HTMLDivElement, {}>('.tooltips > .active-tooltip')
+      .style('opacity', '0')
+  }
+
+  private getLinkSelNode(link: ILink): SVGGElement {
+    return d3.select<SVGGElement, ILink>('#link-' + this.sanitizeId(link.source.ids[0].value + link.target.ids[0].value + link.prop.value)).node()
+  }
+
+  private showLinkTooltips(): void {
+    d3.selectAll<HTMLDivElement, {}>('.link-tooltips > .active-tooltip')
+      .style('top', (link: ILink, i, grp) => (this.getLinkSelNode(link).getBoundingClientRect().top + this.getLinkSelNode(link).getBoundingClientRect().height / 2 - 10 ) + 'px')
+      .style('left', (link: ILink, i, grp) => (this.getLinkSelNode(link).getBoundingClientRect().left + this.getLinkSelNode(link).getBoundingClientRect().width / 2) + 'px')
+      .style('opacity', '1')
+      .text((link: ILink, i, grp) => link.prop.labels.values()[0] ? link.prop.labels.values()[0].value : 'Loading...')
+  }
+
+  private hideLinkTooltips(): void {
+    d3.selectAll<HTMLDivElement, {}>('.link-tooltips > .active-tooltip')
       .style('opacity', '0')
   }
 
@@ -394,6 +413,7 @@ export class ActiveComponentController {
 
     let linkEnterSel: d3.Selection<SVGGElement, ILink, Element, {}> = linkSelection.enter()
       .append<SVGGElement>('g')
+      .attr('id', (link: ILink) => 'link-' + this.sanitizeId(link.source.ids[0].value + link.target.ids[0].value + link.prop.value))
       .classed('link', true)
       .classed('item-link', true)
 
@@ -407,14 +427,16 @@ export class ActiveComponentController {
           .text(link.prop.labels.values()[0] ? link.prop.labels.values()[0].value : 'Loading...')
       })
       .on('mouseout', (link: ILink, i: number) => {
-        // if (!this.viewOptionsShowLabels) {
+        if (!this.viewOptionsShowLinkLabels) {
           d3.select('#' + this.sanitizeId(link.source.ids[0].value + link.target.ids[0].value + link.prop.value)).style('opacity', '0')
-        // }
+        }
       })
 
     linkSelection = linkSelection.merge(linkEnterSel)
 
-    linkSelection.attr('transform', (d) => { return 'translate(' + d.source.leftOffset + ',' + d.source.topOffset + ')' })
+    linkSelection
+      .attr('transform', (d) => { return 'translate(' + d.source.leftOffset + ',' + d.source.topOffset + ')' })
+      .style('opacity', this.viewOptionsShowLinks ? '1' : '0')
 
     linkSelection
       .select('line')
@@ -526,6 +548,7 @@ export class ActiveComponentController {
     })
 
     if (this.viewOptionsShowLabels) this.showTooltips()
+    if (this.viewOptionsShowLinkLabels) this.showLinkTooltips()
 
     // itemSelection
     //   .attr('transform', d => 'translate(' + d.xpos + ',' + d.ypos + ')')
