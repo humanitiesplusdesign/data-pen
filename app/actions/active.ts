@@ -161,10 +161,43 @@ export class ActiveActionService {
   }
 
   public deleteItemFromCurrentLayout(item: IFullItemState): IDeleteItemFromCurrentLayoutAction {
-    return this.$ngRedux.dispatch({
+    let ret = this.$ngRedux.dispatch({
       type: DELETE_ITEM_FROM_LAYOUT,
       payload: item
     })
+
+    let proj: Project = this.$ngRedux.getState().project.project.clone()
+    proj.layouts[0] = {
+      items: this.$ngRedux.getState().active.activeLayout.items.map((i) => {
+        return {
+          ids: i.ids,
+          topOffset: i.topOffset,
+          leftOffset: i.leftOffset
+        }
+      }),
+      active: true
+    }
+    this.projectService.saveCitable(proj.updateEndpoint, proj.graphStoreEndpoint, proj)
+
+    return ret
+  }
+
+  public moveItemOnCurrentLayout(): IDeleteItemFromCurrentLayoutAction {
+    // Currently a stub
+    let proj: Project = this.$ngRedux.getState().project.project.clone()
+    proj.layouts[0] = {
+      items: this.$ngRedux.getState().active.activeLayout.items.map((i) => {
+        return {
+          ids: i.ids,
+          topOffset: i.topOffset,
+          leftOffset: i.leftOffset
+        }
+      }),
+      active: true
+    }
+    this.projectService.saveCitable(proj.updateEndpoint, proj.graphStoreEndpoint, proj)
+
+    return null
   }
 }
 

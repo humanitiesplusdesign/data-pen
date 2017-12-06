@@ -71,14 +71,14 @@ script(type="text/ng-template" id="viewOptionsPopover.html")
     h4 View options
     hr
     label.optionToggle
-      input(type="checkbox")
+      input(type="checkbox" ng-model="$ctrl.viewOptionsShowLinks" ng-click="$ctrl.updateCanvas()")
       span.checkbox-title Show links
     hr
     label.optionToggle
       input(type="checkbox" ng-model="$ctrl.viewOptionsShowLabels" ng-click="$ctrl.viewOptionsShowLabels ? $ctrl.showTooltips() : $ctrl.hideTooltips()")
       span.checkbox-title Show node labels
     label.optionToggle
-      input(type="checkbox")
+      input(type="checkbox" ng-model="$ctrl.viewOptionsShowLinkLabels" ng-click="$ctrl.viewOptionsShowLinkLabels ? $ctrl.showLinkTooltips() : $ctrl.hideLinkTooltips()")
       span.checkbox-title Show link labels
     hr
     label.optionToggle
