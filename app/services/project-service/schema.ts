@@ -49,6 +49,14 @@ SELECT ?id ?labels ?descriptions ?rightsHolders ?rightsHolders_labels ?rightsHol
   public endpoint: string
   public classQuery: string = DataModel.classQuery
   public propertyQuery: string = DataModel.propertyQuery
+  public clone(): Schema {
+    let clone: Schema = new Schema()
+    this.copyCitableTo(clone)
+    clone.endpoint = this.endpoint
+    clone.classQuery = this.classQuery
+    clone.propertyQuery = this.propertyQuery
+    return clone
+  }
   public toTurtle(tb: TurtleBuilder): void {
     if (!tb.fragmentsById.has(this.id)) {
       tb.prefixes['fibra'] = FIBRA.ns
