@@ -539,6 +539,7 @@ export class ActiveComponentController {
           this.dragOrigX = null
           this.dragOrigY = null
           this.updateCanvas()
+          this.activeActionService.moveItemOnCurrentLayout()
         }))
 
     itemSelection = itemSelection.merge(enterSel)
