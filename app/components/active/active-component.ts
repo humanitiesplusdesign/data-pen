@@ -3,7 +3,7 @@ import { ILiteral } from '../../models/rdfjs';
 import { ActiveActionService } from '../../actions/active';
 import { Class, IClass, IProperty, Property } from '../../services/project-service/data-model';
 import { CNode, DataFactory, NamedNode, ONodeSet, RDF, SKOS } from '../../models/rdf';
-import { IItemState } from '../../reducers/active';
+import { IFullItemState } from '../../reducers/active';
 import { AutocompletionResults, Result, SparqlAutocompleteService, ResultGroup } from '../../services/sparql-autocomplete-service';
 import { SparqlItemService, PropertyToValues } from '../../services/sparql-item-service';
 import * as angular from 'angular';
@@ -29,8 +29,8 @@ interface IActiveComponentControllerState {
 }
 
 export interface ILink {
-  source: IItemState,
-  target: IItemState,
+  source: IFullItemState,
+  target: IFullItemState,
   prop: IProperty
 }
 
@@ -59,9 +59,9 @@ export class ActiveComponentController {
   private dragOrigX: number
   private dragOrigY: number
 
-  private currentMenuItem: IItemState
+  private currentMenuItem: IFullItemState
 
-  private oldActiveLayoutItemState: IItemState[]
+  private oldActiveLayoutItemState: IFullItemState[]
 
   private viewOptionsPopoverVisible: boolean = false
   private layerPopoverVisible: boolean = false
@@ -72,7 +72,7 @@ export class ActiveComponentController {
   private gridOptions: {} = {}
 
   private linkMode: boolean = false
-  private linkEndFunction: (d: IItemState) => void
+  private linkEndFunction: (d: IFullItemState) => void
 
   /* @ngInject */
   constructor(private projectActionService: ProjectActionService,
@@ -141,7 +141,7 @@ export class ActiveComponentController {
     this.updateCanvas()
   }
 
-  private linkNode(item: IItemState): void {
+  private linkNode(item: IFullItemState): void {
     let s: d3.Selection<Element, {}, HTMLElement, any> = d3.select('.main-svg')
     let g: d3.Selection<Element, {}, HTMLElement, any> = s.select('.main-g')
     let link: d3.Selection<SVGElement, {}, HTMLElement, any> = g.append<SVGGElement>('g')
@@ -152,7 +152,7 @@ export class ActiveComponentController {
       .classed('link-line', true)
 
     this.linkMode = true
-    this.linkEndFunction = (i: IItemState) => {
+    this.linkEndFunction = (i: IFullItemState) => {
       this.activeActionService.addLink(item, i)
       link.remove()
     }
@@ -166,12 +166,12 @@ export class ActiveComponentController {
       })
   }
 
-  private buildAndDisplayPropertiesMenu(item: IItemState): void {
+  private buildAndDisplayPropertiesMenu(item: IFullItemState): void {
     let modalInstance: any = this.$uibModal.open({
       animation: true,
       component: 'expandModal',
       resolve: {
-        item: function(): IItemState { return item }
+        item: function(): IFullItemState { return item }
       }
     });
   }
@@ -237,7 +237,7 @@ export class ActiveComponentController {
 
 
 
-    let activeItemIds: string[] = this.$ngRedux.getState().active.activeLayout.items.map((d: IItemState) => d.ids.map((i) => i.value)).reduce((a, b) => a.concat(b), [])
+    let activeItemIds: string[] = this.$ngRedux.getState().active.activeLayout.items.map((d: IFullItemState) => d.ids.map((i) => i.value)).reduce((a, b) => a.concat(b), [])
     let ret: Result[] = []
     let processMatchingResults: (results: ResultGroup, classRestrict: boolean) => void = (results, classRestrict) => results.results.forEach(r => {
       if (activeItemIds.indexOf(r.ids[0].value) === -1 && r.additionalInformation.type && r.additionalInformation.type[0]
@@ -267,7 +267,7 @@ export class ActiveComponentController {
   }
 
   private nodeSearchSelect($item: Result, $model, $label, $event): void {
-    let item: IItemState = {
+    let item: IFullItemState = {
       ids: $item.ids,
       item: null,
       description: $item.prefLabel.value,
@@ -285,7 +285,7 @@ export class ActiveComponentController {
 
   private addColdNode(query: string): void {
     this.nodeSearchRemove()
-    let item: IItemState = {
+    let item: IFullItemState = {
       ids: [],
       item: null,
       description: query,
@@ -300,14 +300,14 @@ export class ActiveComponentController {
     return id.replace(/\/|\:|\.|\(|\)|\%|\#|\+|\_/g, '')
   }
 
-  private nodeClick(d: IItemState, groups: SVGCircleElement[]): void {
+  private nodeClick(d: IFullItemState, groups: SVGCircleElement[]): void {
     this.currentMenuItem = d
     d3.select('#' + this.sanitizeId(d.ids[0].value)).style('opacity', '0')
     this.menu.hide()
     this.menu.show(this.getMenuPosition(d))
   }
 
-  private getMenuPosition(itemState: IItemState): [number, number] {
+  private getMenuPosition(itemState: IFullItemState): [number, number] {
     return [
       itemState.leftOffset + (this.state.active.dividerPercent / 100 * window.innerWidth),
       itemState.topOffset + this.circularMenuTopOffset
@@ -316,10 +316,10 @@ export class ActiveComponentController {
 
   private showTooltips(): void {
     d3.selectAll<HTMLDivElement, {}>('.active-tooltip')
-      .style('top', (d: IItemState, i, grp) => (d.topOffset + 43) + 'px' )
-      .style('left', (d: IItemState, i, grp) => (d.leftOffset + (this.state.active.dividerPercent / 100 * window.innerWidth) + 17) + 'px' )
+      .style('top', (d: IFullItemState, i, grp) => (d.topOffset + 43) + 'px' )
+      .style('left', (d: IFullItemState, i, grp) => (d.leftOffset + (this.state.active.dividerPercent / 100 * window.innerWidth) + 17) + 'px' )
       .style('opacity', '1')
-      .text((d: IItemState) => d.description ? d.description : 'Loading...')
+      .text((d: IFullItemState) => d.description ? d.description : 'Loading...')
   }
 
   private hideTooltips(): void {
@@ -327,13 +327,13 @@ export class ActiveComponentController {
       .style('opacity', '0')
   }
 
-  private appendNode(sel: d3.Selection<SVGGElement, any, HTMLElement, any>, top: number, left: number, clss: string): d3.Selection<SVGGElement, IItemState, Element, {}> {
-    let g: d3.Selection<SVGGElement, IItemState, Element, {}> = sel.append<SVGGElement>('g')
+  private appendNode(sel: d3.Selection<SVGGElement, any, HTMLElement, any>, top: number, left: number, clss: string): d3.Selection<SVGGElement, IFullItemState, Element, {}> {
+    let g: d3.Selection<SVGGElement, IFullItemState, Element, {}> = sel.append<SVGGElement>('g')
       .classed('node', true)
       .classed(clss, true)
       .attr('transform', 'translate(' + left + ',' + top + ')')
 
-    let c: d3.Selection<SVGCircleElement, IItemState, Element, {}> = g.append<SVGCircleElement>('circle')
+    let c: d3.Selection<SVGCircleElement, IFullItemState, Element, {}> = g.append<SVGCircleElement>('circle')
       .classed('node-circle', true)
       .attr('r', this.radiusInitial + 'px')
 
@@ -345,7 +345,7 @@ export class ActiveComponentController {
     return g
   }
 
-  private maintainNode(sel: d3.Selection<SVGGElement, IItemState, Element, {}>, top: number, left: number): d3.Selection<SVGGElement, IItemState, Element, {}> {
+  private maintainNode(sel: d3.Selection<SVGGElement, IFullItemState, Element, {}>, top: number, left: number): d3.Selection<SVGGElement, IFullItemState, Element, {}> {
     sel.attr('transform', 'translate(' + top + ',' + left + ')')
     sel.select('circle')
       .classed('loading', (d): boolean => {
@@ -433,16 +433,16 @@ export class ActiveComponentController {
         .classed('active-tooltip', true)
         .attr('id', (link) => this.sanitizeId(link.source.ids[0].value + link.target.ids[0].value + link.prop.value))
 
-    let itemSelection: d3.Selection<SVGGElement, IItemState, Element, {}> = itemG.selectAll<SVGGElement, {}>('.item-node')
-      .data(this.state.active.activeLayout.items, (it: IItemState) => {
+    let itemSelection: d3.Selection<SVGGElement, IFullItemState, Element, {}> = itemG.selectAll<SVGGElement, {}>('.item-node')
+      .data(this.state.active.activeLayout.items, (it: IFullItemState) => {
         return it.ids[0].value;
       })
 
     itemSelection.exit().remove()
 
-    let tooltipSelection: d3.Selection<HTMLDivElement, IItemState, BaseType, {}> = d3.select('.tooltips')
+    let tooltipSelection: d3.Selection<HTMLDivElement, IFullItemState, BaseType, {}> = d3.select('.tooltips')
       .selectAll<HTMLDivElement, {}>('.active-tooltip')
-      .data<IItemState>(this.state.active.activeLayout.items, (it: IItemState) => {
+      .data<IFullItemState>(this.state.active.activeLayout.items, (it: IFullItemState) => {
         return it.ids[0].value;
       })
 
@@ -452,7 +452,7 @@ export class ActiveComponentController {
         .classed('active-tooltip', true)
         .attr('id', (it) => this.sanitizeId(it.ids[0].value))
 
-    let enterSel: d3.Selection<SVGGElement, IItemState, Element, {}> = itemSelection.enter()
+    let enterSel: d3.Selection<SVGGElement, IFullItemState, Element, {}> = itemSelection.enter()
       .append<SVGGElement>('g')
       .classed('node', true)
       .classed('item-node', true)
@@ -460,7 +460,7 @@ export class ActiveComponentController {
 
     enterSel.append<SVGCircleElement>('circle')
       .classed('node-circle', true)
-      .on('click', (d: IItemState, i: number, groups: SVGCircleElement[]) => {
+      .on('click', (d: IFullItemState, i: number, groups: SVGCircleElement[]) => {
         if(this.linkMode) {
           this.linkEndFunction(d)
           this.linkMode = false
@@ -468,7 +468,7 @@ export class ActiveComponentController {
           this.nodeClick(d, groups)
         }
       })
-      .on('mouseenter', (d: IItemState, i: number, grp: SVGCircleElement[]) => {
+      .on('mouseenter', (d: IFullItemState, i: number, grp: SVGCircleElement[]) => {
         if (d.item && !this.dragOrigX) {
           d3.select('#' + this.sanitizeId(d.ids[0].value)).style('top', (grp[i].getBoundingClientRect().top - 5) + 'px')
           .style('left', (grp[i].getBoundingClientRect().left + 25) + 'px')
@@ -481,18 +481,18 @@ export class ActiveComponentController {
           .text('Loading...')
         }
       })
-      .on('mouseout', (d: IItemState, i: number) => {
+      .on('mouseout', (d: IFullItemState, i: number) => {
         if (!this.viewOptionsShowLabels) {
           d3.select('#' + this.sanitizeId(d.ids[0].value)).style('opacity', '0')
         }
       })
       .call(d3.drag()
-        .on('start', (d: IItemState, i: number) => {
+        .on('start', (d: IFullItemState, i: number) => {
           d3.select('#' + this.sanitizeId(d.ids[0].value)).style('opacity', '0')
           this.dragOrigX = d.leftOffset
           this.dragOrigY = d.topOffset
         })
-        .on('drag', (d: IItemState, i: number, group) => {
+        .on('drag', (d: IFullItemState, i: number, group) => {
           // TODO: implement change to offsets using actions and reducers
           d.leftOffset = d3.event.x + this.dragOrigX
           d.topOffset = d3.event.y + this.dragOrigY
@@ -504,7 +504,7 @@ export class ActiveComponentController {
           this.dragOrigY = d.topOffset
           this.updateCanvas()
         })
-        .on('end',  (d: IItemState, i: number, group) => {
+        .on('end',  (d: IFullItemState, i: number, group) => {
           // TODO: implement change to offsets using actions and reducers
           d.leftOffset = d3.event.x + this.dragOrigX
           d.topOffset = d3.event.y + this.dragOrigY
