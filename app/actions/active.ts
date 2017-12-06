@@ -82,10 +82,10 @@ export class ActiveActionService {
             description: i.remoteProperties.find((rp) => rp.property.value === SKOS.prefLabel.value) ?
               i.remoteProperties.find((rp) => rp.property.value === SKOS.prefLabel.value).values[0].value.value :
               '?',
-            topOffset: origItemState.topOffset,
-            leftOffset: origItemState.leftOffset
+            topOffset: origItemState ? origItemState.topOffset : null,
+            leftOffset: origItemState ? origItemState.leftOffset : null
           }
-        })
+        }).filter(i => i.topOffset && i.leftOffset)
 
         return this.$ngRedux.dispatch({
           type: SET_ACTIVE_LAYOUT,
