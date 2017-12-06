@@ -94,6 +94,47 @@ export class ActiveActionService {
       })
   }
 
+  public addItemsToCurrentLayout(items: IFullItemState[]): IAddItemToCurrentLayoutAction[] {
+    let ret = items.filter((item) => {
+      return !this.$ngRedux.getState().active.activeLayout.items.find((i) => i.ids[0].value === item.ids[0].value)
+    }).map((item) => {
+      return this.$ngRedux.dispatch({
+        type: ADD_ITEM_TO_CURRENT_LAYOUT,
+        payload: item
+      })
+    })
+
+    this.sparqlItemService.getItems(
+      ret.map((item) => {
+        return item.payload.ids
+      }),
+      true
+    ).then((sparqlItems) => {
+      return sparqlItems.map((i) => {
+        if(i) {
+          this.$ngRedux.dispatch({
+            type: ADD_ITEM_TO_ITEM_STATE,
+            payload: {
+              itemState: items.find((item) => item.ids[0].value === i.value),
+              fullItem: i
+            }
+          })
+        } else {
+          // ID doesn't exist
+          this.$ngRedux.dispatch({
+            type: UPDATE_ITEM_DESCRIPTION,
+            payload: {
+              itemState: items.find((item) => item.ids[0].value === i.value),
+              newDescription: items.find((item) => item.ids[0].value === i.value).ids[0]
+            }
+          })
+        }
+      })
+    })
+
+    return ret
+  }
+
   public addItemToCurrentLayout(item: IFullItemState): IAddItemToCurrentLayoutAction {
     // Check that the item doesn't already exist
     if(this.$ngRedux.getState().active.activeLayout.items.find((i) => i.ids[0].value === item.ids[0].value)) {

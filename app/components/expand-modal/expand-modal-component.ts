@@ -54,21 +54,22 @@ export class ExpandModalComponentController {
   }
 
   private expand(propValues: PropertyToValues): void {
-    propValues.values.forEach((v, i) => {
-      let theta: number = ((Math.PI * 2) / propValues.values.length)
-      let angle: number = (theta * i)
-      let leftOffset: number = this.itemState.leftOffset + (this.expandRadius * Math.cos(angle))
-      let topOffset: number = this.itemState.topOffset + (this.expandRadius * Math.sin(angle))
+    this.activeActionService.addItemsToCurrentLayout(
+      propValues.values.map((v, i): IFullItemState => {
+        let theta: number = ((Math.PI * 2) / propValues.values.length)
+        let angle: number = (theta * i)
+        let leftOffset: number = this.itemState.leftOffset + (this.expandRadius * Math.cos(angle))
+        let topOffset: number = this.itemState.topOffset + (this.expandRadius * Math.sin(angle))
 
-      this.activeActionService.addItemToCurrentLayout(
-        {
+        return {
           ids: [new NamedNode(v.value.value)],
           item: null,
           description: null,
           topOffset: topOffset,
           leftOffset: leftOffset
-        })
-    })
+        }
+      })
+    )
     this.close()
   }
 
