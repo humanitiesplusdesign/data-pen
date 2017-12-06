@@ -74,7 +74,7 @@ export class ActiveComponentController {
   private linkMode: boolean = false
   private linkEndFunction: (d: IFullItemState) => void
 
-  private gripApis: any = {}
+  private gridApis: any = {}
 
   /* @ngInject */
   constructor(private projectActionService: ProjectActionService,
@@ -556,7 +556,7 @@ export class ActiveComponentController {
     this.menu.hide()
     let nativePercent: number = 100 * evt.clientX / window.innerWidth
     this.activeActionService.setActiveDividerPercentage(nativePercent > 98 ? 100 : nativePercent < 2 ? 0 : nativePercent)
-    d3.values(this.gripApis).forEach((gapi) => gapi.core.queueGridRefresh())
+    this.$timeout(0).then(() => d3.values(this.gridApis).forEach((gapi) => gapi.core.handleWindowResize()))
     if (this.viewOptionsShowLabels) this.showTooltips()
   }
 
@@ -654,7 +654,7 @@ export class ActiveComponentController {
         columnDefs: columnDefs,
         onRegisterApi: (gridApi) => {
           //set gridApi on scope
-          this.gripApis[c.value] = gridApi
+          this.gridApis[c.value] = gridApi
           gridApi.edit.on.afterCellEdit(this.$scope, (rowEntity, colDef, newValue, oldValue) => {
             console.log(rowEntity, colDef, newValue, oldValue)
             this.$scope.$apply();
