@@ -309,13 +309,31 @@ active {
     height: 100%
     width: 0%
     position: absolute
-    padding-bottom: 3em
+    padding-bottom: 5.5em
+    padding-top: 1.5em
 
-    .main-grid {
+    .ng-isolate-scope {
       height: 100%
-      width: 100%
+
+      .tab-content {
+        height: 100%
+
+        .tab-pane {
+          height: 100%
+
+          .main-grid {
+            height: 100%
+            width: 100%
+            padding-bottom: 200px
+          }
+        }
+      }
     }
   }
+
+  // .ui-grid-row:last-child {
+  //   margin-bottom: 100px
+  // }
 
   .main-canvas {
     height: 100%
