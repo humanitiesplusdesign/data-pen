@@ -144,7 +144,8 @@ SELECT * {
     return p
   }
   public clone(): Project {
-    let clone: Project = new Project()
+    return this // FIXME
+/*    let clone: Project = new Project()
     this.copyCitableTo(clone)
     clone.instanceNS = this.instanceNS
     clone.schemaNS = this.schemaNS
@@ -166,7 +167,7 @@ SELECT * {
     clone.authorityEndpoints = this.authorityEndpoints.map(re => re.clone())
     clone.archiveEndpoints = this.archiveEndpoints.map(re => re.clone())
     clone.schemas = this.schemas.map(sch => sch.clone())
-    return clone
+    return clone */
   }
   public toTurtle(tb: TurtleBuilder): void {
     if (!tb.fragmentsById.has(this.id)) {
