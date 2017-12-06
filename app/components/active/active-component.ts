@@ -595,8 +595,8 @@ export class ActiveComponentController {
   }
 
   private setGridOptions(): void {
-    let generatedColumns: string[] = []
-    let generatedColumnLabels: ONodeSet<ILiteral>[] = []
+    let generatedColumns: Map<string, string[]> = new Map()
+    let generatedColumnLabels: Map<string, ONodeSet<ILiteral>[]> = new Map()
 
     let data: {}[] = this.state.active.activeLayout.items.map((item) => {
       let obj: {} = {}
@@ -615,10 +615,16 @@ export class ActiveComponentController {
                 v.value.value
           }).join(',')
           obj[this.sanitizeId(p.property.value)] = propValue
-          if(generatedColumns.indexOf(p.property.value) === -1 && p.property.value !== RDF.type.value && p.property.value !== SKOS.prefLabel.value) {
-            generatedColumns.push(p.property.value)
-            generatedColumnLabels.push(p.property.labels)
-          }
+          typeProp.values.forEach(v => {
+            if(!generatedColumns.has(v.value.value)) {
+              generatedColumns.set(v.value.value, [])
+              generatedColumnLabels.set(v.value.value, [])
+            }
+            if(generatedColumns.get(v.value.value).indexOf(p.property.value) === -1 && p.property.value !== RDF.type.value && p.property.value !== SKOS.prefLabel.value) {
+              generatedColumns.get(v.value.value).push(p.property.value)
+              generatedColumnLabels.get(v.value.value).push(p.property.labels)
+            }
+          })
         })
       }
       return obj
@@ -639,14 +645,16 @@ export class ActiveComponentController {
         }
       ]
 
-      generatedColumns.forEach((c, i) => {
-        columnDefs.push({
-          name: c,
-          field: this.sanitizeId(c),
-          displayName: generatedColumnLabels[i].values && generatedColumnLabels[i].values()[0] ? generatedColumnLabels[i].values()[0].value : '',
-          width: 200
+      if(generatedColumns.has(c.value)) {
+        generatedColumns.get(c.value).forEach((col, i) => {
+          columnDefs.push({
+            name: col,
+            field: this.sanitizeId(col),
+            displayName: generatedColumnLabels.get(c.value)[i].values && generatedColumnLabels.get(c.value)[i].values()[0] ? generatedColumnLabels.get(c.value)[i].values()[0].value : '',
+            width: 200
+          })
         })
-      })
+      }
 
       this.gridOptions[c.value] = {
         data: [{}].concat(data.filter((d) => { return d['types'] ? d['types'].map(v => v.value.value).indexOf(c.value) !== -1 : false })),
