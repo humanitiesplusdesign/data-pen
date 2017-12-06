@@ -128,6 +128,8 @@ SELECT * {
     }
   }
   public layouts: ILayoutState[] = []
+  protected __className: string = 'Project'
+
   public remoteEndpoints(): RemoteEndpointConfiguration[] {
     return this.archiveEndpoints.concat(this.authorityEndpoints)
   }
@@ -142,32 +144,6 @@ SELECT * {
     p.propertyQuery = this.propertyQuery
     p.classQuery = this.classQuery
     return p
-  }
-  public clone(): Project {
-    return this // FIXME
-/*    let clone: Project = new Project()
-    this.copyCitableTo(clone)
-    clone.instanceNS = this.instanceNS
-    clone.schemaNS = this.schemaNS
-    clone.dataModel = this.dataModel.clone()
-    clone.autocompletionQuery = this.autocompletionQuery
-    clone.classStatisticsQuery = this.classStatisticsQuery
-    clone.propertyStatisticsQuery = this.propertyStatisticsQuery
-    clone.itemQuery = this.itemQuery
-    clone.coalesceIdsQuery = this.coalesceIdsQuery
-    clone.deleteItemQuery = this.deleteItemQuery
-    clone.classQuery = this.classStatisticsQuery
-    clone.propertyQuery = this.propertyQuery
-    clone.endpoint = this.endpoint
-    clone.graphStoreEndpoint = this.graphStoreEndpoint
-    clone.updateEndpoint = this.updateEndpoint
-    clone.graph = this.graph
-    clone.sourceClassSettings = this.sourceClassSettings
-    clone.layouts = this.layouts
-    clone.authorityEndpoints = this.authorityEndpoints.map(re => re.clone())
-    clone.archiveEndpoints = this.archiveEndpoints.map(re => re.clone())
-    clone.schemas = this.schemas.map(sch => sch.clone())
-    return clone */
   }
   public toTurtle(tb: TurtleBuilder): void {
     if (!tb.fragmentsById.has(this.id)) {

@@ -7,14 +7,10 @@ import { TurtleBuilder } from 'components/misc-utils';
 export interface ICitableSource {
   sparqlEndpoint: string
   graph?: string
-  clone(): ICitableSource
 }
 
 export class CitableSource implements ICitableSource {
-
   constructor(public sparqlEndpoint: string, public graph?: string) {}
-
-  public clone(): ICitableSource { return new CitableSource(this.sparqlEndpoint, this.graph) }
 }
 
 export interface ICitable {
@@ -25,13 +21,12 @@ export interface ICitable {
   rightsHolders: ICitable[]
   source: ICitableSource
   dateCreated: Date
-  copyCitableTo(other: ICitable): void
-  clone(): ICitable
   toTurtle(tb: TurtleBuilder): void
 }
 
 export class Citable implements ICitable {
   public id: string
+  protected __className: string = 'Citable'
   public static toTurtle(c: ICitable, tb: TurtleBuilder): void {
     tb.prefixes['skos'] = SKOS.ns
     tb.prefixes['dcterms'] = DCTerms.ns
@@ -76,16 +71,4 @@ fibra:qualifiedAssertion [
     this.source = source
   }
   public toTurtle(tb: TurtleBuilder): void { Citable.toTurtle(this, tb) }
-  public copyCitableTo(other: ICitable): void {
-    other.id = this.id
-    other.source = this.source.clone()
-    other.labels = this.labels.clone()
-    other.url = this.url
-    other.descriptions = this.descriptions.clone()
-    other.rightsHolders = this.rightsHolders.map(rh => rh.clone())
-    other.dateCreated = this.dateCreated
-  }
-  public clone(): ICitable {
-    return new Citable(this.id, this.source.clone(), this.labels.clone(), this.url, this.descriptions.clone(), this.rightsHolders.map(rh => rh.clone()), this.dateCreated)
-  }
 }

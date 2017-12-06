@@ -10,7 +10,6 @@ export interface IClass extends IRichNode {
   subClasses: ONodeSet<IClass>
   properties: ONodeSet<IProperty>
   inverseProperties: ONodeSet<IProperty>
-  clone(classMap: {[id: string]: IClass}, propertyMap: {[id: string]: IProperty}): IClass
 }
 
 export class Class extends FullRichNodeFromNode implements IClass {
@@ -19,20 +18,6 @@ export class Class extends FullRichNodeFromNode implements IClass {
   public properties: ONodeSet<IProperty> = new ONodeSet<IProperty>()
   public inverseProperties: ONodeSet<IProperty> = new ONodeSet<IProperty>()
   constructor(id: INode) { super(id) }
-  public clone(classMap: {[id: string]: IClass}, propertyMap: {[id: string]: IProperty}): IClass {
-    if (classMap[this.value]) return classMap[this.value]
-    let clone: Class = new Class(this)
-    classMap[this.value] = clone
-    clone.labels = this.labels
-    clone.descriptions = this.descriptions
-    clone.types = this.types
-    clone.sourceEndpoints = this.sourceEndpoints
-    clone.superClasses = this.superClasses.map(c => c.clone(classMap, propertyMap))
-    clone.subClasses = this.subClasses.map(c => c.clone(classMap, propertyMap))
-    clone.properties = this.properties.map(p => p.clone(classMap, propertyMap))
-    clone.inverseProperties = this.inverseProperties.map(p => p.clone(classMap, propertyMap))
-    return clone
-  }
 }
 
 export interface IProperty extends IRichNode {
@@ -41,7 +26,6 @@ export interface IProperty extends IRichNode {
   superProperties?: ONodeSet<IProperty>
   subProperties?: ONodeSet<IProperty>
   inverseProperty?: IProperty
-  clone?(classMap: {[id: string]: IClass}, propertyMap: {[id: string]: IProperty}): IProperty
 }
 
 export class Property extends FullRichNodeFromNode implements IProperty {
@@ -51,21 +35,6 @@ export class Property extends FullRichNodeFromNode implements IProperty {
   public subProperties: ONodeSet<IProperty> = new ONodeSet<IProperty>()
   public inverseProperty: IProperty
   constructor(id: INode) { super(id) }
-  public clone(classMap: {[id: string]: IClass}, propertyMap: {[id: string]: IProperty}): IProperty {
-    if (propertyMap[this.value]) return propertyMap[this.value]
-    let clone: Property = new Property(this)
-    propertyMap[this.value] = clone
-    clone.labels = this.labels
-    clone.descriptions = this.descriptions
-    clone.types = this.types
-    clone.sourceEndpoints = this.sourceEndpoints
-    clone.domains = this.domains.map(d => d.clone(classMap, propertyMap))
-    clone.ranges = this.ranges.map(r => r.clone(classMap, propertyMap))
-    clone.superProperties = this.superProperties.map(p => p.clone(classMap, propertyMap))
-    clone.subProperties = this.subProperties.map(p => p.clone(classMap, propertyMap))
-    clone.inverseProperty = this.inverseProperty ? this.inverseProperty.clone(classMap, propertyMap) : undefined
-    return clone
-  }
 }
 
 export class DataModel {
@@ -129,15 +98,5 @@ SELECT ?id ?types ?labels ?descriptions ?superClasses ?subClasses {
       return ''
     else
       return 'FILTER (?groupId IN (' + types.map(id => id.toCanonical()).join(', ') + '))'
-  }
-  public clone(): DataModel {
-    let clone: DataModel = new DataModel()
-    let classMap: {[id: string]: IClass} = {}
-    let propertyMap: {[id: string]: IProperty} = {}
-    clone.classMap = this.classMap.mapValues(c => c.clone(classMap, propertyMap))
-    clone.propertyMap = this.propertyMap.mapValues(c => c.clone(classMap, propertyMap))
-    clone.rootClasses = this.rootClasses.map(c => c.clone(classMap, propertyMap))
-    clone.rootProperties = this.rootProperties.map(p => p.clone(classMap, propertyMap))
-    return clone
   }
 }

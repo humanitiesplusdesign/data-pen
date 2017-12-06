@@ -11,6 +11,7 @@ export interface INode extends ITerm {
 }
 
 export class CNode implements INode {
+  public __className: String = 'CNode'
   constructor(public value: string, public termType: 'NamedNode' | 'BlankNode' | 'Literal' | 'Variable' | 'DefaultGraph' | 'UNDEF', public language: string | undefined = undefined, public datatype: INamedNode | undefined = undefined) {}
   public toCanonical(): string {
     switch (this.termType) {
@@ -307,6 +308,7 @@ export class GEOVOCAB {
 }
 
 export class NodeMap<V> {
+  protected __className: string = 'NodeMap'
   constructor(public imap: IMap<V> = new FMap<V>()) {}
   public get(key: INode): V {
     return this.imap.get(key.toCanonical())
@@ -514,6 +516,8 @@ export class NodeSet<N extends INode> {
 }
 
 export class ONodeSet<N extends INode> extends NodeSet<N> {
+
+  protected __className: string = 'ONodeSet'
   constructor() {
     super(new OMap<N>())
   }

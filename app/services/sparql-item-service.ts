@@ -27,6 +27,7 @@ export interface IPropertyAndValue {
 }
 
 export class PropertyAndValue {
+  protected __className: string = 'PropertyAndValue'
   constructor(public property: IProperty, public object: INode, public properties: IPropertyAndValue[] = []) {}
   public pruned(): IPropertyAndValue {
     return new PropertyAndValue(new PrunedRichNodeFromNode(this.property), new PrunedRichNodeFromNode(this.object), this.properties.map(p => p.pruned()))
@@ -44,6 +45,7 @@ export class RichPropertyValue implements IRichPropertyValue {
 
 export class PropertyToValues implements IPropertyToValues {
   public values: IRichPropertyValue[] = []
+  protected __className: string = 'PropertyToValues'
 
   public static toPropertyAndValues(pv: IPropertyToValues, includePropertiesOfProperties: boolean): IPropertyAndValue[] {
     return pv.values.map(v => new PropertyAndValue(pv.property, v.value, flatten(v.properties.map(pv2 =>

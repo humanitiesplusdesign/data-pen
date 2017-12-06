@@ -66,20 +66,7 @@ SELECT * {
   public propertyStatisticsQuery: string = SparqlStatisticsService.getPropertyStatisticsQuery
   public schemaEndpoint: string
   public endpoint: string
-  public clone(): RemoteEndpointConfiguration {
-    let clone: RemoteEndpointConfiguration = new RemoteEndpointConfiguration()
-    this.copyCitableTo(clone)
-    clone.types = this.types.clone()
-    clone.autocompletionQuery = this.autocompletionQuery
-    clone.propertyQuery = this.propertyQuery
-    clone.classQuery = this.classQuery
-    clone.itemQuery = this.itemQuery
-    clone.classStatisticsQuery = this.classStatisticsQuery
-    clone.propertyStatisticsQuery = this.propertyStatisticsQuery
-    clone.schemaEndpoint = this.schemaEndpoint
-    clone.endpoint = this.endpoint
-    return clone
-  }
+  protected __className: string = 'RemoteEndpointConfiguration'
   public toTurtle(tb: TurtleBuilder): void {
     if (!tb.fragmentsById.has(this.id)) {
       tb.prefixes['fibra'] = FIBRA.ns

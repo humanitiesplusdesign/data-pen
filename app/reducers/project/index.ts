@@ -3,8 +3,9 @@ import { SET_ACTIVE_DIVIDER_PERCENTAGE } from 'actions/active';
 import { SET_PROJECT, SET_ACTIVE_ITEM_COUNT, SET_ALL_ITEM_COUNT, SET_FILTERED_ITEM_COUNT} from 'actions/project'
 import {Project} from 'services/project-service/project'
 import {RemoteEndpointConfiguration} from 'services/project-service/remote-endpoint-configuration'
-import {CNode} from 'models/rdf'
+import {CNode, INode} from 'models/rdf'
 import { SET_SOURCE_CLASS_ACTIVE } from 'actions/sources';
+import * as angular from 'angular'
 
 export interface IProjectClass {
   description: string
@@ -40,7 +41,7 @@ export default function models(state: ProjectState = defaultState, action): Proj
         return {
           id: endpoint.id,
           description: endpoint.labels
-            .find((label: CNode) => label.language === 'en').value,
+            .find((label: INode) => label.language === 'en').value,
           classList: [
             {
               description: 'Concept'
@@ -72,7 +73,7 @@ export default function models(state: ProjectState = defaultState, action): Proj
       })
 
     case SET_SOURCE_CLASS_ACTIVE:
-      let newProject1 = state.project.clone()
+      let newProject1: Project = angular.copy(state.project)
       newProject1.sourceClassSettings = Object.assign({}, state.project.sourceClassSettings, {
         [action.payload.source]: Object.assign({}, state.project.sourceClassSettings[action.payload.source], {
           [action.payload.clss]: action.payload.status
@@ -80,7 +81,7 @@ export default function models(state: ProjectState = defaultState, action): Proj
       })
 
       return Object.assign({}, state, {
-        project: newProject1  
+        project: newProject1
       })
 
     case SET_ALL_ITEM_COUNT:

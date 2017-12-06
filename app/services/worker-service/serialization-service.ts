@@ -58,36 +58,8 @@ export class SerializationService {
     }
   }
 
-  public static savePrototypes(args: any): any {
-    SerializationService.savePrototypesInternal(args, new Set<any>())
-    return args
-  }
-
   public static toJson(obj: any): string {
-    return cjson.stringify(SerializationService.savePrototypes(obj))
-  }
-
-  private static savePrototypesInternal(args: any, seen: Set<any>): void {
-    if (!args || seen.has(args) || typeof args !== 'object') return
-    seen.add(args)
-    if (args instanceof Array) args.forEach(arg => SerializationService.savePrototypesInternal(arg, seen))
-    else {
-      if (args.constructor.__name || args.constructor.name !== 'Object') {
-        let currentPrototype: {} = Object.getPrototypeOf(args)
-        out: while (currentPrototype !== Object.prototype) { // attach types only to objects that need them = that have functions
-          for (let prop of Object.getOwnPropertyNames(currentPrototype)) {
-            if (prop !== 'constructor' && typeof(args.__proto__[prop]) === 'function') {
-              args.__className = args.constructor.__name ? args.constructor.__name : args.constructor.name
-              break out
-            }
-          }
-          currentPrototype = Object.getPrototypeOf(currentPrototype)
-        }
-        if (!args.__className) args.__className = 'Object'
-      }
-      for (let key in args) if (args.hasOwnProperty(key))
-        SerializationService.savePrototypesInternal(args[key], seen)
-    }
+    return cjson.stringify(obj)
   }
 
   constructor() {
@@ -97,25 +69,15 @@ export class SerializationService {
       'NamedNode': NamedNode,
       'Citable': Citable,
       'FMap': FMap,
-      'Class': Class,
-      'Property': Property,
       'PrimaryEndpointConfiguration': PrimaryEndpointConfiguration,
       'RemoteEndpointConfiguration': RemoteEndpointConfiguration,
-      'CitableSource': CitableSource,
-      'ProjectSourceInfo': ProjectSourceInfo,
       'Schema': Schema,
       'ONodeSet': ONodeSet,
       'StringSet': StringSet,
       'NodeMap': NodeMap,
-      'DataModel': DataModel,
       'PropertyAndValue': PropertyAndValue,
-      'Item': Item,
-      'PropertyToValues': PropertyToValues,
-      'FullRichNodeFromNode': FullRichNodeFromNode
+      'PropertyToValues': PropertyToValues
     }
-    for (let className in mappings)
-      mappings[className]['__name'] = className
-    mappings['Object'] = Object // it's bad to have __name in Object.prototype, but it does need to be registered
     for (let className in mappings)
       this.prototypeMappings[className] = mappings[className].prototype
   }
@@ -146,8 +108,8 @@ export class SerializationService {
         }
         if (values === null) {
           if (obj[key] instanceof Array)
-            values = obj[key].filter(v => v !== undefined).map(v => SparqlService.stringToSPARQLString(typeof v === 'string' ? v : cjson.stringify(SerializationService.savePrototypes(v))))
-          else values = [ SparqlService.stringToSPARQLString(typeof obj[key] === 'string' ? obj[key] : cjson.stringify(SerializationService.savePrototypes(obj[key]))) ]
+            values = obj[key].filter(v => v !== undefined).map(v => SparqlService.stringToSPARQLString(typeof v === 'string' ? v : cjson.stringify(v)))
+          else values = [ SparqlService.stringToSPARQLString(typeof obj[key] === 'string' ? obj[key] : cjson.stringify(obj[key])) ]
         }
         if (values && values.length > 0) {
           ttl += prop + ' '
@@ -175,7 +137,6 @@ export class SerializationService {
         let prototype: Object = this.prototypeMappings[args.__className]
         if (!prototype) throw 'Unknown prototype ' + args.__className
         args.__proto__ =  prototype
-        delete args.__className
       }
       for (let key in args) if (args.hasOwnProperty(key))
         this.restorePrototypesInternal(args[key])

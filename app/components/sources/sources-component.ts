@@ -38,7 +38,7 @@ export class SourcesComponentController {
         }
       })(this.state)
 
-    if(this.state.project.project) {
+    if (this.state.project.project) {
       this.localSourceClassTree = angular.copy(this.state.project.project.sourceClassSettings)
     }
 
@@ -91,7 +91,7 @@ export class SourcesComponentController {
     this.state.sources.archiveSources.concat(this.state.sources.authoritySources)
       .forEach((ae) => {
         ae.propStats.entries().forEach((kv) => {
-          if(!propMap.has(kv.key)) {
+          if (!propMap.has(kv.key)) {
             propMap.set(kv.key, kv.value)
           } else {
             propMap.set(kv.key, {
@@ -117,12 +117,6 @@ export class SourcesComponentController {
       return this.state.project.project.sourceClassSettings[source][clss]
     } else {
       return false
-    }
-  }
-
-  private mapProjectToActions(state: any): any {
-    return {
-      project: state.project
     }
   }
 

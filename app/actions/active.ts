@@ -126,7 +126,7 @@ export class ActiveActionService {
       payload: item
     })
 
-    let proj: Project = this.$ngRedux.getState().project.project.clone()
+    let proj: Project = angular.copy(this.$ngRedux.getState().project.project)
     proj.layouts[0] = {
       items: this.$ngRedux.getState().active.activeLayout.items.map((i) => {
         return {
@@ -166,7 +166,7 @@ export class ActiveActionService {
       payload: item
     })
 
-    let proj: Project = this.$ngRedux.getState().project.project.clone()
+    let proj: Project = angular.copy(this.$ngRedux.getState().project.project)
     proj.layouts[0] = {
       items: this.$ngRedux.getState().active.activeLayout.items.map((i) => {
         return {
@@ -184,7 +184,7 @@ export class ActiveActionService {
 
   public moveItemOnCurrentLayout(): IDeleteItemFromCurrentLayoutAction {
     // Currently a stub
-    let proj: Project = this.$ngRedux.getState().project.project.clone()
+    let proj: Project = angular.copy(this.$ngRedux.getState().project.project)
     proj.layouts[0] = {
       items: this.$ngRedux.getState().active.activeLayout.items.map((i) => {
         return {

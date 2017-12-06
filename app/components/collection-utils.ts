@@ -5,7 +5,7 @@ export interface IMap<V> extends d3.Map<V> {
   mapValues(f: (value: V, key: string, map: IMap<V>) => V): IMap<V>
   some(f: (value: V, key: string, map: IMap<V>) => boolean): boolean
   find(f: (value: V, key: string, map: IMap<V>) => boolean): {value: V, key: string}
-  goe(key: string, orElse: (key: string) => V)
+  goe(key: string, orElse: (key: string) => V): V
   clone(): IMap<V>
   empty(): boolean
 }
@@ -13,6 +13,8 @@ export interface IMap<V> extends d3.Map<V> {
 export class FMap<V> implements IMap<V> {
 
   public s: {[id: string]: V} = {}
+
+  protected __className: string = 'FMap'
 
   public has(key: string): boolean {
     return this.s[key] !== undefined
@@ -25,7 +27,7 @@ export class FMap<V> implements IMap<V> {
   public get(key: string): V {
     return this.s[key]
   }
-  public goe(key: string, orElse: (key: string) => V) {
+  public goe(key: string, orElse: (key: string) => V): V {
     return this.has(key) ? this.get(key) : orElse(key)
   }
   public remove(key: string): boolean {
@@ -185,6 +187,7 @@ export class IdentitySet<V> {
 
 export class StringSet implements d3.Set {
   public s: {[id: string]: string} = {}
+  protected __className: string = 'StringSet'
   public clear(): this {
     this.s = {}
     return this

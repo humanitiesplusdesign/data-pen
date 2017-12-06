@@ -65,20 +65,7 @@ SELECT * {
   public propertyStatisticsQuery: string = SparqlStatisticsService.getPropertyStatisticsQuery
   public classQuery: string = DataModel.classQuery
   public propertyQuery: string = DataModel.propertyQuery
-  public clone(): PrimaryEndpointConfiguration {
-    let clone: PrimaryEndpointConfiguration = new PrimaryEndpointConfiguration()
-    this.copyCitableTo(clone)
-    clone.compatibleEndpoints = this.compatibleEndpoints.slice(0)
-    clone.autocompletionQuery = this.autocompletionQuery
-    clone.itemQuery = this.itemQuery
-    clone.coalesceIdsQuery = this.coalesceIdsQuery
-    clone.deleteItemQuery = this.deleteItemQuery
-    clone.classStatisticsQuery = this.classStatisticsQuery
-    clone.propertyStatisticsQuery = this.propertyStatisticsQuery
-    clone.classQuery = this.classQuery
-    clone.propertyQuery = this.propertyQuery
-    return clone
-  }
+  protected __className: string = 'PrimaryEndpointConfiguration'
   public toTurtle(tb: TurtleBuilder): void {
     if (!tb.fragmentsById.has(this.id)) {
       tb.prefixes['fibra'] = FIBRA.ns

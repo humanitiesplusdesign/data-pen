@@ -12,7 +12,7 @@ export class WorkerWorkerService {
 
   public $broadcast(name: string, args?: any): void {
     try {
-      self.postMessage({event: 'broadcast', name: name, args: SerializationService.savePrototypes(args)})
+      self.postMessage({event: 'broadcast', name: name, args: args})
     } catch (e) {
       console.log(args, e)
       throw e
@@ -42,7 +42,7 @@ export class WorkerWorkerService {
       promise.then(
         (success) => {
           delete this.cancellers[message.id!]
-          self.postMessage({event: 'success', id: message.id, data: SerializationService.savePrototypes(success)})
+          self.postMessage({event: 'success', id: message.id, data: success})
         },
         (error) => {
           delete this.cancellers[message.id!]
@@ -50,10 +50,10 @@ export class WorkerWorkerService {
             self.postMessage({event: 'failure', id: message.id, data: { name: error.name, message: error.message, stack: error.stack }})
             throw error
           }
-          self.postMessage({event: 'failure', id: message.id, data: SerializationService.savePrototypes(SerializationService.stripFunctions(error))})
+          self.postMessage({event: 'failure', id: message.id, data: SerializationService.stripFunctions(error)})
         },
         (update) =>
-          self.postMessage({event: 'update', id: message.id, data: SerializationService.savePrototypes(update)})
+          self.postMessage({event: 'update', id: message.id, data: update})
       )
     }
   }

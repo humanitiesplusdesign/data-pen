@@ -58,7 +58,6 @@ export class WorkerService {
       let newState: BackendRootState = convertToBackendState(this.$ngRedux.getState(), this.oldState)
       if (newState !== null) {
         this.oldState = newState
-        SerializationService.savePrototypes(newState)
         this.callAll('stateWorkerService', 'setState', [newState])
       }
     })
@@ -93,7 +92,7 @@ export class WorkerService {
   }
 
   public $broadcast(name: string, args: any[]): void {
-    this.workers.forEach(w => w.postMessage({name: name, args: SerializationService.savePrototypes(args)}))
+    this.workers.forEach(w => w.postMessage({name: name, args: args}))
   }
 
   public callAll<T>(service: string, method: string, args: any[] = [], canceller?: angular.IPromise<any>): angular.IPromise<T> {
@@ -104,7 +103,7 @@ export class WorkerService {
       id: id,
       service: service,
       method: method,
-      args: SerializationService.savePrototypes(args)
+      args: args
     }
     if (canceller) canceller.then(() => {
       this.workers.forEach(worker => worker.postMessage({
@@ -133,7 +132,7 @@ export class WorkerService {
       id: id,
       service: service,
       method: method,
-      args: SerializationService.savePrototypes(args)
+      args: args
     })
     return deferred.promise
   }
