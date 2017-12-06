@@ -9,7 +9,7 @@
       img.view-options-icon(src="./app/images/active/view_options.svg")
     button.active-circle-button(uib-popover-template="'layersPopover.html'" popover-trigger="'outsideClick'" popover-placement="auto left-top" popover-class="active-options-popover" popover-is-open="$ctrl.layersPopoverVisible" ng-class="{true: 'button-active', false: ''}[$ctrl.layersPopoverVisible]")
       img.layers-icon(src="./app/images/active/layers.svg")
-    button.active-circle-button.button-disabled(disabled uib-popover-template="'snapshotsPopover.html'" popover-trigger="'outsideClick'" popover-placement="auto left-top" popover-class="active-options-popover" popover-is-open="$ctrl.snapshotsPopoverVisible" ng-class="{true: 'button-active', false: ''}[$ctrl.snapshotsPopoverVisible]")
+    button.active-circle-button(uib-popover-template="'snapshotsPopover.html'" popover-trigger="'outsideClick'" popover-placement="auto left-top" popover-class="active-options-popover" popover-is-open="$ctrl.snapshotsPopoverVisible" ng-class="{true: 'button-active', false: ''}[$ctrl.snapshotsPopoverVisible]")
       img.snapshots-icon(src="./app/images/active/snapshot.svg")
     button.active-circle-button.button-disabled(disabled uib-popover-template="'layoutsPopover.html'" popover-trigger="'outsideClick'" popover-placement="auto left-top" popover-class="active-options-popover" popover-is-open="$ctrl.layoutsPopoverVisible" ng-class="{true: 'button-active', false: ''}[$ctrl.layoutsPopoverVisible]")
       img.layouts-icon(src="./app/images/active/layout.svg")
@@ -70,18 +70,21 @@ script(type="text/ng-template" id="viewOptionsPopover.html")
   .view-options-popover.pop-on-top
     h4 View options
     hr
-    input(type="checkbox", ng-model="$ctrl.viewOptionsShowLabels" ng-click="$ctrl.viewOptionsShowLabels ? $ctrl.showTooltips() : $ctrl.hideTooltips()")
-    span.checkbox-title Show node labels
-    p.description.option-description Always display labels next to nodes.
+    label.optionToggle
+      input(type="checkbox")
+      span.checkbox-title Show links
     hr
-    input(type="checkbox")
-    span.checkbox-title Show node linked status
+    label.optionToggle
+      input(type="checkbox" ng-model="$ctrl.viewOptionsShowLabels" ng-click="$ctrl.viewOptionsShowLabels ? $ctrl.showTooltips() : $ctrl.hideTooltips()")
+      span.checkbox-title Show node labels
+    label.optionToggle
+      input(type="checkbox")
+      span.checkbox-title Show link labels
+    hr
+    label.optionToggle
+      input(type="checkbox")
+      span.checkbox-title Show node reconciliation status
     p.description.option-description
-      | Colors nodes to represent their 
-      span.linked-text linked
-      |  or 
-      span.unlinked-text unlinked
-      |  status.
 script(type="text/ng-template" id="layersPopover.html")
   .layers-popover.pop-on-top
     h4 Layers
