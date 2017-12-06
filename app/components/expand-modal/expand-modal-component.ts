@@ -4,7 +4,7 @@ import { NamedNode, RDF, SKOS } from '../../models/rdf';
 import { PropertyToValues, SparqlItemService } from '../../services/sparql-item-service';
 import { IRootState } from '../../reducers';
 import { IFibraNgRedux } from 'reducers';
-import { IActiveState, IItemState } from '../../reducers/active';
+import { IActiveState, IFullItemState } from '../../reducers/active';
 
 import * as angular from 'angular';
 
@@ -20,7 +20,7 @@ export class ExpandModalComponentController {
   private dismiss: any
   private resolve: any
 
-  private itemState: IItemState
+  private itemState: IFullItemState
   private itemProperties: PropertyToValues[]
 
   private expandRadius: number = 60

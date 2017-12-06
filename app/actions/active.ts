@@ -1,12 +1,14 @@
 import * as angular from 'angular';
 
-import { DataFactory, FIBRA, NamedNode, RDF, SKOS } from '../models/rdf';
+import { DataFactory, FIBRA, NamedNode, RDF, SKOS, INode } from '../models/rdf';
 import { SparqlItemService, PropertyAndValue } from '../services/sparql-item-service';
 
-import { IItemState } from 'reducers/active'
+import { IFullItemState, IFullLayoutState } from 'reducers/active'
 import { Dispatch, Action } from 'redux'
 import { IRootState, IFibraNgRedux } from 'reducers'
 import { Property } from 'services/project-service/data-model';
+import { ILayoutState, Project } from 'services/project-service/project';
+import { ProjectService } from 'services/project-service/project-service';
 
 export const ADD_ITEM_TO_CURRENT_LAYOUT: string = 'ADD_ITEM_TO_CURRENT_LAYOUT'
 export const SET_ACTIVE_DIVIDER_PERCENTAGE: string = 'SET_ACTIVE_DIVIDER_PERCENTAGE'
@@ -14,9 +16,10 @@ export const CLEAR_ACTIVE_STATE: string = 'CLEAR_ACTIVE_STATE'
 export const ADD_ITEM_TO_ITEM_STATE: string = 'ADD_ITEM_TO_ITEM_STATE'
 export const DELETE_ITEM_FROM_LAYOUT: string = 'DELETE_ITEM_FROM_LAYOUT'
 export const UPDATE_ITEM_DESCRIPTION: string = 'UPDATE_ITEM_DESCRIPTION'
+export const SET_ACTIVE_LAYOUT: string = 'SET_ACTIVE_LAYOUT'
 
 export interface IAddItemToCurrentLayoutAction extends Action {
-  payload: IItemState
+  payload: IFullItemState
 }
 
 export interface ISetActiveDividerPercentage extends Action {
@@ -24,14 +27,18 @@ export interface ISetActiveDividerPercentage extends Action {
 }
 
 export interface IDeleteItemFromCurrentLayoutAction extends Action {
-  payload: IItemState
+  payload: IFullItemState
+}
+
+export interface ISetLayout extends angular.IPromise<Action> {
+  payload: IFullLayoutState
 }
 
 export class ActiveActionService {
   /* @ngInject */
-  constructor(private $ngRedux: IFibraNgRedux, private sparqlItemService: SparqlItemService) {}
+  constructor(private $ngRedux: IFibraNgRedux, private sparqlItemService: SparqlItemService, private projectService: ProjectService) {}
 
-  public addLink(item1: IItemState, item2: IItemState) {
+  public addLink(item1: IFullItemState, item2: IFullItemState) {
     this.sparqlItemService.alterItem(item1.ids[0], [new PropertyAndValue(new Property(new NamedNode('DataPenLink')), item2.ids[0])])
       .then(() => {
         this.sparqlItemService.getItem(item1.ids, true).then((i) => {
@@ -56,9 +63,39 @@ export class ActiveActionService {
       })
   }
 
-  public addItemToCurrentLayout(item: IItemState): IAddItemToCurrentLayoutAction {
+  public setLayout(layout: ILayoutState): any {
+    let fls: IFullLayoutState = {
+      items: []
+    }
+
+    let itemIds: INode[][] = layout.items.map((i) => {
+      return i.ids
+    })
+
+    return this.sparqlItemService.getItems(itemIds, true)
+      .then((items) => {
+        fls.items = items.map((i) => {
+          let origItemState = layout.items.find((fi) => fi.ids.map(id => id.value).indexOf(i.value) !== -1)
+          return {
+            ids: [new NamedNode(i.value)],
+            item: i,
+            description: i.remoteProperties.find((rp) => rp.property.value === SKOS.prefLabel.value) ?
+              i.remoteProperties.find((rp) => rp.property.value === SKOS.prefLabel.value).values[0].value.value :
+              '?',
+            topOffset: origItemState.topOffset,
+            leftOffset: origItemState.leftOffset
+          }
+        })
+
+        return this.$ngRedux.dispatch({
+          type: SET_ACTIVE_LAYOUT,
+          payload: fls
+        })
+      })
+  }
+
+  public addItemToCurrentLayout(item: IFullItemState): IAddItemToCurrentLayoutAction {
     // Check that the item doesn't already exist
-    console.log(item.ids[0], this.$ngRedux.getState().active.activeLayout.items, this.$ngRedux.getState().active.activeLayout.items.find((i) => i.ids[0] === item.ids[0]))
     if(this.$ngRedux.getState().active.activeLayout.items.find((i) => i.ids[0].value === item.ids[0].value)) {
       return null
     }
@@ -84,10 +121,25 @@ export class ActiveActionService {
       }
     })
 
-    return this.$ngRedux.dispatch({
+    let ret = this.$ngRedux.dispatch({
       type: ADD_ITEM_TO_CURRENT_LAYOUT,
       payload: item
     })
+
+    let proj: Project = this.$ngRedux.getState().project.project.clone()
+    proj.layouts[0] = {
+      items: this.$ngRedux.getState().active.activeLayout.items.map((i) => {
+        return {
+          ids: i.ids,
+          topOffset: i.topOffset,
+          leftOffset: i.leftOffset
+        }
+      }),
+      active: true
+    }
+    this.projectService.saveCitable(proj.updateEndpoint, proj.graphStoreEndpoint, proj)
+
+    return ret
   }
 
   public setActiveDividerPercentage(percent: number): ISetActiveDividerPercentage {
@@ -97,7 +149,7 @@ export class ActiveActionService {
     })
   }
 
-  public createNewItem(item: IItemState): angular.IPromise<IAddItemToCurrentLayoutAction> {
+  public createNewItem(item: IFullItemState): angular.IPromise<IAddItemToCurrentLayoutAction> {
     return this.sparqlItemService.createNewItem([
       new PropertyAndValue(SKOS.prefLabel, DataFactory.instance.literal(item.description)),
       new PropertyAndValue(RDF.type, DataFactory.instance.namedNode('http://www.cidoc-crm.org/cidoc-crm/E21_Person')),
@@ -108,7 +160,7 @@ export class ActiveActionService {
     })
   }
 
-  public deleteItemFromCurrentLayout(item: IItemState): IDeleteItemFromCurrentLayoutAction {
+  public deleteItemFromCurrentLayout(item: IFullItemState): IDeleteItemFromCurrentLayoutAction {
     return this.$ngRedux.dispatch({
       type: DELETE_ITEM_FROM_LAYOUT,
       payload: item

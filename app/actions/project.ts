@@ -1,6 +1,6 @@
 import { SparqlStatisticsService } from '../services/sparql-statistics-service';
 import { CLEAR_FILTER_STATE } from './filter';
-import { CLEAR_ACTIVE_STATE } from './active';
+import { ActiveActionService, CLEAR_ACTIVE_STATE } from './active';
 import { CLEAR_SOURCES_STATE, ADD_ARCHIVE_SOURCE, ADD_AUTHORITY_SOURCE } from './sources';
 import { Action, Dispatch } from 'redux'
 import {ProjectService} from 'services/project-service/project-service'
@@ -34,7 +34,7 @@ export interface ISetActiveItemCountAction extends Action {
 
 export class ProjectActionService {
   /* @ngInject */
-  constructor(private $ngRedux: IFibraNgRedux, private projectService: ProjectService, private sparqlStatisticsService: SparqlStatisticsService) {
+  constructor(private $ngRedux: IFibraNgRedux, private projectService: ProjectService, private sparqlStatisticsService: SparqlStatisticsService, private activeActionService: ActiveActionService) {
   }
   public setProject(id: string, sparqlEndpoint: string, graph: string): angular.IPromise<IProjectLoadedAction> {
     this.$ngRedux.dispatch({
@@ -80,10 +80,15 @@ export class ProjectActionService {
               })
             })
           })
-          return this.$ngRedux.dispatch({
+
+          let ret = this.$ngRedux.dispatch({
             type: SET_PROJECT,
             payload: project
           })
+
+          if(project.layouts[0]) this.activeActionService.setLayout(project.layouts[0])
+          
+          return ret
         }
     )
   }
