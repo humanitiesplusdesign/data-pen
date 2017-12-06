@@ -48,16 +48,6 @@ export class SerializationService {
     return ret
   }
 
-  public static stripMarks(args: any): void {
-    if (!args || !args.__mark || typeof args !== 'object') return
-    delete args.__mark
-    if (args instanceof Array) args.forEach(arg => SerializationService.stripMarks(arg))
-    else {
-      for (let key in args) if (args.hasOwnProperty(key))
-        SerializationService.stripMarks(args[key])
-    }
-  }
-
   public static toJson(obj: any): string {
     return cjson.stringify(obj)
   }
@@ -123,23 +113,23 @@ export class SerializationService {
   }
 
   public restorePrototypes(args: any): any {
-    this.restorePrototypesInternal(args)
-    SerializationService.stripMarks(args)
+    let seen: Set<any> = new Set<any>()
+    this.restorePrototypesInternal(args, seen)
     return args
   }
 
-  private restorePrototypesInternal(args: any): void {
-    if (!args || args.__mark || typeof args !== 'object') return
-    args.__mark = true
-    if (args instanceof Array) args.forEach(arg => this.restorePrototypesInternal(arg))
+  private restorePrototypesInternal(args: any, seen: Set<any>): void {
+    if (!args || typeof args !== 'object' || seen.has(args)) return
+    if (args instanceof Array) args.forEach(arg => this.restorePrototypesInternal(arg, seen))
     else {
+      seen.add(args)
       if (args.__className) {
         let prototype: Object = this.prototypeMappings[args.__className]
         if (!prototype) throw 'Unknown prototype ' + args.__className
         args.__proto__ =  prototype
       }
       for (let key in args) if (args.hasOwnProperty(key))
-        this.restorePrototypesInternal(args[key])
+        this.restorePrototypesInternal(args[key], seen)
     }
   }
 }
