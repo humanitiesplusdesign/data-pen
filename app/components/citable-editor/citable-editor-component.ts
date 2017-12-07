@@ -74,6 +74,7 @@ export class CitableEditorComponentController implements angular.IComponentContr
   public removeDescription(index: number): void {
     this.citable.descriptions.removei(index)
   }
+  /* @ngInject */
   constructor(private $ngRedux: IFibraNgRedux) {
   }
 }
