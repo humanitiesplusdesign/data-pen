@@ -25,8 +25,8 @@
             span.filter-input-text &nbsp;to&nbsp;
             input.timeline-input(type="number" min="0" max="2500" ng-model="slideMax" ng-change="$ctrl.changeMaxSlider()")
           .filter-controls
-            img.minimise-filter(src="./app/images/filter/minimise.svg" ng-init="minimised = false" ng-click="minimised = !minimised")
-            img.remove-filter(src="./app/images/filter/remove.svg", ng-click="$ctrl.removeFilter(filter.clss, filter.prop)")
+            img.minimise-filter(src=require("images/filter/minimise.svg") ng-init="minimised = false" ng-click="minimised = !minimised")
+            img.remove-filter(src=require("images/filter/remove.svg") ng-click="$ctrl.removeFilter(filter.clss, filter.prop)")
         .filter-box(ng-class="minimised ? 'filter-min' : ''")
           .filter-graph
             svg(ng-attr-height="$ctrl.histogramHeight" ng-attr-width="$ctrl.histogramWidth")

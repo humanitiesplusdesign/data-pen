@@ -6,13 +6,13 @@
 .main-canvas(ng-style="$ctrl.canvasWidthStyle()")
   .control-area
     button.active-circle-button(uib-popover-template="'viewOptionsPopover.html'" popover-trigger="'outsideClick'" popover-placement="auto left-top" popover-class="active-options-popover" popover-is-open="$ctrl.viewOptionsPopoverVisible" ng-class="{true: 'button-active', false: ''}[$ctrl.viewOptionsPopoverVisible]")
-      img.view-options-icon(src="./app/images/active/view_options.svg")
+      img.view-options-icon(src=require("images/active/view_options.svg"))
     button.active-circle-button(uib-popover-template="'layersPopover.html'" popover-trigger="'outsideClick'" popover-placement="auto left-top" popover-class="active-options-popover" popover-is-open="$ctrl.layersPopoverVisible" ng-class="{true: 'button-active', false: ''}[$ctrl.layersPopoverVisible]")
-      img.layers-icon(src="./app/images/active/layers.svg")
+      img.layers-icon(src=require("images/active/layers.svg"))
     button.active-circle-button(uib-popover-template="'snapshotsPopover.html'" popover-trigger="'outsideClick'" popover-placement="auto left-top" popover-class="active-options-popover" popover-is-open="$ctrl.snapshotsPopoverVisible" ng-class="{true: 'button-active', false: ''}[$ctrl.snapshotsPopoverVisible]")
-      img.snapshots-icon(src="./app/images/active/snapshot.svg")
+      img.snapshots-icon(src=require("images/active/snapshot.svg"))
     button.active-circle-button.button-disabled(disabled uib-popover-template="'layoutsPopover.html'" popover-trigger="'outsideClick'" popover-placement="auto left-top" popover-class="active-options-popover" popover-is-open="$ctrl.layoutsPopoverVisible" ng-class="{true: 'button-active', false: ''}[$ctrl.layoutsPopoverVisible]")
-      img.layouts-icon(src="./app/images/active/layout.svg")
+      img.layouts-icon(src=require("images/active/layout.svg"))
   svg.main-svg
     g.main-g
       rect.main-background
@@ -27,7 +27,7 @@
       .spinner(ng-if="loadingSearchResults")
     input.form-control(type="text" ng-model="$ctrl.nodeSearchSelected" placeholder="Search" uib-typeahead="result as $ctrl.nodeSearchLabel(result) for result in $ctrl.nodeSearchResults($viewValue)" typeahead-popup-template-url="resultPopupTemplate.html" typeahead-template-url="resultTemplate.html" typeahead-loading="loadingSearchResults" typeahead-no-results="noResults" typeahead-on-select="$ctrl.nodeSearchSelect($item, $model, $label, $event)" typeahead-wait-ms="1000")
     .input-group-addon.addon-right(ng-click="$ctrl.nodeSearchRemove()")
-      img.dismiss-icon(src="./app/images/filter/remove.svg")
+      img.dismiss-icon(src=require("images/filter/remove.svg"))
   .type-results-only(ng-show="!noResults && loadingSearchResults")
     .fake-typeahead
       label.cold-node(ng-click="$ctrl.addColdNode($ctrl.nodeSearchSelected)") Add "{{ $ctrl.nodeSearchSelected }}" as an unlinked node
