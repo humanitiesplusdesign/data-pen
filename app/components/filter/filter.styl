@@ -1,10 +1,9 @@
-filter {
-
+filter
   display: inline-block
   height: 100%
   width: 100%
 
-  .draggable-divider {
+  .draggable-divider
     top: -100%
     left: 0%
     margin-left: -3px
@@ -13,10 +12,9 @@ filter {
     opacity: 0.5
     background-color: gray
     position: absolute
-    cursor:col-resize;
-  }
+    cursor: col-resize
 
-  .drag-tab {
+  .drag-tab
     top: 49%
     left: 0%
     padding: 0.5em 1em 0.5em 1em
@@ -29,74 +27,61 @@ filter {
     border-width: 1px
     border-color: black
     border-radius: 3px 3px 3px 3px
-  }
 
-  .ui-grid {
+  .ui-grid
     border-width: 0px
     border-style: none
-  }
 
-  .filter-container {
+  .filter-container
     margin-bottom: 20px
 
-    .filter-header {
-      //position: relative
+    .filter-header
+      // position: relative
       height: 20px
       margin-bottom: 10px
       padding: 0 10px 0 10px
 
-      .filter-inputs {
+      .filter-inputs
         display: inline-block
         margin-top: -10px
         margin-left: 10px
 
-        .filter-input-text {
+        .filter-input-text
           color: #A9A9A9
-        }
 
-        .timeline-input {
+        .timeline-input
           outline: 0
           padding: 2px 5px 2px 5px
           border: 1px solid rgba(#000, 0.3)
           border-radius: 5px
 
-          &:focus {
+          &:focus
             border: 1px solid rgba(#466bd3, 1)
-          }
-        }
-      }
 
-      .filter-title {
+      .filter-title
         float: left
         color: #A9A9A9
-      }
 
-      .filter-controls {
+      .filter-controls
         float: right
 
-        .minimise-filter {
+        .minimise-filter
           padding: 10px 5px 10px 5px
           width: 29px
           height: auto
-        }
 
-        .remove-filter {
+        .remove-filter
           padding: 5px
           width: 24px
           height: auto
-        }
 
-        img {
+        img
           opacity: 0.3
 
-          &:hover {
+          &:hover
             opacity: 0.1
-          }
-        }
-      }
-    }
 
-    .filter-box {
+    .filter-box
       height: 230px
       border: 1px solid #ccc
       border-radius: 6px
@@ -104,105 +89,84 @@ filter {
       margin-bottom: 30px
       box-shadow: 0 2px 5px 0 #DCDCDC
 
-      &.filter-min {
+      &.filter-min
         display: none
-      }
 
-      .filter-graph {
+      .filter-graph
         position: absolute
         width: 100%
         padding-top: 35px
-      }
 
-      .rzslider {
-        .rz-bar {
+      .rzslider
+        .rz-bar
           background: rgba(0, 99, 255, 0.05)
           height: 100px
           width: 100%
-        }
 
-        .rz-selection {
+        .rz-selection
           background: rgba(0, 99, 255, 0.3)
-        }
 
-        .rz-pointer {
+        .rz-pointer
           width: 8px
           height: 100px
           top: 0
           background-color: #2d7efc
           border-radius: 0px
           outline: none
-        }
 
-        .rz-pointer:after {
+        .rz-pointer:after
           display: none
-        }
 
-        .rz-tick {
+        .rz-tick
           width: 2px
           height: 10px
           margin-left: 4px
           border-radius: 0
           background: rgba(0, 99, 255, 0.05)
           top: 102px
-        }
 
-        .rz-tick.rz-selected {
+        .rz-tick.rz-selected
           background: #2d7efc
-        }
-      }
-    }
-  }
 
-  .main-table {
+  .main-table
     height: 100%
     width: 0%
     position: absolute
     padding-bottom: 3em
 
-    .main-grid {
+    .main-grid
       height: 100%
       width: 100%
-    }
-  }
 
-  .main-canvas {
+  .main-canvas
     height: 100%
     width: 100%
     position: absolute
     padding-bottom: 3em
 
-    .class-nav {
+    .class-nav
       margin-top: 2em
 
-      li:first-child {
+      li:first-child
         margin-left: 2em
-      }
-    }
 
-    .filter-area {
+    .filter-area
       height: 100%
       width: 100%
       background-color: white
       padding: 2em 2em 5.5em 2em
       overflow-y: scroll
 
-      .filter-heading {
+      .filter-heading
         display: inline-block
-      }
 
-      .add-by-property {
+      .add-by-property
         float: right
         margin-top: 1em
         margin-right: 1em
-      }
 
-      .add-by-type {
+      .add-by-type
         float: right
         width: 8em
         margin-top: 1em
         margin-right: 1em
-      }
-    }
-  }
-}

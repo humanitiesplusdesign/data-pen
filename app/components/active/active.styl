@@ -1,18 +1,15 @@
-active {
-
+active
   display: inline-block
   height: 100%
   width: 100%
 
-  .pop-on-top {
+  .pop-on-top
     z-index: 100
-  }
 
-  .popover {
+  .popover
     max-width: 600px
-  }
 
-  .active-tooltip {
+  .active-tooltip
     position: absolute
     z-index: 20
     background-color: rgba(#f4f4f4, 0.8)
@@ -27,70 +24,59 @@ active {
     opacity: 0
     pointer-events: none
     border-radius: 10px
-  }
 
-  .circular-menu {
+  .circular-menu
     box-shadow: 0px 1px 4px rgba(#000, 0.1)
-    ul {
-      li {
-        a {
+
+    ul
+      li
+        a
           color: black
-        }
-      }
-    }
-    &:after {
+
+    &:after
       content: ''
       box-sizing: border-box
       position: absolute
       width: 78px
       height: 78px
-      //top: 50%;
-      //left: 50%;
+      // top: 50%;
+      // left: 50%;
       border-radius: 100px
       border: 1px solid #ffffff
       box-shadow: inset 0px 1px 4px rgba(#000, 0.1)
-    }
-  }
 
-  .expand-icon, .reconcile-icon, .remove-icon, .link-icon, .properties-icon {
+  .expand-icon, .reconcile-icon, .remove-icon, .link-icon, .properties-icon
     padding: 16px
     background-repeat: no-repeat
     -webkit-backface-visibility: initial !important
-  }
 
-  .expand-icon {
-    background-image: url("../../app/images/active/node_menu/expand.svg")
+  .expand-icon
+    background-image: require('../../app/images/active/node_menu/expand.svg')
     background-position: 0 2px
-  }
 
-  .reconcile-icon {
-    background-image: url("../../app/images/active/node_menu/reconcile.svg")
+  .reconcile-icon
+    background-image: require('../../app/images/active/node_menu/reconcile.svg')
     background-position: 2px 5px
-  }
 
-  .remove-icon {
-    background-image: url("../../app/images/active/node_menu/remove.svg")
+  .remove-icon
+    background-image: require('../../app/images/active/node_menu/remove.svg')
     padding: 15px
     background-position: 1px 7px
-  }
 
-  .ghost-icon {
-    background-image: url("../../app/images/active/node_menu/ghost.svg")
+  .ghost-icon
+    background-image: require('../../app/images/active/node_menu/ghost.svg')
     background-position: -4px 6px
-  }
 
-  .link-icon {
-    background-image: url("../../app/images/active/node_menu/link.svg")
+  .link-icon
+    background-image: require('../../app/images/active/node_menu/link.svg')
     background-position: -4px 6px
-  }
 
-  .properties-icon {
-    background-image: url("../../app/images/active/node_menu/properties.svg")
+  .properties-icon
+    background-image: require('../../app/images/active/node_menu/properties.svg')
     padding: 15px
-    background-position -2px 4px
-  }
+    background-position: -2px 4px
 
-  .cold-node {
+  .cold-node
     font-size: 0.95em
     margin-top: 10px
     margin-left: 47px
@@ -99,9 +85,8 @@ active {
     cursor: pointer
     margin-right: 15px
     display: block
-  }
 
-  .resultType {
+  .resultType
     width: 50px
     display: inline-block
     font-family: 'Roboto Mono', monospace
@@ -113,13 +98,11 @@ active {
     text-overflow: ellipsis
     overflow: hidden
     white-space: nowrap
-  }
 
-  .resultActual {
+  .resultActual
     margin-bottom: 0
-  }
 
-  .resultSource {
+  .resultSource
     display: inline-block
     font-family: 'Roboto Mono', monospace
     font-size: 0.75em
@@ -129,9 +112,8 @@ active {
     text-overflow: ellipsis
     overflow: hidden
     white-space: nowrap
-  }
 
-  .control-area {
+  .control-area
     position: fixed
     top: 50px
     right: 10px
@@ -139,7 +121,7 @@ active {
     padding-top: 2em
     padding-right: 3em
 
-    .active-circle-button {
+    .active-circle-button
       width: 46px
       height: 46px
       border-radius: 100%
@@ -148,135 +130,108 @@ active {
       margin: 0 0 1em 0
       background-color: #fff
       box-shadow: 0px 1px 4px rgba(#000, 0.1)
-      transition: .1s
-      -webkit-transition: .1s
-      -moz-transition: .1s
-      -o-transition: .1s
+      transition: 0.1s
+      -webkit-transition: 0.1s
+      -moz-transition: 0.1s
+      -o-transition: 0.1s
 
-      &:focus {
+      &:focus
         outline: 0
-      }
 
-      &:hover {
+      &:hover
         background-color: #f9f9f9
-      }
 
-      &:active {
+      &:active
         background-color: #f5f5f5
-      }
 
-      &.button-active {
+      &.button-active
         box-shadow: 0 0 5px rgba(#466bd3, 0.7)
-      }
 
-      &.button-disabled {
+      &.button-disabled
         cursor: default !important
         opacity: 0.4 !important
         background-color: #fff !important
-        border: none !important
-      }
+      border: none !important
 
-      .view-options-icon {
+      .view-options-icon
         width: 25px
         height: auto
         margin-top: -4px
         margin-left: -4px
-      }
 
-      .layers-icon {
+      .layers-icon
         width: 20px
         height: auto
         margin-top: -2px
         margin-left: -1px
-      }
 
-      .snapshots-icon {
+      .snapshots-icon
         width: 20px
         height: auto
         margin-top: -5px
         margin-left: -1px
-      }
 
-      .layouts-icon {
+      .layouts-icon
         width: 19px
         height: auto
         margin-top: -2px
         margin-left: 0
-      }
-    }
 
-    .active {
+    .active {}
 
-    }
+    .disabled {}
 
-    .disabled {
-
-    }
-  }
-
-  .active-options-popover {
+  .active-options-popover
     border: none
     box-shadow: 0px 1px 4px rgba(#000, 0.1)
 
-    .arrow {
+    .arrow
       display: none
-    }
 
-    h4 {
+    h4
       font-size: 1.2em
       margin-bottom: 20px
-    }
 
-    .checkbox-title {
+    .checkbox-title
       margin-left: 7px
       font-size: 0.95em
-    }
 
-    .option-description {
+    .option-description
       color: #a4a4a4
       font-size: 0.8em
       margin-top: 3px
       padding-left: 19px
-    }
 
-    .layer-description {
+    .layer-description
       color: #a4a4a4
       font-size: 0.8em
       // margin-top: 3px
       // padding-left: 19px
-    }
 
-    .view-options-popover {
-      .optionToggle {
+    .view-options-popover
+      .optionToggle
         display: block
-      }
 
-      .linked-text {
+      .linked-text
         font-weight: 500
         color: #83b5db
-      }
 
-      .unlinked-text {
+      .unlinked-text
         font-weight: 500
         color: #e36b76
-      }
-    }
 
-    .layers-popover {
-      .layer-toggle {
+    .layers-popover
+      .layer-toggle
         margin-bottom: 10px
 
-        .toggle.custom, .toggle-on.custom, .toggle-off.custom {
+        .toggle.custom, .toggle-on.custom, .toggle-off.custom
           background-color: #466bd3
           color: #ffffff
-        }
-      }
-    }
 
-    .snapshots-popover {
+    .snapshots-popover
       width: 300px
 
-      .snapshot-name-input {
+      .snapshot-name-input
         width: 195px
         outline: 0
         padding-left: 10px
@@ -285,45 +240,33 @@ active {
         box-shadow: 0 1px 1px rgba(#000, 0.05)
         margin-right: 10px
 
-        &:focus {
+        &:focus
           border: 1px solid rgba(#466bd3, 1)
-        }
-      }
 
-      .snapshot-save-button {
-        color: #466bd3;
-        border-bottom: 1px solid #466bd3;
+      .snapshot-save-button
+        color: #466bd3
+        border-bottom: 1px solid #466bd3
         transition: 0.1s
 
-        &:hover {
+        &:hover
           opacity: 0.7
-        }
-      }
 
-      .snapshot-list {
+      .snapshot-list
         max-height: 300px
         overflow-y: scroll
 
-        .snapshot-row {
-          .snapshot-name-label {
+        .snapshot-row
+          .snapshot-name-label
             display: inline-block
-          }
 
-          .snapshot-option {
+          .snapshot-option
             display: inline-block
             float: right
             margin-left: 15px
-          }
-        }
-      }
-    }
 
-    .layouts-popover {
+    .layouts-popover {}
 
-    }
-  }
-
-  .draggable-divider {
+  .draggable-divider
     top: -100%
     left: 0%
     margin-left: -3px
@@ -332,10 +275,9 @@ active {
     opacity: 0.5
     background-color: gray
     position: absolute
-    cursor: col-resize;
-  }
+    cursor: col-resize
 
-  .drag-tab {
+  .drag-tab
     top: 49%
     left: 0%
     padding: 0.5em 1em 0.5em 1em
@@ -348,157 +290,126 @@ active {
     border-width: 1px
     border-color: black
     border-radius: 3px 3px 3px 3px
-  }
 
-  .ui-grid {
+  .ui-grid
     border-width: 0px
     border-style: none
-  }
 
-  .main-table {
+  .main-table
     height: 100%
     width: 0%
     position: absolute
     padding-bottom: 6.5em
     padding-top: 1.5em
 
-    .ng-isolate-scope {
+    .ng-isolate-scope
       height: 100%
 
-      .tab-content {
+      .tab-content
         height: 100%
 
-        .tab-pane {
+        .tab-pane
           height: 100%
 
-          .main-grid {
+          .main-grid
             height: 100%
             width: 100%
-          }
-        }
-      }
-    }
-  }
 
-  .main-canvas {
+  .main-canvas
     height: 100%
     width: 100%
     position: absolute
     padding-bottom: 3em
 
-    .main-svg {
+    .main-svg
       height: 100%
       width: 100%
 
-      .main-background {
+      .main-background
         fill: #f4f4f4
-      }
 
-      .node {
-
-        .node-circle {
+      .node
+        .node-circle
           fill: #cbcbcb
           stroke: #7a7a7a
 
-          &::after {
+          &::after
             content: ''
             display: block
             width: 30px
             height: 30px
             background-color: red
-          }
-        }
-      }
 
-      .link {
+      .link
         stroke-width: 2px
         stroke: #7a7a7a
-      }
 
-      @keyframes node-loading-animation {
-        0% {
+      @keyframes node-loading-animation
+        0%
           opacity: 1
-        }
-        50% {
+
+        50%
           opacity: 0.3
-        }
-        100% {
+
+        100%
           opacity: 1
-        }
-        // to {
-        //   transform: rotate(360deg)
-        // }
-      }
 
-      @keyframes node-jiggle {
-        0% {
+      @keyframes node-jiggle
+        0%
           transform: scale(0.95, 1.05)
-        }
-        50% {
+
+        50%
           transform: scale(1.05, 0.95)
-        }
-        100% {
-          transform: scale(0.95, 1.05)
-        }
-      }
 
-      .loading {
+        100%
+          transform: scale(0.95, 1.05)
+
+      .loading
         -webkit-animation: node-loading-animation 0.7s infinite linear
         animation: node-loading-animation 0.7s infinite linear
-      }
 
-      .jiggle {
-        webkit-animation: node-jiggle 0.4s infinite linear
+      .jiggle
+        -webkit-animation: node-jiggle 0.4s infinite linear
         animation: node-jiggle 0.4s infinite linear
-      }
 
-      .ghosted {
-        opacity:0.3
-      }
+      .ghosted
+        opacity: 0.3
 
-      .linked {
+      .linked
         fill: #e36b76
         stroke: #81393f
-      }
 
-      .unlinked {
+      .unlinked
         fill: #83b5db
         stroke: #335c7b
-      }
-    }
-  }
 
-  .node-search {
+  .node-search
     position: absolute
     top: 100px
     left: 100px
     width: 250px
     font-family: 'Roboto', sans-serif
 
-    .input-group {
+    .input-group
       width: 250px
-    }
 
-    .list-style-none {
+    .list-style-none
       list-style: none
       padding-left: 0
-    }
 
-    .result-type-container {
+    .result-type-container
       margin-bottom: 10px
-    }
 
-    .result-type-container-loading {
+    .result-type-container-loading
       padding-left: 20px
       padding-top: 3px
       margin-bottom: 10px
-    }
 
-    .fake-typeahead {
-      position: absolute;
-      top: 100%;
+    .fake-typeahead
+      position: absolute
+      top: 100%
       left: -40px !important
-      z-index: 1000;
+      z-index: 1000
       background-color: #fff !important
       border-radius: 3px !important
       // border: 1px solid rgba(0, 0, 0, 0.15) !important
@@ -507,14 +418,13 @@ active {
       -webkit-box-shadow: 0px 1px 4px rgba(#000, 0.1) !important
       margin-top: 1em
       min-width: 290px
-    }
 
-    .custom-popup-wrapper {
-      position: absolute;
-      top: 100%;
+    .custom-popup-wrapper
+      position: absolute
+      top: 100%
       left: -40px !important
-      z-index: 1000;
-      display: none;
+      z-index: 1000
+      display: none
       background-color: #fff !important
       border-radius: 3px !important
       // border: 1px solid rgba(0, 0, 0, 0.15) !important
@@ -525,103 +435,88 @@ active {
       max-height: 400px
       overflow-y: scroll
 
-      .active > a {
+      .active > a
         background-color: rgba(#000, 0.03) !important
         color: rgba(#000, 0.8)
-      }
-    }
 
-    .custom-popup-wrapper > .message {
-      padding: 10px 20px;
-      border-bottom: 1px solid #ddd;
-      color: #868686;
-    }
+    .custom-popup-wrapper > .message
+      padding: 10px 20px
+      border-bottom: 1px solid #ddd
+      color: #868686
 
-    .custom-popup-wrapper > .dropdown-menu {
-      position: static;
-      float: none;
-      display: block;
-      min-width: 160px;
-      background-color: transparent;
-      border: none;
-      border-radius: 0;
-      box-shadow: none;
+    .custom-popup-wrapper > .dropdown-menu
+      position: static
+      float: none
+      display: block
+      min-width: 160px
+      background-color: transparent
+      border: none
+      border-radius: 0
+      box-shadow: none
       margin-top: 0
       padding-top: 0
 
-      li {
+      li
         cursor: pointer
-      }
-    }
-  }
 
-  .no-results {
+  .no-results
     // margin-top: 0.7em
     margin-left: 40px
     margin-bottom: 0.7em
     opacity: 0.5
-  }
 
-  .input-group {
+  .input-group
     // border: 1px solid #ccc
     box-shadow: 0px 1px 4px rgba(#000, 0.1)
     border-radius: 5px
 
-    .input-group-addon {
+    .input-group-addon
       border: none
       background-color: #fff
 
-      .addon-left {
+      .addon-left
         padding: 6px, 6px, 6px, 18px
         border-top-left-radius: 7px
         border-bottom-left-radius: 7px
-      }
 
-      .addon-right {
+      .addon-right
         border-top-right-radius: 7px
         border-bottom-right-radius: 7px
-      }
-    }
 
-    .dismiss-icon {
-      position: absolute;
+    .dismiss-icon
+      position: absolute
       width: 12px
       height: auto
       right: 10px
       top: 11px
-      opacity: .4;
-    }
+      opacity: 0.4
 
-    input.form-control {
+    input.form-control
       border: none
       box-shadow: none
       padding-left: 1px
       padding-right: 0px
       font-size: 1em
 
-      &:focus {
+      &:focus
         box-shadow: none
-      }
-    }
 
-    @keyframes spinner {
-      to {
+    @keyframes spinner
+      to
         transform: rotate(360deg)
-      }
-    }
 
-    .spinner {
+    .spinner
       display: inline-block
       width: 13.5px
       height: 15px
       margin-left: 0px
 
-      &:before {
+      &:before
         content: ''
         box-sizing: border-box
         position: absolute
         top: 50%
-        //left: 50%
+        // left: 50%
         width: 20px
         height: 20px
         margin-top: -10px
@@ -631,14 +526,7 @@ active {
         border-top-color: rgba(#000, 0.4)
         animation: spinner 1s linear infinite
         z-index: 10
-      }
-    }
-  }
 
-  /***************** Table Grid styles ********************/
-
-  .ui-grid-top-panel {
+  /* **************** Table Grid styles ******************* */
+  .ui-grid-top-panel
     background-color: red
-  }
-
-}
