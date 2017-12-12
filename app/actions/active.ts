@@ -1,3 +1,5 @@
+import { ProjectActionService } from './project';
+import { ISetLanguageAction } from './general';
 import * as angular from 'angular';
 
 import { DataFactory, FIBRA, NamedNode, RDF, SKOS, INode } from '../models/rdf';
@@ -63,9 +65,10 @@ export class ActiveActionService {
       })
   }
 
-  public setLayout(layout: ILayoutState): any {
+  public setLayout(layout: ILayoutState): angular.IPromise<any> {
     let fls: IFullLayoutState = {
-      items: []
+      items: [],
+      description: ''
     }
 
     let itemIds: INode[][] = layout.items.map((i) => {
@@ -176,7 +179,8 @@ export class ActiveActionService {
           leftOffset: i.leftOffset
         }
       }),
-      active: true
+      active: true,
+      description: this.$ngRedux.getState().active.activeLayout.description
     }
     this.projectService.saveCitable(proj.updateEndpoint, proj.graphStoreEndpoint, proj)
 
@@ -216,7 +220,8 @@ export class ActiveActionService {
           leftOffset: i.leftOffset
         }
       }),
-      active: true
+      active: true,
+      description: this.$ngRedux.getState().active.activeLayout.description
     }
     this.projectService.saveCitable(proj.updateEndpoint, proj.graphStoreEndpoint, proj)
 
@@ -234,7 +239,8 @@ export class ActiveActionService {
           leftOffset: i.leftOffset
         }
       }),
-      active: true
+      active: true,
+      description: this.$ngRedux.getState().active.activeLayout.description
     }
     this.projectService.saveCitable(proj.updateEndpoint, proj.graphStoreEndpoint, proj)
 

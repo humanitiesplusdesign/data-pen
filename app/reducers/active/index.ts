@@ -14,7 +14,8 @@ export type IFullItemState = {
 }
 
 export type IFullLayoutState = {
-  items: IFullItemState[]
+  items: IFullItemState[],
+  description: string
 }
 
 export type IActiveState = {
@@ -24,7 +25,8 @@ export type IActiveState = {
 
 let defaultState: IActiveState = {
   activeLayout: {
-    items: []
+    items: [],
+    description: ''
   },
   dividerPercent: 0
 }

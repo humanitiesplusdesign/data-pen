@@ -23,7 +23,8 @@ export type IItemState = {
 
 export type ILayoutState = {
   items: IItemState[],
-  active: boolean
+  active: boolean,
+  description: string
 }
 
 export class Project extends Citable {

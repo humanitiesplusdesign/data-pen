@@ -1,9 +1,10 @@
 'use strict'
+import { ILayoutState, IItemState } from '../../services/project-service/project';
 import { ILiteral } from '../../models/rdfjs';
 import { ActiveActionService } from '../../actions/active';
 import { Class, IClass, IProperty, Property } from '../../services/project-service/data-model';
 import { CNode, DataFactory, NamedNode, ONodeSet, RDF, SKOS } from '../../models/rdf';
-import { IFullItemState } from '../../reducers/active';
+import { IFullItemState, IFullLayoutState } from '../../reducers/active';
 import { AutocompletionResults, Result, SparqlAutocompleteService, ResultGroup } from '../../services/sparql-autocomplete-service';
 import { SparqlItemService, PropertyToValues } from '../../services/sparql-item-service';
 import * as angular from 'angular';
@@ -20,7 +21,7 @@ import 'angular-ui-grid';
 import 'angular-bootstrap-toggle/dist/angular-bootstrap-toggle.js';
 import cmenu from 'circular-menu';
 import { IModalService } from 'angular-ui-bootstrap'
-import { BaseType } from 'd3';
+import { BaseType, descending } from 'd3';
 import { HIDE_ITEM } from 'actions/items';
 
 interface IActiveComponentControllerState {
@@ -627,6 +628,33 @@ export class ActiveComponentController {
     return filterString ? this.state.project.project.dataModel.classMap.values().filter((c) => {
       return c.labels.find((l) => l.value.toLowerCase().indexOf(filterString.toLowerCase()) !== -1)
     }) : null
+  }
+
+  private savedLayouts(): ILayoutState[] {
+    return this.state.project.project.layouts.filter(l => !l.active)
+  }
+
+  private saveLayout(description: string): void {
+    let newLayout: ILayoutState = {
+      items: this.state.active.activeLayout.items.map((i): IItemState => {
+        return {
+          ids: i.ids,
+          topOffset: i.topOffset,
+          leftOffset: i.leftOffset
+        }
+      }),
+      active: false,
+      description: description
+    }
+    this.projectActionService.addLayout(newLayout)
+  }
+
+  private loadLayout(layout: ILayoutState): angular.IPromise<any> {
+    return this.activeActionService.setLayout(layout)
+  }
+
+  private deleteLayout(layout: ILayoutState): angular.IPromise<any> {
+    return this.projectActionService.deleteLayout(layout)
   }
 
   private setGridOptions(): void {
