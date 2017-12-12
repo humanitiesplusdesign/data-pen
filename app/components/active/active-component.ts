@@ -152,7 +152,7 @@ export class ActiveComponentController {
       .classed('link', true)
       .classed('item-link', true)
 
-    let line = link.append('line')
+    let line: d3.Selection<SVGElement, {}, HTMLElement, any> = link.append<SVGLineElement>('line')
       .classed('link-line', true)
 
     this.linkMode = true
@@ -497,7 +497,7 @@ export class ActiveComponentController {
         this.nodeClick(d, groups)
       })
       .on('click', (d: IFullItemState, i: number, groups: SVGCircleElement[]) => {
-        if(this.linkMode) {
+        if (this.linkMode) {
           this.linkEndFunction(d)
           this.linkMode = false
         }
@@ -608,7 +608,7 @@ export class ActiveComponentController {
   }
 
   private allClasses(): IClass[] {
-    if(this.$ngRedux.getState().project.project) {
+    if (this.$ngRedux.getState().project.project) {
       return d3.keys(this.$ngRedux.getState().project.project.sourceClassSettings).reduce(
         (a, b) => {
           let sourceClasses: string[] = d3.keys(this.$ngRedux.getState().project.project.sourceClassSettings[b])
@@ -640,9 +640,9 @@ export class ActiveComponentController {
       obj['description'] = item.description
       obj['types'] = typeProp ? typeProp.values : []
 
-      if(item.item) {
+      if (item.item) {
         item.item.localProperties.concat(item.item.remoteProperties).forEach((p) => {
-          let propValue = p.values.map((v) => {
+          let propValue: string = p.values.map((v) => {
             return v.value.labels.values && v.value.labels.values() && v.value.labels.values()[0] ?
               v.value.labels.values()[0].value :
               // v.value.labels.values ?
@@ -650,13 +650,13 @@ export class ActiveComponentController {
                 v.value.value
           }).join(',')
           obj[this.sanitizeId(p.property.value)] = propValue
-          if(typeProp) {
+          if (typeProp) {
             typeProp.values.forEach(v => {
-              if(!generatedColumns.has(v.value.value)) {
+              if (!generatedColumns.has(v.value.value)) {
                 generatedColumns.set(v.value.value, [])
                 generatedColumnLabels.set(v.value.value, [])
               }
-              if(generatedColumns.get(v.value.value).indexOf(p.property.value) === -1 && p.property.value !== RDF.type.value && p.property.value !== SKOS.prefLabel.value) {
+              if (generatedColumns.get(v.value.value).indexOf(p.property.value) === -1 && p.property.value !== RDF.type.value && p.property.value !== SKOS.prefLabel.value) {
                 generatedColumns.get(v.value.value).push(p.property.value)
                 generatedColumnLabels.get(v.value.value).push(p.property.labels)
               }
@@ -682,7 +682,7 @@ export class ActiveComponentController {
         }
       ]
 
-      if(generatedColumns.has(c.value)) {
+      if (generatedColumns.has(c.value)) {
         generatedColumns.get(c.value).forEach((col, i) => {
           columnDefs.push({
             name: col,
@@ -698,7 +698,7 @@ export class ActiveComponentController {
         enableFiltering: true,
         columnDefs: columnDefs,
         onRegisterApi: (gridApi) => {
-          //set gridApi on scope
+          // set gridApi on scope
           this.gridApis[c.value] = gridApi
           gridApi.edit.on.afterCellEdit(this.$scope, (rowEntity, colDef, newValue, oldValue) => {
             console.log(rowEntity, colDef, newValue, oldValue)
