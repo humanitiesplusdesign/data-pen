@@ -74,6 +74,8 @@ export class ActiveComponentController {
   private viewOptionsShowLinkLabels: boolean = false
   private gridOptions: {} = {}
 
+  private selectedNodes: IItemState[] = []
+
   private linkMode: boolean = false
   private linkEndFunction: (d: IFullItemState) => void
 
@@ -381,6 +383,7 @@ export class ActiveComponentController {
       .classed('loading', (d): boolean => {
         return d.item === null
       })
+      .attr('filter', d => this.selectedNodes.indexOf(d) !== -1 ? 'url(#drop-shadow)' : '')
       .transition().attr('r', this.radius + 'px')
     return sel
   }
@@ -501,6 +504,13 @@ export class ActiveComponentController {
         if (this.linkMode) {
           this.linkEndFunction(d)
           this.linkMode = false
+        } else {
+          if (this.selectedNodes.indexOf(d) === -1) {
+            this.selectedNodes.push(d)
+          } else {
+            this.selectedNodes.splice(this.selectedNodes.indexOf(d))
+          }
+          this.updateCanvas()
         }
       })
       .on('mouseenter', (d: IFullItemState, i: number, grp: SVGCircleElement[]) => {
