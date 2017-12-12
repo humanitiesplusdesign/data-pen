@@ -52,6 +52,7 @@ export class SerializationService {
     return cjson.stringify(obj)
   }
 
+  /* @ngInject */
   constructor() {
     let mappings: {[className: string]: any} = {
       'Project': Project,

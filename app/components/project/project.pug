@@ -1,12 +1,12 @@
 .interstitial(ng-class="{ 'hide-interstitial' : $ctrl.state.project.description }")
-  img.loading-logo(src="./app/images/logo/datapen-logo.svg")
+  img.loading-logo(src=require("images/logo/datapen-logo.svg"))
 .main-area(ng-show="$ctrl.currentView==='active'")
   active
 .main-area(ng-show="$ctrl.currentView==='sources'")
   sources
 .top-nav
   .nav-element.return-button
-    img.back-icon.transition-200(src="./app/images/nav_bar/back.svg" ui-sref="projects" uib-popover="Back to projects" popover-placement="bottom-left" popover-popup-delay="750" popover-trigger="'mouseenter'")
+    img.back-icon.transition-200(src=require("images/nav_bar/back.svg") ui-sref="projects" uib-popover="Back to projects" popover-placement="bottom-left" popover-popup-delay="750" popover-trigger="'mouseenter'")
   .nav-element.project-description.push-down
     a(ui-sref="configure({id:$ctrl.state.project.id, sourceId: 'Projects' })" ) {{ $ctrl.state.project.description.length > 30 ? $ctrl.state.project.description.substr(0, 27) + '...' : $ctrl.state.project.description }}
   .nav-element.vertical-divider.muted •
@@ -15,9 +15,9 @@
     .nav-element.nav-link.push-down(ng-class="{'nav-link-inactive': $ctrl.currentView !== 'active', 'nav-link-active': $ctrl.currentView === 'active'}", ng-click="$ctrl.setView('active')") Draw
   .nav-element.search-container(ng-hide="$ctrl.currentView==='sources'")
     input.search-bar(placeholder="Search")
-    img.search-image(src="./app/images/nav_bar/search.svg" width="auto" height="100%")
+    img.search-image(src=require("images/nav_bar/search.svg") width="auto" height="100%")
   .nav-element.bibliography-link
-    img.bib-icon(src="./app/images/nav_bar/bibliography.svg" ng-click="$ctrl.openBibliographyModal($ctrl.currentView)")
+    img.bib-icon(src=require("images/nav_bar/bibliography.svg") ng-click="$ctrl.openBibliographyModal($ctrl.currentView)")
   span.usage(ng-hide="$ctrl.currentView==='sources'")
     .nav-element.usage-chart
       .progress

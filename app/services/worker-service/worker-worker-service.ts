@@ -1,7 +1,6 @@
 'use strict'
 
 import * as angular from 'angular';
-import './prototype-mapping-configuration';
 import {BackendRootState, convertToBackendState} from 'reducers'
 import {IMessage, SerializationService} from 'services/worker-service/serialization-service'
 
