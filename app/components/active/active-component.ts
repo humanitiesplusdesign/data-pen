@@ -1,9 +1,10 @@
 'use strict'
+import { ILayoutState, IItemState } from '../../services/project-service/project';
 import { ILiteral } from '../../models/rdfjs';
 import { ActiveActionService } from '../../actions/active';
 import { Class, IClass, IProperty, Property } from '../../services/project-service/data-model';
 import { CNode, DataFactory, NamedNode, ONodeSet, RDF, SKOS } from '../../models/rdf';
-import { IFullItemState } from '../../reducers/active';
+import { IFullItemState, IFullLayoutState } from '../../reducers/active';
 import { AutocompletionResults, Result, SparqlAutocompleteService, ResultGroup } from '../../services/sparql-autocomplete-service';
 import { SparqlItemService, PropertyToValues } from '../../services/sparql-item-service';
 import * as angular from 'angular';
@@ -20,7 +21,7 @@ import 'angular-ui-grid';
 import 'angular-bootstrap-toggle/dist/angular-bootstrap-toggle.js';
 import cmenu from 'circular-menu';
 import { IModalService } from 'angular-ui-bootstrap'
-import { BaseType } from 'd3';
+import { BaseType, descending } from 'd3';
 import { HIDE_ITEM } from 'actions/items';
 
 interface IActiveComponentControllerState {
@@ -72,6 +73,8 @@ export class ActiveComponentController {
   private viewOptionsShowLinks: boolean = true
   private viewOptionsShowLinkLabels: boolean = false
   private gridOptions: {} = {}
+
+  private selectedNodes: IItemState[] = []
 
   private linkMode: boolean = false
   private linkEndFunction: (d: IFullItemState) => void
@@ -152,7 +155,7 @@ export class ActiveComponentController {
       .classed('link', true)
       .classed('item-link', true)
 
-    let line = link.append('line')
+    let line: d3.Selection<SVGElement, {}, HTMLElement, any> = link.append<SVGLineElement>('line')
       .classed('link-line', true)
 
     this.linkMode = true
@@ -380,6 +383,7 @@ export class ActiveComponentController {
       .classed('loading', (d): boolean => {
         return d.item === null
       })
+      .attr('filter', d => this.selectedNodes.indexOf(d) !== -1 ? 'url(#drop-shadow)' : '')
       .transition().attr('r', this.radius + 'px')
     return sel
   }
@@ -497,9 +501,16 @@ export class ActiveComponentController {
         this.nodeClick(d, groups)
       })
       .on('click', (d: IFullItemState, i: number, groups: SVGCircleElement[]) => {
-        if(this.linkMode) {
+        if (this.linkMode) {
           this.linkEndFunction(d)
           this.linkMode = false
+        } else {
+          if (this.selectedNodes.indexOf(d) === -1) {
+            this.selectedNodes.push(d)
+          } else {
+            this.selectedNodes.splice(this.selectedNodes.indexOf(d))
+          }
+          this.updateCanvas()
         }
       })
       .on('mouseenter', (d: IFullItemState, i: number, grp: SVGCircleElement[]) => {
@@ -608,7 +619,7 @@ export class ActiveComponentController {
   }
 
   private allClasses(): IClass[] {
-    if(this.$ngRedux.getState().project.project) {
+    if (this.$ngRedux.getState().project.project) {
       return d3.keys(this.$ngRedux.getState().project.project.sourceClassSettings).reduce(
         (a, b) => {
           let sourceClasses: string[] = d3.keys(this.$ngRedux.getState().project.project.sourceClassSettings[b])
@@ -629,6 +640,33 @@ export class ActiveComponentController {
     }) : null
   }
 
+  private savedLayouts(): ILayoutState[] {
+    return this.state.project.project.layouts.filter(l => !l.active)
+  }
+
+  private saveLayout(description: string): void {
+    let newLayout: ILayoutState = {
+      items: this.state.active.activeLayout.items.map((i): IItemState => {
+        return {
+          ids: i.ids,
+          topOffset: i.topOffset,
+          leftOffset: i.leftOffset
+        }
+      }),
+      active: false,
+      description: description
+    }
+    this.projectActionService.addLayout(newLayout)
+  }
+
+  private loadLayout(layout: ILayoutState): angular.IPromise<any> {
+    return this.activeActionService.setLayout(layout)
+  }
+
+  private deleteLayout(layout: ILayoutState): angular.IPromise<any> {
+    return this.projectActionService.deleteLayout(layout)
+  }
+
   private setGridOptions(): void {
     let generatedColumns: Map<string, string[]> = new Map()
     let generatedColumnLabels: Map<string, ONodeSet<ILiteral>[]> = new Map()
@@ -640,9 +678,9 @@ export class ActiveComponentController {
       obj['description'] = item.description
       obj['types'] = typeProp ? typeProp.values : []
 
-      if(item.item) {
+      if (item.item) {
         item.item.localProperties.concat(item.item.remoteProperties).forEach((p) => {
-          let propValue = p.values.map((v) => {
+          let propValue: string = p.values.map((v) => {
             return v.value.labels.values && v.value.labels.values() && v.value.labels.values()[0] ?
               v.value.labels.values()[0].value :
               // v.value.labels.values ?
@@ -650,13 +688,13 @@ export class ActiveComponentController {
                 v.value.value
           }).join(',')
           obj[this.sanitizeId(p.property.value)] = propValue
-          if(typeProp) {
+          if (typeProp) {
             typeProp.values.forEach(v => {
-              if(!generatedColumns.has(v.value.value)) {
+              if (!generatedColumns.has(v.value.value)) {
                 generatedColumns.set(v.value.value, [])
                 generatedColumnLabels.set(v.value.value, [])
               }
-              if(generatedColumns.get(v.value.value).indexOf(p.property.value) === -1 && p.property.value !== RDF.type.value && p.property.value !== SKOS.prefLabel.value) {
+              if (generatedColumns.get(v.value.value).indexOf(p.property.value) === -1 && p.property.value !== RDF.type.value && p.property.value !== SKOS.prefLabel.value) {
                 generatedColumns.get(v.value.value).push(p.property.value)
                 generatedColumnLabels.get(v.value.value).push(p.property.labels)
               }
@@ -682,7 +720,7 @@ export class ActiveComponentController {
         }
       ]
 
-      if(generatedColumns.has(c.value)) {
+      if (generatedColumns.has(c.value)) {
         generatedColumns.get(c.value).forEach((col, i) => {
           columnDefs.push({
             name: col,
@@ -698,7 +736,7 @@ export class ActiveComponentController {
         enableFiltering: true,
         columnDefs: columnDefs,
         onRegisterApi: (gridApi) => {
-          //set gridApi on scope
+          // set gridApi on scope
           this.gridApis[c.value] = gridApi
           gridApi.edit.on.afterCellEdit(this.$scope, (rowEntity, colDef, newValue, oldValue) => {
             console.log(rowEntity, colDef, newValue, oldValue)

@@ -15,6 +15,12 @@
     button.active-circle-button.button-disabled(disabled uib-popover-template="'layoutsPopover.html'" popover-trigger="'outsideClick'" popover-placement="auto left-top" popover-class="active-options-popover" popover-is-open="$ctrl.layoutsPopoverVisible" ng-class="{true: 'button-active', false: ''}[$ctrl.layoutsPopoverVisible]")
       img.layouts-icon(src=require("images/active/layout.svg"))
   svg.main-svg
+    defs
+      filter#drop-shadow(height="150%" width="150%" left="-5px" top="-5px")
+        feGaussianBlur(in="SourceAlpha" stdDeviation="2" result="blur")
+        feMerge
+          feMergeNode(in="blur")
+          feMergeNode(in="SourceGraphic")
     g.main-g
       rect.main-background
       g.main-g-links
@@ -98,14 +104,14 @@ script(type="text/ng-template" id="snapshotsPopover.html")
     h4 Snapshots
     //- save snapshot, list of snapshots to return to
     hr
-    input.snapshot-name-input(type="text")
-    span.snapshot-save-button Save snapshot
+    input.snapshot-name-input(type="text" ng-model="layoutDescription")
+    span.snapshot-save-button(ng-click="$ctrl.saveLayout(layoutDescription); layoutDescription = ''") Save snapshot
     hr
     .snapshot-list
-      .snapshot-row
-        label.snapshot-name-label Donzellini central
-        label.snapshot-option Delete
-        label.snapshot-option Load
+      .snapshot-row(ng-repeat="layout in $ctrl.savedLayouts()")
+        label.snapshot-name-label {{ layout.description }} ({{ layout.items.length }} entities)
+        a.snapshot-option.btn.btn-xs(ng-click="$ctrl.deleteLayout(layout)") Delete
+        a.snapshot-option.btn.btn-xs(ng-click="$ctrl.loadLayout(layout)") Load
 script(type="text/ng-template" id="layoutsPopover.html")
   .layouts-popover.pop-on-top
     h4 Layouts

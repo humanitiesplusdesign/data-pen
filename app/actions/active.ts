@@ -1,3 +1,5 @@
+import { ProjectActionService } from './project';
+import { ISetLanguageAction } from './general';
 import * as angular from 'angular';
 
 import { DataFactory, FIBRA, NamedNode, RDF, SKOS, INode } from '../models/rdf';
@@ -7,7 +9,7 @@ import { IFullItemState, IFullLayoutState } from 'reducers/active'
 import { Dispatch, Action } from 'redux'
 import { IRootState, IFibraNgRedux } from 'reducers'
 import { Property } from 'services/project-service/data-model';
-import { ILayoutState, Project } from 'services/project-service/project';
+import { ILayoutState, Project, IItemState } from 'services/project-service/project';
 import { ProjectService } from 'services/project-service/project-service';
 
 export const ADD_ITEM_TO_CURRENT_LAYOUT: string = 'ADD_ITEM_TO_CURRENT_LAYOUT'
@@ -38,7 +40,7 @@ export class ActiveActionService {
   /* @ngInject */
   constructor(private $ngRedux: IFibraNgRedux, private sparqlItemService: SparqlItemService, private projectService: ProjectService) {}
 
-  public addLink(item1: IFullItemState, item2: IFullItemState) {
+  public addLink(item1: IFullItemState, item2: IFullItemState): void {
     this.sparqlItemService.alterItem(item1.ids[0], [new PropertyAndValue(new Property(new NamedNode('DataPenLink')), item2.ids[0])])
       .then(() => {
         this.sparqlItemService.getItem(item1.ids, true).then((i) => {
@@ -50,7 +52,7 @@ export class ActiveActionService {
             }
           })
         })
-    
+
         this.sparqlItemService.getItem(item2.ids, true).then((i) => {
           this.$ngRedux.dispatch({
             type: ADD_ITEM_TO_ITEM_STATE,
@@ -63,9 +65,10 @@ export class ActiveActionService {
       })
   }
 
-  public setLayout(layout: ILayoutState): any {
+  public setLayout(layout: ILayoutState): angular.IPromise<any> {
     let fls: IFullLayoutState = {
-      items: []
+      items: [],
+      description: ''
     }
 
     let itemIds: INode[][] = layout.items.map((i) => {
@@ -75,7 +78,7 @@ export class ActiveActionService {
     return this.sparqlItemService.getItems(itemIds, true)
       .then((items) => {
         fls.items = items.map((i) => {
-          let origItemState = layout.items.find((fi) => fi.ids.map(id => id.value).indexOf(i.value) !== -1)
+          let origItemState: IItemState = layout.items.find((fi) => fi.ids.map(id => id.value).indexOf(i.value) !== -1)
           return {
             ids: [new NamedNode(i.value)],
             item: i,
@@ -95,7 +98,7 @@ export class ActiveActionService {
   }
 
   public addItemsToCurrentLayout(items: IFullItemState[]): IAddItemToCurrentLayoutAction[] {
-    let ret = items.filter((item) => {
+    let ret: IAddItemToCurrentLayoutAction[] = items.filter((item) => {
       return !this.$ngRedux.getState().active.activeLayout.items.find((i) => i.ids[0].value === item.ids[0].value)
     }).map((item) => {
       return this.$ngRedux.dispatch({
@@ -111,7 +114,7 @@ export class ActiveActionService {
       true
     ).then((sparqlItems) => {
       return sparqlItems.map((i) => {
-        if(i) {
+        if (i) {
           this.$ngRedux.dispatch({
             type: ADD_ITEM_TO_ITEM_STATE,
             payload: {
@@ -137,12 +140,12 @@ export class ActiveActionService {
 
   public addItemToCurrentLayout(item: IFullItemState): IAddItemToCurrentLayoutAction {
     // Check that the item doesn't already exist
-    if(this.$ngRedux.getState().active.activeLayout.items.find((i) => i.ids[0].value === item.ids[0].value)) {
+    if (this.$ngRedux.getState().active.activeLayout.items.find((i) => i.ids[0].value === item.ids[0].value)) {
       return null
     }
 
     this.sparqlItemService.getItem(item.ids, true).then((i) => {
-      if(i) {
+      if (i) {
         this.$ngRedux.dispatch({
           type: ADD_ITEM_TO_ITEM_STATE,
           payload: {
@@ -162,7 +165,7 @@ export class ActiveActionService {
       }
     })
 
-    let ret = this.$ngRedux.dispatch({
+    let ret: IAddItemToCurrentLayoutAction = this.$ngRedux.dispatch({
       type: ADD_ITEM_TO_CURRENT_LAYOUT,
       payload: item
     })
@@ -176,7 +179,8 @@ export class ActiveActionService {
           leftOffset: i.leftOffset
         }
       }),
-      active: true
+      active: true,
+      description: this.$ngRedux.getState().active.activeLayout.description
     }
     this.projectService.saveCitable(proj.updateEndpoint, proj.graphStoreEndpoint, proj)
 
@@ -202,7 +206,7 @@ export class ActiveActionService {
   }
 
   public deleteItemFromCurrentLayout(item: IFullItemState): IDeleteItemFromCurrentLayoutAction {
-    let ret = this.$ngRedux.dispatch({
+    let ret: IDeleteItemFromCurrentLayoutAction = this.$ngRedux.dispatch({
       type: DELETE_ITEM_FROM_LAYOUT,
       payload: item
     })
@@ -216,7 +220,8 @@ export class ActiveActionService {
           leftOffset: i.leftOffset
         }
       }),
-      active: true
+      active: true,
+      description: this.$ngRedux.getState().active.activeLayout.description
     }
     this.projectService.saveCitable(proj.updateEndpoint, proj.graphStoreEndpoint, proj)
 
@@ -234,7 +239,8 @@ export class ActiveActionService {
           leftOffset: i.leftOffset
         }
       }),
-      active: true
+      active: true,
+      description: this.$ngRedux.getState().active.activeLayout.description
     }
     this.projectService.saveCitable(proj.updateEndpoint, proj.graphStoreEndpoint, proj)
 

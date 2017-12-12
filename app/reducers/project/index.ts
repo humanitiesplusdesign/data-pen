@@ -1,3 +1,5 @@
+import { ILayoutState } from '../../services/project-service/project';
+import { ADD_LAYOUT, DELETE_LAYOUT } from '../../actions/project';
 import { allItemsLoaded } from 'actions/items';
 import { SET_ACTIVE_DIVIDER_PERCENTAGE } from 'actions/active';
 import { SET_PROJECT, SET_ACTIVE_ITEM_COUNT, SET_ALL_ITEM_COUNT, SET_FILTERED_ITEM_COUNT} from 'actions/project'
@@ -5,7 +7,8 @@ import {Project} from 'services/project-service/project'
 import {RemoteEndpointConfiguration} from 'services/project-service/remote-endpoint-configuration'
 import {CNode, INode} from 'models/rdf'
 import { SET_SOURCE_CLASS_ACTIVE } from 'actions/sources';
-import * as angular from 'angular'
+import * as angular from 'angular';
+import { IFullLayoutState } from 'reducers/active';
 
 export interface IProjectClass {
   description: string
@@ -70,6 +73,24 @@ export default function models(state: ProjectState = defaultState, action): Proj
         id: action.payload.id,
         sources: sources,
         description: action.payload.labels.values()[0].value
+      })
+
+    case ADD_LAYOUT:
+      let newProject2: Project = angular.copy(state.project)
+      let newLayouts: ILayoutState[] = newProject2.layouts.slice(0)
+      newLayouts.push(action.payload)
+      newProject2.layouts = newLayouts
+      return Object.assign({}, state, {
+        project: newProject2
+      })
+
+    case DELETE_LAYOUT:
+      let newProject3: Project = angular.copy(state.project)
+      let newLayouts2: ILayoutState[] = newProject3.layouts.slice(0)
+      newLayouts2.splice(newLayouts2.indexOf(action.payload), 1)
+      newProject3.layouts = newLayouts2
+      return Object.assign({}, state, {
+        project: newProject3
       })
 
     case SET_SOURCE_CLASS_ACTIVE:

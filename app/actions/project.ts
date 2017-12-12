@@ -1,3 +1,4 @@
+import { ILayoutState } from '../services/project-service/project';
 import { SparqlStatisticsService } from '../services/sparql-statistics-service';
 import { CLEAR_FILTER_STATE } from './filter';
 import { ActiveActionService, CLEAR_ACTIVE_STATE } from './active';
@@ -10,11 +11,14 @@ import { IFibraNgRedux } from 'reducers'
 import * as angular from 'angular';
 import { ProjectSourceInfo } from 'components/project-sources-view/project-sources-view-component';
 import { CitableSource } from 'models/citable';
+import { IFullLayoutState } from 'reducers/active';
 
 export const SET_PROJECT: string = 'SET_PROJECT'
 export const SET_ALL_ITEM_COUNT: string = 'SET_ALL_ITEM_COUNT'
 export const SET_FILTERED_ITEM_COUNT: string = 'SET_FILTERED_ITEM_COUNT'
 export const SET_ACTIVE_ITEM_COUNT: string = 'SET_ACTIVE_ITEM_COUNT'
+export const ADD_LAYOUT: string = 'ADD_LAYOUT'
+export const DELETE_LAYOUT: string = 'DELETE_LAYOUT'
 
 export interface IProjectLoadedAction extends Action {
   payload: Project
@@ -61,7 +65,7 @@ export class ProjectActionService {
                     propStats: propStats
                   }
                 })
-              })  
+              })
             })
           })
           project.authorityEndpoints.forEach(ae => {
@@ -81,15 +85,41 @@ export class ProjectActionService {
             })
           })
 
-          let ret = this.$ngRedux.dispatch({
+          let ret: IProjectLoadedAction = this.$ngRedux.dispatch({
             type: SET_PROJECT,
             payload: project
           })
 
-          if(project.layouts[0]) this.activeActionService.setLayout(project.layouts[0])
-          
+          if (project.layouts.filter((l) => l.active )[0]) this.activeActionService.setLayout(project.layouts.filter((l) => l.active )[0])
+
           return ret
         }
+    )
+  }
+
+  public addLayout(layout: ILayoutState): angular.IPromise<any> {
+    this.$ngRedux.dispatch({
+      type: ADD_LAYOUT,
+      payload: layout
+    })
+
+    return this.projectService.saveCitable(
+      this.$ngRedux.getState().project.project.updateEndpoint,
+      this.$ngRedux.getState().project.project.graphStoreEndpoint,
+      this.$ngRedux.getState().project.project
+    )
+  }
+
+  public deleteLayout(layout: ILayoutState): angular.IPromise<any> {
+    this.$ngRedux.dispatch({
+      type: DELETE_LAYOUT,
+      payload: layout
+    })
+
+    return this.projectService.saveCitable(
+      this.$ngRedux.getState().project.project.updateEndpoint,
+      this.$ngRedux.getState().project.project.graphStoreEndpoint,
+      this.$ngRedux.getState().project.project
     )
   }
 

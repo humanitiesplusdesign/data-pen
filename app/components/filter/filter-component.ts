@@ -205,4 +205,4 @@ export class FilterComponent implements angular.IComponentOptions {
 }
 
 angular.module('fibra.components.filter', ['ui.bootstrap', 'filearts.dragDrop', 'rzModule', 'ui.grid', 'ui.grid.emptyBaseLayer', 'ui.grid.resizeColumns', 'ui.grid.autoResize', 'ui.grid.edit'])
-  .component('filter', new FilterComponent())
+  .component('filter-view', new FilterComponent())
