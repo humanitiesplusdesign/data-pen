@@ -185,13 +185,14 @@ export class ActiveComponentController {
     let g: d3.Selection<Element, {}, HTMLElement, any> = s.select('.main-g')
 
     let r: d3.Selection<SVGRectElement, {}, HTMLElement, any> = g.select<SVGRectElement>('rect')
-      .on('click', this.canvasClick.bind(this, g))
+      .on('contextmenu', this.canvasClick.bind(this, g))
 
     this.updateCanvasSize()
 
   }
 
   private canvasClick(sel: d3.Selection<SVGGElement, {}, HTMLElement, any>): void {
+    d3.event.preventDefault()
     this.$scope.$apply(() => {
       this.menu.hide()
 
@@ -484,12 +485,14 @@ export class ActiveComponentController {
 
     enterSel.append<SVGCircleElement>('circle')
       .classed('node-circle', true)
+      .on('contextmenu', (d: IFullItemState, i: number, groups: SVGCircleElement[]) => {
+        d3.event.preventDefault()
+        this.nodeClick(d, groups)
+      })
       .on('click', (d: IFullItemState, i: number, groups: SVGCircleElement[]) => {
         if(this.linkMode) {
           this.linkEndFunction(d)
           this.linkMode = false
-        } else {
-          this.nodeClick(d, groups)
         }
       })
       .on('mouseenter', (d: IFullItemState, i: number, grp: SVGCircleElement[]) => {
