@@ -186,9 +186,16 @@ export class ActiveComponentController {
 
     let r: d3.Selection<SVGRectElement, {}, HTMLElement, any> = g.select<SVGRectElement>('rect')
       .on('contextmenu', this.canvasClick.bind(this, g))
+      .on('click', this.canvasLeftClick.bind(this))
 
     this.updateCanvasSize()
+  }
 
+  private canvasLeftClick(): void {
+    this.$scope.$apply(() => {
+      this.menu.hide()
+      this.nodeSearchRemove()
+    })
   }
 
   private canvasClick(sel: d3.Selection<SVGGElement, {}, HTMLElement, any>): void {
