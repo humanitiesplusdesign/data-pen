@@ -1,4 +1,5 @@
 .main-table(ng-style="$ctrl.tableWidthStyle()")
+  label.tableExport Export table
   uib-tabset(type="tabs")
     uib-tab(ng-repeat="class in $ctrl.allClasses()" index="$index" heading="{{ class.labels | prefLang }}")
       //- .main-grid(ui-grid="{ data: $ctrl.state.active.activeLayout.items, enableFiltering: true }" ng-hide="$ctrl.state.active.dividerPercent < 2" ui-grid-auto-resize ui-grid-edit ui-grid-resize-columns ui-grid-empty-base-layer)
