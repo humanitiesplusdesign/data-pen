@@ -19,6 +19,7 @@ import { IActiveState } from 'reducers/active'
 import 'angular-drag-drop';
 import 'angular-ui-grid';
 import 'angular-bootstrap-toggle/dist/angular-bootstrap-toggle.js';
+import 'angular-ui-sortable';
 import cmenu from 'circular-menu';
 import { IModalService } from 'angular-ui-bootstrap'
 import { BaseType, descending } from 'd3';
@@ -755,5 +756,5 @@ export class ActiveComponent implements angular.IComponentOptions {
     public controller: any = ActiveComponentController
 }
 
-angular.module('fibra.components.active', ['ui.bootstrap', 'fibra.actions.project', 'filearts.dragDrop', 'ui.grid', 'ui.grid.emptyBaseLayer', 'ui.grid.resizeColumns', 'ui.grid.edit', 'ui.toggle'])
+angular.module('fibra.components.active', ['ui.bootstrap', 'fibra.actions.project', 'filearts.dragDrop', 'ui.grid', 'ui.grid.emptyBaseLayer', 'ui.grid.resizeColumns', 'ui.grid.edit', 'ui.toggle', 'ui.sortable'])
   .component('active', new ActiveComponent())
