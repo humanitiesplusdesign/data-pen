@@ -26,7 +26,9 @@
           label.checkbox-container(ng-repeat="clss in source.classes" ng-hide="clss.labels.length === 0") 
             input(type="checkbox", ng-model="$ctrl.localSourceClassTree[source.id][clss.value]" ng-click="$ctrl.sourcesActionService.setSourceClassActive(source.id, clss.value, !$ctrl.getSourceClassStatus(source.id, clss.value))")
             span.type-name {{clss.labels | prefLang}}
-              span.type-entities.calibre-numbers-kern {{ source.classStats.get(clss.id) | number }} entities
+              span.type-entities
+                span.calibre-numbers-kern {{ source.classStats.get(clss.id) | number }} 
+                | entities
     .sources-list(ng-show="$ctrl.state.sources.archiveSources.length != 0")
       h6.sources-category-title Archives
       span.source-title-container(ng-repeat="source in $ctrl.state.sources.archiveSources")
