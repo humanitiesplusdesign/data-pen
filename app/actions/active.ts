@@ -82,8 +82,8 @@ export class ActiveActionService {
           return {
             ids: [new NamedNode(i.value)],
             item: i,
-            description: i.remoteProperties.find((rp) => rp.property.value === SKOS.prefLabel.value) ?
-              i.remoteProperties.find((rp) => rp.property.value === SKOS.prefLabel.value).values[0].value.value :
+            description: i.remoteProperties.concat(i.localProperties).find((rp) => rp.property.value === SKOS.prefLabel.value) ?
+              i.remoteProperties.concat(i.localProperties).find((rp) => rp.property.value === SKOS.prefLabel.value).values[0].value.value :
               '?',
             topOffset: origItemState ? origItemState.topOffset : null,
             leftOffset: origItemState ? origItemState.leftOffset : null
