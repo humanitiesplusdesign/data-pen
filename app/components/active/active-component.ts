@@ -20,14 +20,20 @@ import 'angular-drag-drop';
 import 'angular-ui-grid';
 import 'angular-bootstrap-toggle/dist/angular-bootstrap-toggle.js';
 import 'angular-ui-sortable';
+import 'angular-file-saver';
 import cmenu from 'circular-menu';
 import { IModalService } from 'angular-ui-bootstrap'
 import { BaseType, descending } from 'd3';
 import { HIDE_ITEM } from 'actions/items';
+import { getPrefLangString } from 'filters/preferred-language-filter';
+import { GeneralState } from 'reducers/general';
+
+declare function unescape(s: string): string;
 
 interface IActiveComponentControllerState {
   project: ProjectState
   active: IActiveState
+  general: GeneralState
 }
 
 export interface ILink {
@@ -77,6 +83,8 @@ export class ActiveComponentController {
 
   private selectedNodes: IItemState[] = []
 
+  private currentTableClass: IClass = null
+
   private linkMode: boolean = false
   private linkEndFunction: (d: IFullItemState) => void
 
@@ -90,13 +98,15 @@ export class ActiveComponentController {
               private $ngRedux: IFibraNgRedux,
               private $uibModal: IModalService,
               private $timeout: angular.ITimeoutService,
+              private FileSaver: any,
               private sparqlAutocompleteService: SparqlAutocompleteService,
               private $document: angular.IDocumentService) {
     this.unsubscribe = $ngRedux.connect(
       (state: IRootState) => {
         return {
           project: state.project,
-          active: state.active
+          active: state.active,
+          general: state.general
         }
       },
       null)(this.state)
@@ -147,6 +157,7 @@ export class ActiveComponentController {
     })
 
     this.updateCanvas()
+    this.currentTableClass = this.allClasses()[0]
   }
 
   private linkNode(item: IFullItemState): void {
@@ -668,7 +679,21 @@ export class ActiveComponentController {
     return this.projectActionService.deleteLayout(layout)
   }
 
+  private exportTable(): void {
+    let exportData: {}[] = this.gridOptions[this.currentTableClass.value].data.slice(0)
+      .map((d) => {
+        let nd: {} = angular.copy(d)
+        delete nd['types']
+        return nd
+      })
+    exportData.shift()
+    let dataBlob: Blob = new Blob([d3.csvFormat(exportData)], { type: 'text/csv;charset=utf-8' });
+    this.FileSaver.saveAs(dataBlob, this.state.project.description + ' - ' + getPrefLangString(this.currentTableClass.labels, this.state.general.language) + '.csv');
+  }
+
   private setGridOptions(): void {
+    if (!this.currentTableClass) this.currentTableClass = this.allClasses()[0]
+
     let generatedColumns: Map<string, string[]> = new Map()
     let generatedColumnLabels: Map<string, ONodeSet<ILiteral>[]> = new Map()
 
@@ -756,5 +781,16 @@ export class ActiveComponent implements angular.IComponentOptions {
     public controller: any = ActiveComponentController
 }
 
-angular.module('fibra.components.active', ['ui.bootstrap', 'fibra.actions.project', 'filearts.dragDrop', 'ui.grid', 'ui.grid.emptyBaseLayer', 'ui.grid.resizeColumns', 'ui.grid.edit', 'ui.toggle', 'ui.sortable'])
+angular.module('fibra.components.active', [
+    'ui.bootstrap',
+    'fibra.actions.project',
+    'filearts.dragDrop',
+    'ui.grid',
+    'ui.grid.emptyBaseLayer',
+    'ui.grid.resizeColumns',
+    'ui.grid.edit',
+    'ui.toggle',
+    'ui.sortable',
+    'ngFileSaver'
+  ])
   .component('active', new ActiveComponent())
