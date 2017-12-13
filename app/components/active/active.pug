@@ -96,13 +96,17 @@ script(type="text/ng-template" id="layersPopover.html")
   .layers-popover.pop-on-top
     h4 Layers
     hr
-    .layer-toggle(ng-repeat="class in $ctrl.allClasses()")
-      toggle(ng-model="toggleValue" on="Nodes" off="Links" ng-change="changed()" onstyle="custom" offstyle="custom")
-      span.checkbox-title {{ class.labels | prefLang }}
+    label.optionToggle
+      input(type="checkbox")
+      span.checkbox-title Show layer effect
+    hr
+    ul(ui-sortable)
+      li.layer-row(ng-repeat="class in $ctrl.allClasses()")
+        input(type="checkbox")
+        span.checkbox-title {{ class.labels | prefLang }}
 script(type="text/ng-template" id="snapshotsPopover.html")
   .snapshots-popover.pop-on-top
     h4 Snapshots
-    //- save snapshot, list of snapshots to return to
     hr
     input.snapshot-name-input(type="text" ng-model="layoutDescription")
     button.data-pen-button.snapshot-save-button(ng-class="{'button-disabled' : !layoutDescription}" ng-click="$ctrl.saveLayout(layoutDescription); layoutDescription = ''") Save
