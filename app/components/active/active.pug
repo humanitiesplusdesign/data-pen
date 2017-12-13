@@ -105,13 +105,19 @@ script(type="text/ng-template" id="snapshotsPopover.html")
     //- save snapshot, list of snapshots to return to
     hr
     input.snapshot-name-input(type="text" ng-model="layoutDescription")
-    span.snapshot-save-button(ng-click="$ctrl.saveLayout(layoutDescription); layoutDescription = ''") Save
+    button.data-pen-button.snapshot-save-button(ng-class="{'button-disabled' : !layoutDescription}" ng-click="$ctrl.saveLayout(layoutDescription); layoutDescription = ''") Save
     hr
+    label.no-snapshots(ng-show="$ctrl.state.project.project.layouts.length == 0") Create a snapshot to save this layout.
     .snapshot-list
-      .snapshot-row(ng-repeat="layout in $ctrl.savedLayouts()" ng-click="$ctrl.loadLayout(layout)")
-        label.snapshot-name-label {{ layout.description }} ({{ layout.items.length }} entities)
-        a.snapshot-option.btn.btn-xs(ng-click="$ctrl.deleteLayout(layout)") Delete
-        a.snapshot-option.btn.btn-xs Rename
+      .snapshot-row.transition-100(ng-repeat="layout in $ctrl.savedLayouts() | orderBy:'-'" ng-click="$ctrl.loadLayout(layout)" ng-init="actionsVisibility=''" ng-mouseenter="actionsVisibility='visible'" ng-mouseleave="actionsVisibility=''")
+        .snapshot-details-container
+          label.snapshot-name-label(ng-class="{'limit-width' : actionsVisibility=='visible'}") {{ layout.description }}
+          span.snapshot-entities-label
+            span.calibre-numbers-kern {{ layout.items.length }}
+            |  entities
+        .action-items-container(ng-class="actionsVisibility")
+          a.snapshot-option Rename
+          a.snapshot-option.delete-option(ng-click="$ctrl.deleteLayout(layout)") Delete
 script(type="text/ng-template" id="layoutsPopover.html")
   .layouts-popover.pop-on-top
     h4 Layouts

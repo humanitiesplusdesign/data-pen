@@ -8,6 +8,7 @@ active
 
   .popover
     max-width: 600px
+    font-family: 'Calibre', sans-serif
 
   .active-tooltip
     position: absolute
@@ -232,46 +233,93 @@ active
       width: 300px
 
       .snapshot-name-input
-        width: 253px
+        width: 203px
+        height: 27px
         outline: 0
         padding-left: 10px
         border: 1px solid rgba(#000, 0.3)
         border-radius: 3px
         margin-right: 10px
+        margin-left: 8px
 
         &:focus
           border: 1px solid rgba(#466bd3, 1)
 
       .snapshot-save-button
-        color: #466bd3
-        border-bottom: 1px solid #466bd3
-        transition: 0.1s
-        margin-left: 2px
+        position: relative
+        top: -1px
+        width: 68px
+        margin: 0
 
         &:hover
           opacity: 0.7
 
+      .no-snapshots
+        width: 100%
+        text-align: center
+        opacity: .5
+        font-size: 1.1em
+
       .snapshot-list
         max-height: 300px
         overflow-y: scroll
+        margin-bottom: 5px
 
         .snapshot-row
           width: 100%
-          padding: 5px 5px 0 10px
-          border-radius: 15px
+          padding: 10px 5px 5px 10px
+          border-radius: 5px
+          margin-bottom: 5px
 
           &:hover
-            background-color: rgba(0, 0, 0, 0.05)
+            background-color: rgba(#000, 0.03)
             cursor: pointer
 
-          .snapshot-name-label
+          .snapshot-details-container
             display: inline-block
-            cursor: pointer
+            max-width: 100%
+
+            .snapshot-name-label
+              display: block
+              font-size: 1.1em
+              margin-bottom: -3px
+              text-overflow: ellipsis
+              overflow: hidden
+              white-space: nowrap
+              cursor: pointer
+
+            .snapshot-entities-label
+              opacity: .4
+              margin-bottom: 0
+
+          .limit-width
+            max-width: 150px
+
+          .action-items-container
+            display: inline-block
+            float: right
+            display: none
+            padding-top: 7px
+            padding-right: 5px
+            &.visible
+              display: inline-block
 
           .snapshot-option
             display: inline-block
-            float: right
             margin-left: 5px
+            text-transform: uppercase
+            font-weight: 500
+            opacity: .4
+
+            &:hover
+              opacity: 1
+
+          .delete-option
+            color: #d24545
+            margin-left: 10px
+
+            &:hover
+              color: #d24545
 
     .layouts-popover {}
 
