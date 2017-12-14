@@ -1,7 +1,7 @@
 .main-table(ng-style="$ctrl.tableWidthStyle()")
   label.tableExport(ng-click="$ctrl.exportTable()") Export table
   uib-tabset(type="tabs")
-    uib-tab(ng-repeat="class in $ctrl.allClasses()" ng-click="$ctrl.currentTableClass = class" index="$index" heading="{{ class.labels | prefLang }}")
+    uib-tab(ng-repeat="class in $ctrl.allClasses()" ng-click="$ctrl.currentTableClass = class; this.forceTableResize()" index="$index" heading="{{ class.labels | prefLang }}")
       //- .main-grid(ui-grid="{ data: $ctrl.state.active.activeLayout.items, enableFiltering: true }" ng-hide="$ctrl.state.active.dividerPercent < 2" ui-grid-auto-resize ui-grid-edit ui-grid-resize-columns ui-grid-empty-base-layer)
       .main-grid(id="{{ 'grid' + $index }}" ui-grid="$ctrl.gridOptions[class.value]" ng-if="$ctrl.state.active.dividerPercent > 2" ui-grid-edit ui-grid-resize-columns ui-grid-selection)
 .main-canvas(ng-style="$ctrl.canvasWidthStyle()")
