@@ -16,7 +16,7 @@
       img.layouts-icon(src=require("images/active/layout.svg"))
   svg.main-svg
     defs
-      filter#drop-shadow(height="150%" width="150%" left="-5px" top="-5px")
+      filter#drop-shadow(x="-0.3" y="-0.3" height="200%" width="200%")
         feGaussianBlur(in="SourceAlpha" stdDeviation="2" result="blur")
         feMerge
           feMergeNode(in="blur")
