@@ -116,15 +116,29 @@ active
 
   .control-area
     position: fixed
-    top: 50px
+    top: 66px
     right: 10px
     width: 4em
     padding-top: 2em
     padding-right: 3em
 
+    .button-label
+      opacity: 0
+      position: absolute
+      width: 100px
+      left: -115px
+      margin-top: -20px
+      text-transform: none
+      text-align: right
+      color: #858585
+      font-size: 1em
+
+      &.visible
+        opacity: 1
+
     .active-circle-button
-      width: 46px
-      height: 46px
+      width: 42px
+      height: 42px
       border-radius: 100%
       border: none
       padding: 10px 14px
@@ -152,35 +166,31 @@ active
         cursor: default !important
         opacity: 0.4 !important
         background-color: #fff !important
-      border: none !important
+        border: none !important
 
       .view-options-icon
-        width: 25px
-        height: auto
-        margin-top: -4px
-        margin-left: -4px
-
-      .layers-icon
-        width: 20px
+        width: 24px
         height: auto
         margin-top: -2px
-        margin-left: -1px
+        margin-left: -5px
 
-      .snapshots-icon
-        width: 20px
-        height: auto
-        margin-top: -5px
-        margin-left: -1px
-
-      .layouts-icon
+      .layers-icon
         width: 19px
         height: auto
         margin-top: -2px
-        margin-left: 0
+        margin-left: -2px
 
-    .active {}
+      .snapshots-icon
+        width: 19px
+        height: auto
+        margin-top: -5px
+        margin-left: -2px
 
-    .disabled {}
+      .layouts-icon
+        width: 18px
+        height: auto
+        margin-top: -3px
+        margin-left: -1px
 
   .active-options-popover
     border: none

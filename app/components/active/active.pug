@@ -6,14 +6,18 @@
       .main-grid(id="{{ 'grid' + $index }}" ui-grid="$ctrl.gridOptions[class.value]" ng-if="$ctrl.state.active.dividerPercent > 2" ui-grid-edit ui-grid-resize-columns)
 .main-canvas(ng-style="$ctrl.canvasWidthStyle()")
   .control-area
-    button.active-circle-button(uib-popover-template="'viewOptionsPopover.html'" popover-trigger="'outsideClick'" popover-placement="auto left-top" popover-class="active-options-popover" popover-is-open="$ctrl.viewOptionsPopoverVisible" ng-class="{true: 'button-active', false: ''}[$ctrl.viewOptionsPopoverVisible]")
+    button.active-circle-button(ng-init="tooltipViewOptions=''" ng-mouseenter="tooltipViewOptions='visible'" ng-mouseleave="tooltipViewOptions=''" uib-popover-template="'viewOptionsPopover.html'" popover-trigger="'outsideClick'" popover-placement="auto left-top" popover-class="active-options-popover" popover-is-open="$ctrl.viewOptionsPopoverVisible" ng-class="{true: 'button-active', false: ''}[$ctrl.viewOptionsPopoverVisible]")
       img.view-options-icon(src=require("images/active/view_options.svg"))
-    button.active-circle-button(uib-popover-template="'layersPopover.html'" popover-trigger="'outsideClick'" popover-placement="auto left-top" popover-class="active-options-popover" popover-is-open="$ctrl.layersPopoverVisible" ng-class="{true: 'button-active', false: ''}[$ctrl.layersPopoverVisible]")
+      p.button-label.transition-200(ng-class="tooltipViewOptions") View Options
+    button.active-circle-button(ng-init="tooltipLayers=''" ng-mouseenter="tooltipLayers='visible'" ng-mouseleave="tooltipLayers=''" uib-popover-template="'layersPopover.html'" popover-trigger="'outsideClick'" popover-placement="auto left-top" popover-class="active-options-popover" popover-is-open="$ctrl.layersPopoverVisible" ng-class="{true: 'button-active', false: ''}[$ctrl.layersPopoverVisible]")
       img.layers-icon(src=require("images/active/layers.svg"))
-    button.active-circle-button(uib-popover-template="'snapshotsPopover.html'" popover-trigger="'outsideClick'" popover-placement="auto left-top" popover-class="active-options-popover" popover-is-open="$ctrl.snapshotsPopoverVisible" ng-class="{true: 'button-active', false: ''}[$ctrl.snapshotsPopoverVisible]")
+      p.button-label.transition-200(ng-class="tooltipLayers") Layers
+    button.active-circle-button(ng-init="tooltipSnapshots=''" ng-mouseenter="tooltipSnapshots='visible'" ng-mouseleave="tooltipSnapshots=''" uib-popover-template="'snapshotsPopover.html'" popover-trigger="'outsideClick'" popover-placement="auto left-top" popover-class="active-options-popover" popover-is-open="$ctrl.snapshotsPopoverVisible" ng-class="{true: 'button-active', false: ''}[$ctrl.snapshotsPopoverVisible]")
       img.snapshots-icon(src=require("images/active/snapshot.svg"))
-    button.active-circle-button.button-disabled(disabled uib-popover-template="'layoutsPopover.html'" popover-trigger="'outsideClick'" popover-placement="auto left-top" popover-class="active-options-popover" popover-is-open="$ctrl.layoutsPopoverVisible" ng-class="{true: 'button-active', false: ''}[$ctrl.layoutsPopoverVisible]")
+      p.button-label.transition-200(ng-class="tooltipSnapshots") Snapshots
+    //-button.active-circle-button(ng-init="tooltipAssistedLayouts=''" ng-mouseenter="tooltipAssistedLayouts='visible'" ng-mouseleave="tooltipAssistedLayouts=''" uib-popover-template="'layoutsPopover.html'" popover-trigger="'outsideClick'" popover-placement="auto left-top" popover-class="active-options-popover" popover-is-open="$ctrl.layoutsPopoverVisible" ng-class="{true: 'button-active', false: ''}[$ctrl.layoutsPopoverVisible]")
       img.layouts-icon(src=require("images/active/layout.svg"))
+      p.button-label.transition-200(ng-class="tooltipAssistedLayouts") Assisted Layouts
   svg.main-svg
     defs
       filter#drop-shadow(height="150%" width="150%" left="-5px" top="-5px")
