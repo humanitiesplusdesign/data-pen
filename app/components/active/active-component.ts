@@ -82,6 +82,7 @@ export class ActiveComponentController {
   private gridOptions: {} = {}
 
   private selectedNodes: IItemState[] = []
+  private dragSelection: IItemState[] = []
 
   private currentTableClass: IClass = null
 
@@ -202,6 +203,36 @@ export class ActiveComponentController {
     let r: d3.Selection<SVGRectElement, {}, HTMLElement, any> = g.select<SVGRectElement>('rect')
       .on('contextmenu', this.canvasClick.bind(this, g))
       .on('click', this.canvasLeftClick.bind(this))
+      .call(d3.drag()
+        .on('start', () => {
+          d3.select('.main-g')
+            .append('rect')
+              .classed('selection-rect', true)
+              .attr('transform', 'translate(' + d3.event.subject.x + ',' + d3.event.subject.y + ')')
+        })
+        .on('drag', () => {
+          d3.select('.selection-rect')
+            .attr('width', d3.event.x - d3.event.subject.x)
+            .attr('height', d3.event.y - d3.event.subject.y)
+
+          this.state.active.activeLayout.items.forEach((i) => {
+            if (i.leftOffset > d3.event.subject.x &&
+                i.leftOffset < d3.event.x &&
+                i.topOffset > d3.event.subject.y &&
+                i.topOffset < d3.event.y &&
+                this.selectedNodes.concat(this.dragSelection).indexOf(i) === -1) {
+
+              this.dragSelection.push(i)
+              this.updateCanvas()
+            }
+          })
+        })
+        .on('end', () => {
+          d3.select('.selection-rect').remove()
+          this.dragSelection.forEach(i => this.selectedNodes.push(i))
+          this.dragSelection = []
+        })
+      )
 
     this.updateCanvasSize()
   }
@@ -395,7 +426,7 @@ export class ActiveComponentController {
       .classed('loading', (d): boolean => {
         return d.item === null
       })
-      .attr('filter', d => this.selectedNodes.indexOf(d) !== -1 ? 'url(#drop-shadow)' : '')
+      .attr('filter', d => this.selectedNodes.concat(this.dragSelection).indexOf(d) !== -1 ? 'url(#drop-shadow)' : '')
       .transition().attr('r', this.radius + 'px')
     return sel
   }
