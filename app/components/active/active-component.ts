@@ -551,7 +551,7 @@ export class ActiveComponentController {
           if (this.selectedNodes.indexOf(d) === -1) {
             this.selectedNodes.push(d)
           } else {
-            this.selectedNodes.splice(this.selectedNodes.indexOf(d))
+            this.selectedNodes.splice(this.selectedNodes.indexOf(d), 1)
           }
           this.updateCanvas()
         }
@@ -619,9 +619,9 @@ export class ActiveComponentController {
     let allIds: string[] = this.selectedNodes.map(n => n.ids[0].value)
     d3.entries(this.gridOptions).forEach((e: any) => {
       e.value.data.forEach(d => {
-        if (allIds.indexOf(d['id']) !== -1) {
+        if (allIds.indexOf(d['id']) !== -1 && this.gridApis[e.key]) {
           this.gridApis[e.key].selection.selectRow(d)
-        } else {
+        } else if (this.gridApis[e.key]) {
           this.gridApis[e.key].selection.unSelectRow(d)
         }
       })
