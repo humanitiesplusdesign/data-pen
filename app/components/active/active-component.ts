@@ -798,6 +798,7 @@ export class ActiveComponentController {
         data: [{}].concat(data.filter((d) => { return d['types'] ? d['types'].map(v => v.value.value).indexOf(c.value) !== -1 : false })),
         enableFiltering: true,
         multiSelect: true,
+        enableSelectionBatchEvent: false,
         columnDefs: columnDefs,
         onRegisterApi: (gridApi) => {
           // set gridApi on scope
