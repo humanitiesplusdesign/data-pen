@@ -615,11 +615,17 @@ export class ActiveComponentController {
     if (this.viewOptionsShowLabels) this.showTooltips()
     if (this.viewOptionsShowLinkLabels) this.showLinkTooltips()
 
-    // itemSelection
-    //   .attr('transform', d => 'translate(' + d.xpos + ',' + d.ypos + ')')
-
-    // itemSelection.selectAll('circle')
-    //   .attr('r', '5px')
+    // Align table selections to node selections
+    let allIds: string[] = this.selectedNodes.map(n => n.ids[0].value)
+    d3.entries(this.gridOptions).forEach((e: any) => {
+      e.value.data.forEach(d => {
+        if (allIds.indexOf(d['id']) !== -1) {
+          this.gridApis[e.key].selection.selectRow(d)
+        } else {
+          this.gridApis[e.key].selection.unSelectRow(d)
+        }
+      })
+    })
   }
 
   private updateCanvasSize(): void {
@@ -791,6 +797,7 @@ export class ActiveComponentController {
       this.gridOptions[c.value] = {
         data: [{}].concat(data.filter((d) => { return d['types'] ? d['types'].map(v => v.value.value).indexOf(c.value) !== -1 : false })),
         enableFiltering: true,
+        multiSelect: true,
         columnDefs: columnDefs,
         onRegisterApi: (gridApi) => {
           // set gridApi on scope
@@ -799,11 +806,19 @@ export class ActiveComponentController {
             console.log(rowEntity, colDef, newValue, oldValue)
             this.$scope.$apply();
           })
+
+          gridApi.selection.on.rowSelectionChanged(this.$scope, (row) => {
+            let selectedIds: string[] = this.selectedNodes.map(n => n.ids[0].value)
+            if (row.isSelected && selectedIds.indexOf(row.entity.id) === -1 && this.state.active.activeLayout.items.find(i => i.ids[0].value === row.entity.id)) {
+              this.selectedNodes.push(this.state.active.activeLayout.items.find(i => i.ids[0].value === row.entity.id))
+            } else if (!row.isSelected && selectedIds.indexOf(row.entity.id) !== -1) {
+              this.selectedNodes.splice(selectedIds.indexOf(row.entity.id), 1)
+            }
+            this.updateCanvas()
+          })
         }
       }
     })
-
-    console.log(this.gridOptions)
   }
 }
 
@@ -820,6 +835,7 @@ angular.module('fibra.components.active', [
     'ui.grid.emptyBaseLayer',
     'ui.grid.resizeColumns',
     'ui.grid.edit',
+    'ui.grid.selection',
     'ui.toggle',
     'ui.sortable',
     'ngFileSaver'
