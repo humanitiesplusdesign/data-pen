@@ -80,9 +80,9 @@
     "dev-web": "webpack-dev-server --progress",
     "dev-build": "webpack --progress",
     "dev-watch": "webpack --progress --watch",
-    "dist-build": "webpack --config=webpack.dist.config --progress",
-    "dist-watch": "webpack --config=webpack.dist.config --progress --watch",
-    "deploy": "webpack --config=webpack.deploy.config --progress"
+    "dist-build": "webpack -p --config=webpack.dist.config --progress",
+    "dist-watch": "webpack -p --config=webpack.dist.config --progress --watch",
+    "deploy": "webpack -p --config=webpack.deploy.config --progress"
   },
   "dependencies": {}
 }

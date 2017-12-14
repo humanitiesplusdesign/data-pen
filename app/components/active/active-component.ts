@@ -20,14 +20,20 @@ import 'angular-drag-drop';
 import 'angular-ui-grid';
 import 'angular-bootstrap-toggle/dist/angular-bootstrap-toggle.js';
 import 'angular-ui-sortable';
+import 'angular-file-saver';
 import cmenu from 'circular-menu';
 import { IModalService } from 'angular-ui-bootstrap'
 import { BaseType, descending } from 'd3';
 import { HIDE_ITEM } from 'actions/items';
+import { getPrefLangString } from 'filters/preferred-language-filter';
+import { GeneralState } from 'reducers/general';
+
+declare function unescape(s: string): string;
 
 interface IActiveComponentControllerState {
   project: ProjectState
   active: IActiveState
+  general: GeneralState
 }
 
 export interface ILink {
@@ -76,6 +82,9 @@ export class ActiveComponentController {
   private gridOptions: {} = {}
 
   private selectedNodes: IItemState[] = []
+  private dragSelection: IItemState[] = []
+
+  private currentTableClass: IClass = null
 
   private linkMode: boolean = false
   private linkEndFunction: (d: IFullItemState) => void
@@ -90,13 +99,15 @@ export class ActiveComponentController {
               private $ngRedux: IFibraNgRedux,
               private $uibModal: IModalService,
               private $timeout: angular.ITimeoutService,
+              private FileSaver: any,
               private sparqlAutocompleteService: SparqlAutocompleteService,
               private $document: angular.IDocumentService) {
     this.unsubscribe = $ngRedux.connect(
       (state: IRootState) => {
         return {
           project: state.project,
-          active: state.active
+          active: state.active,
+          general: state.general
         }
       },
       null)(this.state)
@@ -147,6 +158,7 @@ export class ActiveComponentController {
     })
 
     this.updateCanvas()
+    this.currentTableClass = this.allClasses()[0]
   }
 
   private linkNode(item: IFullItemState): void {
@@ -191,6 +203,36 @@ export class ActiveComponentController {
     let r: d3.Selection<SVGRectElement, {}, HTMLElement, any> = g.select<SVGRectElement>('rect')
       .on('contextmenu', this.canvasClick.bind(this, g))
       .on('click', this.canvasLeftClick.bind(this))
+      .call(d3.drag()
+        .on('start', () => {
+          d3.select('.main-g')
+            .append('rect')
+              .classed('selection-rect', true)
+              .attr('transform', 'translate(' + d3.event.subject.x + ',' + d3.event.subject.y + ')')
+        })
+        .on('drag', () => {
+          d3.select('.selection-rect')
+            .attr('width', d3.event.x - d3.event.subject.x)
+            .attr('height', d3.event.y - d3.event.subject.y)
+
+          this.state.active.activeLayout.items.forEach((i) => {
+            if (i.leftOffset > d3.event.subject.x &&
+                i.leftOffset < d3.event.x &&
+                i.topOffset > d3.event.subject.y &&
+                i.topOffset < d3.event.y &&
+                this.selectedNodes.concat(this.dragSelection).indexOf(i) === -1) {
+
+              this.dragSelection.push(i)
+              this.updateCanvas()
+            }
+          })
+        })
+        .on('end', () => {
+          d3.select('.selection-rect').remove()
+          this.dragSelection.forEach(i => this.selectedNodes.push(i))
+          this.dragSelection = []
+        })
+      )
 
     this.updateCanvasSize()
   }
@@ -384,7 +426,7 @@ export class ActiveComponentController {
       .classed('loading', (d): boolean => {
         return d.item === null
       })
-      .attr('filter', d => this.selectedNodes.indexOf(d) !== -1 ? 'url(#drop-shadow)' : '')
+      .attr('filter', d => this.selectedNodes.concat(this.dragSelection).indexOf(d) !== -1 ? 'url(#drop-shadow)' : '')
       .transition().attr('r', this.radius + 'px')
     return sel
   }
@@ -573,11 +615,17 @@ export class ActiveComponentController {
     if (this.viewOptionsShowLabels) this.showTooltips()
     if (this.viewOptionsShowLinkLabels) this.showLinkTooltips()
 
-    // itemSelection
-    //   .attr('transform', d => 'translate(' + d.xpos + ',' + d.ypos + ')')
-
-    // itemSelection.selectAll('circle')
-    //   .attr('r', '5px')
+    // Align table selections to node selections
+    let allIds: string[] = this.selectedNodes.map(n => n.ids[0].value)
+    d3.entries(this.gridOptions).forEach((e: any) => {
+      e.value.data.forEach(d => {
+        if (allIds.indexOf(d['id']) !== -1) {
+          this.gridApis[e.key].selection.selectRow(d)
+        } else {
+          this.gridApis[e.key].selection.unSelectRow(d)
+        }
+      })
+    })
   }
 
   private updateCanvasSize(): void {
@@ -668,7 +716,21 @@ export class ActiveComponentController {
     return this.projectActionService.deleteLayout(layout)
   }
 
+  private exportTable(): void {
+    let exportData: {}[] = this.gridOptions[this.currentTableClass.value].data.slice(0)
+      .map((d) => {
+        let nd: {} = angular.copy(d)
+        delete nd['types']
+        return nd
+      })
+    exportData.shift()
+    let dataBlob: Blob = new Blob([d3.csvFormat(exportData)], { type: 'text/csv;charset=utf-8' });
+    this.FileSaver.saveAs(dataBlob, this.state.project.description + ' - ' + getPrefLangString(this.currentTableClass.labels, this.state.general.language) + '.csv');
+  }
+
   private setGridOptions(): void {
+    if (!this.currentTableClass) this.currentTableClass = this.allClasses()[0]
+
     let generatedColumns: Map<string, string[]> = new Map()
     let generatedColumnLabels: Map<string, ONodeSet<ILiteral>[]> = new Map()
 
@@ -735,6 +797,7 @@ export class ActiveComponentController {
       this.gridOptions[c.value] = {
         data: [{}].concat(data.filter((d) => { return d['types'] ? d['types'].map(v => v.value.value).indexOf(c.value) !== -1 : false })),
         enableFiltering: true,
+        multiSelect: true,
         columnDefs: columnDefs,
         onRegisterApi: (gridApi) => {
           // set gridApi on scope
@@ -743,11 +806,19 @@ export class ActiveComponentController {
             console.log(rowEntity, colDef, newValue, oldValue)
             this.$scope.$apply();
           })
+
+          gridApi.selection.on.rowSelectionChanged(this.$scope, (row) => {
+            let selectedIds: string[] = this.selectedNodes.map(n => n.ids[0].value)
+            if (row.isSelected && selectedIds.indexOf(row.entity.id) === -1 && this.state.active.activeLayout.items.find(i => i.ids[0].value === row.entity.id)) {
+              this.selectedNodes.push(this.state.active.activeLayout.items.find(i => i.ids[0].value === row.entity.id))
+            } else if (!row.isSelected && selectedIds.indexOf(row.entity.id) !== -1) {
+              this.selectedNodes.splice(selectedIds.indexOf(row.entity.id), 1)
+            }
+            this.updateCanvas()
+          })
         }
       }
     })
-
-    console.log(this.gridOptions)
   }
 }
 
@@ -756,5 +827,17 @@ export class ActiveComponent implements angular.IComponentOptions {
     public controller: any = ActiveComponentController
 }
 
-angular.module('fibra.components.active', ['ui.bootstrap', 'fibra.actions.project', 'filearts.dragDrop', 'ui.grid', 'ui.grid.emptyBaseLayer', 'ui.grid.resizeColumns', 'ui.grid.edit', 'ui.toggle', 'ui.sortable'])
+angular.module('fibra.components.active', [
+    'ui.bootstrap',
+    'fibra.actions.project',
+    'filearts.dragDrop',
+    'ui.grid',
+    'ui.grid.emptyBaseLayer',
+    'ui.grid.resizeColumns',
+    'ui.grid.edit',
+    'ui.grid.selection',
+    'ui.toggle',
+    'ui.sortable',
+    'ngFileSaver'
+  ])
   .component('active', new ActiveComponent())

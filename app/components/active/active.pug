@@ -1,9 +1,9 @@
 .main-table(ng-style="$ctrl.tableWidthStyle()")
-  label.tableExport Export table
+  label.tableExport(ng-click="$ctrl.exportTable()") Export table
   uib-tabset(type="tabs")
-    uib-tab(ng-repeat="class in $ctrl.allClasses()" index="$index" heading="{{ class.labels | prefLang }}")
+    uib-tab(ng-repeat="class in $ctrl.allClasses()" ng-click="$ctrl.currentTableClass = class" index="$index" heading="{{ class.labels | prefLang }}")
       //- .main-grid(ui-grid="{ data: $ctrl.state.active.activeLayout.items, enableFiltering: true }" ng-hide="$ctrl.state.active.dividerPercent < 2" ui-grid-auto-resize ui-grid-edit ui-grid-resize-columns ui-grid-empty-base-layer)
-      .main-grid(id="{{ 'grid' + $index }}" ui-grid="$ctrl.gridOptions[class.value]" ng-if="$ctrl.state.active.dividerPercent > 2" ui-grid-edit ui-grid-resize-columns)
+      .main-grid(id="{{ 'grid' + $index }}" ui-grid="$ctrl.gridOptions[class.value]" ng-if="$ctrl.state.active.dividerPercent > 2" ui-grid-edit ui-grid-resize-columns ui-grid-selection)
 .main-canvas(ng-style="$ctrl.canvasWidthStyle()")
   .control-area
     button.active-circle-button(ng-init="tooltipViewOptions=''" ng-mouseenter="tooltipViewOptions='visible'" ng-mouseleave="tooltipViewOptions=''" uib-popover-template="'viewOptionsPopover.html'" popover-trigger="'outsideClick'" popover-placement="auto left-top" popover-class="active-options-popover" popover-is-open="$ctrl.viewOptionsPopoverVisible" ng-class="{true: 'button-active', false: ''}[$ctrl.viewOptionsPopoverVisible]")
@@ -20,7 +20,7 @@
       p.button-label.transition-200(ng-class="tooltipAssistedLayouts") Assisted Layouts
   svg.main-svg
     defs
-      filter#drop-shadow(height="150%" width="150%" left="-5px" top="-5px")
+      filter#drop-shadow(x="-0.3" y="-0.3" height="200%" width="200%")
         feGaussianBlur(in="SourceAlpha" stdDeviation="2" result="blur")
         feMerge
           feMergeNode(in="blur")

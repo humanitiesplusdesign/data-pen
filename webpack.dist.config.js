@@ -10,8 +10,9 @@ const commonConf = require('./webpack.common.config.js');
 commonConf.watch = false
 commonConf.output.path = path.join(__dirname + '/dist')
 
-module.exports = [ Object.assign({
+module.exports = [ Object.assign({}, commonConf, {
   name: 'ui',
+  devtool: 'source-map',
   entry: {
     ui: './app/index.ts',
     worker: './app/worker-index.ts'
@@ -29,7 +30,7 @@ module.exports = [ Object.assign({
       filename: "common-bundle.js"
       
     }),
-    new webpack.optimize.UglifyJsPlugin(),
+    // new webpack.optimize.UglifyJsPlugin(), -p adds this
     new webpack.DefinePlugin({'process.env.NODE_ENV':  '"production"'}),
     new webpack.NoEmitOnErrorsPlugin(),
     new BitBarWebpackProgressPlugin(),
@@ -37,5 +38,5 @@ module.exports = [ Object.assign({
       title: "Fibra UI Webpack Distribution Build"
     })
   ]
-}, commonConf)
+})
 ];

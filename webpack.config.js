@@ -13,7 +13,7 @@ commonConf.module.rules[0].use.unshift({
     rootElement: 'html'
   }
 })
-module.exports = [ Object.assign({
+module.exports = [ Object.assign({}, commonConf, {
   name: 'ui',
   entry: {
     ui: './app/index.ts',
@@ -39,7 +39,7 @@ module.exports = [ Object.assign({
       title: "Fibra UI Webpack Build"
     })
   ]
-}, commonConf)/*, Object.assign({
+})/*, Object.assign({
   name: 'worker',
   entry: {
     worker: './app/worker-index.ts',

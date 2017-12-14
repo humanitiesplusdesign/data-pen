@@ -5,7 +5,7 @@ const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const commonConf = {
   cache: true,
   watch: true,
-  devtool: 'cheap-module-inline-source-map',
+  devtool: 'cheap-module-eval-source-map',
   context: __dirname,
   node: {
     fs: 'empty'
