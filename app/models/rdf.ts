@@ -238,6 +238,13 @@ export class SKOS {
   public static related: INamedNode = new NamedNode(SKOS.ns + 'related')
 }
 
+export class RDFS {
+  public static ns: string = 'http://www.w3.org/2000/01/rdf-schema#'
+  public static label: INamedNode = new NamedNode(RDFS.ns + 'label')
+  public static Class: INamedNode = new NamedNode(RDFS.ns + 'Class')
+  public static Property: INamedNode = new NamedNode(RDFS.ns + 'Property')
+}
+
 export class VOID {
   public static ns: string = 'http://rdfs.org/ns/void#'
   public static sparqlEndpoint: INamedNode = new NamedNode(VOID.ns + 'sparqlEndpoint')
@@ -259,6 +266,8 @@ export class OWL {
   public static sameAs: INamedNode = new NamedNode(OWL.ns + 'sameAs')
   public static Thing: INamedNode = new NamedNode(OWL.ns + 'Thing')
   public static Class: INamedNode = new NamedNode(OWL.ns + 'Class')
+  public static ObjectProperty: INamedNode = new NamedNode(OWL.ns + 'ObjectProperty')
+  public static DatatypeProperty: INamedNode = new NamedNode(OWL.ns + 'DatatypeProperty')
 }
 
 export class RDF {

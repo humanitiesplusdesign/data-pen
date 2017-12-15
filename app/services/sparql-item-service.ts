@@ -2,8 +2,8 @@
 
 import * as angular from 'angular'
 import {IRichNode, PrunedRichNodeFromNode, RichNodeFromRichNode, FullRichNodeFromNode} from 'models/richnode'
-import {INode, DataFactory, DefaultGraph, ENodeMap, OWL, Triple, Graph, NamedNode} from 'models/rdf'
-import {IQuad, ITriple} from 'models/rdfjs'
+import {INode, DataFactory, DefaultGraph, ENodeMap, OWL, Triple, Graph, NamedNode, SKOS, RDFS} from 'models/rdf'
+import {IQuad, ITriple, ILiteral} from 'models/rdfjs'
 import {WorkerService} from 'services/worker-service/worker-service'
 import {EMap, StringSet} from 'components/collection-utils'
 import {FibraSparqlService} from 'services/fibra-sparql-service'
@@ -173,22 +173,23 @@ WHERE {
 
 export class SparqlItemWorkerService {
 
-  private static processItemResult(properties: PropertyToValues[], dataModel: DataModel, propertyMap: EMap<PropertyToValues>, propertyValueMap: EMap<EMap<IRichNode>>, sameAses: INode[], endpoint: string, b: {[varId: string]: ISparqlBinding}): void {
+  private static processItemResult(item: Item, properties: PropertyToValues[], dataModel: DataModel, propertyMap: EMap<PropertyToValues>, propertyValueMap: EMap<EMap<IRichNode>>, sameAses: INode[], endpoint: string, b: {[varId: string]: ISparqlBinding}): void {
     if (b['property']) {
-      let n: IRichNode = propertyValueMap.goc(b['property'].value).goc(b['object'].value, () => {
-        let propertyToValues: PropertyToValues = propertyMap.goc(b['property'].value, () => {
-          let ret: PropertyToValues = new PropertyToValues(dataModel.propertyMap.goe(b['property'].value, () => new Property(DataFactory.instance.nodeFromBinding(b['property']))))
-          if (b['propertyLabel']) ret.property.labels.add(DataFactory.instance.literalFromBinding(b['propertyLabel']))
-          properties.push(ret)
-          return ret
-        })
+      let propertyToValues: PropertyToValues = propertyMap.goc(b['property'].value, () => {
+        let ret: PropertyToValues = new PropertyToValues(dataModel.propertyMap.goe(b['property'].value, () => new Property(DataFactory.instance.nodeFromBinding(b['property']))))
+        if (b['propertyLabel']) ret.property.labels.add(DataFactory.instance.literalFromBinding(b['propertyLabel']))
+        properties.push(ret)
+        return ret
+      })
+      let n: IRichNode = propertyValueMap.goc(b['property'].value).goc(b['object'].value + ':' + b['object']['xml:lang'] + ':' + b['object'].datatype, () => {
         let oNode: IRichNode = new FullRichNodeFromNode(DataFactory.instance.nodeFromBinding(b['object']))
         oNode.sourceEndpoints = new StringSet()
         propertyToValues.values.push(new RichPropertyValue(oNode))
-        if (OWL.sameAs.equals(propertyToValues.property)) sameAses.push(oNode)
         if (b['objectLabel']) oNode.labels.add(DataFactory.instance.literalFromBinding(b['objectLabel']))
         return oNode
       })
+      if (OWL.sameAs.equals(propertyToValues.property)) sameAses.push(n)
+      if (SKOS.prefLabel.equals(propertyToValues.property) || RDFS.label.equals(propertyToValues.property)) item.labels.add(n as ILiteral)
       n.sourceEndpoints.add(endpoint)
     }
   }
@@ -211,7 +212,7 @@ export class SparqlItemWorkerService {
         for (let b of response.results.bindings) {
           let item: Item = items.goc(b['id'].value)
           if (b['itemLabel']) item.labels = b['itemLabel'].value
-          SparqlItemWorkerService.processItemResult(item.localProperties,  this.stateWorkerService.state.project.dataModel, idPropertyMap.goc(b['id'].value), idPropertyValueMap.goc(b['id'].value), idSameAses.goc(item), this.stateWorkerService.state.project.endpoint, b)
+          SparqlItemWorkerService.processItemResult(item, item.localProperties,  this.stateWorkerService.state.project.dataModel, idPropertyMap.goc(b['id'].value), idPropertyValueMap.goc(b['id'].value), idSameAses.goc(item), this.stateWorkerService.state.project.endpoint, b)
         }
         if (queryRemote) {
           ret.notify({ endpointType: 'primary', endpoint: this.stateWorkerService.state.project.endpoint, items: items.values()})
@@ -237,7 +238,7 @@ export class SparqlItemWorkerService {
                 if (response2.results.bindings.length !== 0) {
                   for (let b of response2.results.bindings) {
                     let item: Item = items.goc(b['id'].value)
-                    SparqlItemWorkerService.processItemResult(item.remoteProperties,  this.stateWorkerService.state.project.dataModel, idPropertyMap.goc(b['id'].value), idPropertyValueMap.goc(b['id'].value), idSameAses.goc(item), endpoint.id, b)
+                    SparqlItemWorkerService.processItemResult(item, item.remoteProperties,  this.stateWorkerService.state.project.dataModel, idPropertyMap.goc(b['id'].value), idPropertyValueMap.goc(b['id'].value), idSameAses.goc(item), endpoint.id, b)
                   }
                   ret.notify({ endpointType: 'remote', endpoint: endpoint.id, items: items.values()})
                 }

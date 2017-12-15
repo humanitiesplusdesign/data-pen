@@ -9,7 +9,7 @@ import {Class, Property, DataModel} from 'services/project-service/data-model'
 import {CNode, ONodeSet, NodeMap} from 'models/rdf'
 import {NamedNode} from 'models/rdf'
 import {Citable, CitableSource} from 'models/citable'
-import {FMap, StringSet} from 'components/collection-utils'
+import {FMap, StringSet, OMap} from 'components/collection-utils'
 import {PropertyAndValue, Item, PropertyToValues} from 'services/sparql-item-service'
 import {FullRichNodeFromNode} from 'models/richnode'
 import { ProjectSourceInfo } from 'components/project-sources-view/project-sources-view-component'
@@ -64,6 +64,7 @@ export class SerializationService {
       'RemoteEndpointConfiguration': RemoteEndpointConfiguration,
       'Schema': Schema,
       'ONodeSet': ONodeSet,
+      'OMap': OMap,
       'StringSet': StringSet,
       'NodeMap': NodeMap,
       'PropertyAndValue': PropertyAndValue,

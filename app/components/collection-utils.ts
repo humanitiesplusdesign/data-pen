@@ -256,6 +256,7 @@ export class StringSet implements d3.Set {
 }
 
 export class OMap<V> extends FMap<V> {
+  protected __className: string = 'OMap'
   public ka: string[] = []
   public va: V[] = []
 

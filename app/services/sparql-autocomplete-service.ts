@@ -244,6 +244,7 @@ export class SparqlAutocompleteWorkerService {
           },
           (error) => d.notify({endpointType: 'remote', endpoint: endpointConfiguration.id, error: SerializationService.stripFunctions(error)})
       )})).then(() => {
+        console.log(results)
         d.resolve(results)
       })
     }

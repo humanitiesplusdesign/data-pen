@@ -11,6 +11,7 @@ import { IRootState, IFibraNgRedux } from 'reducers'
 import { Property } from 'services/project-service/data-model';
 import { ILayoutState, Project, IItemState } from 'services/project-service/project';
 import { ProjectService } from 'services/project-service/project-service';
+import { getPrefLangString } from 'filters/preferred-language-filter';
 
 export const ADD_ITEM_TO_CURRENT_LAYOUT: string = 'ADD_ITEM_TO_CURRENT_LAYOUT'
 export const SET_ACTIVE_DIVIDER_PERCENTAGE: string = 'SET_ACTIVE_DIVIDER_PERCENTAGE'
@@ -82,9 +83,7 @@ export class ActiveActionService {
           return {
             ids: [new NamedNode(i.value)],
             item: i,
-            description: i.remoteProperties.concat(i.localProperties).find((rp) => rp.property.value === SKOS.prefLabel.value) ?
-              i.remoteProperties.concat(i.localProperties).find((rp) => rp.property.value === SKOS.prefLabel.value).values[0].value.value :
-              '?',
+            description: getPrefLangString(i.labels, this.$ngRedux.getState().general.language),
             topOffset: origItemState ? origItemState.topOffset : null,
             leftOffset: origItemState ? origItemState.leftOffset : null
           }
