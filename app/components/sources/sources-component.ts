@@ -80,9 +80,24 @@ export class SourcesComponentController {
     let propStatistics: Map<string, PropertyStatistics> = this.propStatistics()
     return {
       sources: sources,
-      properties: c.properties.values().filter(p => { return propStatistics.has(p.value) && propStatistics.get(p.value).values > 0 }).sort((a, b) => {
-        return +propStatistics.get(a.value).values < +propStatistics.get(b.value).values ? 1 : -1
-      })
+      properties: this.state.project.project.dataModel.propertyMap.values()
+        .filter(p => { return propStatistics.has(p.value) && propStatistics.get(p.value).values > 0 })
+        .filter(p => p.labels.values().length > 0)
+        .filter(p => {
+          // Check that an authority with this class also has this property
+          return this.state.sources.archiveSources.concat(this.state.sources.authoritySources).reduce(
+            (a, b) => {
+              return a || (
+                this.state.project.project.sourceClassSettings[b.id][c.value] &&
+                b.propStats.get(p.value) &&
+                !!b.propStats.get(p.value).values
+              )
+            },
+            false)
+        })
+        .sort((a, b) => {
+          return +propStatistics.get(a.value).values < +propStatistics.get(b.value).values ? 1 : -1
+        })
     }
   }
 
@@ -109,7 +124,7 @@ export class SourcesComponentController {
     return this.state.sources.archiveSources.concat(this.state.sources.authoritySources)
       .map(ae => ae.classStats.get(clss))
       .filter((tot) => !isNaN(tot))
-      .reduce((a,b) => +a + +b, 0)
+      .reduce((a, b) => +a + +b, 0)
   }
 
   private getSourceClassStatus(source: string, clss: string): boolean {
