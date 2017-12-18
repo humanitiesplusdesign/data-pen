@@ -84,6 +84,7 @@ export class ActiveComponentController {
   private gridOptions: {} = {}
 
   private selectedNodes: IItemState[] = []
+  private selectedNodesCount: number
   private dragSelection: IItemState[] = []
 
   private currentTableClass: IClass = null
@@ -152,12 +153,12 @@ export class ActiveComponentController {
         click: () => {
           this.activeActionService.deleteItemFromCurrentLayout(this.currentMenuItem)
           this.updateCanvas()
-
         }
       }]
     })
 
     this.menuItems = this.menu._container.childNodes
+    console.log(this.menuItems)
     this.menuTooltip = d3.select('.circle-menu-tooltip')
     this.updateMenuTooltip()
 
@@ -256,7 +257,6 @@ export class ActiveComponentController {
   }
 
   private canvasClick(sel: d3.Selection<SVGGElement, {}, HTMLElement, any>): void {
-    console.log("CLICKED!")
     d3.event.preventDefault()
     this.$scope.$apply(() => {
       this.menu.hide()
@@ -369,7 +369,6 @@ export class ActiveComponentController {
   }
 
   private nodeClick(d: IFullItemState, groups: SVGCircleElement[]): void {
-    console.log("node clicked!")
     this.currentMenuItem = d
     d3.select('#' + this.sanitizeId(d.ids[0].value)).style('opacity', '0')
     this.menu.hide()
@@ -385,9 +384,7 @@ export class ActiveComponentController {
   }
 
   private updateMenuTooltip(d?: IFullItemState): void {
-    console.log("Updating menu tooltip status")
     let circleMenuVisible = document.getElementById('circle-menu').classList.contains('opened-nav')
-    console.log("Circle menu visible: " + circleMenuVisible)
     if (circleMenuVisible) {
       this.menuTooltip.style('opacity', '1')
       this.menuTooltip.style('left', this.getMenuPosition(d)[0] + 'px')
@@ -583,6 +580,8 @@ export class ActiveComponentController {
             } else {
               this.selectedNodes.splice(this.selectedNodes.indexOf(d))
             }
+            this.selectedNodesCount = this.selectedNodes.length
+            console.log("Node clicked while holding shift. Currently: " + this.selectedNodesCount + " nodes selected.")
           } else {
             this.selectedNodes = []
             this.selectedNodes.push(d)
@@ -660,6 +659,7 @@ export class ActiveComponentController {
         }
       })
     })
+
   }
 
   private updateCanvasSize(): void {
@@ -748,6 +748,10 @@ export class ActiveComponentController {
 
   private deleteLayout(layout: ILayoutState): angular.IPromise<any> {
     return this.projectActionService.deleteLayout(layout)
+  }
+
+  private getSelectedNodes(): number {
+    return this.selectedNodesCount
   }
 
   private exportTable(): void {
