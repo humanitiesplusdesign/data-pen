@@ -252,7 +252,6 @@ export class ActiveComponentController {
   private canvasLeftClick(sel: d3.Selection<SVGGElement, {}, HTMLElement, any>): void {
     this.$scope.$apply(() => {
       this.menu.hide()
-      this.updateMenuTooltip()
       this.nodeSearchRemove()
     })
   }
@@ -397,6 +396,10 @@ export class ActiveComponentController {
     } else {
       this.menuTooltip.style('opacity', '0')
     }
+  }
+
+  private hideMenuTooltip(): void {
+    this.menuTooltip.style('opacity', '0')
   }
 
   private showTooltips(): void {
