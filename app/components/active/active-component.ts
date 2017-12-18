@@ -93,6 +93,7 @@ export class ActiveComponentController {
   private dragSelection: IItemState[] = []
 
   private currentTableClass: IClass = null
+  private currentClasses: IClass[] = []
 
   private linkMode: boolean = false
   private linkEndFunction: (d: IFullItemState) => void
@@ -185,6 +186,12 @@ export class ActiveComponentController {
         // icon:
         title: 'Select Inverse',
         click: () => {
+          let oldSelection: IItemState[] = this.selectedNodes.slice(0)
+          this.selectedNodes = this.state.active.activeLayout.items.filter((i) => {
+            return oldSelection.indexOf(i) === -1
+          })
+          this.$scope.$apply()
+          this.updateCanvas()
         }
       }, {
         icon: 'remove-icon',
@@ -193,6 +200,7 @@ export class ActiveComponentController {
           this.selectedNodes.forEach((i: IFullItemState) => {
             this.activeActionService.deleteItemFromCurrentLayout(i)
           })
+          this.$scope.$apply()
           this.selectedNodes = []
           this.updateCanvas()
         }
@@ -242,6 +250,14 @@ export class ActiveComponentController {
         this.oldActiveLayoutItemState = this.state.active.activeLayout.items
         this.updateCanvas()
         this.setGridOptions()
+      }
+
+      let tempClasses: IClass[] = this.allClasses()
+      if (tempClasses.reduce((a, b) => { return a || this.currentClasses.indexOf(b) === -1 }, false) ||
+          this.currentClasses.reduce((a, b) => { return a || tempClasses.indexOf(b) === -1 }, false)
+      ) {
+        tempClasses = tempClasses.sort((a, b) => this.currentClasses.indexOf(a) - this.currentClasses.indexOf(b))
+        this.currentClasses = tempClasses
       }
     })
 
