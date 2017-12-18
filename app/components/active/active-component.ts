@@ -158,13 +158,7 @@ export class ActiveComponentController {
         icon: 'remove-icon',
         title: 'Remove',
         click: () => {
-          if (this.selectedNodes.length > 0) {
-            this.selectedNodes.forEach((i: IFullItemState) => {
-              this.activeActionService.deleteItemFromCurrentLayout(i)
-            })
-          } else {
-            this.activeActionService.deleteItemFromCurrentLayout(this.currentMenuItem)
-          }
+          this.activeActionService.deleteItemFromCurrentLayout(this.currentMenuItem)
           this.selectedNodes = []
           this.updateCanvas()
         }
@@ -196,7 +190,10 @@ export class ActiveComponentController {
         icon: 'remove-icon',
         title: 'Remove',
         click: () => {
-          // this.activeActionService.deleteItemFromCurrentLayout(this.currentMenuItem)
+          this.selectedNodes.forEach((i: IFullItemState) => {
+            this.activeActionService.deleteItemFromCurrentLayout(i)
+          })
+          this.selectedNodes = []
           this.updateCanvas()
         }
       }]
