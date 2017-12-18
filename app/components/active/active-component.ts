@@ -206,7 +206,12 @@ export class ActiveComponentController {
       .on('click', this.canvasLeftClick.bind(this))
       .call(d3.drag()
         .on('start', () => {
-          d3.event.sourceEvent.stopPropagation()
+          this.$scope.$apply(() => {
+              this.menu.hide()
+              this.nodeSearchRemove()
+              this.selectedNodes = []
+              this.updateCanvas()
+          })
           d3.select('.main-g')
             .append('rect')
               .classed('selection-rect', true)
@@ -239,19 +244,8 @@ export class ActiveComponentController {
     this.updateCanvasSize()
   }
 
-  private canvasLeftClick(sel: d3.Selection<SVGGElement, {}, HTMLElement, any>): void {
-    if (d3.event.defaultPrevented) return
+  private canvasLeftClick(): void {
 
-    this.$scope.$apply(() => {
-      // if (d3.event.ctrlKey) {
-      //   this.canvasClick(sel)
-      // } else {
-        this.menu.hide()
-        this.nodeSearchRemove()
-        this.selectedNodes = []
-        this.updateCanvas()
-      // }
-    })
   }
 
   private canvasClick(sel: d3.Selection<SVGGElement, {}, HTMLElement, any>): void {
