@@ -58,6 +58,7 @@ export class ActiveComponentController {
   private menu: any
   private menuItems: any
   private menuTooltip: d3.Selection<Element, {}, HTMLElement, any>
+  private menuOperation: string = ''
 
   private nodeSearch: d3.Selection<Element, {}, HTMLElement, any>
   private nodeSearchTypeahead: d3.Selection<Element, {}, HTMLElement, any>
@@ -160,6 +161,23 @@ export class ActiveComponentController {
     this.menuItems = this.menu._container.childNodes
     this.menuTooltip = d3.select('.circle-menu-tooltip')
     this.updateMenuTooltip()
+
+    // Wire up menu to detect hover and update the menuOperation
+    d3.select('#circle-menu')
+      .select('ul')
+      .selectAll('li')
+      .on('mouseover', (d, i, g: BaseType[]) => {
+        this.menuOperation = d3.select(g[i])
+          .select('a')
+          .select('div')
+          .select('.text')
+          .text()
+        this.$scope.$apply()
+      })
+      .on('mouseout', () => {
+        this.menuOperation = ''
+        this.$scope.$apply()
+      })
 
     this.$ngRedux.subscribe(() => {
       if (this.oldActiveLayoutItemState !== this.state.active.activeLayout.items) {
