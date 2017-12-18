@@ -227,7 +227,6 @@ export class ActiveComponentController {
           d3.select('.main-g')
             .append('rect')
               .classed('selection-rect', true)
-              // .attr('transform', 'translate(' + d3.event.subject.x + ',' + d3.event.subject.y + ')')
         })
         .on('drag', () => {
           if (d3.event.x - d3.event.subject.x < 0) {
@@ -239,7 +238,6 @@ export class ActiveComponentController {
               .attr('x', d3.event.subject.x)
               .attr('width', d3.event.x - d3.event.subject.x)
           }
-
           if (d3.event.y - d3.event.subject.y < 0) {
             d3.select('.selection-rect')
               .attr('y', d3.event.y)
@@ -249,7 +247,6 @@ export class ActiveComponentController {
               .attr('y', d3.event.subject.y)
               .attr('height', d3.event.y - d3.event.subject.y)
           }
-
           this.state.active.activeLayout.items.forEach((i) => {
             if (i.leftOffset > parseInt(d3.select('.selection-rect').attr('x')) &&
                 i.leftOffset < parseInt(d3.select('.selection-rect').attr('x')) + parseInt(d3.select('.selection-rect').attr('width')) &&
