@@ -672,13 +672,15 @@ export class ActiveComponentController {
     // Align table selections to node selections
     let allIds: string[] = this.selectedNodes.map(n => n.ids[0].value)
     d3.entries(this.gridOptions).forEach((e: any) => {
-      e.value.data.forEach(d => {
-        if (allIds.indexOf(d['id']) !== -1) {
-          this.gridApis[e.key].selection.selectRow(d)
-        } else {
-          this.gridApis[e.key].selection.unSelectRow(d)
-        }
-      })
+      if (this.gridApis[e.key]) {
+        e.value.data.forEach(d => {
+          if (allIds.indexOf(d['id']) !== -1) {
+            this.gridApis[e.key].selection.selectRow(d)
+          } else {
+            this.gridApis[e.key].selection.unSelectRow(d)
+          }
+        })
+      }
     })
 
   }
