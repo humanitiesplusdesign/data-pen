@@ -60,6 +60,9 @@ export class ActiveComponentController {
   private menuTooltip: d3.Selection<Element, {}, HTMLElement, any>
   private menuOperation: string = ''
 
+  private multiMenu: any
+  private multiMenuItems: any
+
   private nodeSearch: d3.Selection<Element, {}, HTMLElement, any>
   private nodeSearchTypeahead: d3.Selection<Element, {}, HTMLElement, any>
   private tooltip: d3.Selection<HTMLDivElement, {}, HTMLElement, undefined>
@@ -72,6 +75,7 @@ export class ActiveComponentController {
   private dragOrigY: number
 
   private currentMenuItem: IFullItemState
+  private currentMultiMenuItem: IFullItemState
 
   private oldActiveLayoutItemState: IFullItemState[]
 
@@ -167,7 +171,39 @@ export class ActiveComponentController {
       }]
     })
 
+    this.multiMenu = cmenu('#circle-multiMenu').config({
+      background: '#ffffff',
+      backgroundHover: '#fafafa',
+      diameter: 160,
+      menus: [{
+        icon: 'link-icon',
+        title: 'Link',
+        click: () => {
+          // this.linkNode(this.currentMenuItem)
+        }
+      }, {
+        icon: 'expand-icon',
+        title: 'Expand',
+        click: () => {
+          // this.buildAndDisplayPropertiesMenu(this.currentMenuItem)
+        }
+      }, {
+        // icon:
+        title: 'Select Inverse',
+        click: () => {
+        }
+      }, {
+        icon: 'remove-icon',
+        title: 'Remove',
+        click: () => {
+          // this.activeActionService.deleteItemFromCurrentLayout(this.currentMenuItem)
+          this.updateCanvas()
+        }
+      }]
+    })
+
     this.menuItems = this.menu._container.childNodes
+    this.multiMenuItems = this.multiMenu._container.childNodes
     this.menuTooltip = d3.select('.circle-menu-tooltip')
     this.updateMenuTooltip()
 
@@ -245,6 +281,7 @@ export class ActiveComponentController {
         .on('start', () => {
           this.$scope.$apply(() => {
             this.menu.hide()
+            this.multiMenu.hide()
             this.updateMenuTooltip()
             this.nodeSearchRemove()
             this.selectedNodes = []
@@ -253,7 +290,6 @@ export class ActiveComponentController {
           d3.select('.main-g')
             .append('rect')
               .classed('selection-rect', true)
-              // .attr('transform', 'translate(' + d3.event.subject.x + ',' + d3.event.subject.y + ')')
         })
         .on('drag', () => {
           if (d3.event.x - d3.event.subject.x < 0) {
@@ -265,7 +301,6 @@ export class ActiveComponentController {
               .attr('x', d3.event.subject.x)
               .attr('width', d3.event.x - d3.event.subject.x)
           }
-
           if (d3.event.y - d3.event.subject.y < 0) {
             d3.select('.selection-rect')
               .attr('y', d3.event.y)
@@ -275,7 +310,6 @@ export class ActiveComponentController {
               .attr('y', d3.event.subject.y)
               .attr('height', d3.event.y - d3.event.subject.y)
           }
-
           this.state.active.activeLayout.items.forEach((i) => {
             if (i.leftOffset > parseInt(d3.select('.selection-rect').attr('x'), 10) &&
                 i.leftOffset < parseInt(d3.select('.selection-rect').attr('x'), 10) + parseInt(d3.select('.selection-rect').attr('width'), 10) &&
@@ -308,6 +342,7 @@ export class ActiveComponentController {
     d3.event.preventDefault()
     this.$scope.$apply(() => {
       this.menu.hide()
+      this.multiMenu.hide()
       this.updateMenuTooltip()
 
       if (!this.currentlyAdding) {
@@ -420,7 +455,12 @@ export class ActiveComponentController {
     this.currentMenuItem = d
     d3.select('#' + this.sanitizeId(d.ids[0].value)).style('opacity', '0')
     this.menu.hide()
-    this.menu.show(this.getMenuPosition(d))
+    this.multiMenu.hide()
+    if (this.selectedNodes.length > 1) {
+      this.multiMenu.show(this.getMenuPosition(d))
+    } else {
+      this.menu.show(this.getMenuPosition(d))
+    }
     this.updateMenuTooltip(d)
   }
 
@@ -732,6 +772,7 @@ export class ActiveComponentController {
 
   private dragDivider(evt: DragEvent): void {
     this.menu.hide()
+    this.multiMenu.hide()
     let nativePercent: number = 100 * evt.clientX / window.innerWidth
     this.activeActionService.setActiveDividerPercentage(nativePercent > 98 ? 100 : nativePercent < 2 ? 0 : nativePercent)
     this.$timeout(0).then(() => d3.values(this.gridApis).forEach((gapi) => gapi.core.handleWindowResize()))
