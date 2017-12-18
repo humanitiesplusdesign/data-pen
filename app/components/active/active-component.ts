@@ -221,6 +221,22 @@ export class ActiveComponentController {
         this.$scope.$apply()
       })
 
+    d3.select('#circle-multiMenu')
+      .select('ul')
+      .selectAll('li')
+      .on('mouseover', (d, i, g: BaseType[]) => {
+        this.menuOperation = d3.select(g[i])
+          .select('a')
+          .select('div')
+          .select('.text')
+          .text()
+        this.$scope.$apply()
+      })
+      .on('mouseout', () => {
+        this.menuOperation = ''
+        this.$scope.$apply()
+      })
+
     this.$ngRedux.subscribe(() => {
       if (this.oldActiveLayoutItemState !== this.state.active.activeLayout.items) {
         this.oldActiveLayoutItemState = this.state.active.activeLayout.items
@@ -470,7 +486,8 @@ export class ActiveComponentController {
 
   private updateMenuTooltip(d?: IFullItemState): void {
     let circleMenuVisible: boolean = document.getElementById('circle-menu').classList.contains('opened-nav')
-    if (circleMenuVisible) {
+    let circleMultiMenuVisible: boolean = document.getElementById('circle-multiMenu').classList.contains('opened-nav')
+    if (circleMenuVisible || circleMultiMenuVisible) {
       this.menuTooltip.style('opacity', '1')
       this.menuTooltip.style('left', this.getMenuPosition(d)[0] + 'px')
       this.menuTooltip.style('top', this.getMenuPosition(d)[1] + 95 + 'px')
