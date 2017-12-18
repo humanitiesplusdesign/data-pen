@@ -88,6 +88,7 @@ export class SourcesComponentController {
           return this.state.sources.archiveSources.concat(this.state.sources.authoritySources).reduce(
             (a, b) => {
               return a || (
+                this.state.project.project.sourceClassSettings[b.id] &&
                 this.state.project.project.sourceClassSettings[b.id][c.value] &&
                 b.propStats.get(p.value) &&
                 !!b.propStats.get(p.value).values

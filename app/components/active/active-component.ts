@@ -152,6 +152,7 @@ export class ActiveComponentController {
         click: () => {
           this.activeActionService.deleteItemFromCurrentLayout(this.currentMenuItem)
           this.updateCanvas()
+
         }
       }]
     })
@@ -248,7 +249,7 @@ export class ActiveComponentController {
     this.updateCanvasSize()
   }
 
-  private canvasLeftClick(): void {
+  private canvasLeftClick(sel: d3.Selection<SVGGElement, {}, HTMLElement, any>): void {
     this.$scope.$apply(() => {
       this.menu.hide()
       this.updateMenuTooltip()
@@ -574,10 +575,15 @@ export class ActiveComponentController {
           this.linkEndFunction(d)
           this.linkMode = false
         } else {
-          if (this.selectedNodes.indexOf(d) === -1) {
-            this.selectedNodes.push(d)
+          if (d3.event.shiftKey) {
+            if (this.selectedNodes.indexOf(d) === -1) {
+              this.selectedNodes.push(d)
+            } else {
+              this.selectedNodes.splice(this.selectedNodes.indexOf(d))
+            }
           } else {
-            this.selectedNodes.splice(this.selectedNodes.indexOf(d), 1)
+            this.selectedNodes = []
+            this.selectedNodes.push(d)
           }
           this.updateCanvas()
         }
@@ -645,9 +651,9 @@ export class ActiveComponentController {
     let allIds: string[] = this.selectedNodes.map(n => n.ids[0].value)
     d3.entries(this.gridOptions).forEach((e: any) => {
       e.value.data.forEach(d => {
-        if (allIds.indexOf(d['id']) !== -1 && this.gridApis[e.key]) {
+        if (allIds.indexOf(d['id']) !== -1) {
           this.gridApis[e.key].selection.selectRow(d)
-        } else if (this.gridApis[e.key]) {
+        } else {
           this.gridApis[e.key].selection.unSelectRow(d)
         }
       })
@@ -676,13 +682,9 @@ export class ActiveComponentController {
     this.menu.hide()
     let nativePercent: number = 100 * evt.clientX / window.innerWidth
     this.activeActionService.setActiveDividerPercentage(nativePercent > 98 ? 100 : nativePercent < 2 ? 0 : nativePercent)
-    this.forceTableResize()
+    this.$timeout(0).then(() => d3.values(this.gridApis).forEach((gapi) => gapi.core.handleWindowResize()))
     if (this.viewOptionsShowLabels) this.showTooltips()
     if (this.viewOptionsShowLinkLabels) this.$timeout(0).then(() => this.showLinkTooltips())
-  }
-
-  private forceTableResize(): void {
-    this.$timeout(0).then(() => d3.values(this.gridApis).forEach((gapi) => gapi.core.handleWindowResize()))
   }
 
   private tableWidthStyle(): {} {
@@ -828,7 +830,6 @@ export class ActiveComponentController {
         data: [{}].concat(data.filter((d) => { return d['types'] ? d['types'].map(v => v.value.value).indexOf(c.value) !== -1 : false })),
         enableFiltering: true,
         multiSelect: true,
-        enableSelectionBatchEvent: false,
         columnDefs: columnDefs,
         onRegisterApi: (gridApi) => {
           // set gridApi on scope
