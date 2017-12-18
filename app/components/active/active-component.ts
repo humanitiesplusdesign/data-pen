@@ -206,10 +206,10 @@ export class ActiveComponentController {
       .call(d3.drag()
         .on('start', () => {
           this.$scope.$apply(() => {
-              this.menu.hide()
-              this.nodeSearchRemove()
-              this.selectedNodes = []
-              this.updateCanvas()
+            this.menu.hide()
+            this.nodeSearchRemove()
+            this.selectedNodes = []
+            this.updateCanvas()
           })
           d3.select('.main-g')
             .append('rect')
@@ -247,6 +247,10 @@ export class ActiveComponentController {
               this.dragSelection.push(i)
               this.updateCanvas()
             }
+            // else if (this.dragSelection.indexOf(i) !== -1) {
+            //   this.dragSelection.splice(this.dragSelection.indexOf(i), 1)
+            //   this.updateCanvas()
+            // }
           })
         })
         .on('end', () => {
@@ -567,7 +571,7 @@ export class ActiveComponentController {
             if (this.selectedNodes.indexOf(d) === -1) {
               this.selectedNodes.push(d)
             } else {
-              this.selectedNodes.splice(this.selectedNodes.indexOf(d))
+              this.selectedNodes.splice(this.selectedNodes.indexOf(d), 1)
             }
           } else {
             this.selectedNodes = []
