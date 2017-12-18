@@ -85,7 +85,6 @@ export class ActiveComponentController {
   private gridOptions: {} = {}
 
   private selectedNodes: IItemState[] = []
-  private selectedNodesCount: number
   private dragSelection: IItemState[] = []
 
   private currentTableClass: IClass = null
@@ -159,7 +158,6 @@ export class ActiveComponentController {
     })
 
     this.menuItems = this.menu._container.childNodes
-    console.log(this.menuItems)
     this.menuTooltip = d3.select('.circle-menu-tooltip')
     this.updateMenuTooltip()
 
@@ -252,13 +250,14 @@ export class ActiveComponentController {
           }
 
           this.state.active.activeLayout.items.forEach((i) => {
-            if (i.leftOffset > parseInt(d3.select('.selection-rect').attr('x')) &&
-                i.leftOffset < parseInt(d3.select('.selection-rect').attr('x')) + parseInt(d3.select('.selection-rect').attr('width')) &&
-                i.topOffset > parseInt(d3.select('.selection-rect').attr('y')) &&
-                i.topOffset < parseInt(d3.select('.selection-rect').attr('y')) + parseInt(d3.select('.selection-rect').attr('height')) &&
+            if (i.leftOffset > parseInt(d3.select('.selection-rect').attr('x'), 10) &&
+                i.leftOffset < parseInt(d3.select('.selection-rect').attr('x'), 10) + parseInt(d3.select('.selection-rect').attr('width'), 10) &&
+                i.topOffset > parseInt(d3.select('.selection-rect').attr('y'), 10) &&
+                i.topOffset < parseInt(d3.select('.selection-rect').attr('y'), 10) + parseInt(d3.select('.selection-rect').attr('height'), 10) &&
                 this.selectedNodes.concat(this.dragSelection).indexOf(i) === -1) {
 
               this.dragSelection.push(i)
+              this.$scope.$apply()
               this.updateCanvas()
             }
             // else if (this.dragSelection.indexOf(i) !== -1) {
@@ -271,6 +270,7 @@ export class ActiveComponentController {
           d3.select('.selection-rect').remove()
           this.dragSelection.forEach(i => this.selectedNodes.push(i))
           this.dragSelection = []
+          this.$scope.$apply()
         })
       )
 
@@ -405,7 +405,7 @@ export class ActiveComponentController {
   }
 
   private updateMenuTooltip(d?: IFullItemState): void {
-    let circleMenuVisible = document.getElementById('circle-menu').classList.contains('opened-nav')
+    let circleMenuVisible: boolean = document.getElementById('circle-menu').classList.contains('opened-nav')
     if (circleMenuVisible) {
       this.menuTooltip.style('opacity', '1')
       this.menuTooltip.style('left', this.getMenuPosition(d)[0] + 'px')
@@ -601,12 +601,12 @@ export class ActiveComponentController {
             } else {
               this.selectedNodes.splice(this.selectedNodes.indexOf(d), 1)
             }
-            this.selectedNodesCount = this.selectedNodes.length
-            console.log("Node clicked while holding shift. Currently: " + this.selectedNodesCount + " nodes selected.")
+            console.log('Node clicked while holding shift. Currently: ' + this.selectedNodes.length + ' nodes selected.')
           } else {
             this.selectedNodes = []
             this.selectedNodes.push(d)
           }
+          this.$scope.$apply()
           this.updateCanvas()
         }
       })
@@ -771,10 +771,6 @@ export class ActiveComponentController {
 
   private deleteLayout(layout: ILayoutState): angular.IPromise<any> {
     return this.projectActionService.deleteLayout(layout)
-  }
-
-  private getSelectedNodes(): number {
-    return this.selectedNodesCount
   }
 
   private exportTable(): void {
