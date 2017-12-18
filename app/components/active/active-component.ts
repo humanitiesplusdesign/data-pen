@@ -27,6 +27,7 @@ import { BaseType, descending } from 'd3';
 import { HIDE_ITEM } from 'actions/items';
 import { getPrefLangString } from 'filters/preferred-language-filter';
 import { GeneralState } from 'reducers/general';
+import 'ng-focus-if';
 
 declare function unescape(s: string): string;
 
@@ -876,6 +877,7 @@ angular.module('fibra.components.active', [
     'ui.grid.selection',
     'ui.toggle',
     'ui.sortable',
-    'ngFileSaver'
+    'ngFileSaver',
+    'focus-if'
   ])
   .component('active', new ActiveComponent())

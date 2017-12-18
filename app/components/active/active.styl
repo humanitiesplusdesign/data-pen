@@ -317,6 +317,17 @@ active
               white-space: nowrap
               cursor: pointer
 
+              &:focus, .edit-mode
+                background-color: #fff
+                border: 1px solid rgba(#000, 0.2)
+                border-radius: 3px
+                padding: 5px 7px 5px 7px
+                outline: 0
+                margin-bottom: 3px
+                text-overflow: none
+                overflow: none
+                white-space: none
+
             .snapshot-entities-label
               opacity: .4
               margin-bottom: 0
@@ -343,9 +354,20 @@ active
             &:hover
               opacity: 1
 
+          .snapshot-edit-options
+            display: inline-block
+            opacity: 1
+
+          .cancel-option, .delete-option
+            margin-left: 10px
+
+          .cancel-option
+            color: #8e8e8e !important
+            &:hover
+              color: #8e8e8e !important
+
           .delete-option
             color: #d24545
-            margin-left: 10px
 
             &:hover
               color: #d24545

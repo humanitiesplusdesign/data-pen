@@ -118,15 +118,18 @@ script(type="text/ng-template" id="snapshotsPopover.html")
     hr
     label.no-snapshots(ng-show="$ctrl.state.project.project.layouts.length == 0") Create a snapshot to save this layout.
     .snapshot-list
-      .snapshot-row.transition-100(ng-repeat="layout in $ctrl.savedLayouts() | orderBy:'-'" ng-click="$ctrl.loadLayout(layout)" ng-init="actionsVisibility=''" ng-mouseenter="actionsVisibility='visible'" ng-mouseleave="actionsVisibility=''")
-        .snapshot-details-container
-          label.snapshot-name-label(ng-class="{'limit-width' : actionsVisibility=='visible'}") {{ layout.description }}
+      .snapshot-row.transition-100(ng-repeat="layout in $ctrl.savedLayouts() | orderBy:'-'" ng-init="actionsVisibility=''" ng-mouseenter="actionsVisibility='visible'" ng-mouseleave="actionsVisibility=''")
+        .snapshot-details-container(ng-init="nameEditable=false")
+          label.snapshot-name-label.transition-200(ng-click="$ctrl.loadLayout(layout)" ng-attr-contenteditable="{{nameEditable && true || false }}" focus-if="nameEditable" ng-class="{'limit-width' : actionsVisibility=='visible', 'edit-mode' : nameEditable}") {{ layout.description }}
           span.snapshot-entities-label
             span.calibre-numbers-kern {{ layout.items.length }}
             |  entities
-        .action-items-container(ng-class="actionsVisibility")
-          a.snapshot-option Rename
+        .action-items-container(ng-hide="nameEditable" ng-class="actionsVisibility")
+          a.snapshot-option(ng-click="nameEditable=true") Rename
           a.snapshot-option.delete-option(ng-click="$ctrl.deleteLayout(layout)") Delete
+        .action-items-container.snapshot-edit-options(ng-show="nameEditable")
+          a.snapshot-option(ng-click="nameEditable=false") Save
+          a.snapshot-option.cancel-option(ng-click="nameEditable=false") Cancel
 script(type="text/ng-template" id="layoutsPopover.html")
   .layouts-popover.pop-on-top
     h4 Layouts

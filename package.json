@@ -50,6 +50,7 @@
     "jquery-ui": "^1.12.1",
     "main-bower-files": "^2.13.1",
     "ng-annotate-loader": "^0.6.1",
+    "ng-focus-if": "^1.0.7",
     "ng-redux": "^3.5.2",
     "ngstorage": "0.3.11",
     "pug": "^2.0.0-rc.4",
