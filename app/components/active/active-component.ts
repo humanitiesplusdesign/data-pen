@@ -161,6 +161,7 @@ export class ActiveComponentController {
           } else {
             this.activeActionService.deleteItemFromCurrentLayout(this.currentMenuItem)
           }
+          this.selectedNodes = []
           this.updateCanvas()
         }
       }]
