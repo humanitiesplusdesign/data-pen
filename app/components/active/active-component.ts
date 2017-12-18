@@ -55,6 +55,8 @@ export class ActiveComponentController {
   private currentlyAdding: boolean = false
 
   private menu: any
+  private menuItems: any
+  private menuTooltip: d3.Selection<Element, {}, HTMLElement, any>
 
   private nodeSearch: d3.Selection<Element, {}, HTMLElement, any>
   private nodeSearchTypeahead: d3.Selection<Element, {}, HTMLElement, any>
@@ -82,6 +84,7 @@ export class ActiveComponentController {
   private gridOptions: {} = {}
 
   private selectedNodes: IItemState[] = []
+  private selectedNodesCount: number
   private dragSelection: IItemState[] = []
 
   private currentTableClass: IClass = null
@@ -128,27 +131,36 @@ export class ActiveComponentController {
       diameter: 160,
       menus: [{
         icon: 'link-icon',
+        title: 'Link',
         click: () => {
           this.linkNode(this.currentMenuItem)
         }
       }, {
-        icon: 'properties-icon'
+        icon: 'properties-icon',
+        title: 'Properties'
       }, {
         icon: 'expand-icon',
+        title: 'Expand',
         click: () => {
           this.buildAndDisplayPropertiesMenu(this.currentMenuItem)
         }
       }, {
-        icon: 'reconcile-icon'
+        icon: 'reconcile-icon',
+        title: 'Reconcile'
       }, {
         icon: 'remove-icon',
+        title: 'Remove',
         click: () => {
           this.activeActionService.deleteItemFromCurrentLayout(this.currentMenuItem)
           this.updateCanvas()
-
         }
       }]
     })
+
+    this.menuItems = this.menu._container.childNodes
+    console.log(this.menuItems)
+    this.menuTooltip = d3.select('.circle-menu-tooltip')
+    this.updateMenuTooltip()
 
     this.$ngRedux.subscribe(() => {
       if (this.oldActiveLayoutItemState !== this.state.active.activeLayout.items) {
@@ -207,6 +219,7 @@ export class ActiveComponentController {
         .on('start', () => {
           this.$scope.$apply(() => {
             this.menu.hide()
+            this.updateMenuTooltip()
             this.nodeSearchRemove()
             this.selectedNodes = []
             this.updateCanvas()
@@ -267,6 +280,7 @@ export class ActiveComponentController {
     d3.event.preventDefault()
     this.$scope.$apply(() => {
       this.menu.hide()
+      this.updateMenuTooltip()
 
       if (!this.currentlyAdding) {
         this.nodeSearchOffsetTop = d3.event.offsetY
@@ -311,9 +325,6 @@ export class ActiveComponentController {
   }
 
   private processResults(res: AutocompletionResults): Result[] {
-
-
-
     let activeItemIds: string[] = this.$ngRedux.getState().active.activeLayout.items.map((d: IFullItemState) => d.ids.map((i) => i.value)).reduce((a, b) => a.concat(b), [])
     let ret: Result[] = []
     let processMatchingResults: (results: ResultGroup, classRestrict: boolean) => void = (results, classRestrict) => results.results.forEach(r => {
@@ -382,6 +393,7 @@ export class ActiveComponentController {
     d3.select('#' + this.sanitizeId(d.ids[0].value)).style('opacity', '0')
     this.menu.hide()
     this.menu.show(this.getMenuPosition(d))
+    this.updateMenuTooltip(d)
   }
 
   private getMenuPosition(itemState: IFullItemState): [number, number] {
@@ -389,6 +401,21 @@ export class ActiveComponentController {
       itemState.leftOffset + (this.state.active.dividerPercent / 100 * window.innerWidth),
       itemState.topOffset + this.circularMenuTopOffset
     ]
+  }
+
+  private updateMenuTooltip(d?: IFullItemState): void {
+    let circleMenuVisible = document.getElementById('circle-menu').classList.contains('opened-nav')
+    if (circleMenuVisible) {
+      this.menuTooltip.style('opacity', '1')
+      this.menuTooltip.style('left', this.getMenuPosition(d)[0] + 'px')
+      this.menuTooltip.style('top', this.getMenuPosition(d)[1] + 95 + 'px')
+    } else {
+      this.menuTooltip.style('opacity', '0')
+    }
+  }
+
+  private hideMenuTooltip(): void {
+    this.menuTooltip.style('opacity', '0')
   }
 
   private showTooltips(): void {
@@ -573,6 +600,8 @@ export class ActiveComponentController {
             } else {
               this.selectedNodes.splice(this.selectedNodes.indexOf(d), 1)
             }
+            this.selectedNodesCount = this.selectedNodes.length
+            console.log("Node clicked while holding shift. Currently: " + this.selectedNodesCount + " nodes selected.")
           } else {
             this.selectedNodes = []
             this.selectedNodes.push(d)
@@ -650,6 +679,7 @@ export class ActiveComponentController {
         }
       })
     })
+
   }
 
   private updateCanvasSize(): void {
@@ -738,6 +768,10 @@ export class ActiveComponentController {
 
   private deleteLayout(layout: ILayoutState): angular.IPromise<any> {
     return this.projectActionService.deleteLayout(layout)
+  }
+
+  private getSelectedNodes(): number {
+    return this.selectedNodesCount
   }
 
   private exportTable(): void {
