@@ -3,16 +3,12 @@ active
   height: 100%
   width: 100%
 
-  .pop-on-top
-    z-index: 100
-
   .popover
     max-width: 600px
     font-family: 'Calibre', sans-serif
 
   .active-tooltip
     position: absolute
-    z-index: 20
     background-color: rgba(#f4f4f4, 0.8)
     color: #555555
     font-family: 'Roboto', sans-serif
@@ -86,7 +82,7 @@ active
     position: absolute
     transform: translateX(-50%)
     text-align: center
-    z-index: 20
+    z-index: 1
     background-color: rgba(#f4f4f4, 0.8)
     color: #555555
     padding: 3px 7px 3px 7px
@@ -138,6 +134,7 @@ active
     width: 4em
     padding-top: 2em
     padding-right: 3em
+    z-index: 2
 
     .button-label
       opacity: 0
@@ -317,6 +314,17 @@ active
               white-space: nowrap
               cursor: pointer
 
+              &:focus, .edit-mode
+                background-color: #fff
+                border: 1px solid rgba(#000, 0.2)
+                border-radius: 3px
+                padding: 5px 7px 5px 7px
+                outline: 0
+                margin-bottom: 3px
+                text-overflow: none
+                overflow: none
+                white-space: none
+
             .snapshot-entities-label
               opacity: .4
               margin-bottom: 0
@@ -343,9 +351,20 @@ active
             &:hover
               opacity: 1
 
+          .snapshot-edit-options
+            display: inline-block
+            opacity: 1
+
+          .cancel-option, .delete-option
+            margin-left: 10px
+
+          .cancel-option
+            color: #8e8e8e !important
+            &:hover
+              color: #8e8e8e !important
+
           .delete-option
             color: #d24545
-            margin-left: 10px
 
             &:hover
               color: #d24545

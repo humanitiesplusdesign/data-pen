@@ -59,7 +59,7 @@
 #circle-menu.circle-menu(ng-click="$ctrl.hideMenuTooltip()")
 #circle-multiMenu.circle-multiMenu(ng-click="$ctrl.hideMenuTooltip()")
 #properties-menu.circle-menu
-#circle-menu-tooltip.circle-menu-tooltip {{ $ctrl.getSelectedNodes() }} nodes selected.
+#circle-menu-tooltip.circle-menu-tooltip {{ $ctrl.menuOperation }} {{ $ctrl.selectedNodes.length ? $ctrl.selectedNodes.length : 1 }} nodes
 .tooltips
 .link-tooltips
 script(type="text/ng-template" id="resultTemplate.html")
@@ -80,7 +80,7 @@ script(type="text/ng-template" id="resultPopupTemplate.html")
       li.uib-typeahead-match(ng-repeat="match in matches track by $index" ng-class="{active: isActive($index) }" ng-mouseenter="selectActive($index)" ng-click="selectMatch($index)" role="option" id="{{::match.id}}")
         div(uib-typeahead-match index="$index" match="match" query="query" template-url="templateUrl")
 script(type="text/ng-template" id="viewOptionsPopover.html")
-  .view-options-popover.pop-on-top
+  .view-options-popover
     h4 View options
     hr
     label.optionToggle
@@ -99,7 +99,7 @@ script(type="text/ng-template" id="viewOptionsPopover.html")
       span.checkbox-title Show node reconciliation status
     p.description.option-description
 script(type="text/ng-template" id="layersPopover.html")
-  .layers-popover.pop-on-top
+  .layers-popover
     h4 Layers
     hr
     label.optionToggle
@@ -111,7 +111,7 @@ script(type="text/ng-template" id="layersPopover.html")
         input(type="checkbox")
         span.checkbox-title {{ class.labels | prefLang }}
 script(type="text/ng-template" id="snapshotsPopover.html")
-  .snapshots-popover.pop-on-top
+  .snapshots-popover
     h4 Snapshots
     hr
     input.snapshot-name-input(type="text" ng-model="layoutDescription")
@@ -119,16 +119,19 @@ script(type="text/ng-template" id="snapshotsPopover.html")
     hr
     label.no-snapshots(ng-show="$ctrl.state.project.project.layouts.length == 0") Create a snapshot to save this layout.
     .snapshot-list
-      .snapshot-row.transition-100(ng-repeat="layout in $ctrl.savedLayouts() | orderBy:'-'" ng-click="$ctrl.loadLayout(layout)" ng-init="actionsVisibility=''" ng-mouseenter="actionsVisibility='visible'" ng-mouseleave="actionsVisibility=''")
-        .snapshot-details-container
-          label.snapshot-name-label(ng-class="{'limit-width' : actionsVisibility=='visible'}") {{ layout.description }}
+      .snapshot-row.transition-100(ng-repeat="layout in $ctrl.savedLayouts() | orderBy:'-'" ng-init="actionsVisibility=''" ng-mouseenter="actionsVisibility='visible'" ng-mouseleave="actionsVisibility=''")
+        .snapshot-details-container(ng-init="nameEditable=false")
+          label.snapshot-name-label.transition-200(ng-click="$ctrl.loadLayout(layout)" ng-attr-contenteditable="{{nameEditable && true || false }}" focus-if="nameEditable" ng-class="{'limit-width' : actionsVisibility=='visible', 'edit-mode' : nameEditable}") {{ layout.description }}
           span.snapshot-entities-label
             span.calibre-numbers-kern {{ layout.items.length }}
             |  entities
-        .action-items-container(ng-class="actionsVisibility")
-          a.snapshot-option Rename
+        .action-items-container(ng-hide="nameEditable" ng-class="actionsVisibility")
+          a.snapshot-option(ng-click="nameEditable=true; $ctrl.snapshotEditing = true" ng-hide="$ctrl.snapshotEditing") Rename
           a.snapshot-option.delete-option(ng-click="$ctrl.deleteLayout(layout)") Delete
+        .action-items-container.snapshot-edit-options(ng-show="nameEditable")
+          a.snapshot-option(ng-click="nameEditable=false; $ctrl.snapshotEditing = false; $ctrl.saveLayoutDescription(layout, $index)") Save
+          a.snapshot-option.cancel-option(ng-click="nameEditable=false") Cancel
 script(type="text/ng-template" id="layoutsPopover.html")
-  .layouts-popover.pop-on-top
+  .layouts-popover
     h4 Layouts
     hr
