@@ -3,16 +3,12 @@ active
   height: 100%
   width: 100%
 
-  .pop-on-top
-    z-index: 100
-
   .popover
     max-width: 600px
     font-family: 'Calibre', sans-serif
 
   .active-tooltip
     position: absolute
-    z-index: 20
     background-color: rgba(#f4f4f4, 0.8)
     color: #555555
     font-family: 'Roboto', sans-serif
@@ -86,7 +82,7 @@ active
     position: absolute
     transform: translateX(-50%)
     text-align: center
-    z-index: 20
+    z-index: 1
     background-color: rgba(#f4f4f4, 0.8)
     color: #555555
     padding: 3px 7px 3px 7px
@@ -138,6 +134,7 @@ active
     width: 4em
     padding-top: 2em
     padding-right: 3em
+    z-index: 2
 
     .button-label
       opacity: 0
