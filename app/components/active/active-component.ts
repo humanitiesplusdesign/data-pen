@@ -172,9 +172,6 @@ export class ActiveComponentController {
           // this.linkNode(this.currentMenuItem)
         }
       }, {
-        // icon: 'properties-icon',
-        title: 'Properties'
-      }, {
         icon: 'expand-icon',
         title: 'Expand',
         click: () => {
