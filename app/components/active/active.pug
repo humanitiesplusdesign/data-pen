@@ -107,7 +107,7 @@ script(type="text/ng-template" id="layersPopover.html")
       span.checkbox-title Show layer effect
     hr
     ul(ui-sortable)
-      li.layer-row(ng-repeat="class in $ctrl.allClasses()")
+      li.layer-row(ng-repeat="class in $ctrl.currentClasses")
         input(type="checkbox")
         span.checkbox-title {{ class.labels | prefLang }}
 script(type="text/ng-template" id="snapshotsPopover.html")
