@@ -55,6 +55,8 @@ export class ActiveComponentController {
   private currentlyAdding: boolean = false
 
   private menu: any
+  private menuItems: any
+  private menuTooltip: d3.Selection<Element, {}, HTMLElement, any>
 
   private nodeSearch: d3.Selection<Element, {}, HTMLElement, any>
   private nodeSearchTypeahead: d3.Selection<Element, {}, HTMLElement, any>
@@ -128,26 +130,35 @@ export class ActiveComponentController {
       diameter: 160,
       menus: [{
         icon: 'link-icon',
+        title: 'Link',
         click: () => {
           this.linkNode(this.currentMenuItem)
         }
       }, {
-        icon: 'properties-icon'
+        icon: 'properties-icon',
+        title: 'Properties'
       }, {
         icon: 'expand-icon',
+        title: 'Expand',
         click: () => {
           this.buildAndDisplayPropertiesMenu(this.currentMenuItem)
         }
       }, {
-        icon: 'reconcile-icon'
+        icon: 'reconcile-icon',
+        title: 'Reconcile'
       }, {
         icon: 'remove-icon',
+        title: 'Remove',
         click: () => {
           this.activeActionService.deleteItemFromCurrentLayout(this.currentMenuItem)
           this.updateCanvas()
         }
       }]
     })
+
+    this.menuItems = this.menu._container.childNodes
+    this.menuTooltip = d3.select('.circle-menu-tooltip')
+    this.updateMenuTooltip()
 
     this.$ngRedux.subscribe(() => {
       if (this.oldActiveLayoutItemState !== this.state.active.activeLayout.items) {
@@ -203,36 +214,36 @@ export class ActiveComponentController {
     let r: d3.Selection<SVGRectElement, {}, HTMLElement, any> = g.select<SVGRectElement>('rect')
       .on('contextmenu', this.canvasClick.bind(this, g))
       .on('click', this.canvasLeftClick.bind(this))
-      .call(d3.drag()
-        .on('start', () => {
-          d3.select('.main-g')
-            .append('rect')
-              .classed('selection-rect', true)
-              .attr('transform', 'translate(' + d3.event.subject.x + ',' + d3.event.subject.y + ')')
-        })
-        .on('drag', () => {
-          d3.select('.selection-rect')
-            .attr('width', d3.event.x - d3.event.subject.x)
-            .attr('height', d3.event.y - d3.event.subject.y)
-
-          this.state.active.activeLayout.items.forEach((i) => {
-            if (i.leftOffset > d3.event.subject.x &&
-                i.leftOffset < d3.event.x &&
-                i.topOffset > d3.event.subject.y &&
-                i.topOffset < d3.event.y &&
-                this.selectedNodes.concat(this.dragSelection).indexOf(i) === -1) {
-
-              this.dragSelection.push(i)
-              this.updateCanvas()
-            }
-          })
-        })
-        .on('end', () => {
-          d3.select('.selection-rect').remove()
-          this.dragSelection.forEach(i => this.selectedNodes.push(i))
-          this.dragSelection = []
-        })
-      )
+      // .call(d3.drag()
+      //   .on('start', () => {
+      //     d3.select('.main-g')
+      //       .append('rect')
+      //         .classed('selection-rect', true)
+      //         .attr('transform', 'translate(' + d3.event.subject.x + ',' + d3.event.subject.y + ')')
+      //   })
+      //   .on('drag', () => {
+      //     d3.select('.selection-rect')
+      //       .attr('width', d3.event.x - d3.event.subject.x)
+      //       .attr('height', d3.event.y - d3.event.subject.y)
+      //
+      //     this.state.active.activeLayout.items.forEach((i) => {
+      //       if (i.leftOffset > d3.event.subject.x &&
+      //           i.leftOffset < d3.event.x &&
+      //           i.topOffset > d3.event.subject.y &&
+      //           i.topOffset < d3.event.y &&
+      //           this.selectedNodes.concat(this.dragSelection).indexOf(i) === -1) {
+      //
+      //         this.dragSelection.push(i)
+      //         this.updateCanvas()
+      //       }
+      //     })
+      //   })
+      //   .on('end', () => {
+      //     d3.select('.selection-rect').remove()
+      //     this.dragSelection.forEach(i => this.selectedNodes.push(i))
+      //     this.dragSelection = []
+      //   })
+      // )
 
     this.updateCanvasSize()
   }
@@ -240,14 +251,17 @@ export class ActiveComponentController {
   private canvasLeftClick(): void {
     this.$scope.$apply(() => {
       this.menu.hide()
+      this.updateMenuTooltip()
       this.nodeSearchRemove()
     })
   }
 
   private canvasClick(sel: d3.Selection<SVGGElement, {}, HTMLElement, any>): void {
+    console.log("CLICKED!")
     d3.event.preventDefault()
     this.$scope.$apply(() => {
       this.menu.hide()
+      this.updateMenuTooltip()
 
       if (!this.currentlyAdding) {
         this.nodeSearchOffsetTop = d3.event.offsetY
@@ -292,9 +306,6 @@ export class ActiveComponentController {
   }
 
   private processResults(res: AutocompletionResults): Result[] {
-
-
-
     let activeItemIds: string[] = this.$ngRedux.getState().active.activeLayout.items.map((d: IFullItemState) => d.ids.map((i) => i.value)).reduce((a, b) => a.concat(b), [])
     let ret: Result[] = []
     let processMatchingResults: (results: ResultGroup, classRestrict: boolean) => void = (results, classRestrict) => results.results.forEach(r => {
@@ -359,10 +370,12 @@ export class ActiveComponentController {
   }
 
   private nodeClick(d: IFullItemState, groups: SVGCircleElement[]): void {
+    console.log("node clicked!")
     this.currentMenuItem = d
     d3.select('#' + this.sanitizeId(d.ids[0].value)).style('opacity', '0')
     this.menu.hide()
     this.menu.show(this.getMenuPosition(d))
+    this.updateMenuTooltip(d)
   }
 
   private getMenuPosition(itemState: IFullItemState): [number, number] {
@@ -370,6 +383,19 @@ export class ActiveComponentController {
       itemState.leftOffset + (this.state.active.dividerPercent / 100 * window.innerWidth),
       itemState.topOffset + this.circularMenuTopOffset
     ]
+  }
+
+  private updateMenuTooltip(d?: IFullItemState): void {
+    console.log("Updating menu tooltip status")
+    let circleMenuVisible = document.getElementById('circle-menu').classList.contains('opened-nav')
+    console.log("Circle menu visible: " + circleMenuVisible)
+    if (circleMenuVisible) {
+      this.menuTooltip.style('opacity', '1')
+      this.menuTooltip.style('left', this.getMenuPosition(d)[0] + 'px')
+      this.menuTooltip.style('top', this.getMenuPosition(d)[1] + 95 + 'px')
+    } else {
+      this.menuTooltip.style('opacity', '0')
+    }
   }
 
   private showTooltips(): void {

@@ -34,6 +34,11 @@ active
         a
           color: black
 
+          .text
+            position: absolute
+            opacity: 0
+
+
     &:after
       content: ''
       box-sizing: border-box
@@ -76,6 +81,18 @@ active
     background-image: url('../../app/images/active/node_menu/properties.svg')
     padding: 15px
     background-position: -2px 4px
+
+  .circle-menu-tooltip
+    position: absolute
+    transform: translateX(-50%)
+    text-align: center
+    z-index: 20
+    background-color: rgba(#f4f4f4, 0.8)
+    color: #555555
+    padding: 3px 7px 3px 7px
+    border-radius: 4px
+    font-size: 1.05em
+    opacity: 0
 
   .cold-node
     font-size: 0.95em
@@ -425,8 +442,8 @@ active
             background-color: red
 
       .link
-        stroke-width: 2px
-        stroke: #7a7a7a
+        stroke-width: 1px
+        stroke: #b6b6b6
 
       @keyframes node-loading-animation
         0%
