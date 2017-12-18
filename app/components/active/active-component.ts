@@ -152,7 +152,13 @@ export class ActiveComponentController {
         icon: 'remove-icon',
         title: 'Remove',
         click: () => {
-          this.activeActionService.deleteItemFromCurrentLayout(this.currentMenuItem)
+          if (this.selectedNodes.length > 0) {
+            this.selectedNodes.forEach((i: IFullItemState) => {
+              this.activeActionService.deleteItemFromCurrentLayout(i)
+            })
+          } else {
+            this.activeActionService.deleteItemFromCurrentLayout(this.currentMenuItem)
+          }
           this.updateCanvas()
         }
       }]
