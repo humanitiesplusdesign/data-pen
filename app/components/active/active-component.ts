@@ -427,7 +427,11 @@ export class ActiveComponentController {
     d3.select('#' + this.sanitizeId(d.ids[0].value)).style('opacity', '0')
     this.menu.hide()
     this.multiMenu.hide()
-    this.multiMenu.show(this.getMenuPosition(d))
+    if (this.selectedNodes.length > 1) {
+      this.multiMenu.show(this.getMenuPosition(d))
+    } else {
+      this.menu.show(this.getMenuPosition(d))
+    }
     this.updateMenuTooltip(d)
   }
 
