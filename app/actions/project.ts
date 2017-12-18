@@ -19,6 +19,7 @@ export const SET_FILTERED_ITEM_COUNT: string = 'SET_FILTERED_ITEM_COUNT'
 export const SET_ACTIVE_ITEM_COUNT: string = 'SET_ACTIVE_ITEM_COUNT'
 export const ADD_LAYOUT: string = 'ADD_LAYOUT'
 export const DELETE_LAYOUT: string = 'DELETE_LAYOUT'
+export const REPLACE_LAYOUT: string = 'REPLACE_LAYOUT'
 
 export interface IProjectLoadedAction extends Action {
   payload: Project
@@ -114,6 +115,28 @@ export class ProjectActionService {
     this.$ngRedux.dispatch({
       type: DELETE_LAYOUT,
       payload: layout
+    })
+
+    return this.projectService.saveCitable(
+      this.$ngRedux.getState().project.project.updateEndpoint,
+      this.$ngRedux.getState().project.project.graphStoreEndpoint,
+      this.$ngRedux.getState().project.project
+    )
+  }
+
+  public changeLayoutDescription(originalLayout: ILayoutState, newDescription: string): angular.IPromise<any> {
+    let newLayout: ILayoutState = {
+      items: originalLayout.items,
+      active: originalLayout.active,
+      description: newDescription
+    }
+
+    this.$ngRedux.dispatch({
+      type: REPLACE_LAYOUT,
+      payload: {
+        oldLayout: originalLayout,
+        newLayout: newLayout
+      }
     })
 
     return this.projectService.saveCitable(

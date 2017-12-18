@@ -95,6 +95,8 @@ export class ActiveComponentController {
 
   private gridApis: any = {}
 
+  private snapshotEditing: boolean = false
+
   /* @ngInject */
   constructor(private projectActionService: ProjectActionService,
               private activeActionService: ActiveActionService,
@@ -772,6 +774,15 @@ export class ActiveComponentController {
 
   private savedLayouts(): ILayoutState[] {
     return this.state.project.project.layouts.filter(l => !l.active)
+  }
+
+  private saveLayoutDescription(layout: ILayoutState, layoutIndex: number): void {
+    let newDescription: string =
+      d3.select('.snapshot-list')
+        .selectAll<HTMLLabelElement, {}>('.snapshot-name-label')
+        .nodes()[layoutIndex].textContent
+
+    this.projectActionService.changeLayoutDescription(layout, newDescription)
   }
 
   private saveLayout(description: string): void {

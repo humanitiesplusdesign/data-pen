@@ -1,5 +1,5 @@
 import { ILayoutState } from '../../services/project-service/project';
-import { ADD_LAYOUT, DELETE_LAYOUT } from '../../actions/project';
+import { ADD_LAYOUT, DELETE_LAYOUT, REPLACE_LAYOUT } from '../../actions/project';
 import { allItemsLoaded } from 'actions/items';
 import { SET_ACTIVE_DIVIDER_PERCENTAGE } from 'actions/active';
 import { SET_PROJECT, SET_ACTIVE_ITEM_COUNT, SET_ALL_ITEM_COUNT, SET_FILTERED_ITEM_COUNT} from 'actions/project'
@@ -91,6 +91,15 @@ export default function models(state: ProjectState = defaultState, action): Proj
       newProject3.layouts = newLayouts2
       return Object.assign({}, state, {
         project: newProject3
+      })
+
+    case REPLACE_LAYOUT:
+      let newProject4: Project = angular.copy(state.project)
+      let newLayouts4: ILayoutState[] = newProject4.layouts.slice(0)
+      newLayouts4.splice(newLayouts4.indexOf(action.payload.oldLayout), 1, action.payload.newLayout)
+      newProject4.layouts = newLayouts4
+      return Object.assign({}, state, {
+        project: newProject4
       })
 
     case SET_SOURCE_CLASS_ACTIVE:

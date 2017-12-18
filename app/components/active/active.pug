@@ -125,10 +125,10 @@ script(type="text/ng-template" id="snapshotsPopover.html")
             span.calibre-numbers-kern {{ layout.items.length }}
             |  entities
         .action-items-container(ng-hide="nameEditable" ng-class="actionsVisibility")
-          a.snapshot-option(ng-click="nameEditable=true") Rename
+          a.snapshot-option(ng-click="nameEditable=true; $ctrl.snapshotEditing = true" ng-hide="$ctrl.snapshotEditing") Rename
           a.snapshot-option.delete-option(ng-click="$ctrl.deleteLayout(layout)") Delete
         .action-items-container.snapshot-edit-options(ng-show="nameEditable")
-          a.snapshot-option(ng-click="nameEditable=false") Save
+          a.snapshot-option(ng-click="nameEditable=false; $ctrl.snapshotEditing = false; $ctrl.saveLayoutDescription(layout, $index)") Save
           a.snapshot-option.cancel-option(ng-click="nameEditable=false") Cancel
 script(type="text/ng-template" id="layoutsPopover.html")
   .layouts-popover.pop-on-top
