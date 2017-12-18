@@ -214,46 +214,45 @@ export class ActiveComponentController {
 
     let r: d3.Selection<SVGRectElement, {}, HTMLElement, any> = g.select<SVGRectElement>('rect')
       .on('contextmenu', this.canvasClick.bind(this, g))
-      .on('click', this.canvasLeftClick.bind(this))
-      // .call(d3.drag()
-      //   .on('start', () => {
-      //     d3.select('.main-g')
-      //       .append('rect')
-      //         .classed('selection-rect', true)
-      //         .attr('transform', 'translate(' + d3.event.subject.x + ',' + d3.event.subject.y + ')')
-      //   })
-      //   .on('drag', () => {
-      //     d3.select('.selection-rect')
-      //       .attr('width', d3.event.x - d3.event.subject.x)
-      //       .attr('height', d3.event.y - d3.event.subject.y)
-      //
-      //     this.state.active.activeLayout.items.forEach((i) => {
-      //       if (i.leftOffset > d3.event.subject.x &&
-      //           i.leftOffset < d3.event.x &&
-      //           i.topOffset > d3.event.subject.y &&
-      //           i.topOffset < d3.event.y &&
-      //           this.selectedNodes.concat(this.dragSelection).indexOf(i) === -1) {
-      //
-      //         this.dragSelection.push(i)
-      //         this.updateCanvas()
-      //       }
-      //     })
-      //   })
-      //   .on('end', () => {
-      //     d3.select('.selection-rect').remove()
-      //     this.dragSelection.forEach(i => this.selectedNodes.push(i))
-      //     this.dragSelection = []
-      //   })
-      // )
+      .call(d3.drag()
+        .on('start', () => {
+          this.$scope.$apply(() => {
+              this.menu.hide()
+              this.updateMenuTooltip()
+              this.nodeSearchRemove()
+              this.selectedNodes = []
+              this.updateCanvas()
+          })
+          d3.select('.main-g')
+            .append('rect')
+              .classed('selection-rect', true)
+              .attr('transform', 'translate(' + d3.event.subject.x + ',' + d3.event.subject.y + ')')
+        })
+        .on('drag', () => {
+          d3.select('.selection-rect')
+            .attr('width', d3.event.x - d3.event.subject.x)
+            .attr('height', d3.event.y - d3.event.subject.y)
+
+          this.state.active.activeLayout.items.forEach((i) => {
+            if (i.leftOffset > d3.event.subject.x &&
+                i.leftOffset < d3.event.x &&
+                i.topOffset > d3.event.subject.y &&
+                i.topOffset < d3.event.y &&
+                this.selectedNodes.concat(this.dragSelection).indexOf(i) === -1) {
+
+              this.dragSelection.push(i)
+              this.updateCanvas()
+            }
+          })
+        })
+        .on('end', () => {
+          d3.select('.selection-rect').remove()
+          this.dragSelection.forEach(i => this.selectedNodes.push(i))
+          this.dragSelection = []
+        })
+      )
 
     this.updateCanvasSize()
-  }
-
-  private canvasLeftClick(sel: d3.Selection<SVGGElement, {}, HTMLElement, any>): void {
-    this.$scope.$apply(() => {
-      this.menu.hide()
-      this.nodeSearchRemove()
-    })
   }
 
   private canvasClick(sel: d3.Selection<SVGGElement, {}, HTMLElement, any>): void {
