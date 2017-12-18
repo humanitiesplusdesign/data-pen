@@ -219,32 +219,52 @@ export class ActiveComponentController {
       .call(d3.drag()
         .on('start', () => {
           this.$scope.$apply(() => {
-              this.menu.hide()
-              this.updateMenuTooltip()
-              this.nodeSearchRemove()
-              this.selectedNodes = []
-              this.updateCanvas()
+            this.menu.hide()
+            this.updateMenuTooltip()
+            this.nodeSearchRemove()
+            this.selectedNodes = []
+            this.updateCanvas()
           })
           d3.select('.main-g')
             .append('rect')
               .classed('selection-rect', true)
-              .attr('transform', 'translate(' + d3.event.subject.x + ',' + d3.event.subject.y + ')')
+              // .attr('transform', 'translate(' + d3.event.subject.x + ',' + d3.event.subject.y + ')')
         })
         .on('drag', () => {
-          d3.select('.selection-rect')
-            .attr('width', d3.event.x - d3.event.subject.x)
-            .attr('height', d3.event.y - d3.event.subject.y)
+          if (d3.event.x - d3.event.subject.x < 0) {
+            d3.select('.selection-rect')
+              .attr('x', d3.event.x)
+              .attr('width', d3.event.subject.x - d3.event.x)
+          } else {
+            d3.select('.selection-rect')
+              .attr('x', d3.event.subject.x)
+              .attr('width', d3.event.x - d3.event.subject.x)
+          }
+
+          if (d3.event.y - d3.event.subject.y < 0) {
+            d3.select('.selection-rect')
+              .attr('y', d3.event.y)
+              .attr('height', d3.event.subject.y - d3.event.y)
+          } else {
+            d3.select('.selection-rect')
+              .attr('y', d3.event.subject.y)
+              .attr('height', d3.event.y - d3.event.subject.y)
+          }
 
           this.state.active.activeLayout.items.forEach((i) => {
-            if (i.leftOffset > d3.event.subject.x &&
-                i.leftOffset < d3.event.x &&
-                i.topOffset > d3.event.subject.y &&
-                i.topOffset < d3.event.y &&
+            if (i.leftOffset > parseInt(d3.select('.selection-rect').attr('x')) &&
+                i.leftOffset < parseInt(d3.select('.selection-rect').attr('x')) + parseInt(d3.select('.selection-rect').attr('width')) &&
+                i.topOffset > parseInt(d3.select('.selection-rect').attr('y')) &&
+                i.topOffset < parseInt(d3.select('.selection-rect').attr('y')) + parseInt(d3.select('.selection-rect').attr('height')) &&
                 this.selectedNodes.concat(this.dragSelection).indexOf(i) === -1) {
 
               this.dragSelection.push(i)
               this.updateCanvas()
             }
+            // else if (this.dragSelection.indexOf(i) !== -1) {
+            //   this.dragSelection.splice(this.dragSelection.indexOf(i), 1)
+            //   this.updateCanvas()
+            // }
           })
         })
         .on('end', () => {
@@ -579,7 +599,7 @@ export class ActiveComponentController {
             if (this.selectedNodes.indexOf(d) === -1) {
               this.selectedNodes.push(d)
             } else {
-              this.selectedNodes.splice(this.selectedNodes.indexOf(d))
+              this.selectedNodes.splice(this.selectedNodes.indexOf(d), 1)
             }
             this.selectedNodesCount = this.selectedNodes.length
             console.log("Node clicked while holding shift. Currently: " + this.selectedNodesCount + " nodes selected.")
