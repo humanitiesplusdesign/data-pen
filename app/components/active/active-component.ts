@@ -183,7 +183,7 @@ export class ActiveComponentController {
           // this.buildAndDisplayPropertiesMenu(this.currentMenuItem)
         }
       }, {
-        // icon:
+        icon: 'invert-icon',
         title: 'Select Inverse',
         click: () => {
           let oldSelection: IItemState[] = this.selectedNodes.slice(0)
@@ -879,6 +879,20 @@ export class ActiveComponentController {
   private deleteLayout(layout: ILayoutState): angular.IPromise<any> {
     return this.projectActionService.deleteLayout(layout)
   }
+
+  private openLoadSnapshotWarningModal(): void {
+    let modalInstance: any = this.$uibModal.open({
+      animation: true,
+      component: 'snapshotWarningModal'
+    });
+    modalInstance.result.then(
+      function(): void {
+        // continue
+      },
+      function(): void {
+        // cancel
+      });
+  };
 
   private exportTable(): void {
     let exportData: {}[] = this.gridOptions[this.currentTableClass.value].data.slice(0)

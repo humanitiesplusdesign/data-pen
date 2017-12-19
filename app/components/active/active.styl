@@ -47,7 +47,7 @@ active
       border: 1px solid #ffffff
       box-shadow: inset 0px 1px 4px rgba(#000, 0.1)
 
-  .expand-icon, .reconcile-icon, .remove-icon, .link-icon, .properties-icon
+  .expand-icon, .reconcile-icon, .remove-icon, .link-icon, .properties-icon, .invert-icon
     padding: 16px
     background-repeat: no-repeat
     -webkit-backface-visibility: initial !important
@@ -76,7 +76,12 @@ active
   .properties-icon
     background-image: url('../../app/images/active/node_menu/properties.svg')
     padding: 15px
-    background-position: -2px 4px
+    background-position: 2px 6px
+
+  .invert-icon
+    background-image: url('../../app/images/active/node_menu/invert.svg')
+    padding: 15px
+    background-position: 2px 4px
 
   .circle-menu-tooltip
     position: absolute
@@ -397,6 +402,32 @@ active
               color: #d24545
 
     .layouts-popover {}
+
+  #stop-importing-button
+    box-shadow: 0 1px 5px rgba(#000, 0.15)
+    position: absolute
+    width: 140px
+    height: 34px
+    left: 50%
+    bottom: 130px
+    transform: translateX(-50%)
+    padding-bottom: 4px
+    border-radius: 34px
+    font-size: 1.1em
+    border: none
+    display: none
+
+    &:focus
+      outline: 0
+
+    &:hover
+      background-color: #f9f9f9
+
+    &:active
+      background-color: #f5f5f5
+
+    &.button-active
+      box-shadow: 0 0 5px rgba(#466bd3, 0.7)
 
   .draggable-divider
     top: -100%
