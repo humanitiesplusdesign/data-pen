@@ -76,6 +76,8 @@ export class ActiveComponentController {
 
   private currentMenuItem: IFullItemState
   private currentMultiMenuItem: IFullItemState
+  private circleMenuVisible: boolean
+  private circleMultiMenuVisible: boolean
 
   private oldActiveLayoutItemState: IFullItemState[]
 
@@ -485,12 +487,13 @@ export class ActiveComponentController {
     d3.select('#' + this.sanitizeId(d.ids[0].value)).style('opacity', '0')
     this.menu.hide()
     this.multiMenu.hide()
-    if (this.selectedNodes.length > 1) {
+    if (this.selectedNodes.length > 1 && this.selectedNodes.indexOf(d) !== -1) {
       this.multiMenu.show(this.getMenuPosition(d))
     } else {
       this.menu.show(this.getMenuPosition(d))
     }
     this.updateMenuTooltip(d)
+    this.$scope.$apply()
   }
 
   private getMenuPosition(itemState: IFullItemState): [number, number] {
@@ -501,9 +504,9 @@ export class ActiveComponentController {
   }
 
   private updateMenuTooltip(d?: IFullItemState): void {
-    let circleMenuVisible: boolean = document.getElementById('circle-menu').classList.contains('opened-nav')
-    let circleMultiMenuVisible: boolean = document.getElementById('circle-multiMenu').classList.contains('opened-nav')
-    if (circleMenuVisible || circleMultiMenuVisible) {
+    this.circleMenuVisible = document.getElementById('circle-menu').classList.contains('opened-nav')
+    this.circleMultiMenuVisible = document.getElementById('circle-multiMenu').classList.contains('opened-nav')
+    if (this.circleMenuVisible || this.circleMultiMenuVisible) {
       this.menuTooltip.style('opacity', '1')
       this.menuTooltip.style('left', this.getMenuPosition(d)[0] + 'px')
       this.menuTooltip.style('top', this.getMenuPosition(d)[1] + 95 + 'px')

@@ -60,7 +60,7 @@
 #circle-menu.circle-menu(ng-click="$ctrl.hideMenuTooltip()")
 #circle-multiMenu.circle-multiMenu(ng-click="$ctrl.hideMenuTooltip()")
 #properties-menu.circle-menu
-#circle-menu-tooltip.circle-menu-tooltip {{ $ctrl.menuOperation }} {{ $ctrl.selectedNodes.length ? $ctrl.selectedNodes.length : 1 }} nodes
+#circle-menu-tooltip.circle-menu-tooltip {{ $ctrl.menuOperation }} {{ $ctrl.selectedNodes.length && $ctrl.circleMultiMenuVisible ? $ctrl.selectedNodes.length : 1 }} nodes
 .tooltips
 .link-tooltips
 script(type="text/ng-template" id="resultTemplate.html")
