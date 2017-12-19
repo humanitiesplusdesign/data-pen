@@ -727,30 +727,29 @@ export class ActiveComponentController {
       })
       .call(d3.drag()
         .on('start', (d: IFullItemState, i: number) => {
-          d3.select('#' + this.sanitizeId(d.ids[0].value)).style('opacity', '0')
+          ((this.selectedNodes.indexOf(d) === -1) ? [d] : this.selectedNodes).forEach((is) => {
+            d3.select('#' + this.sanitizeId(is.ids[0].value)).style('opacity', '0')
+          })
           this.dragOrigX = d.leftOffset
           this.dragOrigY = d.topOffset
         })
         .on('drag', (d: IFullItemState, i: number, group) => {
           // TODO: implement change to offsets using actions and reducers
-          d.leftOffset = d3.event.x + this.dragOrigX
-          d.topOffset = d3.event.y + this.dragOrigY
-          if (d.topOffset < 20) { d.topOffset = 20 }
-          if (d.topOffset > window.innerHeight - 75) { d.topOffset = window.innerHeight - 75 }
-          if (d.leftOffset < 20) { d.leftOffset = 20 }
-          if (d.leftOffset > window.innerWidth - 20) { d.leftOffset = window.innerWidth - 20 }
+          let origTop: number = d.topOffset;
+          let origLeft: number = d.leftOffset;
+          ((this.selectedNodes.indexOf(d) === -1) ? [d] : this.selectedNodes).forEach((is) => {
+            is.leftOffset = d3.event.x + this.dragOrigX + (is.leftOffset - origLeft)
+            is.topOffset = d3.event.y + this.dragOrigY + (is.topOffset - origTop)
+            if (is.topOffset < 20) { is.topOffset = 20 }
+            if (is.topOffset > window.innerHeight - 75) { is.topOffset = window.innerHeight - 75 }
+            if (is.leftOffset < 20) { is.leftOffset = 20 }
+            if (is.leftOffset > window.innerWidth - 20) { is.leftOffset = window.innerWidth - 20 }
+          })
           this.dragOrigX = d.leftOffset
           this.dragOrigY = d.topOffset
           this.updateCanvas()
         })
         .on('end',  (d: IFullItemState, i: number, group) => {
-          // TODO: implement change to offsets using actions and reducers
-          d.leftOffset = d3.event.x + this.dragOrigX
-          d.topOffset = d3.event.y + this.dragOrigY
-          if (d.topOffset < 20) { d.topOffset = 20 }
-          if (d.topOffset > window.innerHeight - 75) { d.topOffset = window.innerHeight - 75 }
-          if (d.leftOffset < 20) { d.leftOffset = 20 }
-          if (d.leftOffset > window.innerWidth - 20) { d.leftOffset = window.innerWidth - 20 }
           this.dragOrigX = null
           this.dragOrigY = null
           this.updateCanvas()
