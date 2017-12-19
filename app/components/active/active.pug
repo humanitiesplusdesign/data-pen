@@ -5,6 +5,7 @@
       //- .main-grid(ui-grid="{ data: $ctrl.state.active.activeLayout.items, enableFiltering: true }" ng-hide="$ctrl.state.active.dividerPercent < 2" ui-grid-auto-resize ui-grid-edit ui-grid-resize-columns ui-grid-empty-base-layer)
       .main-grid(id="{{ 'grid' + $index }}" ui-grid="$ctrl.gridOptions[class.value]" ng-if="$ctrl.state.active.dividerPercent > 2" ui-grid-edit ui-grid-resize-columns ui-grid-selection)
 .main-canvas(ng-style="$ctrl.canvasWidthStyle()")
+  button#stop-importing-button.data-pen-button Stop Importing
   .control-area
     button.active-circle-button(ng-init="tooltipViewOptions=''" ng-mouseenter="tooltipViewOptions='visible'" ng-mouseleave="tooltipViewOptions=''" uib-popover-template="'viewOptionsPopover.html'" popover-trigger="'outsideClick'" popover-placement="auto left-top" popover-class="active-options-popover" popover-is-open="$ctrl.viewOptionsPopoverVisible" ng-class="{true: 'button-active', false: ''}[$ctrl.viewOptionsPopoverVisible]")
       img.view-options-icon(src=require("images/active/view_options.svg"))

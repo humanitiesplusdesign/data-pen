@@ -183,7 +183,7 @@ export class ActiveComponentController {
           // this.buildAndDisplayPropertiesMenu(this.currentMenuItem)
         }
       }, {
-        // icon:
+        icon: 'invert-icon',
         title: 'Select Inverse',
         click: () => {
           let oldSelection: IItemState[] = this.selectedNodes.slice(0)
