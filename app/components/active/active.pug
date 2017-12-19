@@ -113,7 +113,8 @@ script(type="text/ng-template" id="layersPopover.html")
         img.grip-lines(src=require("images/active/grip_lines.svg") preserveAspectRatio="none")
 script(type="text/ng-template" id="snapshotsPopover.html")
   .snapshots-popover
-    h4 Snapshots
+    h4 Snapshots 
+      span.blue-text(ng-click="$ctrl.openLoadSnapshotWarningModal()") (test open modal)
     hr
     input.snapshot-name-input(type="text" ng-model="layoutDescription")
     button.data-pen-button.snapshot-save-button(ng-class="{'button-disabled' : !layoutDescription}" ng-click="$ctrl.saveLayout(layoutDescription); layoutDescription = ''") Save

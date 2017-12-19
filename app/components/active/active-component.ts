@@ -880,6 +880,20 @@ export class ActiveComponentController {
     return this.projectActionService.deleteLayout(layout)
   }
 
+  private openLoadSnapshotWarningModal(): void {
+    let modalInstance: any = this.$uibModal.open({
+      animation: true,
+      component: 'snapshotWarningModal'
+    });
+    modalInstance.result.then(
+      function(): void {
+        // continue
+      },
+      function(): void {
+        // cancel
+      });
+  };
+
   private exportTable(): void {
     let exportData: {}[] = this.gridOptions[this.currentTableClass.value].data.slice(0)
       .map((d) => {
