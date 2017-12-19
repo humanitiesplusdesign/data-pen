@@ -315,7 +315,9 @@ export class ActiveComponentController {
             this.multiMenu.hide()
             this.updateMenuTooltip()
             this.nodeSearchRemove()
-            this.selectedNodes = []
+            if (!d3.event.sourceEvent.shiftKey) {
+              this.selectedNodes = []
+            }
             this.updateCanvas()
           })
           d3.select('.main-g')
@@ -349,14 +351,19 @@ export class ActiveComponentController {
                 this.selectedNodes.concat(this.dragSelection).indexOf(i) === -1) {
 
               this.dragSelection.push(i)
-              this.$scope.$apply()
-              this.updateCanvas()
+            } else if (
+              !( i.leftOffset > parseInt(d3.select('.selection-rect').attr('x'), 10) &&
+                i.leftOffset < parseInt(d3.select('.selection-rect').attr('x'), 10) + parseInt(d3.select('.selection-rect').attr('width'), 10) &&
+                i.topOffset > parseInt(d3.select('.selection-rect').attr('y'), 10) &&
+                i.topOffset < parseInt(d3.select('.selection-rect').attr('y'), 10) + parseInt(d3.select('.selection-rect').attr('height'), 10)) &&
+              this.dragSelection.indexOf(i) !== -1
+            ) {
+              // Outside the current selection box but in the current drag selection, remove it.
+              this.dragSelection.splice(this.dragSelection.indexOf(i), 1)
             }
-            // else if (this.dragSelection.indexOf(i) !== -1) {
-            //   this.dragSelection.splice(this.dragSelection.indexOf(i), 1)
-            //   this.updateCanvas()
-            // }
           })
+          this.$scope.$apply()
+          this.updateCanvas()
         })
         .on('end', () => {
           d3.select('.selection-rect').remove()
