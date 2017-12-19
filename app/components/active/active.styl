@@ -257,14 +257,30 @@ active
           cursor: move
 
           &:hover
-            background-color: rgba(0, 0, 0, 0.01);
-            padding: 4px 4px 6px 6px;
-            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
-            border-radius: 3px;
-            width: 106%;
+            background-color: rgba(#fbfbfb, 0.9)
+            padding: 4px 6px 6px 6px
+            box-shadow: 0 1px 4px rgba(#000, 0.2)
+            border-radius: 3px
+            width: 106%
             margin-left: -3%
             margin-top: -4px
             margin-bottom: 4px
+            z-index: 3
+
+          .eye-switch
+            width: 18px
+            margin-top: -2px
+            margin-right: 7px
+            cursor: pointer
+
+            &.disabled
+              opacity: .15
+
+          .grip-lines
+            width: 15px
+            float: right
+            opacity: 0.4
+            margin-top: 6px
 
     .snapshots-popover
       width: 300px
