@@ -5,6 +5,7 @@
       //- .main-grid(ui-grid="{ data: $ctrl.state.active.activeLayout.items, enableFiltering: true }" ng-hide="$ctrl.state.active.dividerPercent < 2" ui-grid-auto-resize ui-grid-edit ui-grid-resize-columns ui-grid-empty-base-layer)
       .main-grid(id="{{ 'grid' + $index }}" ui-grid="$ctrl.gridOptions[class.value]" ng-if="$ctrl.state.active.dividerPercent > 2" ui-grid-edit ui-grid-resize-columns ui-grid-selection)
 .main-canvas(ng-style="$ctrl.canvasWidthStyle()")
+  button#stop-importing-button.data-pen-button Stop Importing
   .control-area
     button.active-circle-button(ng-init="tooltipViewOptions=''" ng-mouseenter="tooltipViewOptions='visible'" ng-mouseleave="tooltipViewOptions=''" uib-popover-template="'viewOptionsPopover.html'" popover-trigger="'outsideClick'" popover-placement="auto left-top" popover-class="active-options-popover" popover-is-open="$ctrl.viewOptionsPopoverVisible" ng-class="{true: 'button-active', false: ''}[$ctrl.viewOptionsPopoverVisible]")
       img.view-options-icon(src=require("images/active/view_options.svg"))
@@ -107,17 +108,19 @@ script(type="text/ng-template" id="layersPopover.html")
       span.checkbox-title Show layer effect
     hr
     ul(ui-sortable)
-      li.layer-row(ng-repeat="class in $ctrl.allClasses()")
-        input(type="checkbox")
+      li.layer-row(ng-repeat="class in $ctrl.currentClasses" ng-init="activeLayer=true")
+        img.eye-switch(ng-click="activeLayer=!activeLayer" ng-class="{'disabled' : !activeLayer}" src=require("images/active/view_options.svg"))
         span.checkbox-title {{ class.labels | prefLang }}
+        img.grip-lines(src=require("images/active/grip_lines.svg") preserveAspectRatio="none")
 script(type="text/ng-template" id="snapshotsPopover.html")
   .snapshots-popover
-    h4 Snapshots
+    h4 Snapshots 
+      span.blue-text(ng-click="$ctrl.openLoadSnapshotWarningModal()") (test open modal)
     hr
     input.snapshot-name-input(type="text" ng-model="layoutDescription")
     button.data-pen-button.snapshot-save-button(ng-class="{'button-disabled' : !layoutDescription}" ng-click="$ctrl.saveLayout(layoutDescription); layoutDescription = ''") Save
     hr
-    label.no-snapshots(ng-show="$ctrl.state.project.project.layouts.length == 0") Create a snapshot to save this layout.
+    label.no-snapshots(ng-show="$ctrl.savedLayouts().length == 0") Create a snapshot to save this layout.
     .snapshot-list
       .snapshot-row.transition-100(ng-repeat="layout in $ctrl.savedLayouts() | orderBy:'-'" ng-init="actionsVisibility=''" ng-mouseenter="actionsVisibility='visible'" ng-mouseleave="actionsVisibility=''")
         .snapshot-details-container(ng-init="nameEditable=false")
