@@ -211,7 +211,6 @@ export class SparqlItemWorkerService {
         let idSameAses: ENodeMap<INode[]> = new ENodeMap<INode[]>(() => [])
         for (let b of response.results.bindings) {
           let item: Item = items.goc(b['id'].value)
-          if (b['itemLabel']) item.labels = b['itemLabel'].value
           SparqlItemWorkerService.processItemResult(item, item.localProperties,  this.stateWorkerService.state.project.dataModel, idPropertyMap.goc(b['id'].value), idPropertyValueMap.goc(b['id'].value), idSameAses.goc(item), this.stateWorkerService.state.project.endpoint, b)
         }
         if (queryRemote) {
