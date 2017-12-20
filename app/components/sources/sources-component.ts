@@ -12,6 +12,7 @@ import { IModalService } from 'angular-ui-bootstrap'
 import * as d3 from 'd3';
 import { Class, Property, IClass, IProperty } from 'services/project-service/data-model';
 import { FMap, IMap, EMap, IEMap } from 'components/collection-utils';
+import { SKOS, RDF, FOAF, DCTerms } from 'models/rdf';
 
 interface ISourcesComponentControllerState {
   project: ProjectState
@@ -23,6 +24,7 @@ export class SourcesComponentController {
   private state: ISourcesComponentControllerState = <ISourcesComponentControllerState>{}
   private projectsOpen: { [id: string]: boolean } = {}
   private localSourceClassTree: ISourceClassTree
+  private propStatistics: IMap<IMap<PropertyStatistics>>
 
   /* @ngInject */
   constructor(private projectService: ProjectService,
@@ -51,6 +53,8 @@ export class SourcesComponentController {
         this.localSourceClassTree = angular.copy(this.state.project.project.sourceClassSettings)
         oldSourceClassTree = this.state.project.project.sourceClassSettings
       }
+
+      this.propStatistics = this.buildPropStatistics()
     })
   }
 
@@ -78,7 +82,7 @@ export class SourcesComponentController {
 
   private sourcePropsForClass(c: Class): any {
     let sources: string[] = d3.keys(this.localSourceClassTree)
-    let allPropStatistics: IMap<IMap<PropertyStatistics>> = this.propStatistics()
+    let allPropStatistics: IMap<IMap<PropertyStatistics>> = this.propStatistics
     if (!allPropStatistics.has(c.value)) return {
       sources: sources,
       properies: []
@@ -96,8 +100,9 @@ export class SourcesComponentController {
               return a || (
                 this.state.project.project.sourceClassSettings[b.id] &&
                 this.state.project.project.sourceClassSettings[b.id][c.value] &&
-                b.propStats.get(p.value) &&
-                !!b.propStats.get(p.value).values
+                b.propStats.get(c.value) &&
+                b.propStats.get(c.value).get(p.value) &&
+                !!b.propStats.get(c.value).get(p.value).values
               )
             },
             false)
@@ -108,25 +113,46 @@ export class SourcesComponentController {
     }
   }
 
-  private propStatistics(): IMap<IMap<PropertyStatistics>> {
+  private propSubjectsComparator(classValue: string, prop1: any, prop2: any): number {
+    if (!this.propStatistics.get(classValue).get(prop1.value) || !this.propStatistics.get(classValue).get(prop2.value)) {
+      return -1
+    } else {
+      return this.propStatistics.get(classValue).get(prop1.value).subjects > this.propStatistics.get(classValue).get(prop2.value).subjects ?
+        1 :
+        this.propStatistics.get(classValue).get(prop1.value).subjects < this.propStatistics.get(classValue).get(prop2.value).subjects ?
+          -1 :
+          0
+    }
+  }
+
+  private buildPropStatistics(): IMap<IMap<PropertyStatistics>> {
     let classPropMap: IEMap<IMap<PropertyStatistics>> = new EMap<FMap<PropertyStatistics>>(() => new FMap<PropertyStatistics>())
     this.state.sources.archiveSources.concat(this.state.sources.authoritySources)
       .forEach((ae) => {
         ae.propStats.entries().forEach((ckv) => {
           let propMap: IMap<PropertyStatistics> = classPropMap.goc(ckv.key)
           ckv.value.each((value, key) => {
-            if (!propMap.has(key)) {
-              propMap.set(key, value)
-            } else {
-              let ps: PropertyStatistics = propMap.get(key)
-              ps.subjects += value.subjects
-              ps.values += value.values
-              ps.min = ps.min < value.min ? ps.min : value.min
-              ps.max = ps.max > value.max ? ps.max : value.max
+            if (key !== SKOS.prefLabel.value &&
+                key !== RDF.type.value &&
+                key !== SKOS.altLabel.value &&
+                key !== DCTerms.description.value) {
+              if (!propMap.has(key)) {
+                let newValue: PropertyStatistics = angular.copy(value)
+                newValue.subjects = +newValue.subjects
+                newValue.values = +newValue.values
+                propMap.set(key, newValue)
+              } else {
+                let ps: PropertyStatistics = propMap.get(key)
+                ps.subjects += value.subjects
+                ps.values += value.values
+                ps.min = ps.min < value.min ? ps.min : value.min
+                ps.max = ps.max > value.max ? ps.max : value.max
+              }
             }
           })
         })
       })
+    console.log(classPropMap)
     return classPropMap
   }
 
