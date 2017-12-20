@@ -11,6 +11,7 @@ import { IFibraNgRedux } from 'reducers'
 import { IModalService } from 'angular-ui-bootstrap'
 import * as d3 from 'd3';
 import { Class, Property, IClass, IProperty } from 'services/project-service/data-model';
+import { FMap, IMap, EMap, IEMap } from 'components/collection-utils';
 
 interface ISourcesComponentControllerState {
   project: ProjectState
@@ -77,7 +78,12 @@ export class SourcesComponentController {
 
   private sourcePropsForClass(c: Class): any {
     let sources: string[] = d3.keys(this.localSourceClassTree)
-    let propStatistics: Map<string, PropertyStatistics> = this.propStatistics()
+    let allPropStatistics: IMap<IMap<PropertyStatistics>> = this.propStatistics()
+    if (!allPropStatistics.has(c.value)) return {
+      sources: sources,
+      properies: []
+    }
+    let propStatistics: IMap<PropertyStatistics> = allPropStatistics.get(c.value)
     return {
       sources: sources,
       properties: this.state.project.project.dataModel.propertyMap.values()
@@ -102,23 +108,26 @@ export class SourcesComponentController {
     }
   }
 
-  private propStatistics(): Map<string, PropertyStatistics> {
-    let propMap: Map<string, PropertyStatistics> = new Map<string, PropertyStatistics>()
+  private propStatistics(): IMap<IMap<PropertyStatistics>> {
+    let classPropMap: IEMap<IMap<PropertyStatistics>> = new EMap<FMap<PropertyStatistics>>(() => new FMap<PropertyStatistics>())
     this.state.sources.archiveSources.concat(this.state.sources.authoritySources)
       .forEach((ae) => {
-        ae.propStats.entries().forEach((kv) => {
-          if (!propMap.has(kv.key)) {
-            propMap.set(kv.key, kv.value)
-          } else {
-            propMap.set(kv.key, {
-              values: +propMap.get(kv.key).values + kv.value.values,
-              min: propMap.get(kv.key).min < kv.value.min ? propMap.get(kv.key).min : kv.value.min,
-              max: propMap.get(kv.key).max > kv.value.max ? propMap.get(kv.key).max : kv.value.max
-            })
-          }
+        ae.propStats.entries().forEach((ckv) => {
+          let propMap: IMap<PropertyStatistics> = classPropMap.goc(ckv.key)
+          ckv.value.each((value, key) => {
+            if (!propMap.has(key)) {
+              propMap.set(key, value)
+            } else {
+              let ps: PropertyStatistics = propMap.get(key)
+              ps.subjects += value.subjects
+              ps.values += value.values
+              ps.min = ps.min < value.min ? ps.min : value.min
+              ps.max = ps.max > value.max ? ps.max : value.max
+            }
+          })
         })
       })
-    return propMap
+    return classPropMap
   }
 
   private grandTotal(clss: string): number {

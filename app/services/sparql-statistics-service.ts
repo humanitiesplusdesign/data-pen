@@ -6,10 +6,11 @@ import {FibraSparqlService} from './fibra-sparql-service'
 import {Project} from 'services/project-service/project'
 import {RemoteEndpointConfiguration} from 'services/project-service/remote-endpoint-configuration'
 import {TreeNode} from 'models/treenode'
-import { IMap, FMap } from 'components/collection-utils';
+import { IMap, FMap, EMap } from 'components/collection-utils';
 
 export class PropertyStatistics {
   constructor(
+    public subjects: number,
     public values: number,
     public min: number | string,
     public max: number | string
@@ -28,20 +29,21 @@ export class SparqlStatisticsService {
     GROUP BY ?id
   }
 # ENDGRAPH
-}
-`
-  public static getPropertyStatisticsQuery: string = `SELECT ?id ?min ?max ?values {
-# STARTGRAPH
-  {
-    SELECT ?id (COUNT(*) AS ?values) (COUNT(DISTINCT ?s) AS ?subjects) (MIN(?value) AS ?min) (MAX(?value) AS ?max) {
-      ?s ?id ?value .
-      # CONSTRAINTS
+}`
+  public static getPropertyStatisticsQuery: string = `SELECT ?classId ?propertyId ?subjects ?values ?min ?max {
+  # STARTGRAPH
+    {
+      SELECT ?classId ?propertyId (COUNT(*) AS ?values) (COUNT(DISTINCT ?s) AS ?subjects) (MIN(?value) AS ?min) (MAX(?value) AS ?max) {
+        ?s ?propertyId ?value .
+        # CONSTRAINTS
+        OPTIONAL {
+          ?s a ?classId .
+        }
+      }
+      GROUP BY ?classId ?propertyId
     }
-    GROUP BY ?id
-  }
-# ENDGRAPH
-}
-`
+  # ENDGRAPH
+}`
   /* @ngInject */
   constructor(private workerService: WorkerService) {}
   public getClassStatistics(endpointConfiguration: Project | RemoteEndpointConfiguration, canceller?: angular.IPromise<any>): angular.IPromise<IMap<number>> {
@@ -63,11 +65,11 @@ export class SparqlStatisticsWorkerService {
       return ret
     })
   }
-  public getPropertyStatistics(endpoint: string, query: string, canceller?: angular.IPromise<any>): angular.IPromise<IMap<PropertyStatistics>> {
+  public getPropertyStatistics(endpoint: string, query: string, canceller?: angular.IPromise<any>): angular.IPromise<IMap<IMap<PropertyStatistics>>> {
     return this.fibraSparqlService.query(endpoint, query, canceller).then(response => {
-      let ret: IMap<PropertyStatistics> = new FMap<PropertyStatistics>()
+      let ret: IMap<IMap<PropertyStatistics>> = new FMap<IMap<PropertyStatistics>>()
       for (let b of response.results.bindings)
-        ret.set(b['id'].value, new PropertyStatistics(b['values'].value, b['min'].value, b['max'].value))
+        ret.goc(b['classId'] ? b['classId'].value : '', () => new FMap<PropertyStatistics>()).set(b['propertyId'].value, new PropertyStatistics(b['subjects'].value, b['values'].value, b['min'].value, b['max'].value))
       return ret
     })
   }

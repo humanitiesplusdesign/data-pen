@@ -16,7 +16,7 @@ export interface ISource {
   labels: ILiteral[],
   classes: Class[],
   classStats: IMap<number>
-  propStats: IMap<PropertyStatistics>
+  propStats: IMap<IMap<PropertyStatistics>>
 }
 
 export interface ISourcesState {
