@@ -10,7 +10,6 @@ import {PrimaryEndpointConfiguration} from './primary-endpoint-configuration'
 import {RemoteEndpointConfiguration} from './remote-endpoint-configuration'
 import {Schema} from './schema'
 import {FMap, IEMap, EMap} from '../../components/collection-utils'
-import {toTurtle} from '../../components/misc-utils'
 import {DataFactory, ONodeSet} from '../../models/rdf'
 import {DataModel, Class, Property} from './data-model'
 import { ILiteral } from 'models/rdfjs';

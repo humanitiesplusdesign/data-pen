@@ -4,22 +4,20 @@ import {FMap, IMap} from './collection-utils'
 import { SparqlService } from 'angular-sparql-service/dist/sparql-service'
 import * as cjson from 'circular-json'
 
-export function toTurtle(tb: TurtleBuilder): string {
-  let s: string = ''
-  for (let key in tb.prefixes) s = s + '@prefix ' + key + ': <' + tb.prefixes[key] + '> .\n'
-  tb.fragmentsById.values().forEach(str => s = s + str.substring(0, str.length - 2) + ' .\n\n')
-  return s
-}
-
 export class TurtleBuilder {
   public prefixes: {[prefix: string]: string} = {}
   public fragmentsById: IMap<string> = new FMap<string>()
-}
-
-export function citableToTurtle(c: ICitable): string {
-  let tb: TurtleBuilder = new TurtleBuilder()
-  c.toTurtle(tb)
-  return toTurtle(tb)
+  public sparqlPrefixes(): string {
+    let s: string = ''
+    for (let key in this.prefixes) s = s + 'PREFIX ' + key + ': <' + this.prefixes[key] + '>\n'
+    return s
+  }
+  public toTurtle(includePrefixes: boolean): string {
+    let s: string = ''
+    if (includePrefixes) for (let key in this.prefixes) s = s + '@prefix ' + key + ': <' + this.prefixes[key] + '> .\n'
+    this.fragmentsById.values().forEach(str => s = s + str.substring(0, str.length - 2) + ' .\n\n')
+    return s
+  }
 }
 
 let lut: string[] = []

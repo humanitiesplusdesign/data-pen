@@ -11,22 +11,30 @@ import {PrimaryEndpointConfiguration} from './primary-endpoint-configuration'
 import {RemoteEndpointConfiguration} from './remote-endpoint-configuration'
 import {Schema} from './schema'
 import {FMap, IEMap, EMap} from '../../components/collection-utils'
-import {toTurtle, TurtleBuilder} from '../../components/misc-utils'
+import {TurtleBuilder} from '../../components/misc-utils'
 import {DataFactory, FIBRA} from '../../models/rdf'
 import {DataModel, Class, Property} from './data-model'
 import { SerializationService } from 'services/worker-service/serialization-service';
 
 export class ProjectService {
 
-  private static deleteQuery: string = `DELETE {
+  private static updateQuery: string = `# PREFIXES
+DELETE {
 # STARTGRAPH
   # PATTERNS
 # ENDGRAPH
 }
+INSERT {
+# STARTGRAPH
+  # DATA
+# ENDGRAPH
+}
 WHERE {
+{
 # STARTGRAPH
   # PATTERNS
 # ENDGRAPH
+} UNION {}
 }`
 
   /* @ngInject */
@@ -80,20 +88,23 @@ WHERE {
     return this.deleteObject(updateEndpoint, citable.id, citable.source.graph)
   }
 
-  public deleteObjects(updateEndpoint: string, ids: string[], graph?: string): angular.IPromise<{}> {
-    let dq: string = graph ? ProjectService.deleteQuery.replace(/# STARTGRAPH/g, 'GRAPH <' + graph + '> {').replace(/# ENDGRAPH/g, '}') : ProjectService.deleteQuery.replace(/.*# STARTGRAPH\n/g, '').replace(/.*# ENDGRAPH\n/g, '')
-    dq = dq.replace(/# PATTERNS/g, ids.reduce((acc: string, id: string, index: number) => acc + ' <' + id + '> ?p' + index + ' ?o' + index + ' .', ''))
+  public updateObjects(updateEndpoint: string, deleteIds: string[], graph?: string, prefixes?: string, update?: string): angular.IPromise<{}> {
+    let dq: string = ProjectService.updateQuery
+    if (prefixes) dq = dq.replace(/# PREFIXES/g, prefixes)
+    if (graph) dq = dq.replace(/# STARTGRAPH/g, 'GRAPH <' + graph + '> {').replace(/# ENDGRAPH/g, '}')
+    dq = dq.replace(/# PATTERNS/g, deleteIds.reduce((acc: string, id: string, index: number) => acc + ' <' + id + '> ?p' + index + ' ?o' + index + ' .', ''))
+    if (update) dq = dq.replace(/# DATA/g, update)
     return this.fibraSparqlService.update(updateEndpoint, dq)
   }
 
   public deleteObject(updateEndpoint: string, id: string, graph?: string): angular.IPromise<{}> {
-    return this.deleteObjects(updateEndpoint, [id], graph)
+    return this.updateObjects(updateEndpoint, [id], graph)
   }
 
   public saveCitable(updateEndpoint: string, graphStoreEndpoint: string, ps: ICitable): angular.IPromise<{}> {
     let tb: TurtleBuilder = new TurtleBuilder()
     ps.toTurtle(tb)
-    return this.deleteObjects(updateEndpoint, tb.fragmentsById.keys(), ps.source.graph).then(() => this.fibraSparqlService.post(graphStoreEndpoint, toTurtle(tb), ps.source.graph))
+    return this.updateObjects(updateEndpoint, tb.fragmentsById.keys(), ps.source.graph, tb.sparqlPrefixes(), tb.toTurtle(false))
   }
 
 }
