@@ -3,7 +3,7 @@ import { ILayoutState, IItemState } from '../../services/project-service/project
 import { ILiteral } from '../../models/rdfjs';
 import { ActiveActionService } from '../../actions/active';
 import { Class, IClass, IProperty, Property } from '../../services/project-service/data-model';
-import { CNode, DataFactory, NamedNode, ONodeSet, RDF, SKOS } from '../../models/rdf';
+import { CNode, DataFactory, NamedNode, ONodeSet, RDF, SKOS, OWL } from '../../models/rdf';
 import { IFullItemState, IFullLayoutState } from '../../reducers/active';
 import { AutocompletionResults, Result, SparqlAutocompleteService, ResultGroup } from '../../services/sparql-autocomplete-service';
 import { SparqlItemService, PropertyToValues } from '../../services/sparql-item-service';
@@ -49,7 +49,8 @@ export class ActiveComponentController {
 
   private radiusInitial: number = 1
   private radius: number = 8
-  private radiusBounce: number = 12
+  private radii: number[] = [14, 11, 8, 5, 2]
+  private radiusBounce: number = 4
   private nodeSearchTopOffset: number = 39
   private nodeSearchTypeaheadHeight: number = 400
   private circularMenuTopOffset: number = 55
@@ -265,6 +266,7 @@ export class ActiveComponentController {
 
     this.updateCanvas()
     this.currentTableClass = this.allClasses()[0]
+    this.currentClasses = this.allClasses()
   }
 
   private linkNode(item: IFullItemState): void {
@@ -567,7 +569,7 @@ export class ActiveComponentController {
       .attr('r', this.radiusInitial + 'px')
 
     c.transition()
-        .attr('r', this.radiusBounce + 'px')
+        .attr('r', (this.radiusInitial + this.radiusBounce) + 'px')
       .transition()
       .attr('r', this.radius + 'px')
 
@@ -581,7 +583,18 @@ export class ActiveComponentController {
         return d.item === null
       })
       .attr('filter', d => this.selectedNodes.concat(this.dragSelection).indexOf(d) !== -1 ? 'url(#drop-shadow)' : '')
-      .transition().attr('r', this.radius + 'px')
+      .transition().attr('r', (d): string => {
+        console.log(JSON.stringify(this.currentClasses.map(c => c.value)))
+        if (d.item && d.item.localProperties.concat(d.item.remoteProperties).find(p => p.property.value === RDF.type.value)) {
+          let layerIndex: number = d.item.localProperties.concat(d.item.remoteProperties).find(p => p.property.value === RDF.type.value).values.reduce((a, b) => {
+            let foundIndex: number = this.currentClasses.findIndex(c => c.value === b.value.value)
+            return foundIndex !== -1 && foundIndex < a ? foundIndex : a
+          }, this.currentClasses.length - 1)
+          return this.radii[layerIndex] + 'px'
+        } else {
+          return this.radius + 'px'
+        }
+      })
     return sel
   }
 

@@ -107,7 +107,7 @@ script(type="text/ng-template" id="layersPopover.html")
       input(type="checkbox")
       span.checkbox-title Show layer effect
     hr
-    ul(ui-sortable)
+    ul(ui-sortable ng-model="$ctrl.currentClasses" ui-sortable-stop="$ctrl.updateCanvas.bind($ctrl)")
       li.layer-row(ng-repeat="class in $ctrl.currentClasses" ng-init="activeLayer=true")
         img.eye-switch(ng-click="activeLayer=!activeLayer" ng-class="{'disabled' : !activeLayer}" src=require("images/active/view_options.svg"))
         span.checkbox-title {{ class.labels | prefLang }}
