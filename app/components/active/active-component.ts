@@ -488,7 +488,7 @@ export class ActiveComponentController {
   }
 
   private sanitizeId(id: string): string {
-    return id.replace(/\/|\:|\.|\(|\)|\%|\#|\+|\_/g, '')
+    return 'f' + id.replace(/\/|\:|\.|\(|\)|\%|\#|\+|\_/g, '')
   }
 
   private nodeClick(d: IFullItemState, groups: SVGCircleElement[]): void {
@@ -584,7 +584,6 @@ export class ActiveComponentController {
       })
       .attr('filter', d => this.selectedNodes.concat(this.dragSelection).indexOf(d) !== -1 ? 'url(#drop-shadow)' : '')
       .transition().attr('r', (d): string => {
-        console.log(JSON.stringify(this.currentClasses.map(c => c.value)))
         if (d.item && d.item.localProperties.concat(d.item.remoteProperties).find(p => p.property.value === RDF.type.value)) {
           let layerIndex: number = d.item.localProperties.concat(d.item.remoteProperties).find(p => p.property.value === RDF.type.value).values.reduce((a, b) => {
             let foundIndex: number = this.currentClasses.findIndex(c => c.value === b.value.value)

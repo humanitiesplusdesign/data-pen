@@ -152,7 +152,6 @@ export class SourcesComponentController {
           })
         })
       })
-    console.log(classPropMap)
     return classPropMap
   }
 
