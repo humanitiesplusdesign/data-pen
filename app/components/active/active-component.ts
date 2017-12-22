@@ -539,7 +539,7 @@ export class ActiveComponentController {
 
   private showTooltips(): void {
     d3.selectAll<HTMLDivElement, {}>('.tooltips > .active-tooltip')
-      .style('top', (d: IFullItemState, i, grp) => (d.topOffset + 43) + 'px' )
+      .style('top', (d: IFullItemState, i, grp) => (d.topOffset + 41) + 'px' )
       .style('left', (d: IFullItemState, i, grp) => (d.leftOffset + (this.state.active.dividerPercent / 100 * window.innerWidth) + 17) + 'px' )
       .style('opacity', '1')
       .text((d: IFullItemState) => d.description ? d.description : 'Loading...')
@@ -760,10 +760,14 @@ export class ActiveComponentController {
       .on('mouseenter', (d: IFullItemState, i: number, grp: SVGCircleElement[]) => {
         if (d.item && !this.dragOrigX) {
           d3.select('#' + this.sanitizeId(d.ids[0].value))
+            .style('top', (d: IFullItemState, i, grp) => (d.topOffset + 41) + 'px' )
+            .style('left', (d: IFullItemState, i, grp) => (d.leftOffset + (this.state.active.dividerPercent / 100 * window.innerWidth) + 17) + 'px' )
             .style('opacity', '1')
             .text(d.description)
         } else if (!this.dragOrigX) {
           d3.select('#' + this.sanitizeId(d.ids[0].value))
+            .style('top', (d: IFullItemState, i, grp) => (d.topOffset + 41) + 'px' )
+            .style('left', (d: IFullItemState, i, grp) => (d.leftOffset + (this.state.active.dividerPercent / 100 * window.innerWidth) + 17) + 'px' )
             .style('opacity', '1')
             .text('Loading...')
         }
