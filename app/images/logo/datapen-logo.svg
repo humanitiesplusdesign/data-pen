@@ -23,6 +23,7 @@
     #shape-circle-1 {
       transform-origin: 63.4px 70.2px;
       animation: dot-1 2s ease infinite;
+      animation-direction: reverse;
     }
 
     @keyframes dot-1 {
@@ -46,6 +47,7 @@
     #shape-circle-2 {
       transform-origin: 38.7px 90.5px;
       animation: dot-2 2s ease infinite;
+      animation-direction: reverse;
     }
 
     @keyframes dot-2 {
@@ -72,6 +74,7 @@
     #shape-circle-3 {
       transform-origin: 90.9px 99.9px;
       animation: dot-3 2s ease infinite;
+      animation-direction: reverse;
     }
 
     @keyframes dot-3 {
@@ -97,19 +100,24 @@
         stroke-dashoffset: 0;
       }
       0% {
-        stroke-width: 0
+        stroke-width: 0;
+        opacity: 0;
       }
       20% {
-        stroke-width: 3
+        stroke-width: 3;
+        opacity: 1;
       }
       50% {
-        stroke-width: 3
+        stroke-width: 3;
+        opacity: 1;
       }
       80% {
-        stroke-width: 0
+        stroke-width: 0;
+        opacity: 0;
       }
       100% {
-        stroke-width: 0
+        stroke-width: 0;
+        opacity: 0;
       }
     }
 
@@ -117,6 +125,7 @@
       stroke-dasharray: 100;
       stroke-dashoffset: 100;
       animation: line-bottom 2s ease infinite;
+      animation-direction: reverse;
     }
 
     @keyframes line-top {
@@ -124,22 +133,27 @@
         stroke-dashoffset: 0;
       }
       0% {
-        stroke-width: 0
+        stroke-width: 0;
+        opacity: 0;
       }
       20% {
-        stroke-width: 0
+        stroke-width: 0;
       }
       40% {
-        stroke-width: 3
+        stroke-width: 3;
+        opacity: 1;
       }
       60% {
-        stroke-width: 3
+        stroke-width: 3;
+        opacity: 1;
       }
       90% {
-        stroke-width: 0
+        stroke-width: 0;
+        opacity: 0;
       }
       100% {
-        stroke-width: 0
+        stroke-width: 0;
+        opacity: 0;
       }
     }
 
@@ -147,6 +161,7 @@
       stroke-dasharray: 100;
       stroke-dashoffset: 100;
       animation: line-top 2s ease infinite;
+      animation-direction: reverse;
     }
 
   </style>
