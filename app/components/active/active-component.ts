@@ -99,7 +99,7 @@ export class ActiveComponentController {
   private currentClasses: IClass[] = []
 
   private linkMode: boolean = false
-  private linkEndFunction: (d: IFullItemState) => void
+  private linkEndFunction: (d?: IFullItemState) => void
 
   private gridApis: any = {}
 
@@ -275,14 +275,19 @@ export class ActiveComponentController {
     let link: d3.Selection<SVGElement, {}, HTMLElement, any> = g.append<SVGGElement>('g')
       .classed('link', true)
       .classed('item-link', true)
+      .classed('new-link', true)
 
     let line: d3.Selection<SVGElement, {}, HTMLElement, any> = link.append<SVGLineElement>('line')
       .classed('link-line', true)
+      .classed('new-link', true)
 
     this.linkMode = true
     this.linkEndFunction = (i: IFullItemState) => {
-      this.activeActionService.addLink(item, i)
+      if(i && i.item) {
+        this.activeActionService.addLink(item, i)
+      }
       link.remove()
+      this.linkMode = false
     }
 
     d3.select('.main-background')
@@ -310,6 +315,9 @@ export class ActiveComponentController {
 
     let r: d3.Selection<SVGRectElement, {}, HTMLElement, any> = g.select<SVGRectElement>('rect')
       .on('contextmenu', this.canvasClick.bind(this, g))
+      .on('click', () => {
+        this.linkEndFunction()
+      })
       .call(d3.drag()
         .on('start', () => {
           this.$scope.$apply(() => {
@@ -383,6 +391,7 @@ export class ActiveComponentController {
     this.$scope.$apply(() => {
       this.menu.hide()
       this.multiMenu.hide()
+      this.linkEndFunction()
       this.updateMenuTooltip()
 
       if (!this.currentlyAdding) {
