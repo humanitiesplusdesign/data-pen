@@ -104,7 +104,7 @@ script(type="text/ng-template" id="layersPopover.html")
     h4 Layers
     hr
     label.optionToggle
-      input(type="checkbox")
+      input(type="checkbox" ng-model="$ctrl.showLayerEffect" ng-click="$ctrl.updateCanvas()")
       span.checkbox-title Show layer effect
     hr
     ul(ui-sortable ng-model="$ctrl.currentClasses" ui-sortable-stop="$ctrl.updateCanvas.bind($ctrl)")

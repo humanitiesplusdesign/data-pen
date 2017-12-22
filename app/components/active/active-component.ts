@@ -98,6 +98,8 @@ export class ActiveComponentController {
   private currentTableClass: IClass = null
   private currentClasses: IClass[] = []
 
+  private showLayerEffect: boolean = false
+
   private linkMode: boolean = false
   private linkEndFunction: (d?: IFullItemState) => void
 
@@ -593,7 +595,7 @@ export class ActiveComponentController {
       })
       .attr('filter', d => this.selectedNodes.concat(this.dragSelection).indexOf(d) !== -1 ? 'url(#drop-shadow)' : '')
       .transition().attr('r', (d): string => {
-        if (d.item && d.item.localProperties.concat(d.item.remoteProperties).find(p => p.property.value === RDF.type.value)) {
+        if (this.showLayerEffect && d.item && d.item.localProperties.concat(d.item.remoteProperties).find(p => p.property.value === RDF.type.value)) {
           let layerIndex: number = d.item.localProperties.concat(d.item.remoteProperties).find(p => p.property.value === RDF.type.value).values.reduce((a, b) => {
             let foundIndex: number = this.currentClasses.findIndex(c => c.value === b.value.value)
             return foundIndex !== -1 && foundIndex < a ? foundIndex : a
