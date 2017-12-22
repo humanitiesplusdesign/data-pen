@@ -750,15 +750,13 @@ export class ActiveComponentController {
       })
       .on('mouseenter', (d: IFullItemState, i: number, grp: SVGCircleElement[]) => {
         if (d.item && !this.dragOrigX) {
-          d3.select('#' + this.sanitizeId(d.ids[0].value)).style('top', (grp[i].getBoundingClientRect().top - 5) + 'px')
-          .style('left', (grp[i].getBoundingClientRect().left + 25) + 'px')
-          .style('opacity', '1')
-          .text(d.description)
+          d3.select('#' + this.sanitizeId(d.ids[0].value))
+            .style('opacity', '1')
+            .text(d.description)
         } else if (!this.dragOrigX) {
-          d3.select('#' + this.sanitizeId(d.ids[0].value)).style('top', (grp[i].getBoundingClientRect().top - 5) + 'px')
-          .style('left', (grp[i].getBoundingClientRect().left + 25) + 'px')
-          .style('opacity', '1')
-          .text('Loading...')
+          d3.select('#' + this.sanitizeId(d.ids[0].value))
+            .style('opacity', '1')
+            .text('Loading...')
         }
       })
       .on('mouseout', (d: IFullItemState, i: number) => {
