@@ -22,6 +22,11 @@ export class BibliographyModalComponentController {
   private cancel(): void {
     this.dismiss()
   }
+
+  /* @ngInject */
+  constructor() {
+    
+  }
 }
 
 export class BiblographyModalComponent implements angular.IComponentOptions {

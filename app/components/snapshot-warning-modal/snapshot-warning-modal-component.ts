@@ -22,6 +22,11 @@ export class ConfirmSnapshotLoadComponentController {
   private cancel(): void {
     this.dismiss()
   }
+
+  /* @ngInject */
+  constructor() {
+    
+  }
 }
 
 export class ConfirmSnapshotLoadComponent implements angular.IComponentOptions {
