@@ -618,6 +618,13 @@ export class ActiveComponentController {
     return links
   }
 
+  private getLinkedNodes(node: IFullItemState): IFullItemState[] {
+    let links: ILink[] = this.calculateLinks()
+    return this.state.active.activeLayout.items.filter(i => {
+      return links.find(l => (l.source === node && l.target === i) || (l.target === node && l.source === i))
+    })
+  }
+
   private updateCanvas(): void {
     let s: d3.Selection<Element, {}, HTMLElement, any> = d3.select('.main-svg')
     let g: d3.Selection<Element, {}, HTMLElement, any> = s.select('.main-g')
@@ -722,10 +729,22 @@ export class ActiveComponentController {
             }
             console.log('Node clicked while holding shift. Currently: ' + this.selectedNodes.length + ' nodes selected.')
           } else {
-            this.selectedNodes = []
-            this.selectedNodes.push(d)
+            if(this.selectedNodes.indexOf(d) === -1) {
+              this.selectedNodes = []
+              this.selectedNodes.push(d)
+            }
           }
           this.$scope.$apply()
+          this.updateCanvas()
+        }
+      })
+      .on('dblclick', (d: IFullItemState, i: number, groups: SVGCircleElement[]) => {
+        // Keep in mind that click also triggers twice when this event triggers.
+        if(d.item) {
+          this.getLinkedNodes(d)
+            .filter(n => this.selectedNodes.indexOf(n) === -1)
+            .forEach(n => this.selectedNodes.push(n))
+          if(this.selectedNodes.indexOf(d) === -1) this.selectedNodes.push(d)
           this.updateCanvas()
         }
       })
