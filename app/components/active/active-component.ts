@@ -107,6 +107,8 @@ export class ActiveComponentController {
 
   private snapshotEditing: boolean = false
 
+  private lastClickTargetSelected: boolean = false
+
   /* @ngInject */
   constructor(private projectActionService: ProjectActionService,
               private activeActionService: ActiveActionService,
@@ -732,6 +734,7 @@ export class ActiveComponentController {
           this.linkEndFunction(d)
           this.linkMode = false
         } else {
+          this.lastClickTargetSelected = this.selectedNodes.indexOf(d) !== -1
           if (d3.event.shiftKey) {
             if (this.selectedNodes.indexOf(d) === -1) {
               this.selectedNodes.push(d)
@@ -752,7 +755,7 @@ export class ActiveComponentController {
       .on('dblclick', (d: IFullItemState, i: number, groups: SVGCircleElement[]) => {
         // Keep in mind that click also triggers twice when this event triggers.
         if (d.item) {
-          if (d3.event.shiftKey) {
+          if (this.lastClickTargetSelected) {
             this.selectedNodes.slice().forEach((n: IFullItemState) => {
               this.getLinkedNodes(n)
                 .filter(no => this.selectedNodes.indexOf(no) === -1)
