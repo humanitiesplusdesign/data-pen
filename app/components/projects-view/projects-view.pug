@@ -13,7 +13,7 @@
       p.message-text Something went wrong while loading your projects. Check your internet connection and try a refresh?
 
     .no-projects.col-md-8.col-md-offset-2(ng-if="$ctrl.projects.Projects.length === 0 && $ctrl.projectSourceState[id]=='ready'")
-      p.message-text A project contains a set of sources, filters, and active data, as well as tabular and graphical workspaces. Create a project to get started!
+      p.message-text A project contains a selection of sources, entities, and properties, as well as tabular and graphical workspaces. Create a project to get started!
 
     a(ui-sref="configure({sourceId:id})" ng-if="$ctrl.projectSourceState[id]=='ready'" )
       button.new-project-button(type="button" data-toggle="modal" data-target="#newProjectDialog" ng-class="$ctrl.projects.Projects.length === 0 ? 'none-position' : ''") Start new project
