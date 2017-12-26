@@ -393,7 +393,7 @@ export class ActiveComponentController {
     this.$scope.$apply(() => {
       this.menu.hide()
       this.multiMenu.hide()
-      this.linkEndFunction()
+      if(this.linkEndFunction) this.linkEndFunction()
       this.updateMenuTooltip()
 
       if (!this.currentlyAdding) {
