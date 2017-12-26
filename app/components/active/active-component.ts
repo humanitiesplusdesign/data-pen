@@ -318,7 +318,7 @@ export class ActiveComponentController {
     let r: d3.Selection<SVGRectElement, {}, HTMLElement, any> = g.select<SVGRectElement>('rect')
       .on('contextmenu', this.canvasClick.bind(this, g))
       .on('click', () => {
-        this.linkEndFunction()
+        if(this.linkEndFunction) this.linkEndFunction()
       })
       .call(d3.drag()
         .on('start', () => {
