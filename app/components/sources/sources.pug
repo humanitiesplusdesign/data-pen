@@ -66,7 +66,7 @@
                       span.calibre-numbers-kern {{ source.classStats.get(class.value) | number }} 
                       | entities
                       br
-                      span(ng-show="!source.propStats") Statistics unavailable
+                      span(ng-show="!source.propStats || source.propStats.size() === 0") Statistics unavailable
               .matrix-cell(ng-repeat="prop in $ctrl.propStatistics.get(class.value).keys() | orderBy: prop : true : $ctrl.propSubjectsComparator.bind($ctrl, class.value)" ng-style="{'background-color':'rgba(69, 106, 210, '+source.propStats.get(class.value).get(prop).subjects/source.classStats.get(class.value)+')'}" uib-popover="{{ source.propStats.get(class.value).get(prop).subjects }} / {{ source.classStats.get(class.value) }} ({{ source.propStats.get(class.value).get(prop).subjects / source.classStats.get(class.value) * 100 | number : 2 }}%)" popover-placement="bottom" popover-popup-delay="250" popover-trigger="'mouseenter'")
                 .stats.stats-available(ng-show="source.propStats.get(class.value).get(prop).subjects || source.propStats.get(class.value).get(prop).subjects === 0")
                   label(ng-class="{'text-white' : (source.propStats.get(class.value).get(prop).subjects / source.classStats.get(class.value) * 100 | number : 0) > 50}") {{ $ctrl.floor(source.propStats.get(class.value).get(prop).subjects / source.classStats.get(class.value) * 100) | number : 0 }}%

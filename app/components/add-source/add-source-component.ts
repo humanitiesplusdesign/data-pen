@@ -152,11 +152,10 @@ export class AddSourceComponentController {
 
     this.projectService.saveCitable(this.userSource.updateEndpoint, this.userSource.graphStoreEndpoint, p)
       .then(() => {
-        this.projectActionService.setProject(p.id, p.source.sparqlEndpoint, p.source.graph)
-          .then(() => {
-            this.close()
-          })
+        return this.projectActionService.setProject(p.id, p.source.sparqlEndpoint, p.source.graph)
       })
+
+    this.close()
   }
 
   private cancel(): void {
