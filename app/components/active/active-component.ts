@@ -318,7 +318,7 @@ export class ActiveComponentController {
     let r: d3.Selection<SVGRectElement, {}, HTMLElement, any> = g.select<SVGRectElement>('rect')
       .on('contextmenu', this.canvasClick.bind(this, g))
       .on('click', () => {
-        if(this.linkEndFunction) this.linkEndFunction()
+        if (this.linkEndFunction) this.linkEndFunction()
       })
       .call(d3.drag()
         .on('start', () => {
@@ -393,7 +393,7 @@ export class ActiveComponentController {
     this.$scope.$apply(() => {
       this.menu.hide()
       this.multiMenu.hide()
-      if(this.linkEndFunction) this.linkEndFunction()
+      if (this.linkEndFunction) this.linkEndFunction()
       this.updateMenuTooltip()
 
       if (!this.currentlyAdding) {
@@ -740,7 +740,7 @@ export class ActiveComponentController {
             }
             console.log('Node clicked while holding shift. Currently: ' + this.selectedNodes.length + ' nodes selected.')
           } else {
-            if(this.selectedNodes.indexOf(d) === -1) {
+            if (this.selectedNodes.indexOf(d) === -1) {
               this.selectedNodes = []
               this.selectedNodes.push(d)
             }
@@ -751,11 +751,19 @@ export class ActiveComponentController {
       })
       .on('dblclick', (d: IFullItemState, i: number, groups: SVGCircleElement[]) => {
         // Keep in mind that click also triggers twice when this event triggers.
-        if(d.item) {
-          this.getLinkedNodes(d)
-            .filter(n => this.selectedNodes.indexOf(n) === -1)
-            .forEach(n => this.selectedNodes.push(n))
-          if(this.selectedNodes.indexOf(d) === -1) this.selectedNodes.push(d)
+        if (d.item) {
+          if (d3.event.shiftKey) {
+            this.selectedNodes.forEach((n: IFullItemState) => {
+              this.getLinkedNodes(n)
+                .filter(no => this.selectedNodes.indexOf(no) === -1)
+                .forEach(no => this.selectedNodes.push(no))
+            })
+          } else {
+            this.getLinkedNodes(d)
+              .filter(n => this.selectedNodes.indexOf(n) === -1)
+              .forEach(n => this.selectedNodes.push(n))
+            if (this.selectedNodes.indexOf(d) === -1) this.selectedNodes.push(d)
+          }
           this.updateCanvas()
         }
       })
