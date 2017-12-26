@@ -753,7 +753,7 @@ export class ActiveComponentController {
         // Keep in mind that click also triggers twice when this event triggers.
         if (d.item) {
           if (d3.event.shiftKey) {
-            this.selectedNodes.forEach((n: IFullItemState) => {
+            this.selectedNodes.slice().forEach((n: IFullItemState) => {
               this.getLinkedNodes(n)
                 .filter(no => this.selectedNodes.indexOf(no) === -1)
                 .forEach(no => this.selectedNodes.push(no))
