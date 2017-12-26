@@ -128,6 +128,7 @@ export class SourcesComponentController {
   private buildPropStatistics(): IMap<IMap<PropertyStatistics>> {
     let classPropMap: IEMap<IMap<PropertyStatistics>> = new EMap<FMap<PropertyStatistics>>(() => new FMap<PropertyStatistics>())
     this.state.sources.archiveSources.concat(this.state.sources.authoritySources)
+      .filter(ae => ae.propStats)
       .forEach((ae) => {
         ae.propStats.entries().forEach((ckv) => {
           let propMap: IMap<PropertyStatistics> = classPropMap.goc(ckv.key)

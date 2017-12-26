@@ -16,6 +16,7 @@ import { UUID } from 'components/misc-utils';
 export const SET_SOURCE_CLASS_ACTIVE: string = 'SET_SOURCE_CLASS_ACTIVE'
 export const ADD_ARCHIVE_SOURCE: string = 'ADD_ARCHIVE_SOURCE'
 export const ADD_AUTHORITY_SOURCE: string = 'ADD_AUTHORITY_SOURCE'
+export const ADD_PROP_STATS_TO_SOURCE: string = 'ADD_PROP_STATS_TO_SOURCE'
 export const CLEAR_SOURCES_STATE: string = 'CLEAR_SOURCES_STATE'
 export const UPLOAD_FILE: string = 'UPLOAD_FILE'
 

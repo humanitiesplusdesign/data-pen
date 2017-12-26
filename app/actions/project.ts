@@ -2,7 +2,7 @@ import { ILayoutState } from '../services/project-service/project';
 import { SparqlStatisticsService } from '../services/sparql-statistics-service';
 import { CLEAR_FILTER_STATE } from './filter';
 import { ActiveActionService, CLEAR_ACTIVE_STATE } from './active';
-import { CLEAR_SOURCES_STATE, ADD_ARCHIVE_SOURCE, ADD_AUTHORITY_SOURCE } from './sources';
+import { CLEAR_SOURCES_STATE, ADD_ARCHIVE_SOURCE, ADD_AUTHORITY_SOURCE, ADD_PROP_STATS_TO_SOURCE } from './sources';
 import { Action, Dispatch } from 'redux'
 import {ProjectService} from 'services/project-service/project-service'
 import {Project} from 'services/project-service/project'
@@ -55,14 +55,22 @@ export class ProjectActionService {
         project => {
           project.archiveEndpoints.forEach(ae => {
             this.sparqlStatisticsService.getClassStatistics(ae).then(stats => {
+              this.$ngRedux.dispatch({
+                type: ADD_ARCHIVE_SOURCE,
+                payload: {
+                  id: ae.id,
+                  labels: ae.labels,
+                  classes: project.dataModel.classMap.values().filter(c => stats.has(c.value)),
+                  classStats: stats,
+                  propStats: null
+                }
+              })
+
               this.sparqlStatisticsService.getPropertyStatistics(ae).then(propStats => {
                 this.$ngRedux.dispatch({
-                  type: ADD_ARCHIVE_SOURCE,
+                  type: ADD_PROP_STATS_TO_SOURCE,
                   payload: {
-                    id: ae.id,
-                    labels: ae.labels,
-                    classes: project.dataModel.classMap.values().filter(c => stats.has(c.value)),
-                    classStats: stats,
+                    source: this.$ngRedux.getState().sources.archiveSources.concat(this.$ngRedux.getState().sources.authoritySources).find(s => s.id === ae.id),
                     propStats: propStats
                   }
                 })
@@ -71,14 +79,22 @@ export class ProjectActionService {
           })
           project.authorityEndpoints.forEach(ae => {
             this.sparqlStatisticsService.getClassStatistics(ae).then(stats => {
+              this.$ngRedux.dispatch({
+                type: ADD_AUTHORITY_SOURCE,
+                payload: {
+                  id: ae.id,
+                  labels: ae.labels,
+                  classes: project.dataModel.classMap.values().filter(c => stats.has(c.value)),
+                  classStats: stats,
+                  propStats: null
+                }
+              })
+
               this.sparqlStatisticsService.getPropertyStatistics(ae).then(propStats => {
                 this.$ngRedux.dispatch({
-                  type: ADD_AUTHORITY_SOURCE,
+                  type: ADD_PROP_STATS_TO_SOURCE,
                   payload: {
-                    id: ae.id,
-                    labels: ae.labels,
-                    classes: project.dataModel.classMap.values().filter(c => stats.has(c.value)),
-                    classStats: stats,
+                    source: this.$ngRedux.getState().sources.archiveSources.concat(this.$ngRedux.getState().sources.authoritySources).find(s => s.id === ae.id),
                     propStats: propStats
                   }
                 })
