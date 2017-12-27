@@ -869,9 +869,14 @@ export class ActiveComponentController {
     this.multiMenu.hide()
     let nativePercent: number = 100 * evt.clientX / window.innerWidth
     this.activeActionService.setActiveDividerPercentage(nativePercent > 98 ? 100 : nativePercent < 2 ? 0 : nativePercent)
-    this.$timeout(0).then(() => d3.values(this.gridApis).forEach((gapi) => gapi.core.handleWindowResize()))
+    this.forceTableResize()
     if (this.viewOptionsShowLabels) this.showTooltips()
     if (this.viewOptionsShowLinkLabels) this.$timeout(0).then(() => this.showLinkTooltips())
+  }
+
+  private forceTableResize(clss?: IClass): void {
+    let gapis: any[] = clss ? [this.gridApis[clss.value]] : d3.values(this.gridApis)
+    this.$timeout(0).then(() => gapis.forEach((gapi) => gapi.core.handleWindowResize()))
   }
 
   private tableWidthStyle(): {} {
