@@ -6,7 +6,7 @@ import { Class, IClass, IProperty, Property } from '../../services/project-servi
 import { CNode, DataFactory, NamedNode, ONodeSet, RDF, SKOS, OWL } from '../../models/rdf';
 import { IFullItemState, IFullLayoutState } from '../../reducers/active';
 import { AutocompletionResults, Result, SparqlAutocompleteService, ResultGroup } from '../../services/sparql-autocomplete-service';
-import { SparqlItemService, PropertyToValues } from '../../services/sparql-item-service';
+import { SparqlItemService, PropertyToValues, IRichPropertyValue } from '../../services/sparql-item-service';
 import * as angular from 'angular';
 import { ProjectService } from 'services/project-service/project-service'
 import { ProjectActionService } from 'actions/project';
@@ -28,6 +28,7 @@ import { HIDE_ITEM } from 'actions/items';
 import { getPrefLangString } from 'filters/preferred-language-filter';
 import { GeneralState } from 'reducers/general';
 import 'ng-focus-if';
+import { generateAcronym } from 'filters/make-acronym-filter';
 
 declare function unescape(s: string): string;
 
@@ -287,7 +288,7 @@ export class ActiveComponentController {
 
     this.linkMode = true
     this.linkEndFunction = (i: IFullItemState) => {
-      if(i && i.item) {
+      if (i && i.item) {
         this.activeActionService.addLink(item, i)
       }
       link.remove()
@@ -980,6 +981,7 @@ export class ActiveComponentController {
 
     let generatedColumns: Map<string, string[]> = new Map()
     let generatedColumnLabels: Map<string, ONodeSet<ILiteral>[]> = new Map()
+    let generatedColumnMultiples: Map<string, boolean[]> = new Map()
 
     let data: {}[] = this.state.active.activeLayout.items.map((item) => {
       let obj: {} = {}
@@ -990,34 +992,40 @@ export class ActiveComponentController {
 
       if (item.item) {
         item.item.localProperties.concat(item.item.remoteProperties).forEach((p) => {
-          let propValue: string = p.values.map((v) => {
-            return v.value.labels.values && v.value.labels.values() && v.value.labels.values()[0] ?
-              v.value.labels.values()[0].value :
-              // v.value.labels.values ?
-                // v.value.labels.values[0] :
-                v.value.value
-          }).join(',')
+          let propValue: IRichPropertyValue[] = p.values// .map((v) => {
+            // return v.value.labels.values && v.value.labels.values() && v.value.labels.values()[0] ?
+          //     v.value.labels.values()[0].value :
+          //     // v.value.labels.values ?
+          //       // v.value.labels.values[0] :
+          //       v.value.value
+          // })
           obj[this.sanitizeId(p.property.value)] = propValue
           if (typeProp) {
             typeProp.values.forEach(v => {
               if (!generatedColumns.has(v.value.value)) {
                 generatedColumns.set(v.value.value, [])
                 generatedColumnLabels.set(v.value.value, [])
+                generatedColumnMultiples.set(v.value.value, [])
               }
               if (generatedColumns.get(v.value.value).indexOf(p.property.value) === -1 && p.property.value !== RDF.type.value && p.property.value !== SKOS.prefLabel.value) {
                 generatedColumns.get(v.value.value).push(p.property.value)
                 generatedColumnLabels.get(v.value.value).push(p.property.labels)
+                generatedColumnMultiples.get(v.value.value).push(false)
               }
+              if (propValue && propValue.length && propValue.length > 1) generatedColumnMultiples.get(v.value.value).splice(generatedColumns.get(v.value.value).indexOf(p.property.value), 1, true)
             })
           } else {
             if (!generatedColumns.has('other')) {
               generatedColumns.set('other', [])
               generatedColumnLabels.set('other', [])
+              generatedColumnMultiples.set('other', [])
             }
             if (generatedColumns.get('other').indexOf(p.property.value) === -1 && p.property.value !== RDF.type.value && p.property.value !== SKOS.prefLabel.value) {
               generatedColumns.get('other').push(p.property.value)
               generatedColumnLabels.get('other').push(p.property.labels)
+              generatedColumnMultiples.get('other').push(false)
             }
+            if (propValue && propValue.length && propValue.length > 1) generatedColumnMultiples.get('other').splice(generatedColumns.get('other').indexOf(p.property.value), 1, true)
           }
         })
       }
@@ -1044,14 +1052,26 @@ export class ActiveComponentController {
 
         if (generatedColumns.has(c)) {
           generatedColumns.get(c).forEach((col, i) => {
-            columnDefs.push({
+            let cd: {} = {
               name: col,
               field: this.sanitizeId(col),
               displayName: generatedColumnLabels.get(c)[i].values && generatedColumnLabels.get(c)[i].values()[0] ? generatedColumnLabels.get(c)[i].values()[0].value : '',
               width: 200
-            })
+            }
+            if (generatedColumnMultiples.get(c)[i]) {
+              cd['cellTemplate'] = '<div class="ui-grid-cell-contents" title="TOOLTIP">' +
+                  '<span ng-repeat="propValue in COL_FIELD" class="table-cell-pill">{{ propValue.value.labels | prefLang }}</span>' +
+                '</div>'
+            } else {
+              cd['cellTemplate'] = '<div class="ui-grid-cell-contents" title="TOOLTIP">' +
+                  '<span ng-repeat="propValue in COL_FIELD">{{ propValue.value.labels | prefLang }}</span>' +
+                '</div>'
+            }
+            columnDefs.push(cd)
           })
         }
+
+        console.log([{}].concat(data.filter((d) => { return d['types'] ? d['types'].map(v => v.value.value).indexOf(c) !== -1 : false })))
 
         this.gridOptions[c] = {
           data: [{}].concat(data.filter((d) => { return d['types'] ? d['types'].map(v => v.value.value).indexOf(c) !== -1 : false })),
