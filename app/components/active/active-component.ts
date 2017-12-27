@@ -1009,63 +1009,79 @@ export class ActiveComponentController {
                 generatedColumnLabels.get(v.value.value).push(p.property.labels)
               }
             })
+          } else {
+            if (!generatedColumns.has('other')) {
+              generatedColumns.set('other', [])
+              generatedColumnLabels.set('other', [])
+            }
+            if (generatedColumns.get('other').indexOf(p.property.value) === -1 && p.property.value !== RDF.type.value && p.property.value !== SKOS.prefLabel.value) {
+              generatedColumns.get('other').push(p.property.value)
+              generatedColumnLabels.get('other').push(p.property.labels)
+            }
           }
         })
       }
       return obj
     })
 
-    this.allClasses().forEach((c) => {
-      let columnDefs: {}[] = [
-        {
-          field: 'id',
-          name: 'id',
-          cellTemplate: '<div class="ui-grid-cell-contents"><a href="{{row.entity.id}}" target="_blank">{{row.entity.id}}</a></div>',
-          width: 200
-        },
-        {
-          field: 'description',
-          name: 'description',
-          width: 200
-        }
-      ]
-
-      if (generatedColumns.has(c.value)) {
-        generatedColumns.get(c.value).forEach((col, i) => {
-          columnDefs.push({
-            name: col,
-            field: this.sanitizeId(col),
-            displayName: generatedColumnLabels.get(c.value)[i].values && generatedColumnLabels.get(c.value)[i].values()[0] ? generatedColumnLabels.get(c.value)[i].values()[0].value : '',
+    this.allClasses()
+      .map(c => c.value)
+      .concat(['other'])
+      .forEach((c) => {
+        let columnDefs: {}[] = [
+          {
+            field: 'id',
+            name: 'id',
+            cellTemplate: '<div class="ui-grid-cell-contents"><a href="{{row.entity.id}}" target="_blank">{{row.entity.id}}</a></div>',
             width: 200
-          })
-        })
-      }
+          },
+          {
+            field: 'description',
+            name: 'description',
+            width: 200
+          }
+        ]
 
-      this.gridOptions[c.value] = {
-        data: [{}].concat(data.filter((d) => { return d['types'] ? d['types'].map(v => v.value.value).indexOf(c.value) !== -1 : false })),
-        enableFiltering: true,
-        multiSelect: true,
-        columnDefs: columnDefs,
-        onRegisterApi: (gridApi) => {
-          // set gridApi on scope
-          this.gridApis[c.value] = gridApi
-          gridApi.edit.on.afterCellEdit(this.$scope, (rowEntity, colDef, newValue, oldValue) => {
-            console.log(rowEntity, colDef, newValue, oldValue)
-            this.$scope.$apply();
-          })
-
-          gridApi.selection.on.rowSelectionChanged(this.$scope, (row) => {
-            let selectedIds: string[] = this.selectedNodes.map(n => n.ids[0].value)
-            if (row.isSelected && selectedIds.indexOf(row.entity.id) === -1 && this.state.active.activeLayout.items.find(i => i.ids[0].value === row.entity.id)) {
-              this.selectedNodes.push(this.state.active.activeLayout.items.find(i => i.ids[0].value === row.entity.id))
-            } else if (!row.isSelected && selectedIds.indexOf(row.entity.id) !== -1) {
-              this.selectedNodes.splice(selectedIds.indexOf(row.entity.id), 1)
-            }
-            this.updateCanvas()
+        if (generatedColumns.has(c)) {
+          generatedColumns.get(c).forEach((col, i) => {
+            columnDefs.push({
+              name: col,
+              field: this.sanitizeId(col),
+              displayName: generatedColumnLabels.get(c)[i].values && generatedColumnLabels.get(c)[i].values()[0] ? generatedColumnLabels.get(c)[i].values()[0].value : '',
+              width: 200
+            })
           })
         }
-      }
-    })
+
+        this.gridOptions[c] = {
+          data: [{}].concat(data.filter((d) => { return d['types'] ? d['types'].map(v => v.value.value).indexOf(c) !== -1 : false })),
+          enableFiltering: true,
+          multiSelect: true,
+          columnDefs: columnDefs,
+          onRegisterApi: (gridApi) => {
+            // set gridApi on scope
+            this.gridApis[c] = gridApi
+            gridApi.edit.on.afterCellEdit(this.$scope, (rowEntity, colDef, newValue, oldValue) => {
+              console.log(rowEntity, colDef, newValue, oldValue)
+              this.$scope.$apply();
+            })
+
+            gridApi.selection.on.rowSelectionChanged(this.$scope, (row) => {
+              let selectedIds: string[] = this.selectedNodes.map(n => n.ids[0].value)
+              if (row.isSelected && selectedIds.indexOf(row.entity.id) === -1 && this.state.active.activeLayout.items.find(i => i.ids[0].value === row.entity.id)) {
+                this.selectedNodes.push(this.state.active.activeLayout.items.find(i => i.ids[0].value === row.entity.id))
+              } else if (!row.isSelected && selectedIds.indexOf(row.entity.id) !== -1) {
+                this.selectedNodes.splice(selectedIds.indexOf(row.entity.id), 1)
+              }
+              this.updateCanvas()
+            })
+          }
+        }
+
+        if (c === 'other') {
+          this.gridOptions[c].data = [{}].concat(data.filter((d) => { return d['types'].length === 0 }))
+        }
+      })
   }
 }
 
