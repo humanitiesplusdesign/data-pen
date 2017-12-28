@@ -22,9 +22,9 @@
     .form-group
       label.col-md-2.control-label(for="groupField") Group
       .col-md-8
-        input.form-control(type="text" id="groupField" aria-describedby="valueHelpBlock")
+        input.form-control(type="text" id="groupField" aria-describedby="valueHelpBlock" ng-model="groupText")
       label.col-md-2.control-label
-        button.select-button Apply
+        button.select-button(ng-click="$ctrl.setGroup(groupText)") Apply
   br
   form.form-horizontal
     .form-group

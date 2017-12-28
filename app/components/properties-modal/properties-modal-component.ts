@@ -1,13 +1,14 @@
 'use strict'
-import { ActiveActionService } from '../../actions/active';
-import { NamedNode, RDF, SKOS } from '../../models/rdf';
-import { PropertyToValues, SparqlItemService } from '../../services/sparql-item-service';
+import { ActiveActionService, ADD_ITEM_TO_ITEM_STATE } from '../../actions/active';
+import { NamedNode, RDF, SKOS, FIBRA, CNode } from '../../models/rdf';
+import { PropertyToValues, SparqlItemService, PropertyAndValue, Item } from '../../services/sparql-item-service';
 import { IRootState } from '../../reducers';
 import { IFibraNgRedux } from 'reducers';
 import { IActiveState, IFullItemState } from '../../reducers/active';
 
 import * as angular from 'angular';
-import { Mark } from 'services/project-service/project';
+import { Mark, IItemState } from 'services/project-service/project';
+import { Property } from 'services/project-service/data-model';
 
 interface IPropertiesModalComponentControllerState {
   active: IActiveState
@@ -28,7 +29,9 @@ export class PropertiesModalComponentController {
   /* @ngInject */
   constructor(
     private $ngRedux: IFibraNgRedux,
-    private activeActionService: ActiveActionService
+    private activeActionService: ActiveActionService,
+    private sparqlItemService: SparqlItemService,
+    private $q: angular.IQService
   ) {
     let stateUnsubscribe: () => void = $ngRedux.connect(
       (state: IRootState) => {
@@ -52,6 +55,27 @@ export class PropertiesModalComponentController {
   private setMark(mark?: Mark) {
     this.resolve.items.forEach(it => it.mark = mark)
     this.resolve.update()
+  }
+
+  private setGroup(group: string) {
+    this.$q.all(
+      this.resolve.items.map((item: IItemState) => {
+        return this.sparqlItemService.alterItem(item.ids[0], [new PropertyAndValue(new Property(FIBRA.groupProp), new CNode(group, 'Literal'))])
+      })
+    ).then(() => {
+      return this.sparqlItemService.getItems(this.resolve.items.map((item: IItemState) => item.ids), true)
+        .then((items) => {
+          return items.forEach((item: Item) => {
+            this.$ngRedux.dispatch({
+              type: ADD_ITEM_TO_ITEM_STATE,
+              payload: {
+                itemState: this.resolve.items.find((i) => i.ids[0].value === item.value),
+                fullItem: item
+              }
+            })
+          })
+        })
+    })
   }
 }
 
