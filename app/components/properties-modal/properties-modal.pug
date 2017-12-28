@@ -1,0 +1,39 @@
+.modal-header
+  h4.modal-title#modal-title Add local properties to {{ $ctrl.titleText }}
+.modal-body#modal-body
+  br
+  form.form-horizontal
+    .form-group
+      span#valueHelpBlock.help-block.col-md-offset-2.col-md-10 Create new properties or add values to existing properties
+    .form-group
+      label.col-md-2.control-label(for="keyField") Key
+      .col-md-8
+        input.form-control(type="text" id="keyField" placeholder="e.g. Place of Birth")
+    .form-group
+      label.col-md-2.control-label(for="valueField") Value
+      .col-md-8
+        input.form-control(type="text" id="valueField" placeholder="e.g. Helsinki" aria-describedby="valueHelpBlock")
+      label.col-md-2.control-label
+        button.select-button Apply
+  br
+  form.form-horizontal
+    .form-group
+      span#groupHelpBlock.help-block.col-md-offset-2.col-md-10 Add a group to node(s)
+    .form-group
+      label.col-md-2.control-label(for="groupField") Group
+      .col-md-8
+        input.form-control(type="text" id="groupField" aria-describedby="valueHelpBlock")
+      label.col-md-2.control-label
+        button.select-button Apply
+  br
+  form.form-horizontal
+    .form-group
+      label.col-md-2.control-label Mark
+      .col-md-10
+        button.btn-danger.btn-circle
+        button.btn-warning.btn-circle
+        button.btn-success.btn-circle
+        button.btn-primary.btn-circle
+        button.btn-default.btn-circle
+.modal-footer
+  button.cancel-button.transition-200(ng-click="$ctrl.close()") Close

@@ -93,8 +93,8 @@ export class ActiveComponentController {
   private viewOptionsShowLinkLabels: boolean = false
   private gridOptions: {} = {}
 
-  private selectedNodes: IItemState[] = []
-  private dragSelection: IItemState[] = []
+  private selectedNodes: IFullItemState[] = []
+  private dragSelection: IFullItemState[] = []
 
   private currentTableClass: IClass = null
   private currentClasses: IClass[] = []
@@ -153,12 +153,15 @@ export class ActiveComponentController {
         }
       }, {
         icon: 'properties-icon',
-        title: 'Properties'
+        title: 'Properties',
+        click: () => {
+          this.buildAndDisplayPropertiesMenu([this.currentMenuItem])
+        }
       }, {
         icon: 'expand-icon',
         title: 'Expand',
         click: () => {
-          this.buildAndDisplayPropertiesMenu(this.currentMenuItem)
+          this.buildAndDisplayExpandMenu(this.currentMenuItem)
         }
       }, {
         icon: 'reconcile-icon',
@@ -185,10 +188,10 @@ export class ActiveComponentController {
           // this.linkNode(this.currentMenuItem)
         }
       }, {
-        icon: 'expand-icon',
-        title: 'Expand',
+        icon: 'properties-icon',
+        title: 'Properties',
         click: () => {
-          // this.buildAndDisplayPropertiesMenu(this.currentMenuItem)
+          this.buildAndDisplayPropertiesMenu(this.selectedNodes)
         }
       }, {
         icon: 'invert-icon',
@@ -304,7 +307,7 @@ export class ActiveComponentController {
       })
   }
 
-  private buildAndDisplayPropertiesMenu(item: IFullItemState): void {
+  private buildAndDisplayExpandMenu(item: IFullItemState): void {
     let modalInstance: any = this.$uibModal.open({
       animation: true,
       component: 'expandModal',
@@ -312,6 +315,16 @@ export class ActiveComponentController {
         item: function(): IFullItemState { return item }
       }
     });
+  }
+
+  private buildAndDisplayPropertiesMenu(items: IFullItemState[]): void {
+    let modalInstance: any = this.$uibModal.open({
+      animation: true,
+      component: 'propertiesModal',
+      resolve: {
+        items: function(): IFullItemState[] { return items }
+      }
+    })
   }
 
   private buildCanvas(): void {
