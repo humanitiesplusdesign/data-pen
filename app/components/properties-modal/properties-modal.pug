@@ -8,13 +8,13 @@
     .form-group
       label.col-md-2.control-label(for="keyField") Key
       .col-md-8
-        input.form-control(type="text" id="keyField" placeholder="e.g. Place of Birth")
+        input.form-control(type="text" id="keyField" placeholder="e.g. Place of Birth" ng-model="$ctrl.selectedPropDescription" uib-typeahead="property for property in $ctrl.getFilteredProperties($viewValue) | limitTo: 10" typeahead-template-url="resultTemplate.html" typeahead-on-select="$ctrl.onPropertySelect($item, $model, $label, $event)" ng-change="$ctrl.selectedProp = null")
     .form-group
       label.col-md-2.control-label(for="valueField") Value
       .col-md-8
-        input.form-control(type="text" id="valueField" placeholder="e.g. Helsinki" aria-describedby="valueHelpBlock")
+        input.form-control(type="text" id="valueField" placeholder="e.g. Helsinki" aria-describedby="valueHelpBlock" ng-model="$ctrl.selectedValueDescription" uib-typeahead="value for value in $ctrl.getFilteredValues($viewValue) | limitTo: 10" typeahead-template-url="resultTemplate.html" typeahead-on-select="$ctrl.onValueSelect($item, $model, $label, $event)" ng-change="$ctrl.selectedValue = null")
       label.col-md-2.control-label
-        button.select-button Apply
+        button.select-button(ng-click="$ctrl.applyPropValueSelection()") Apply
   br
   form.form-horizontal
     .form-group
@@ -39,3 +39,6 @@
         button.select-button(ng-click="$ctrl.setMark()") Remove
 .modal-footer
   button.cancel-button.transition-200(ng-click="$ctrl.close()") Close
+script(type="text/ng-template" id="resultTemplate.html")
+  a
+    span.resultActual {{ match.model.labels | prefLang }}

@@ -1,6 +1,6 @@
 'use strict'
 import { ActiveActionService, ADD_ITEM_TO_ITEM_STATE } from '../../actions/active';
-import { NamedNode, RDF, SKOS, FIBRA, CNode } from '../../models/rdf';
+import { NamedNode, RDF, SKOS, FIBRA, CNode, INode } from '../../models/rdf';
 import { PropertyToValues, SparqlItemService, PropertyAndValue, Item } from '../../services/sparql-item-service';
 import { IRootState } from '../../reducers';
 import { IFibraNgRedux } from 'reducers';
@@ -8,10 +8,17 @@ import { IActiveState, IFullItemState } from '../../reducers/active';
 
 import * as angular from 'angular';
 import { Mark, IItemState } from 'services/project-service/project';
-import { Property } from 'services/project-service/data-model';
+import { Property, IProperty } from 'services/project-service/data-model';
+import { INamedNode } from 'models/rdfjs';
+import { ProjectState } from 'reducers/project';
+import { GeneralState } from 'reducers/general';
+
+import { getPrefLangString } from 'filters/preferred-language-filter';
 
 interface IPropertiesModalComponentControllerState {
-  active: IActiveState
+  active: IActiveState,
+  project: ProjectState,
+  general: GeneralState
 }
 
 export class PropertiesModalComponentController {
@@ -26,6 +33,11 @@ export class PropertiesModalComponentController {
   private marks: Mark[] = [Mark.Red, Mark.Yellow, Mark.Green, Mark.Blue, Mark.White]
   private itemProperties: PropertyToValues[]
 
+  private selectedProp: IProperty
+  private selectedPropDescription: string
+  private selectedValue: INode
+  private selectedValueDescription: string
+
   /* @ngInject */
   constructor(
     private $ngRedux: IFibraNgRedux,
@@ -36,7 +48,9 @@ export class PropertiesModalComponentController {
     let stateUnsubscribe: () => void = $ngRedux.connect(
       (state: IRootState) => {
         return {
-          active: state.active
+          active: state.active,
+          project: state.project,
+          general: state.general
         }
       },
       null)(this.state)
@@ -57,10 +71,37 @@ export class PropertiesModalComponentController {
     this.resolve.update()
   }
 
-  private setGroup(group: string) {
+  private getFilteredProperties(filter: string): IProperty[] {
+    return this.state.project.project.dataModel.propertyMap.values()
+      .filter(prop => prop.labels.values().map(l => l.value).join().toLowerCase().indexOf(filter.toLowerCase()) !== -1)
+  }
+
+  private onPropertySelect($item: IProperty, $model, $label, $event): void {
+    this.selectedProp = $item
+    this.selectedPropDescription = getPrefLangString($item.labels, this.state.general.language)
+  }
+
+  private getFilteredValues(filter: string): Item[] {
+    return this.state.active.activeLayout.items.map(i => i.item).filter(i => i)
+      .filter(i => i.labels.values().map(l => l.value).join().toLowerCase().indexOf(filter.toLowerCase()) !== -1)
+  }
+
+  private onValueSelect($item: Item, $model, $label, $event): void {
+    this.selectedValue = $item
+    this.selectedValueDescription = getPrefLangString($item.labels, this.state.general.language)
+  }
+
+  private applyPropValueSelection(): void {
+    if(!this.selectedPropDescription || !this.selectedValueDescription) return
+    let localProp: IProperty = this.selectedProp ? this.selectedProp : new Property(new NamedNode(this.selectedPropDescription))
+    let localValue: INode = this.selectedValue ? this.selectedValue : new CNode(this.selectedValueDescription, 'Literal')
+    this.setProperty(localProp, localValue)
+  }
+
+  private setProperty(prop: IProperty, value: INode): void {
     this.$q.all(
       this.resolve.items.map((item: IItemState) => {
-        return this.sparqlItemService.alterItem(item.ids[0], [new PropertyAndValue(new Property(FIBRA.groupProp), new CNode(group, 'Literal'))])
+        return this.sparqlItemService.alterItem(item.ids[0], [new PropertyAndValue(prop, value)])
       })
     ).then(() => {
       return this.sparqlItemService.getItems(this.resolve.items.map((item: IItemState) => item.ids), true)
@@ -77,6 +118,10 @@ export class PropertiesModalComponentController {
         })
     })
   }
+
+  private setGroup(group: string): void {
+    this.setProperty(new Property(FIBRA.groupProp), new CNode(group, 'Literal'))
+  }
 }
 
 export class PropertiesModalComponent implements angular.IComponentOptions {
@@ -89,5 +134,5 @@ export class PropertiesModalComponent implements angular.IComponentOptions {
   public controller: (new (...args: any[]) => angular.IController) = PropertiesModalComponentController
 }
 
-angular.module('fibra.components.properties-modal', [])
+angular.module('fibra.components.properties-modal', ['ui.bootstrap'])
   .component('propertiesModal', new PropertiesModalComponent())
