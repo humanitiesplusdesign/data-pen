@@ -1,5 +1,5 @@
 'use strict'
-import { ILayoutState, IItemState } from '../../services/project-service/project';
+import { ILayoutState, IItemState, Mark } from '../../services/project-service/project';
 import { ILiteral } from '../../models/rdfjs';
 import { ActiveActionService } from '../../actions/active';
 import { Class, IClass, IProperty, Property } from '../../services/project-service/data-model';
@@ -308,7 +308,7 @@ export class ActiveComponentController {
   }
 
   private buildAndDisplayExpandMenu(item: IFullItemState): void {
-    let modalInstance: any = this.$uibModal.open({
+    let modalInstance: angular.ui.bootstrap.IModalInstanceService = this.$uibModal.open({
       animation: true,
       component: 'expandModal',
       resolve: {
@@ -318,12 +318,19 @@ export class ActiveComponentController {
   }
 
   private buildAndDisplayPropertiesMenu(items: IFullItemState[]): void {
-    let modalInstance: any = this.$uibModal.open({
+    let update: () => void = this.updateCanvas.bind(this)
+    let modalInstance: angular.ui.bootstrap.IModalInstanceService = this.$uibModal.open({
       animation: true,
       component: 'propertiesModal',
       resolve: {
-        items: function(): IFullItemState[] { return items }
+        items: function(): IFullItemState[] { return items },
+        update: function(): () => void { return update }
       }
+    })
+
+    modalInstance.result.finally(() => {
+      this.updateCanvas()
+      this.activeActionService.saveCurrentLayout()
     })
   }
 
@@ -609,6 +616,13 @@ export class ActiveComponentController {
       .classed('loading', (d): boolean => {
         return d.item === null
       })
+      .classed('red', (d): boolean => d.mark === Mark.Red)
+      .classed('yellow', (d): boolean => {
+        return d.mark === Mark.Yellow
+      })
+      .classed('green', (d): boolean => d.mark === Mark.Green)
+      .classed('blue', (d): boolean => d.mark === Mark.Blue)
+      .classed('white', (d): boolean => d.mark === Mark.White)
       .attr('filter', d => this.selectedNodes.concat(this.dragSelection).indexOf(d) !== -1 ? 'url(#drop-shadow)' : '')
       .transition().attr('r', (d): string => {
         if (this.showLayerEffect && d.item && d.item.localProperties.concat(d.item.remoteProperties).find(p => p.property.value === RDF.type.value)) {
@@ -832,7 +846,7 @@ export class ActiveComponentController {
           this.dragOrigX = null
           this.dragOrigY = null
           this.updateCanvas()
-          this.$timeout(0).then(() => this.activeActionService.moveItemOnCurrentLayout())
+          this.$timeout(0).then(() => this.activeActionService.saveCurrentLayout())
         }))
 
     itemSelection = itemSelection.merge(enterSel)
@@ -943,11 +957,13 @@ export class ActiveComponentController {
   private saveLayout(description: string): void {
     let newLayout: ILayoutState = {
       items: this.state.active.activeLayout.items.map((i): IItemState => {
-        return {
+        let newState: IItemState = {
           ids: i.ids,
           topOffset: i.topOffset,
           leftOffset: i.leftOffset
         }
+        if (i.mark !== undefined) newState.mark = i.mark
+        return newState
       }),
       active: false,
       description: description

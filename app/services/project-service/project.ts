@@ -15,13 +15,16 @@ import { SparqlStatisticsService } from 'services/sparql-statistics-service';
 import { TurtleBuilder } from 'components/misc-utils';
 import { SerializationService } from 'services/worker-service/serialization-service';
 
-export type IItemState = {
+export enum Mark {Red, Yellow, Green, Blue, White}
+
+export interface IItemState {
   ids: INode[],
   topOffset: number,
-  leftOffset: number
+  leftOffset: number,
+  mark?: Mark
 }
 
-export type ILayoutState = {
+export interface ILayoutState {
   items: IItemState[],
   active: boolean,
   description: string

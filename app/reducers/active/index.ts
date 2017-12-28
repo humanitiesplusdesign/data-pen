@@ -4,21 +4,19 @@ import { ADD_ITEM_TO_ITEM_STATE, DELETE_ITEM_FROM_LAYOUT, UPDATE_ITEM_DESCRIPTIO
 import { Item } from 'services/sparql-item-service';
 import { INode, SKOS } from 'models/rdf';
 import { ADD_ITEM_TO_CURRENT_LAYOUT, SET_ACTIVE_DIVIDER_PERCENTAGE, CLEAR_ACTIVE_STATE } from 'actions/active'
+import { IItemState } from 'services/project-service/project';
 
-export type IFullItemState = {
-  ids: INode[],
+export interface IFullItemState extends IItemState {
   item: Item,
-  description: string,
-  topOffset: number,
-  leftOffset: number
+  description: string
 }
 
-export type IFullLayoutState = {
+export interface IFullLayoutState {
   items: IFullItemState[],
   description: string
 }
 
-export type IActiveState = {
+export interface IActiveState {
   activeLayout: IFullLayoutState,
   dividerPercent: number
 }

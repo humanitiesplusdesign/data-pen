@@ -29,11 +29,13 @@
   form.form-horizontal
     .form-group
       label.col-md-2.control-label Mark
-      .col-md-10
-        button.btn-danger.btn-circle
-        button.btn-warning.btn-circle
-        button.btn-success.btn-circle
-        button.btn-primary.btn-circle
-        button.btn-default.btn-circle
+      .col-md-8
+        button.btn-danger.btn-circle(ng-click="$ctrl.setMark($ctrl.marks[0])")
+        button.btn-warning.btn-circle(ng-click="$ctrl.setMark($ctrl.marks[1])")
+        button.btn-success.btn-circle(ng-click="$ctrl.setMark($ctrl.marks[2])")
+        button.btn-primary.btn-circle(ng-click="$ctrl.setMark($ctrl.marks[3])")
+        button.btn-default.btn-circle(ng-click="$ctrl.setMark($ctrl.marks[4])")
+      label.col-md-2.control-label
+        button.select-button(ng-click="$ctrl.setMark()") Remove
 .modal-footer
   button.cancel-button.transition-200(ng-click="$ctrl.close()") Close

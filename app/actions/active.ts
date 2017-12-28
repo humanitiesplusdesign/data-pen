@@ -80,13 +80,15 @@ export class ActiveActionService {
       .then((items) => {
         fls.items = items.map((i) => {
           let origItemState: IItemState = layout.items.find((fi) => fi.ids.map(id => id.value).indexOf(i.value) !== -1)
-          return {
+          let newItemState: IFullItemState = {
             ids: [new NamedNode(i.value)],
             item: i,
             description: getPrefLangString(i.labels, this.$ngRedux.getState().general.language),
             topOffset: origItemState ? origItemState.topOffset : null,
             leftOffset: origItemState ? origItemState.leftOffset : null
           }
+          if (origItemState.mark !== undefined) newItemState.mark = origItemState.mark
+          return newItemState
         }).filter(i => i.topOffset && i.leftOffset)
 
         return this.$ngRedux.dispatch({
@@ -227,15 +229,17 @@ export class ActiveActionService {
     return ret
   }
 
-  public moveItemOnCurrentLayout(): IDeleteItemFromCurrentLayoutAction {
-    // Currently a stub
+  public saveCurrentLayout(): IDeleteItemFromCurrentLayoutAction {
+    // Currently a stub - anywhere this is used we actually need a new action that properly goes through a reducer
     let proj: Project = angular.copy(this.$ngRedux.getState().project.project)
-    proj.layouts[0] = {
+    let activeLayoutIndex: number = proj.layouts.findIndex((l => l.active))
+    proj.layouts[activeLayoutIndex] = {
       items: this.$ngRedux.getState().active.activeLayout.items.map((i) => {
         return {
           ids: i.ids,
           topOffset: i.topOffset,
-          leftOffset: i.leftOffset
+          leftOffset: i.leftOffset,
+          mark: i.mark
         }
       }),
       active: true,

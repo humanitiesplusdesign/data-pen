@@ -7,6 +7,7 @@ import { IFibraNgRedux } from 'reducers';
 import { IActiveState, IFullItemState } from '../../reducers/active';
 
 import * as angular from 'angular';
+import { Mark } from 'services/project-service/project';
 
 interface IPropertiesModalComponentControllerState {
   active: IActiveState
@@ -21,6 +22,7 @@ export class PropertiesModalComponentController {
   private resolve: any
 
   private titleText: string = ''
+  private marks: Mark[] = [Mark.Red, Mark.Yellow, Mark.Green, Mark.Blue, Mark.White]
   private itemProperties: PropertyToValues[]
 
   /* @ngInject */
@@ -44,6 +46,12 @@ export class PropertiesModalComponentController {
     this.titleText = this.resolve.items.length === 1 ?
       this.resolve.items[0].description :
       '' + this.resolve.items.length + ' nodes'
+    
+  }
+
+  private setMark(mark?: Mark) {
+    this.resolve.items.forEach(it => it.mark = mark)
+    this.resolve.update()
   }
 }
 
