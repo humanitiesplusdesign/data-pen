@@ -1,11 +1,10 @@
 .modal-header
-  h4.modal-title#modal-title Add local properties to {{ $ctrl.titleText }}
+  h4.modal-title#modal-title Add properties to {{ $ctrl.titleText }}
 .modal-body#modal-body
   br
   form.form-horizontal
     .form-group
-      span#valueHelpBlock.help-block.col-md-offset-2.col-md-10 Create new properties or add values to existing properties
-    .form-group
+      #valueHelpBlock.help-block.col-md-offset-2.col-md-10 Create new properties or add values to existing properties. Properties are shared across snapshots in a project.
       label.col-md-2.control-label(for="keyField") Key
       .col-md-8
         input.form-control(type="text" id="keyField" placeholder="e.g. Place of Birth" ng-model="$ctrl.selectedPropDescription" uib-typeahead="property for property in $ctrl.getFilteredProperties($viewValue) | limitTo: 10" typeahead-template-url="resultTemplateForPropertyValue.html" typeahead-on-select="$ctrl.onPropertySelect($item, $model, $label, $event)" ng-change="$ctrl.selectedProp = null")
@@ -15,11 +14,11 @@
         input.form-control(type="text" id="valueField" placeholder="e.g. Helsinki" aria-describedby="valueHelpBlock" ng-model="$ctrl.selectedValueDescription" uib-typeahead="value for value in $ctrl.getFilteredValues($viewValue) | limitTo: 10" typeahead-template-url="resultTemplateForPropertyValue.html" typeahead-on-select="$ctrl.onValueSelect($item, $model, $label, $event)" ng-change="$ctrl.selectedValue = null")
       label.col-md-2.control-label
         button.select-button(ng-click="$ctrl.applyPropValueSelection()") Apply
+      #valueHelpBlock.help-block.col-md-offset-2.col-md-10 You can search for and select a node that is already in the Draw view, or assign any text you want to the property. If you want the value to be a node in the future, we recommend you first create the node in Draw and then add it here.
   br
   form.form-horizontal
     .form-group
-      span#groupHelpBlock.help-block.col-md-offset-2.col-md-10 Add a group to node(s)
-    .form-group
+      #groupHelpBlock.help-block.col-md-offset-2.col-md-10 Add a group to node(s). Groups are shared across snapshots in a project.
       label.col-md-2.control-label(for="groupField") Group
       .col-md-8
         input.form-control(type="text" id="groupField" aria-describedby="valueHelpBlock" ng-model="groupText")
@@ -28,6 +27,7 @@
   br
   form.form-horizontal
     .form-group
+      #groupHelpBlock.help-block.col-md-offset-2.col-md-10 Mark nodes using color. Marks are specific to Draw or snapshots.
       label.col-md-2.control-label Mark
       .col-md-8
         button.btn-danger.btn-circle(ng-click="$ctrl.setMark($ctrl.marks[0])")
