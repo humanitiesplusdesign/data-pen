@@ -18,12 +18,23 @@
   br
   form.form-horizontal
     .form-group
-      #groupHelpBlock.help-block.col-md-offset-2.col-md-10 Add a group to node(s). Groups are shared across snapshots in a project.
+      #valueHelpBlock.help-block.col-md-offset-2.col-md-10 Add a group to node(s). Groups are shared across snapshots in a project.
       label.col-md-2.control-label(for="groupField") Group
       .col-md-8
-        input.form-control(type="text" id="groupField" aria-describedby="valueHelpBlock" ng-model="groupText")
+        input.form-control(type="text" id="groupField" aria-describedby="groupHelpBlock" ng-model="$ctrl.groupDescription")
       label.col-md-2.control-label
-        button.select-button(ng-click="$ctrl.setGroup(groupText)") Apply
+        button.select-button(ng-click="$ctrl.setGroup($ctrl.groupDescription)") Apply
+  br
+  form.form-horizontal
+    .form-group
+      #typeHelpBlock.help-block.col-md-offset-2.col-md-10 Add a type to node(s). Types are shared across a project.
+      .col-md-10.col-md-offset-2
+        span.type-pill(ng-repeat="type in $ctrl.getTypes()") {{ type.labels | prefLang }}
+      label.col-md-2.control-label(for="typeField") Type
+      .col-md-8
+        input.form-control(type="text" id="typeField" placeholder="e.g. Person" aria-describedby="typeHelpBlock" ng-model="$ctrl.selectedTypeDescription" uib-typeahead="type for type in $ctrl.getFilteredTypes($viewValue) | limitTo: 10" typeahead-template-url="resultTemplateForPropertyValue.html" typeahead-on-select="$ctrl.onTypeSelect($item, $model, $label, $event)" ng-change="$ctrl.selectedType = null")
+      label.col-md-2.control-label
+        button.select-button(ng-click="$ctrl.setType()") Apply
   br
   form.form-horizontal
     .form-group

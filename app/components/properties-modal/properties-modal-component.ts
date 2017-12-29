@@ -8,7 +8,7 @@ import { IActiveState, IFullItemState } from '../../reducers/active';
 
 import * as angular from 'angular';
 import { Mark, IItemState } from 'services/project-service/project';
-import { Property, IProperty } from 'services/project-service/data-model';
+import { Property, IProperty, IClass } from 'services/project-service/data-model';
 import { INamedNode } from 'models/rdfjs';
 import { ProjectState } from 'reducers/project';
 import { GeneralState } from 'reducers/general';
@@ -37,13 +37,18 @@ export class PropertiesModalComponentController {
   private selectedPropDescription: string
   private selectedValue: INode
   private selectedValueDescription: string
+  private selectedType: IClass
+  private selectedTypeDescription: string
+  private groupDescription: string
 
   /* @ngInject */
   constructor(
     private $ngRedux: IFibraNgRedux,
     private activeActionService: ActiveActionService,
     private sparqlItemService: SparqlItemService,
-    private $q: angular.IQService
+    private $q: angular.IQService,
+    private $timeout: angular.ITimeoutService,
+    private $scope: angular.IScope
   ) {
     let stateUnsubscribe: () => void = $ngRedux.connect(
       (state: IRootState) => {
@@ -95,32 +100,86 @@ export class PropertiesModalComponentController {
     if(!this.selectedPropDescription || !this.selectedValueDescription) return
     let localProp: IProperty = this.selectedProp ? this.selectedProp : new Property(new NamedNode(this.selectedPropDescription))
     let localValue: INode = this.selectedValue ? this.selectedValue : new CNode(this.selectedValueDescription, 'Literal')
-    this.setProperty(localProp, localValue)
+    this.setProperty(localProp, [localValue])
+    this.selectedPropDescription = null
+    this.selectedValueDescription = null
   }
 
-  private setProperty(prop: IProperty, value: INode): void {
+  private getTypes(): IClass[] {
+    return this.resolve.items.reduce((a: IClass[], b: IFullItemState) => {
+      b.item.localProperties.concat(b.item.remoteInverseProperties)
+        .filter(pv => pv.property.value === RDF.type.value)
+        .forEach(pv => pv.values.forEach(v => {
+          if(!a.find(c => c.value === v.value.value)) {
+            a.push(this.state.project.project.dataModel.classMap.get(v.value.value))
+          }
+        }))
+      return a
+    }, [])
+  }
+
+  private setProperty(prop: IProperty, values?: INode[], removeValues?: INode[]): void {
     this.$q.all(
       this.resolve.items.map((item: IItemState) => {
-        return this.sparqlItemService.alterItem(item.ids[0], [new PropertyAndValue(prop, value)])
+        return this.sparqlItemService.alterItem(
+          item.ids[0],
+          values ? values.map(v => new PropertyAndValue(prop, v)) : [],
+          removeValues ? removeValues.map(rv => new PropertyAndValue(prop, rv)) : [])
       })
     ).then(() => {
       return this.sparqlItemService.getItems(this.resolve.items.map((item: IItemState) => item.ids), true)
         .then((items) => {
           return items.forEach((item: Item) => {
+            console.log(this.resolve.items.find((i) => !!i.ids.find((v) => v.value === item.value)), this.state.active.activeLayout.items.find((i) => !!i.ids.find((v) => v.value === item.value)), item.value, this.resolve.items.map(i => i.ids))
             this.$ngRedux.dispatch({
               type: ADD_ITEM_TO_ITEM_STATE,
               payload: {
-                itemState: this.resolve.items.find((i) => i.ids[0].value === item.value),
+                itemState: this.state.active.activeLayout.items.find((i) => !!i.ids.find((v) => v.value === item.value)),
                 fullItem: item
               }
             })
           })
         })
+    }).then(() => {
+      // The item on the active layout state actually changes, so we have to swap out the item in this.resolve.items
+      this.resolve.items = this.resolve.items.map(item => this.state.active.activeLayout.items.find((i) => i.ids[0] === item.ids[0]))
     })
   }
 
   private setGroup(group: string): void {
-    this.setProperty(new Property(FIBRA.groupProp), new CNode(group, 'Literal'))
+    this.setProperty(
+      new Property(FIBRA.groupProp),
+      [new CNode(group, 'Literal')],
+      this.resolve.items.reduce((a: INode[], b: IFullItemState) => {
+        // Find all groups assigned to the current selection and remove them.
+        b.item.localProperties.concat(b.item.remoteProperties)
+          .filter(pv => pv.property.value === FIBRA.groupProp.value)
+          .forEach(pv => pv.values.forEach(v => {
+            if(!a.find(n => n.value === v.value.value) && v.value.value !== group) {
+              a.push(v.value)
+            }
+          }))
+        return a
+      }, [])
+    )
+    this.groupDescription = null
+  }
+
+  private setType(): void {
+    if (this.selectedType) {
+      this.setProperty(new Property(RDF.type), [this.selectedType])
+      this.selectedTypeDescription = null
+    }
+  }
+
+  private onTypeSelect($item: IClass, $model, $label, $event): void {
+    this.selectedType = $item
+    this.selectedTypeDescription = getPrefLangString($item.labels, this.state.general.language)
+  }
+
+  private getFilteredTypes(filter: string): IClass[] {
+    return this.state.project.project.dataModel.classMap.values()
+      .filter(clss => clss.labels.values().map(l => l.value).join().toLowerCase().indexOf(filter.toLowerCase()) !== -1)
   }
 }
 

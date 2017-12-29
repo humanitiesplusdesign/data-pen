@@ -1021,40 +1021,38 @@ export class ActiveComponentController {
 
       if (item.item) {
         item.item.localProperties.concat(item.item.remoteProperties).forEach((p) => {
-          let propValue: IRichPropertyValue[] = p.values// .map((v) => {
-            // return v.value.labels.values && v.value.labels.values() && v.value.labels.values()[0] ?
-          //     v.value.labels.values()[0].value :
-          //     // v.value.labels.values ?
-          //       // v.value.labels.values[0] :
-          //       v.value.value
-          // })
-          obj[this.sanitizeId(p.property.value)] = propValue
-          if (typeProp) {
-            typeProp.values.forEach(v => {
-              if (!generatedColumns.has(v.value.value)) {
-                generatedColumns.set(v.value.value, [])
-                generatedColumnLabels.set(v.value.value, [])
-                generatedColumnMultiples.set(v.value.value, [])
+          if (p.property.value !== RDF.type.value && p.property.value !== SKOS.prefLabel.value) {
+            let propValue: IRichPropertyValue[] = p.values// .map((v) => {
+            obj[this.sanitizeId(p.property.value)] = propValue
+            if (typeProp) {
+              typeProp.values.forEach(v => {
+                if (!generatedColumns.has(v.value.value)) {
+                  generatedColumns.set(v.value.value, [])
+                  generatedColumnLabels.set(v.value.value, [])
+                  generatedColumnMultiples.set(v.value.value, [])
+                }
+                if (generatedColumns.get(v.value.value).indexOf(p.property.value) === -1) {
+                  generatedColumns.get(v.value.value).push(p.property.value)
+                  generatedColumnLabels.get(v.value.value).push(p.property.labels)
+                  generatedColumnMultiples.get(v.value.value).push(false)
+                }
+                if (propValue && propValue.length && propValue.length > 1) {
+                  generatedColumnMultiples.get(v.value.value).splice(generatedColumns.get(v.value.value).indexOf(p.property.value), 1, true)
+                }
+              })
+            } else {
+              if (!generatedColumns.has('other')) {
+                generatedColumns.set('other', [])
+                generatedColumnLabels.set('other', [])
+                generatedColumnMultiples.set('other', [])
               }
-              if (generatedColumns.get(v.value.value).indexOf(p.property.value) === -1 && p.property.value !== RDF.type.value && p.property.value !== SKOS.prefLabel.value) {
-                generatedColumns.get(v.value.value).push(p.property.value)
-                generatedColumnLabels.get(v.value.value).push(p.property.labels)
-                generatedColumnMultiples.get(v.value.value).push(false)
+              if (generatedColumns.get('other').indexOf(p.property.value) === -1 && p.property.value !== RDF.type.value && p.property.value !== SKOS.prefLabel.value) {
+                generatedColumns.get('other').push(p.property.value)
+                generatedColumnLabels.get('other').push(p.property.labels)
+                generatedColumnMultiples.get('other').push(false)
               }
-              if (propValue && propValue.length && propValue.length > 1) generatedColumnMultiples.get(v.value.value).splice(generatedColumns.get(v.value.value).indexOf(p.property.value), 1, true)
-            })
-          } else {
-            if (!generatedColumns.has('other')) {
-              generatedColumns.set('other', [])
-              generatedColumnLabels.set('other', [])
-              generatedColumnMultiples.set('other', [])
+              if (propValue && propValue.length && propValue.length > 1) generatedColumnMultiples.get('other').splice(generatedColumns.get('other').indexOf(p.property.value), 1, true)
             }
-            if (generatedColumns.get('other').indexOf(p.property.value) === -1 && p.property.value !== RDF.type.value && p.property.value !== SKOS.prefLabel.value) {
-              generatedColumns.get('other').push(p.property.value)
-              generatedColumnLabels.get('other').push(p.property.labels)
-              generatedColumnMultiples.get('other').push(false)
-            }
-            if (propValue && propValue.length && propValue.length > 1) generatedColumnMultiples.get('other').splice(generatedColumns.get('other').indexOf(p.property.value), 1, true)
           }
         })
       }
