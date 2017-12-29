@@ -846,7 +846,9 @@ export class ActiveComponentController {
           this.dragOrigX = null
           this.dragOrigY = null
           this.updateCanvas()
-          this.$timeout(0).then(() => this.activeActionService.saveCurrentLayout())
+          this.$timeout(0).then(() => {
+            this.activeActionService.saveCurrentLayout()
+          })
         }))
 
     itemSelection = itemSelection.merge(enterSel)
@@ -1097,8 +1099,6 @@ export class ActiveComponentController {
             columnDefs.push(cd)
           })
         }
-
-        console.log([{}].concat(data.filter((d) => { return d['types'] ? d['types'].map(v => v.value.value).indexOf(c) !== -1 : false })))
 
         this.gridOptions[c] = {
           data: [{}].concat(data.filter((d) => { return d['types'] ? d['types'].map(v => v.value.value).indexOf(c) !== -1 : false })),

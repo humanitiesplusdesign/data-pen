@@ -107,7 +107,17 @@ export class ProjectActionService {
             payload: project
           })
 
-          if (project.layouts.filter((l) => l.active )[0]) this.activeActionService.setLayout(project.layouts.filter((l) => l.active )[0])
+          if (project.layouts.filter((l) => l.active )[0]) {
+            this.activeActionService.setLayout(project.layouts.filter((l) => l.active )[0])
+          } else {
+            this.addLayout({
+              items: [],
+              active: true,
+              description: ''
+            }).then(() => {
+              this.activeActionService.setLayout(this.$ngRedux.getState().project.project.layouts.filter((l) => l.active )[0])
+            })
+          }
 
           return ret
         }
