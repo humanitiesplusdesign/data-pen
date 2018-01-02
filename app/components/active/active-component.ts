@@ -397,14 +397,15 @@ export class ActiveComponentController {
               this.dragSelection.splice(this.dragSelection.indexOf(i), 1)
             }
           })
-          this.$scope.$apply()
+          this.$scope.$digest()
           this.updateCanvas()
         })
         .on('end', () => {
           d3.select('.selection-rect').remove()
           this.dragSelection.forEach(i => this.selectedNodes.push(i))
           this.dragSelection = []
-          this.$scope.$apply()
+          this.$scope.$digest()
+          this.$timeout(0).then(() => this.updateCanvas())
         })
       )
 
@@ -864,7 +865,7 @@ export class ActiveComponentController {
     let allIds: string[] = this.selectedNodes.map(n => n.ids[0].value)
     d3.entries(this.gridOptions).forEach((e: any) => {
       if (this.gridApis[e.key]) {
-        e.value.data.forEach(d => {
+        e.value.data.filter(d => d['id']).forEach(d => {
           if (allIds.indexOf(d['id']) !== -1) {
             this.gridApis[e.key].selection.selectRow(d)
           } else {
