@@ -1072,12 +1072,12 @@ export class ActiveComponentController {
     })
 
     let sortAlgo: (a: IRichPropertyValue[], b: IRichPropertyValue[]) => number = (a, b) => {
-      let aString: string = a.map(p => {
+      let aString: string = a && a.map ? a.map(p => {
         return getPrefLangString(p.value.labels, this.state.general.language)
-      }).join()
-      let bString: string = b.map(p => {
+      }).join() : ''
+      let bString: string = b && b.map ? b.map(p => {
         return getPrefLangString(p.value.labels, this.state.general.language)
-      }).join()
+      }).join() : ''
       if (aString < bString) {
         return 1
       } else if (bString < aString) {
@@ -1085,6 +1085,11 @@ export class ActiveComponentController {
       } else {
         return 0
       }
+    }
+
+    let filterFunction = (searchTerm: string, cellValue: IRichPropertyValue[], row, col) => {
+      let combinedLabels: string = cellValue ? cellValue.map(v => getPrefLangString(v.value.labels, this.state.general.language)).join('||') : ''
+      return combinedLabels.indexOf(searchTerm) >= 0;
     }
 
     this.allClasses()
@@ -1112,7 +1117,10 @@ export class ActiveComponentController {
               field: this.sanitizeId(col),
               displayName: generatedColumnLabels.get(c)[i].values && generatedColumnLabels.get(c)[i].values()[0] ? generatedColumnLabels.get(c)[i].values()[0].value : '',
               width: 200,
-              sortingAlgorithm: sortAlgo
+              sortingAlgorithm: sortAlgo,
+              filter: {
+                condition: filterFunction
+              }
             }
             if (generatedColumnMultiples.get(c)[i]) {
               cd['cellTemplate'] = '<div class="ui-grid-cell-contents" title="TOOLTIP">' +
