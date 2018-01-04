@@ -777,7 +777,7 @@ export class ActiveComponentController {
               this.selectedNodes.push(d)
             }
           }
-          this.$scope.$apply()
+          this.$scope.$digest()
           this.updateCanvas()
         }
       })
