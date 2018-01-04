@@ -14,6 +14,7 @@ import {FIBRA, VOID} from 'models/rdf'
 import { SparqlStatisticsService } from 'services/sparql-statistics-service';
 import { TurtleBuilder } from 'components/misc-utils';
 import { SerializationService } from 'services/worker-service/serialization-service';
+import { IClassCounts } from 'components/projects-view/projects-view-component';
 
 export enum Mark {Red, Yellow, Green, Blue, White}
 
@@ -26,6 +27,7 @@ export interface IItemState {
 
 export interface ILayoutState {
   items: IItemState[],
+  counts: IClassCounts
   active: boolean,
   description: string
 }

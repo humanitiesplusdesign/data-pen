@@ -3,18 +3,29 @@ import { Project } from '../../services/project-service/project';
 import { RemoteEndpointConfiguration } from '../../services/project-service/remote-endpoint-configuration';
 import * as angular from 'angular';
 
-import { Citable, ICitable } from '../../models/citable';
+import { Citable, ICitable, ICitableSource } from '../../models/citable';
 import { ProjectSourceInfo } from '../project-sources-view/project-sources-view-component'
 import { ProjectService } from '../../services/project-service/project-service'
 import { SocialAuthService } from '../../services/social-auth-service'
 import { IModalService } from 'angular-ui-bootstrap'
 import retina from 'retinajs'
+import { IClass } from 'services/project-service/data-model';
+import { ILiteral } from 'models/rdfjs';
+import { ONodeSet, CNode } from 'models/rdf';
+
+export interface IClassCounts { 
+  [clss: string]: {
+    count: number,
+    description: CNode[]
+  }
+}
 
 export class ProjectsViewComponentController implements angular.IComponentController {
 
   public projectSourceState: { [id: string]: 'loading' | 'error' | 'ready' } = {}
   public projects: { [id: string]: ICitable[] } = {}
   public projectSources: { [id: string]: ProjectSourceInfo } = {}
+  private projectClassCounts: { [id: string]: IClassCounts } = {}
   public lang: string
 
   private authorities: RemoteEndpointConfiguration[]
@@ -26,7 +37,13 @@ export class ProjectsViewComponentController implements angular.IComponentContro
   }
 
   /* @ngInject */
-  constructor(private projectService: ProjectService, socialAuthService: SocialAuthService, $document: angular.IDocumentService, private $uibModal: IModalService) {
+  constructor(
+    private projectService: ProjectService,
+    socialAuthService: SocialAuthService,
+    $document: angular.IDocumentService,
+    private $uibModal: IModalService,
+    private $q: angular.IQService
+  ) {
     let projectSources: ProjectSourceInfo[] = projectService.getProjectSources()
     if (projectSources.length === 0) {
       // projectSources.push(new ProjectSourceInfo('Private projects in local browser storage', 'local:projects', 'local:projects', 'local:projects', '', 'http://ldf.fi/fibra/rdfstoreJSEndpoint'))
@@ -48,6 +65,9 @@ export class ProjectsViewComponentController implements angular.IComponentContro
         projects => {
           this.projectSourceState[source.id] = 'ready'
           this.projects[source.id] = projects
+          projects.forEach(p => {
+            this.populateClassCounts(p, source)
+          })
         },
         err => {
           this.projectSourceState[source.id] = 'error'
@@ -66,6 +86,18 @@ export class ProjectsViewComponentController implements angular.IComponentContro
     return this.authorities.concat(this.archives).filter((ae) => {
       return project.authorityEndpoints.concat(project.archiveEndpoints).map((p) => p.id).indexOf(ae.id) !== -1
     })
+  }
+
+  private populateClassCounts(project: Project, source: ICitableSource): void {
+    this.projectService.loadProject(source, project.id, false)
+      .then(p => {
+        if(p.layouts.find(l => l.active)) {
+          this.projectClassCounts[project.id] = p.layouts.find(l => l.active).counts
+        } else {
+          this.projectClassCounts[project.id] = {}
+        }
+      })
+      .then(() => console.log(this.projectClassCounts))
   }
 
   private openDeleteProjectModal(project: Project, i: number, sourceId: string): void {

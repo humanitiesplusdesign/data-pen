@@ -113,6 +113,7 @@ export class ProjectActionService {
             this.addLayout({
               items: [],
               active: true,
+              counts: {},
               description: ''
             }).then(() => {
               this.activeActionService.setLayout(this.$ngRedux.getState().project.project.layouts.filter((l) => l.active )[0])
@@ -154,7 +155,8 @@ export class ProjectActionService {
     let newLayout: ILayoutState = {
       items: originalLayout.items,
       active: originalLayout.active,
-      description: newDescription
+      description: newDescription,
+      counts: {}
     }
 
     this.$ngRedux.dispatch({

@@ -133,7 +133,7 @@ export class SourcesComponentController {
         ae.propStats.entries().forEach((ckv) => {
           let propMap: IMap<PropertyStatistics> = classPropMap.goc(ckv.key)
           // Only count if this source is turned on for this class
-          if(ae.classStats.has(ckv.key) && this.localSourceClassTree[ae.id][ckv.key]) {
+          if(ae.classStats.has(ckv.key) && this.localSourceClassTree[ae.id] && this.localSourceClassTree[ae.id][ckv.key]) {
             ckv.value.each((value, key) => {
               if (key !== SKOS.prefLabel.value &&
                   key !== RDF.type.value &&
@@ -169,7 +169,6 @@ export class SourcesComponentController {
   }
 
   private propertyTotalPercentage(classKey: string, propKey: string): number {
-    console.log(classKey, propKey, this.propStatistics.get(classKey).get(propKey).subjects, this.grandTotal(classKey))
     return this.propStatistics.get(classKey).get(propKey).subjects / this.grandTotal(classKey)
   }
 

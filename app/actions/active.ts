@@ -181,6 +181,7 @@ export class ActiveActionService {
         }
       }),
       active: true,
+      counts: {},
       description: this.$ngRedux.getState().active.activeLayout.description
     }
     this.projectService.saveCitable(proj.updateEndpoint, proj.graphStoreEndpoint, proj)
@@ -222,6 +223,7 @@ export class ActiveActionService {
         }
       }),
       active: true,
+      counts: {},
       description: this.$ngRedux.getState().active.activeLayout.description
     }
     this.projectService.saveCitable(proj.updateEndpoint, proj.graphStoreEndpoint, proj)
@@ -242,6 +244,21 @@ export class ActiveActionService {
           mark: i.mark
         }
       }),
+      // Build active counts
+      counts: this.$ngRedux.getState().active.activeLayout.items.reduce((a, b) => {
+        b.item.localProperties.concat(b.item.remoteProperties).filter(p => p.property.value === RDF.type.value)
+          .forEach(p => p.values.forEach(v => {
+            if(a[v.value.value] !== undefined) {
+              a[v.value.value].count += 1
+            } else {
+              a[v.value.value] = {
+                count: 1,
+                description: this.$ngRedux.getState().project.project.dataModel.classMap.get(v.value.value).labels.values()
+              }
+            }
+          }))
+        return a
+      }, {}),
       active: true,
       description: this.$ngRedux.getState().active.activeLayout.description
     }

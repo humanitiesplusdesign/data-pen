@@ -969,6 +969,7 @@ export class ActiveComponentController {
         return newState
       }),
       active: false,
+      counts: {},
       description: description
     }
     this.projectActionService.addLayout(newLayout)

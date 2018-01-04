@@ -29,15 +29,9 @@
                 label.project-details-list-title Draw
                 .draw-lists
                   ul.project-details-list.draw-item-counts
-                    li 215
-                    li 2
-                    li 12
-                    li 8
+                    li(ng-repeat="(classId, clssCount) in $ctrl.projectClassCounts[project.id]") {{ clssCount.count }}
                   ul.project-details-list.draw-item-names
-                    li Person
-                    li Place
-                    li Publication
-                    li Persimmon
+                    li(ng-repeat="(classId, clssCount) in $ctrl.projectClassCounts[project.id]") {{ clssCount.description | prefLang }}
                   
           //- .project-filter
           //-   a(ui-sref="project({id:project.id,sparqlEndpoint:project.source.sparqlEndpoint,graph:project.source.graph, view: 'filter'})")
