@@ -3,7 +3,7 @@ import { ILayoutState, IItemState, Mark } from '../../services/project-service/p
 import { ILiteral } from '../../models/rdfjs';
 import { ActiveActionService } from '../../actions/active';
 import { Class, IClass, IProperty, Property } from '../../services/project-service/data-model';
-import { CNode, DataFactory, NamedNode, ONodeSet, RDF, SKOS, OWL } from '../../models/rdf';
+import { CNode, DataFactory, NamedNode, ONodeSet, RDF, SKOS, OWL, INode } from '../../models/rdf';
 import { IFullItemState, IFullLayoutState } from '../../reducers/active';
 import { AutocompletionResults, Result, SparqlAutocompleteService, ResultGroup } from '../../services/sparql-autocomplete-service';
 import { SparqlItemService, PropertyToValues, IRichPropertyValue } from '../../services/sparql-item-service';
@@ -1087,6 +1087,20 @@ export class ActiveComponentController {
       }
     }
 
+    let handleRowSelection = (rows) => {
+      console.log(rows)
+      let selectedIds: string[] = []
+      this.selectedNodes.forEach(n => n.ids.forEach(id => selectedIds.push(id.value)))
+      rows.forEach(row => {
+        if (row.isSelected && selectedIds.indexOf(row.entity.id) === -1 && this.state.active.activeLayout.items.find(i => i.ids[0].value === row.entity.id)) {
+          this.selectedNodes.push(this.state.active.activeLayout.items.find(i => i.ids[0].value === row.entity.id))
+        } else if (!row.isSelected && selectedIds.indexOf(row.entity.id) !== -1) {
+          this.selectedNodes.splice(this.selectedNodes.findIndex(n => n.ids.map(id => id.value).indexOf(row.entity.id) !== -1), 1)
+        }
+      })
+      this.updateCanvas()
+    }
+
     let filterFunction = (searchTerm: string, cellValue: IRichPropertyValue[], row, col) => {
       let combinedLabels: string = cellValue ? cellValue.map(v => getPrefLangString(v.value.labels, this.state.general.language)).join('||') : ''
       return combinedLabels.indexOf(searchTerm) >= 0;
@@ -1148,15 +1162,9 @@ export class ActiveComponentController {
               this.$scope.$apply();
             })
 
-            gridApi.selection.on.rowSelectionChanged(this.$scope, (row) => {
-              let selectedIds: string[] = this.selectedNodes.map(n => n.ids[0].value)
-              if (row.isSelected && selectedIds.indexOf(row.entity.id) === -1 && this.state.active.activeLayout.items.find(i => i.ids[0].value === row.entity.id)) {
-                this.selectedNodes.push(this.state.active.activeLayout.items.find(i => i.ids[0].value === row.entity.id))
-              } else if (!row.isSelected && selectedIds.indexOf(row.entity.id) !== -1) {
-                this.selectedNodes.splice(selectedIds.indexOf(row.entity.id), 1)
-              }
-              this.updateCanvas()
-            })
+            gridApi.selection.on.rowSelectionChanged(this.$scope, (row) => handleRowSelection([row]))
+
+            gridApi.selection.on.rowSelectionChangedBatch(this.$scope, handleRowSelection)
           }
         }
 
