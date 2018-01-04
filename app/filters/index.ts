@@ -7,6 +7,7 @@ import 'filters/make-acronym-filter'
 
 angular.module('fibra.filters', [
   'fibra.filters.pref-lang',
+  'fibra.filters.pref-lang-label',
   'fibra.filters.citable',
   'fibra.filters.make-acronym'
 ])
