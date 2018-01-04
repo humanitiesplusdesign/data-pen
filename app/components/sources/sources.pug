@@ -75,7 +75,7 @@
             .matrix-total-container
               .matrix-total
                 .matrix-total-label Total
-              .matrix-total-cell(ng-repeat="prop in $ctrl.propStatistics.get(class.value).keys() | orderBy: prop : true : $ctrl.propSubjectsComparator.bind($ctrl, class.value)") {{ (+$ctrl.propStatistics.get(class.value).get(prop).subjects / $ctrl.grandTotal(class.value)) * 100 | number: 0 }}
+              .matrix-total-cell(ng-repeat="prop in $ctrl.propStatistics.get(class.value).keys() | orderBy: prop : true : $ctrl.propSubjectsComparator.bind($ctrl, class.value)" ng-style="{'background-color':'rgba(69, 106, 210, '+$ctrl.propertyTotalPercentage(class.value, prop)+')'}")
                 .stats.stats-available(ng-show="$ctrl.propStatistics.get(class.value).get(prop).subjects")
-                  label(ng-class="{'text-white' : ($ctrl.propStatistics.get(class.value).get(prop).subjects / source.classStats.get(class.id) * 100 | number : 0) > 50}") {{ $ctrl.floor($ctrl.propStatistics.get(class.value).get(prop).subjects / source.classStats.get(class.value) * 100) | number : 0 }}%
+                  label(ng-class="{'text-white' : ($ctrl.propertyTotalPercentage(class.value, prop) * 100) > 50}") {{ $ctrl.floor($ctrl.propertyTotalPercentage(class.value, prop) * 100) | number : 0 }}%
                 .stats.stats-unavailable(ng-show="!$ctrl.propStatistics.get(class.value).get(prop).subjects")

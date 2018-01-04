@@ -132,25 +132,28 @@ export class SourcesComponentController {
       .forEach((ae) => {
         ae.propStats.entries().forEach((ckv) => {
           let propMap: IMap<PropertyStatistics> = classPropMap.goc(ckv.key)
-          ckv.value.each((value, key) => {
-            if (key !== SKOS.prefLabel.value &&
-                key !== RDF.type.value &&
-                key !== SKOS.altLabel.value &&
-                key !== DCTerms.description.value) {
-              if (!propMap.has(key)) {
-                let newValue: PropertyStatistics = angular.copy(value)
-                newValue.subjects = +newValue.subjects
-                newValue.values = +newValue.values
-                propMap.set(key, newValue)
-              } else {
-                let ps: PropertyStatistics = propMap.get(key)
-                ps.subjects += value.subjects
-                ps.values += value.values
-                ps.min = ps.min < value.min ? ps.min : value.min
-                ps.max = ps.max > value.max ? ps.max : value.max
+          // Only count if this source is turned on for this class
+          if(ae.classStats.has(ckv.key) && this.localSourceClassTree[ae.id][ckv.key]) {
+            ckv.value.each((value, key) => {
+              if (key !== SKOS.prefLabel.value &&
+                  key !== RDF.type.value &&
+                  key !== SKOS.altLabel.value &&
+                  key !== DCTerms.description.value) {
+                if (!propMap.has(key)) {
+                  let newValue: PropertyStatistics = angular.copy(value)
+                  newValue.subjects = +newValue.subjects
+                  newValue.values = +newValue.values
+                  propMap.set(key, newValue)
+                } else {
+                  let ps: PropertyStatistics = propMap.get(key)
+                  ps.subjects += +value.subjects
+                  ps.values += +value.values
+                  ps.min = ps.min < value.min ? ps.min : value.min
+                  ps.max = ps.max > value.max ? ps.max : value.max
+                }
               }
-            }
-          })
+            })
+          }
         })
       })
     return classPropMap
@@ -158,9 +161,16 @@ export class SourcesComponentController {
 
   private grandTotal(clss: string): number {
     return this.state.sources.archiveSources.concat(this.state.sources.authoritySources)
+      // Filter out sources where this class is not turned on
+      .filter(ae => ae.classStats.has(clss) && this.localSourceClassTree[ae.id][clss])
       .map(ae => ae.classStats.get(clss))
       .filter((tot) => !isNaN(tot))
       .reduce((a, b) => +a + +b, 0)
+  }
+
+  private propertyTotalPercentage(classKey: string, propKey: string): number {
+    console.log(classKey, propKey, this.propStatistics.get(classKey).get(propKey).subjects, this.grandTotal(classKey))
+    return this.propStatistics.get(classKey).get(propKey).subjects / this.grandTotal(classKey)
   }
 
   private getSourceClassStatus(source: string, clss: string): boolean {
