@@ -998,14 +998,22 @@ export class ActiveComponentController {
   };
 
   private exportTable(): void {
-    let exportData: {}[] = this.gridOptions[this.currentTableClass.value].data.slice(0)
+    let exportData: string[][] = this.gridOptions[this.currentTableClass.value].data.slice(0)
       .map((d) => {
-        let nd: {} = angular.copy(d)
-        delete nd['types']
+        let nd = {}
+        d3.keys(d)
+          .filter(key => key !== 'types')
+          .forEach(key => {
+            if(typeof d[key] === 'string') {
+              nd[key] = d[key]
+            } else {
+              nd[key] = d[key].map(v => getPrefLangString(v.value.labels, this.state.general.language)).join(', ')
+            }
+          })
         return nd
       })
     exportData.shift()
-    let dataBlob: Blob = new Blob([d3.csvFormat(exportData)], { type: 'text/csv;charset=utf-8' });
+    let dataBlob: Blob = new Blob([d3.csvFormat(exportData)], { type: 'text/csv;charset=utf-8;' });
     this.FileSaver.saveAs(dataBlob, this.state.project.description + ' - ' + getPrefLangString(this.currentTableClass.labels, this.state.general.language) + '.csv');
   }
 
