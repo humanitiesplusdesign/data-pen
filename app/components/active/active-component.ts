@@ -1063,6 +1063,22 @@ export class ActiveComponentController {
       return obj
     })
 
+    let sortAlgo: (a: IRichPropertyValue[], b: IRichPropertyValue[]) => number = (a, b) => {
+      let aString: string = a.map(p => {
+        return getPrefLangString(p.value.labels, this.state.general.language)
+      }).join()
+      let bString: string = b.map(p => {
+        return getPrefLangString(p.value.labels, this.state.general.language)
+      }).join()
+      if (aString < bString) {
+        return 1
+      } else if (bString < aString) {
+        return -1
+      } else {
+        return 0
+      }
+    }
+
     this.allClasses()
       .map(c => c.value)
       .concat(['other'])
@@ -1087,7 +1103,8 @@ export class ActiveComponentController {
               name: col,
               field: this.sanitizeId(col),
               displayName: generatedColumnLabels.get(c)[i].values && generatedColumnLabels.get(c)[i].values()[0] ? generatedColumnLabels.get(c)[i].values()[0].value : '',
-              width: 200
+              width: 200,
+              sortingAlgorithm: sortAlgo
             }
             if (generatedColumnMultiples.get(c)[i]) {
               cd['cellTemplate'] = '<div class="ui-grid-cell-contents" title="TOOLTIP">' +
