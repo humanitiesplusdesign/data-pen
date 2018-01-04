@@ -3,13 +3,21 @@
 import {ILiteral} from '../models/rdfjs'
 import * as angular from 'angular'
 import { IFibraNgRedux } from 'reducers';
-import { NodeSet, ONodeSet } from 'models/rdf';
+import { NodeSet, ONodeSet, INode } from 'models/rdf';
+import { IRichNode } from 'models/richnode';
 
-export function getPrefLangString(literals: NodeSet<ILiteral> | ILiteral[], prefLang: string): string {
-  if (!literals) return '?'
+export function getPrefLangString(literals: NodeSet<ILiteral> | ILiteral[], prefLang: string, uri?: string): string {
+  if (!literals) {
+    if (uri) {
+      let lname: string = uri.replace(/.*\//, '').replace(/.*\#/, '').replace('_', ' ').replace(/[A-ZÅÄÖ]/g, (match) => ' ' + match.toLocaleLowerCase())
+      if (lname !== '') return lname
+      return uri
+    }
+    return '?'
+  }
   let dl: string = null
   let pl: string = null
-  let al: string = '?'
+  let al: string = null
   let plParts: string[] = prefLang.split('-')
   let p: (l) => boolean = l => {
     if (l.language === '') dl = l.value
@@ -23,10 +31,23 @@ export function getPrefLangString(literals: NodeSet<ILiteral> | ILiteral[], pref
   if (cl) return cl.value
   if (pl) return pl
   if (dl) return dl
-  return al
+  if (al) return al
+  if (uri) {
+    let lname: string = uri.replace(/.*\//, '').replace(/.*\#/, '').replace('_', ' ')
+    lname = lname[0] + lname.substring(1).replace(/[A-ZÅÄÖ]/g, (match) => ' ' + match.toLocaleLowerCase())
+    if (lname !== '') return lname
+    return uri
+  }
+  return '?'
 }
 
+angular.module('fibra.filters.pref-lang-label', [])
+  .filter('prefLangLabel', /* @ngInject */ ($ngRedux: IFibraNgRedux) => (node: IRichNode) => {
+    if (!node) return '?'
+    return getPrefLangString(node.labels, $ngRedux.getState().general.language, node.value)
+  })
+
 angular.module('fibra.filters.pref-lang', [])
-  .filter('prefLang', /* @ngInject */ ($ngRedux: IFibraNgRedux) => (literals: NodeSet<ILiteral>) => {
-    return getPrefLangString(literals, $ngRedux.getState().general.language)
+  .filter('prefLang', /* @ngInject */ ($ngRedux: IFibraNgRedux) => (literals: NodeSet<ILiteral>, uri?: string) => {
+    return getPrefLangString(literals, $ngRedux.getState().general.language, uri)
   })
