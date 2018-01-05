@@ -1102,8 +1102,8 @@ export class ActiveComponentController {
     }
 
     let filterFunction = (searchTerm: string, cellValue: IRichPropertyValue[], row, col) => {
-      let combinedLabels: string = cellValue ? cellValue.map(v => getPrefLangString(v.value.labels, this.state.general.language)).join('||') : ''
-      return combinedLabels.indexOf(searchTerm) >= 0;
+      let combinedLabels: string = cellValue ? cellValue.map(v => getPrefLangString(v.value.labels, this.state.general.language).toLowerCase).join('||') : ''
+      return combinedLabels.indexOf(searchTerm.toLowerCase()) >= 0;
     }
 
     this.allClasses()
