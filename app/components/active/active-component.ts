@@ -51,6 +51,7 @@ export class ActiveComponentController {
   private radiusInitial: number = 1
   private radius: number = 8
   private radii: number[] = [14, 11, 8, 5, 2]
+  private searchHighlightRadiusAddition: number = 5
   private radiusBounce: number = 4
   private nodeSearchTopOffset: number = 39
   private nodeSearchTypeaheadHeight: number = 400
@@ -82,6 +83,7 @@ export class ActiveComponentController {
   private circleMultiMenuVisible: boolean
 
   private oldActiveLayoutItemState: IFullItemState[]
+  private oldSearchString: string = ''
 
   private viewOptionsPopoverVisible: boolean = false
   private layerPopoverVisible: boolean = false
@@ -269,6 +271,11 @@ export class ActiveComponentController {
       ) {
         tempClasses = tempClasses.sort((a, b) => this.currentClasses.indexOf(a) - this.currentClasses.indexOf(b))
         this.currentClasses = tempClasses
+      }
+
+      if (this.oldSearchString !== this.state.project.search) {
+        this.oldSearchString = this.state.project.search
+        this.updateCanvas()
       }
     })
 
@@ -613,7 +620,20 @@ export class ActiveComponentController {
 
   private maintainNode(sel: d3.Selection<SVGGElement, IFullItemState, Element, {}>, top: number, left: number): d3.Selection<SVGGElement, IFullItemState, Element, {}> {
     sel.attr('transform', 'translate(' + top + ',' + left + ')')
-    sel.select('circle')
+    sel.select('.search-backing')
+      .classed('search-result', (d): boolean => this.state.project.search !== '' && getPrefLangString(d.item.labels, this.state.general.language).toLowerCase().indexOf(this.state.project.search.toLowerCase()) !== -1)
+      .transition().attr('r', (d): string => {
+        if (this.showLayerEffect && d.item && d.item.localProperties.concat(d.item.remoteProperties).find(p => p.property.value === RDF.type.value)) {
+          let layerIndex: number = d.item.localProperties.concat(d.item.remoteProperties).find(p => p.property.value === RDF.type.value).values.reduce((a, b) => {
+            let foundIndex: number = this.currentClasses.findIndex(c => c.value === b.value.value)
+            return foundIndex !== -1 && foundIndex < a ? foundIndex : a
+          }, this.currentClasses.length - 1)
+          return (this.radii[layerIndex] + this.searchHighlightRadiusAddition) + 'px'
+        } else {
+          return (this.radius + this.searchHighlightRadiusAddition) + 'px'
+        }
+      })
+    sel.select('.node-circle')
       .classed('loading', (d): boolean => {
         return d.item === null
       })
@@ -751,6 +771,9 @@ export class ActiveComponentController {
       .classed('node', true)
       .classed('item-node', true)
       .attr('transform', (d) => { return 'translate(' + d.leftOffset + ',' + d.topOffset + ')' })
+
+    enterSel.append<SVGCircleElement>('circle')
+      .classed('search-backing', true)
 
     enterSel.append<SVGCircleElement>('circle')
       .classed('node-circle', true)

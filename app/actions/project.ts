@@ -20,6 +20,7 @@ export const SET_ACTIVE_ITEM_COUNT: string = 'SET_ACTIVE_ITEM_COUNT'
 export const ADD_LAYOUT: string = 'ADD_LAYOUT'
 export const DELETE_LAYOUT: string = 'DELETE_LAYOUT'
 export const REPLACE_LAYOUT: string = 'REPLACE_LAYOUT'
+export const SET_SEARCH_VALUE: string = 'SET_SEARCH_VALUE'
 
 export interface IProjectLoadedAction extends Action {
   payload: Project
@@ -192,6 +193,13 @@ export class ProjectActionService {
     return this.$ngRedux.dispatch({
       type: SET_ACTIVE_ITEM_COUNT,
       payload: count
+    })
+  }
+
+  public setSearchValue(search: string): void {
+    this.$ngRedux.dispatch({
+      type: SET_SEARCH_VALUE,
+      payload: search
     })
   }
 }

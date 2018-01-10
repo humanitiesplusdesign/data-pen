@@ -1,5 +1,5 @@
 import { ILayoutState } from '../../services/project-service/project';
-import { ADD_LAYOUT, DELETE_LAYOUT, REPLACE_LAYOUT } from '../../actions/project';
+import { ADD_LAYOUT, DELETE_LAYOUT, REPLACE_LAYOUT, SET_SEARCH_VALUE } from '../../actions/project';
 import { allItemsLoaded } from 'actions/items';
 import { SET_ACTIVE_DIVIDER_PERCENTAGE } from 'actions/active';
 import { SET_PROJECT, SET_ACTIVE_ITEM_COUNT, SET_ALL_ITEM_COUNT, SET_FILTERED_ITEM_COUNT} from 'actions/project'
@@ -28,7 +28,8 @@ export class ProjectState {
     public description: string = '',
     public allItemsCount: number = 0,
     public filteredItemsCount: number = 0,
-    public activeItemsCount: number = 0
+    public activeItemsCount: number = 0,
+    public search: string = ''
   ) {}
 }
 
@@ -125,9 +126,14 @@ export default function models(state: ProjectState = defaultState, action): Proj
       })
 
     case SET_ACTIVE_ITEM_COUNT:
-    return Object.assign({}, state, {
-      activeItemsCount: action.payload
-    })
+      return Object.assign({}, state, {
+        activeItemsCount: action.payload
+      })
+
+    case SET_SEARCH_VALUE:
+      return Object.assign({}, state, {
+        search: action.payload
+      })
 
     default:
       return state
