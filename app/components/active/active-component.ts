@@ -624,10 +624,16 @@ export class ActiveComponentController {
       .classed('search-result', (d): boolean => this.state.project.search !== '' && getPrefLangString(d.item.labels, this.state.general.language).toLowerCase().indexOf(this.state.project.search.toLowerCase()) !== -1)
       .transition().attr('r', (d): string => {
         if (this.showLayerEffect && d.item && d.item.localProperties.concat(d.item.remoteProperties).find(p => p.property.value === RDF.type.value)) {
-          let layerIndex: number = d.item.localProperties.concat(d.item.remoteProperties).find(p => p.property.value === RDF.type.value).values.reduce((a, b) => {
-            let foundIndex: number = this.currentClasses.findIndex(c => c.value === b.value.value)
-            return foundIndex !== -1 && foundIndex < a ? foundIndex : a
-          }, this.currentClasses.length - 1)
+          let layerIndex: number = d.item.localProperties
+            .concat(d.item.remoteProperties)
+            .find(p => p.property.value === RDF.type.value).values
+            .reduce(
+              (a, b) => {
+                let foundIndex: number = this.currentClasses.findIndex(c => c.value === b.value.value)
+                return foundIndex !== -1 && foundIndex < a ? foundIndex : a
+              },
+              this.currentClasses.length - 1
+            )
           return (this.radii[layerIndex] + this.searchHighlightRadiusAddition) + 'px'
         } else {
           return (this.radius + this.searchHighlightRadiusAddition) + 'px'
@@ -647,10 +653,16 @@ export class ActiveComponentController {
       .attr('filter', d => this.selectedNodes.concat(this.dragSelection).indexOf(d) !== -1 ? 'url(#drop-shadow)' : '')
       .transition().attr('r', (d): string => {
         if (this.showLayerEffect && d.item && d.item.localProperties.concat(d.item.remoteProperties).find(p => p.property.value === RDF.type.value)) {
-          let layerIndex: number = d.item.localProperties.concat(d.item.remoteProperties).find(p => p.property.value === RDF.type.value).values.reduce((a, b) => {
-            let foundIndex: number = this.currentClasses.findIndex(c => c.value === b.value.value)
-            return foundIndex !== -1 && foundIndex < a ? foundIndex : a
-          }, this.currentClasses.length - 1)
+          let layerIndex: number = d.item.localProperties
+            .concat(d.item.remoteProperties)
+            .find(p => p.property.value === RDF.type.value).values
+            .reduce(
+              (a, b) => {
+                let foundIndex: number = this.currentClasses.findIndex(c => c.value === b.value.value)
+                return foundIndex !== -1 && foundIndex < a ? foundIndex : a
+              },
+              this.currentClasses.length - 1
+            )
           return this.radii[layerIndex] + 'px'
         } else {
           return this.radius + 'px'
@@ -825,14 +837,14 @@ export class ActiveComponentController {
       .on('mouseenter', (d: IFullItemState, i: number, grp: SVGCircleElement[]) => {
         if (d.item && !this.dragOrigX) {
           d3.select('#' + this.sanitizeId(d.ids[0].value))
-            .style('top', (d: IFullItemState, i, grp) => (d.topOffset + 41) + 'px' )
-            .style('left', (d: IFullItemState, i, grp) => (d.leftOffset + (this.state.active.dividerPercent / 100 * window.innerWidth) + 17) + 'px' )
+            .style('top', (d2: IFullItemState, i2, grp2) => (d2.topOffset + 41) + 'px' )
+            .style('left', (d2: IFullItemState, i2, grp2) => (d2.leftOffset + (this.state.active.dividerPercent / 100 * window.innerWidth) + 17) + 'px' )
             .style('opacity', '1')
             .text(d.description)
         } else if (!this.dragOrigX) {
           d3.select('#' + this.sanitizeId(d.ids[0].value))
-            .style('top', (d: IFullItemState, i, grp) => (d.topOffset + 41) + 'px' )
-            .style('left', (d: IFullItemState, i, grp) => (d.leftOffset + (this.state.active.dividerPercent / 100 * window.innerWidth) + 17) + 'px' )
+            .style('top', (d2: IFullItemState, i2, grp2) => (d2.topOffset + 41) + 'px' )
+            .style('left', (d2: IFullItemState, i2, grp2) => (d2.leftOffset + (this.state.active.dividerPercent / 100 * window.innerWidth) + 17) + 'px' )
             .style('opacity', '1')
             .text('Loading...')
         }
@@ -1023,11 +1035,11 @@ export class ActiveComponentController {
   private exportTable(): void {
     let exportData: string[][] = this.gridOptions[this.currentTableClass.value].data.slice(0)
       .map((d) => {
-        let nd = {}
+        let nd: any = {}
         d3.keys(d)
           .filter(key => key !== 'types')
           .forEach(key => {
-            if(typeof d[key] === 'string') {
+            if (typeof d[key] === 'string') {
               nd[key] = d[key]
             } else {
               nd[key] = d[key].map(v => getPrefLangString(v.value.labels, this.state.general.language)).join(', ')
@@ -1110,8 +1122,8 @@ export class ActiveComponentController {
       }
     }
 
-    let handleRowSelection = (rows) => {
-      console.log(rows)
+    let handleRowSelection: (rows: any) => void = (rows) => {
+      // console.log(rows)
       let selectedIds: string[] = []
       this.selectedNodes.forEach(n => n.ids.forEach(id => selectedIds.push(id.value)))
       rows.forEach(row => {
@@ -1124,7 +1136,8 @@ export class ActiveComponentController {
       this.updateCanvas()
     }
 
-    let filterFunction = (searchTerm: string, cellValue: IRichPropertyValue[], row, col) => {
+    let filterFunction: (searchTerm: string, cellValue: IRichPropertyValue[], row: any, col: any) => boolean = (searchTerm: string, cellValue: IRichPropertyValue[], row, col) => {
+      // console.log(searchTerm, cellValue, row, col, cellValue.map(v => getPrefLangString(v.value.labels, this.state.general.language).toLowerCase))
       let combinedLabels: string = cellValue ? cellValue.map(v => getPrefLangString(v.value.labels, this.state.general.language).toLowerCase).join('||') : ''
       return combinedLabels.indexOf(searchTerm.toLowerCase()) >= 0;
     }
