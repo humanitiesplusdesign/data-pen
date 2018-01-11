@@ -162,7 +162,7 @@ export class SourcesComponentController {
   private grandTotal(clss: string): number {
     return this.state.sources.archiveSources.concat(this.state.sources.authoritySources)
       // Filter out sources where this class is not turned on
-      .filter(ae => ae.classStats.has(clss) && this.localSourceClassTree[ae.id][clss])
+      .filter(ae => ae.classStats.has(clss) && this.localSourceClassTree[ae.id] && this.localSourceClassTree[ae.id][clss])
       .map(ae => ae.classStats.get(clss))
       .filter((tot) => !isNaN(tot))
       .reduce((a, b) => +a + +b, 0)
