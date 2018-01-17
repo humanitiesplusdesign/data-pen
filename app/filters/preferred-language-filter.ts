@@ -19,7 +19,7 @@ export function getPrefLangString(literals: NodeSet<ILiteral> | ILiteral[], pref
   let pl: string = null
   let al: string = null
   let plParts: string[] = prefLang.split('-')
-  let p: (l) => boolean = l => {
+  let p: (l: ILiteral) => boolean = l => {
     if (l.language === '') dl = l.value
     else al = l.value
     if (l.language === prefLang) return true

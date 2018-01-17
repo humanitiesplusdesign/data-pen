@@ -1136,9 +1136,8 @@ export class ActiveComponentController {
       this.updateCanvas()
     }
 
-    let filterFunction: (searchTerm: string, cellValue: IRichPropertyValue[], row: any, col: any) => boolean = (searchTerm: string, cellValue: IRichPropertyValue[], row, col) => {
-      // console.log(searchTerm, cellValue, row, col, cellValue.map(v => getPrefLangString(v.value.labels, this.state.general.language).toLowerCase))
-      let combinedLabels: string = cellValue ? cellValue.map(v => getPrefLangString(v.value.labels, this.state.general.language).toLowerCase).join('||') : ''
+    let filterFunction: (searchTerm: string, cellValue: IRichPropertyValue[], row: any, col: any) => boolean = (searchTerm, cellValue, row, col) => {
+      let combinedLabels: string = cellValue ? cellValue.map(v => getPrefLangString(v.value.labels, this.state.general.language).toLowerCase()).join('||') : ''
       return combinedLabels.indexOf(searchTerm.toLowerCase()) >= 0;
     }
 
