@@ -271,6 +271,7 @@ export class ActiveComponentController {
       ) {
         tempClasses = tempClasses.sort((a, b) => this.currentClasses.indexOf(a) - this.currentClasses.indexOf(b))
         this.currentClasses = tempClasses
+        this.updateCanvas()
       }
 
       if (this.oldSearchString !== this.state.project.search) {
@@ -279,7 +280,7 @@ export class ActiveComponentController {
       }
     })
 
-    this.updateCanvas()
+    // this.updateCanvas()
     this.currentTableClass = this.allClasses()[0]
     this.currentClasses = this.allClasses()
   }
@@ -941,6 +942,7 @@ export class ActiveComponentController {
   }
 
   private forceTableResize(clss?: IClass): void {
+    console.log('forcing table resize')
     let gapis: any[] = clss ? [this.gridApis[clss.value]] : d3.values(this.gridApis)
     this.$timeout(0).then(() => gapis.forEach((gapi) => gapi.core.handleWindowResize()))
   }
@@ -1070,7 +1072,7 @@ export class ActiveComponentController {
         item.item.localProperties.concat(item.item.remoteProperties).forEach((p) => {
           if (p.property.value !== RDF.type.value && p.property.value !== SKOS.prefLabel.value) {
             let propValue: IRichPropertyValue[] = p.values// .map((v) => {
-            obj[this.sanitizeId(p.property.value)] = propValue
+            obj[this.sanitizeId(p.property.value)] = p.values
             if (typeProp) {
               typeProp.values.forEach(v => {
                 if (!generatedColumns.has(v.value.value)) {
@@ -1123,7 +1125,6 @@ export class ActiveComponentController {
     }
 
     let handleRowSelection: (rows: any) => void = (rows) => {
-      // console.log(rows)
       let selectedIds: string[] = []
       this.selectedNodes.forEach(n => n.ids.forEach(id => selectedIds.push(id.value)))
       rows.forEach(row => {
@@ -1137,7 +1138,7 @@ export class ActiveComponentController {
     }
 
     let filterFunction: (searchTerm: string, cellValue: IRichPropertyValue[], row: any, col: any) => boolean = (searchTerm, cellValue, row, col) => {
-      let combinedLabels: string = cellValue ? cellValue.map(v => getPrefLangString(v.value.labels, this.state.general.language).toLowerCase()).join('||') : ''
+      let combinedLabels: string = cellValue ? cellValue.map(v => getPrefLangString(v.value.labels, this.state.general.language, v.value.value).toLowerCase()).join('||') : ''
       return combinedLabels.indexOf(searchTerm.toLowerCase()) >= 0;
     }
 
@@ -1173,11 +1174,11 @@ export class ActiveComponentController {
             }
             if (generatedColumnMultiples.get(c)[i]) {
               cd['cellTemplate'] = '<div class="ui-grid-cell-contents" title="TOOLTIP">' +
-                  '<span ng-repeat="propValue in COL_FIELD" class="table-cell-pill">{{ propValue.value.labels | prefLang }}</span>' +
+                  '<span ng-repeat="propValue in row.entity[col.field]" class="table-cell-pill">{{ propValue.value.labels | prefLang:propValue.value.value }}</span>' +
                 '</div>'
             } else {
               cd['cellTemplate'] = '<div class="ui-grid-cell-contents" title="TOOLTIP">' +
-                  '<span ng-repeat="propValue in COL_FIELD">{{ propValue.value.labels | prefLang }}</span>' +
+                  '<span ng-repeat="propValue in row.entity[col.field]">{{ propValue.value.labels | prefLang:propValue.value.value }}</span>' +
                 '</div>'
             }
             columnDefs.push(cd)
@@ -1188,6 +1189,7 @@ export class ActiveComponentController {
           data: [{}].concat(data.filter((d) => { return d['types'] ? d['types'].map(v => v.value.value).indexOf(c) !== -1 : false })),
           enableFiltering: true,
           multiSelect: true,
+          fastWatch: true,
           columnDefs: columnDefs,
           onRegisterApi: (gridApi) => {
             // set gridApi on scope

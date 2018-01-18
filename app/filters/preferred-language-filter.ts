@@ -6,7 +6,13 @@ import { IFibraNgRedux } from 'reducers';
 import { NodeSet, ONodeSet, INode } from 'models/rdf';
 import { IRichNode } from 'models/richnode';
 
+let uriCache: Map<string, string> = new Map()
+
 export function getPrefLangString(literals: NodeSet<ILiteral> | ILiteral[], prefLang: string, uri?: string): string {
+  if (uri && uriCache.has(uri)) {
+    // console.log('hit')
+    return uriCache.get(uri)
+  }
   if (!literals) {
     if (uri) {
       let lname: string = uri.replace(/.*\//, '').replace(/.*\#/, '').replace('_', ' ').replace(/[A-ZÅÄÖ]/g, (match) => ' ' + match.toLocaleLowerCase())
@@ -28,7 +34,10 @@ export function getPrefLangString(literals: NodeSet<ILiteral> | ILiteral[], pref
     return false
   }
   let cl: ILiteral = literals instanceof Array ? literals.find(p) : literals.find(p)
-  if (cl) return cl.value
+  if (cl) {
+    if (uri) uriCache.set(uri, cl.value)
+    return cl.value
+  }
   if (pl) return pl
   if (dl) return dl
   if (al) return al
