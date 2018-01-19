@@ -54,7 +54,7 @@ export class ProjectsViewComponentController implements angular.IComponentContro
     }
 
     if (socialAuthService.isLoggedIn() && !projectSources.some(s => s.id === 'Projects')) {
-      projectSources.unshift(new ProjectSourceInfo('Projects', 'http:s//ldf.fi/fibra/sparql', 'https://ldf.fi/fibra/sparql', 'https://ldf.fi/fibra/sparql', socialAuthService.getSourceID(), 'http://ldf.fi/fibra/fusekiEndpointWithTextIndexAndSecoFunctions'))
+      projectSources.unshift(new ProjectSourceInfo('Projects', 'https://ldf.fi/fibra/sparql', 'https://ldf.fi/fibra/sparql', 'https://ldf.fi/fibra/sparql', socialAuthService.getSourceID(), 'http://ldf.fi/fibra/fusekiEndpointWithTextIndexAndSecoFunctions'))
     }
 
     projectSources.forEach(source => {
