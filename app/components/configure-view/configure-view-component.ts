@@ -33,12 +33,19 @@ export class ConfigureViewComponentController implements angular.IComponentContr
   public authorities: RemoteEndpointConfiguration[] = []
   public archives: RemoteEndpointConfiguration[] = []
 
+  public dateBoundaryStart: string
+  public dateBoundaryEnd: string
+
   private $stateParams: any
 
   public saveAndOpen(): void {
     this.project.authorityEndpoints = this.authorities.filter(a => this.selectedAuthorities[a.id])
     this.project.archiveEndpoints = this.archives.filter(a => this.selectedArchives[a.id])
     this.project.schemas = this.schemas.filter(a => this.selectedSchemas[a.id])
+    if (this.dateBoundaryStart && this.dateBoundaryEnd && RegExp('^[0-9]+$').test(this.dateBoundaryStart) && RegExp('^[0-9]+$').test(this.dateBoundaryEnd)) {
+      this.project.dateBoundaryStart = this.dateBoundaryStart
+      this.project.dateBoundaryEnd = this.dateBoundaryEnd
+    }
     this.projectService.saveCitable(this.projectSource.updateEndpoint, this.projectSource.graphStoreEndpoint, this.project).then(() => this.$state.go('project', { id: this.project.id, sparqlEndpoint: this.project.source.sparqlEndpoint, graph: this.project.source.graph, view: 'active'}))
   }
 
@@ -72,15 +79,21 @@ export class ConfigureViewComponentController implements angular.IComponentContr
   }
 
   public noProjects(): boolean {
-    if (this.projects.length == 0) {
+    // if (this.projects.length === 0) {
       return true
-    } else {
-      return false
-    }
+    // } else {
+    //   return false
+    // }
   }
 
   /* @ngInject */
-  constructor(private $q: angular.IQService, private projectService: ProjectService, $stateParams: any, private $ngRedux: IFibraNgRedux, private $state: angular.ui.IStateService) {
+  constructor(
+    private $q: angular.IQService,
+    private projectService: ProjectService,
+    $stateParams: any,
+    private $ngRedux: IFibraNgRedux,
+    private $state: angular.ui.IStateService
+  ) {
     this.projectSources = projectService.getProjectSources()
     this.$stateParams = $stateParams
     this.projectSource = this.projectSources.find(ps => ps.id === $stateParams.sourceId)
@@ -88,6 +101,8 @@ export class ConfigureViewComponentController implements angular.IComponentContr
     if ($stateParams.id) {
       projectService.loadProject(this.projectSource, $stateParams.id, false).then(p => {
         this.project = p
+        this.dateBoundaryStart = p.dateBoundaryStart
+        this.dateBoundaryEnd = p.dateBoundaryEnd
         this.selectedTemplate = p.asTemplate()
       })
     } else {
@@ -122,8 +137,8 @@ export class ConfigureViewComponentController implements angular.IComponentContr
 }
 
 export class ConfigureViewComponent implements angular.IComponentOptions {
-    public controller = ConfigureViewComponentController // (new (...args: any[]) => angular.IController) = ConfigureViewComponentController
-    public template = require('./configure-view.pug')()
+    public controller: any = ConfigureViewComponentController // (new (...args: any[]) => angular.IController) = ConfigureViewComponentController
+    public template: any = require('./configure-view.pug')()
 }
 
 angular.module('fibra.components.configure', ['fibra.services'])

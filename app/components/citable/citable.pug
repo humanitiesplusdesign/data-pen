@@ -2,7 +2,7 @@
   h3.citable-label(ng-if="!$ctrl.citable.url",title="{{$ctrl.citable.labels | prefLang}}") {{$ctrl.citable.labels | prefLang}}
   p.citable-date {{ $ctrl.parseDate($ctrl.citable.dateCreated) | date : 'd MMMM, yyyy' }}
   p.citable-description
-    span.citable-proj-date-range 1685&ndash;1815. 
+    span.citable-proj-date-range(ng-if="$ctrl.citable.dateBoundaryStart && $ctrl.citable.dateBoundaryEnd") {{$ctrl.citable.dateBoundaryStart}}&ndash;{{$ctrl.citable.dateBoundaryEnd}}. 
     span(ng-if="!$ctrl.citable.url",title="{{$ctrl.citable.descriptions | prefLang}}") {{$ctrl.citable.descriptions | prefLang}}
 span(ng-repeat="rightsHolder in $ctrl.citable.rightsHolders")
   span(ng-if="$first") &nbsp;(

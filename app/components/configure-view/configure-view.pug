@@ -13,6 +13,17 @@
     .left-side(ng-class="{'col-md-4 col-md-offset-1' : !$ctrl.editingMode() && !$ctrl.noProjects(), 'col-md-10 col-md-offset-1' : $ctrl.editingMode() || $ctrl.noProjects()}")
       p.title-warning.transition-200(ng-class="titleWarning") Please enter a project title
       citable-editor(citable="$ctrl.project",no-id)
+      .row
+        label.input-label Year boundaries
+      .row
+        form(name="dateBoundaries")
+          .form-group.col-md-5(ng-class="{ 'has-error': !dateBoundaries.dateBoundaryStart.$valid }")
+            input.form-control(type="text", name="dateBoundaryStart" ng-model="$ctrl.dateBoundaryStart" pattern="^[0-9]+$" placeholder="e.g. 1750")
+          .form-group.col-md-5.col-md-offset-2(ng-class="{ 'has-error': !dateBoundaries.dateBoundaryEnd.$valid }")
+            input.form-control(type="text", name="dateBoundaryEnd" ng-model="$ctrl.dateBoundaryEnd" pattern="^[0-9]+$" placeholder="e.g. 1850")
+      br
+      .row
+        p Setting these boundaries will make queries faster and reduce ambiguity when searching for entities in authority databases that span vast periods of time.  
     .right-side.col-md-5.col-md-offset-1(ng-show="!$ctrl.editingMode() && !$ctrl.noProjects()")
       h5 Pull from an existing project
       p Use another Data Pen project as a template to start from. Pull in a sources configuration or all data.

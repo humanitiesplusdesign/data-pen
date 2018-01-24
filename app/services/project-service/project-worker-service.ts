@@ -175,7 +175,7 @@ export class ProjectWorkerService {
       response => {
         let projects: EMap<T> = new EMap<T>(oc)
         let conf: IBindingsToObjectConfiguration = {
-          bindingTypes: { rightsHolders: 'uniqueArray', sourceClassSettings: 'single', layouts: 'single', schemas: 'uniqueArray', authorityEndpoints: 'uniqueArray', archiveEndpoints: 'uniqueArray'},
+          bindingTypes: { rightsHolders: 'uniqueArray', sourceClassSettings: 'single', layouts: 'single', dateBoundaryStart: 'single', dateBoundaryEnd: 'single', schemas: 'uniqueArray', authorityEndpoints: 'uniqueArray', archiveEndpoints: 'uniqueArray'},
           bindingConverters: {
             dateCreated: (binding) => new Date(binding.value),
             types: (binding) => DataFactory.nodeFromBinding(binding),
@@ -189,7 +189,9 @@ export class ProjectWorkerService {
             rightsHolders: (binding) => new Citable(binding.value, angular.copy(source)),
             compatibleSchemas: (binding) => DataFactory.nodeFromBinding(binding),
             sourceClassSettings: (binding) => this.serializationService.fromJson(binding.value),
-            layouts: (binding) => this.serializationService.fromJson(binding.value)
+            layouts: (binding) => this.serializationService.fromJson(binding.value),
+            dateBoundaryStart: (binding) => this.serializationService.fromJson(binding.value),
+            dateBoundaryEnd: (binding) => this.serializationService.fromJson(binding.value)
           },
           bindingHandlers: {
             types: (obj, prop, value) => obj[prop].add(value),

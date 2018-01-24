@@ -56,6 +56,8 @@ SELECT * {
     ?id fibra:classStatisticsQuery ?classStatisticsQuery .
     OPTIONAL { ?id fibra:sourceClassSettings ?sourceClassSettings }
     OPTIONAL { ?id fibra:layouts ?layouts }
+    OPTIONAL { ?id fibra:dateBoundaryStart ?dateBoundaryStart }
+    OPTIONAL { ?id fibra:dateBoundaryEnd ?dateBoundaryEnd }
     OPTIONAL { ?id fibra:propertyStatisticsQuery ?propertyStatisticsQuery }
     ?id fibra:itemQuery ?itemQuery .
     ?id fibra:deleteItemQuery ?deleteItemQuery .
@@ -134,6 +136,8 @@ SELECT * {
     }
   }
   public layouts: ILayoutState[] = []
+  public dateBoundaryStart: string
+  public dateBoundaryEnd: string
   protected __className: string = 'Project'
 
   public remoteEndpoints(): RemoteEndpointConfiguration[] {
@@ -235,6 +239,8 @@ fibra:graphStoreEndpoint <${this.graphStoreEndpoint}> ;
 fibra:schemaNS ${SparqlService.stringToSPARQLString(this.schemaNS)} ;
 fibra:sourceClassSettings ${SparqlService.stringToSPARQLString(SerializationService.toJson(this.sourceClassSettings))} ;
 fibra:layouts ${SparqlService.stringToSPARQLString(SerializationService.toJson(this.layouts))} ;
+fibra:dateBoundaryStart ${SparqlService.stringToSPARQLString(SerializationService.toJson(this.dateBoundaryStart))} ;
+fibra:dateBoundaryEnd ${SparqlService.stringToSPARQLString(SerializationService.toJson(this.dateBoundaryEnd))} ;
 fibra:instanceNS ${SparqlService.stringToSPARQLString(this.instanceNS)} .`
       tb.fragmentsById.set(this.id, f)
     }
