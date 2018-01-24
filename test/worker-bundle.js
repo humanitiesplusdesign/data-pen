@@ -1,1 +1,741 @@
-webpackJsonp([1],{0:function(e,r){e.exports=angular},564:function(e,r,n){"use strict";var t=n(0),i=function(e){if(e&&e.__esModule)return e;var r={};if(null!=e)for(var n in e)Object.prototype.hasOwnProperty.call(e,n)&&(r[n]=e[n]);return r.default=e,r}(t),o=n(565),a=n(566),u=n(209),s=n(35),c=n(567),l=n(68);n(69),n(67),n(150),n(210);var d=i.module("fibra",["fi.seco.sparql","http-auth-interceptor","fibra.services.serialization-service","fibra.services.sparql-statistics-service"]);d.config(["$provide",function(e){e.service("fibraSparqlService",u.FibraSparqlService),e.service("projectWorkerService",a.ProjectWorkerService),e.service("stateWorkerService",o.StateWorkerService),e.service("workerWorkerService",o.WorkerWorkerService),e.service("sparqlItemWorkerService",s.SparqlItemWorkerService),e.service("sparqlUpdateWorkerService",c.SparqlUpdateWorkerService),e.service("sparqlAutocompleteWorkerService",l.SparqlAutocompleteWorkerService)}]),d.run(["$rootScope","workerWorkerService",function(e,r){e.$on("event:auth-loginRequired",function(e){return r.$broadcast("event:auth-loginRequired",e)})}]);var f={};d.config(["$httpProvider",function(e){e.interceptors.push(function(){return{request:function(e){return f[e.url]&&(e.headers.Authorization=f[e.url]),e}}})}]),d.run(["$rootScope","authService","$http",function(e,r,n){e.$on("main:auth-loginAuthInfo",function(e,n){f=n,r.loginConfirmed()})}])},565:function(e,r,n){"use strict";function t(e){return e&&e.__esModule?e:{default:e}}Object.defineProperty(r,"__esModule",{value:!0}),r.StateWorkerService=r.WorkerWorkerService=void 0;var i=n(1),o=t(i),a=n(2),u=t(a),s=n(0),c=function(e){if(e&&e.__esModule)return e;var r={};if(null!=e)for(var n in e)Object.prototype.hasOwnProperty.call(e,n)&&(r[n]=e[n]);return r.default=e,r}(s),l=n(67),d=r.WorkerWorkerService=function(){function e(r,n,t,i){(0,o.default)(this,e),this.serializationService=r,this.$injector=n,this.$q=t,this.$rootScope=i,this.cancellers=[]}return e.$inject=["serializationService","$injector","$q","$rootScope"],(0,u.default)(e,[{key:"$broadcast",value:function(e,r){try{self.postMessage({event:"broadcast",name:e,args:r})}catch(e){throw console.log(r,e),e}}},{key:"onMessage",value:function(e){var r=this;if(void 0===e.id)this.$rootScope.$broadcast(e.name,this.serializationService.restorePrototypes(e.args)),this.$rootScope.$apply();else if(e.cancel){var n=this.cancellers[e.id];delete this.cancellers[e.id],n&&n.resolve()}else{var t=this.$injector.get(e.service),i=this.$q.defer();this.cancellers[e.id]=i;var o=t[e.method].apply(t,this.serializationService.restorePrototypes(e.args).concat(i.promise));if(!o||!o.then){var a=this.$q.defer();a.resolve(o),o=a.promise}o.then(function(n){delete r.cancellers[e.id],self.postMessage({event:"success",id:e.id,data:n})},function(n){if(delete r.cancellers[e.id],n instanceof Error)throw self.postMessage({event:"failure",id:e.id,data:{name:n.name,message:n.message,stack:n.stack}}),n;self.postMessage({event:"failure",id:e.id,data:l.SerializationService.stripFunctions(n)})},function(r){return self.postMessage({event:"update",id:e.id,data:r})})}}}]),e}(),f=r.StateWorkerService=function(){function e(){(0,o.default)(this,e)}return(0,u.default)(e,[{key:"setState",value:function(e){this.state=e}}]),e}();c.module("fibra.services.worker-service",["fibra.services.serialization-service"]).config(["$provide",function(e){e.service("stateWorkerService",f),e.service("workerWorkerService",d)}])},566:function(e,r,n){"use strict";function t(e){return e&&e.__esModule?e:{default:e}}Object.defineProperty(r,"__esModule",{value:!0}),r.ProjectWorkerService=void 0;var i=n(1),o=t(i),a=n(2),u=t(a),s=n(0),c=function(e){if(e&&e.__esModule)return e;var r={};if(null!=e)for(var n in e)Object.prototype.hasOwnProperty.call(e,n)&&(r[n]=e[n]);return r.default=e,r}(s),l=n(28),d=n(130),f=n(34),p=n(90),v=n(132),h=n(133),g=n(23),y=n(7),S=n(27),m=r.ProjectWorkerService=function(){function e(r,n,t){(0,o.default)(this,e),this.fibraSparqlService=r,this.serializationService=n,this.$q=t}return e.$inject=["fibraSparqlService","serializationService","$q"],(0,u.default)(e,[{key:"loadPrimaryEndpointConfiguration",value:function(e,r){return this.runSingleQuery(e,p.PrimaryEndpointConfiguration.listPrimaryEndpointConfigurationsQuery,r,new p.PrimaryEndpointConfiguration(r,e))}},{key:"listPrimaryEndpointConfigurations",value:function(e){return this.runListQuery(e,p.PrimaryEndpointConfiguration.listPrimaryEndpointConfigurationsQuery,function(r){return new p.PrimaryEndpointConfiguration(r,e)})}},{key:"loadRemoteEndpointConfiguration",value:function(e,r){return this.runSingleQuery(e,v.RemoteEndpointConfiguration.listRemoteEndpointConfigurationsQuery,r,new v.RemoteEndpointConfiguration(r,e))}},{key:"listArchiveEndpointConfigurations",value:function(e){return this.runListQuery(e,v.RemoteEndpointConfiguration.listRemoteEndpointConfigurationsQuery.replace(/# TYPELIMIT/g,"?id a fibra:ArchiveEndpointConfiguration"),function(r){return new v.RemoteEndpointConfiguration(r,e)})}},{key:"listAuthorityEndpointConfigurations",value:function(e){return this.runListQuery(e,v.RemoteEndpointConfiguration.listRemoteEndpointConfigurationsQuery.replace(/# TYPELIMIT/g,"?id a fibra:AuthorityEndpointConfiguration"),function(r){return new v.RemoteEndpointConfiguration(r,e)})}},{key:"listProjects",value:function(e){return this.runListQuery(e,d.Project.listProjectsQuery,function(r){return new d.Project(r,e)})}},{key:"listSchemas",value:function(e){return this.runListQuery(e,h.Schema.listSchemasQuery,function(r){return new h.Schema(r,e)})}},{key:"loadSchema",value:function(e,r){return this.runSingleQuery(e,h.Schema.listSchemasQuery,r,new h.Schema(r,e))}},{key:"loadDataModel",value:function(e,r){var n=this,t=new S.DataModel,i=new g.EMap(function(e){var r=new S.Class(y.DataFactory.namedNode(e));return t.classMap.set(e,r),r}),o=new g.EMap(function(e){var r=new S.Property(y.DataFactory.namedNode(e));return t.propertyMap.set(e,r),r}),a={bindingConverters:{superClasses:function(e){return i.goc(e.value)},subClasses:function(e){return i.goc(e.value)},types:function(e){return i.goc(e.value)},labels:function(e){return y.DataFactory.nodeFromBinding(e)},descriptions:function(e){return y.DataFactory.nodeFromBinding(e)}},bindingHandlers:{types:function(e,r,n){return e[r].add(n)},labels:function(e,r,n){return e[r].add(n)},descriptions:function(e,r,n){return e[r].add(n)},superClasses:function(e,r,n){return e[r].add(n)},subClasses:function(e,r,n){return e[r].add(n)}}},u={bindingConverters:{superProperties:function(e){return o.goc(e.value)},subProperties:function(e){return o.goc(e.value)},inverseProperty:function(e){return o.goc(e.value)},types:function(e){return i.goc(e.value)},domains:function(e){return i.goc(e.value)},ranges:function(e){return i.goc(e.value)},labels:function(e){return y.DataFactory.nodeFromBinding(e)},descriptions:function(e){return y.DataFactory.nodeFromBinding(e)}},bindingHandlers:{superProperties:function(e,r,n){return e[r].add(n)},subProperties:function(e,r,n){return e[r].add(n)},types:function(e,r,n){return e[r].add(n)},domains:function(e,r,n){return e[r].add(n)},ranges:function(e,r,n){return e[r].add(n)},labels:function(e,r,n){return e[r].add(n)},descriptions:function(e,r,n){return e[r].add(n)}}},s=[];return e.forEach(function(e){r.forEach(function(e){e.schemaEndpoint&&e.classQuery&&(s.push(n.fibraSparqlService.query(e.schemaEndpoint,e.classQuery).then(function(e){var r=new f.UniqueObjectTracker;e.results.bindings.forEach(function(e){return f.SparqlService.bindingsToObject(e,i.goc(e.id.value),a,e.id.value,r)})})),s.push(n.fibraSparqlService.query(e.schemaEndpoint,e.propertyQuery).then(function(e){var r=new f.UniqueObjectTracker;e.results.bindings.forEach(function(e){return f.SparqlService.bindingsToObject(e,o.goc(e.id.value),u,e.id.value,r)})})))}),s.push(n.fibraSparqlService.query(e.endpoint,e.classQuery).then(function(e){var r=new f.UniqueObjectTracker;e.results.bindings.forEach(function(e){return f.SparqlService.bindingsToObject(e,i.goc(e.id.value),a,e.id.value,r)})})),s.push(n.fibraSparqlService.query(e.endpoint,e.propertyQuery).then(function(e){var r=new f.UniqueObjectTracker;e.results.bindings.forEach(function(e){return f.SparqlService.bindingsToObject(e,o.goc(e.id.value),u,e.id.value,r)})}))}),this.$q.all(s).then(function(){return i.values().forEach(function(e){e.superClasses.values().filter(function(r){return!r.subClasses.find(function(r){return r===e})}).forEach(function(r){return r.subClasses.add(e)}),e.subClasses.values().filter(function(r){return!r.superClasses.find(function(r){return r===e})}).forEach(function(r){return r.superClasses.add(e)})}),i.values().forEach(function(e){e.superClasses.empty()&&t.rootClasses.push(e)}),o.values().forEach(function(e){e.inverseProperty&&(e.inverseProperty.inverseProperty=e),e.superProperties.values().filter(function(r){return!r.subProperties.find(function(r){return r===e})}).forEach(function(r){return r.subProperties.add(e)}),e.subProperties.values().filter(function(r){return!r.superProperties.find(function(r){return r===e})}).forEach(function(r){return r.superProperties.add(e)}),e.domains.each(function(r){return r.properties.add(e)}),e.ranges.each(function(r){return r.inverseProperties.add(e)})}),o.values().forEach(function(e){e.superProperties.empty()&&t.rootProperties.push(e)}),t})}},{key:"loadProject",value:function(e,r,n){var t=this,i=this.runSingleQuery(e,d.Project.listProjectsQuery,r,new d.Project(r,e));return n?i.then(function(e){var r=[];return r.push(t.$q.all(e.schemas.map(function(e){return t.loadSchema(e.source,e.id)})).then(function(r){return e.schemas=r})),r.push(t.$q.all(e.archiveEndpoints.map(function(e){return t.loadRemoteEndpointConfiguration(e.source,e.id)})).then(function(r){return e.archiveEndpoints=r})),r.push(t.$q.all(e.authorityEndpoints.map(function(e){return t.loadRemoteEndpointConfiguration(e.source,e.id)})).then(function(r){return e.authorityEndpoints=r})),t.$q.all(r).then(function(){return t.loadDataModel(e.schemas,e.archiveEndpoints.concat(e.authorityEndpoints)).then(function(r){return e.dataModel=r}).then(function(){return e})})}):i}},{key:"runSingleQuery",value:function(e,r,n,t){return this.runQuery(e,r,n,function(){return t}).then(function(e){return e[0]})}},{key:"runListQuery",value:function(e,r,n){return this.runQuery(e,r,null,n)}},{key:"runQuery",value:function(r,n,t,i){var o=this;return n=r.graph?n.replace(/# STARTGRAPH/g,"GRAPH <"+r.graph+"> {").replace(/# ENDGRAPH/g,"}"):n.replace(/.*# STARTGRAPH\n/g,"").replace(/.*# ENDGRAPH\n/g,""),t&&(n=n.replace(/# VALUE/g,"VALUES ?id { <"+t+"> }").replace(/<ID>/g,"<"+t+">")),this.fibraSparqlService.query(r.sparqlEndpoint,n).then(function(n){var t=new g.EMap(i),a={bindingTypes:{rightsHolders:"uniqueArray",sourceClassSettings:"single",layouts:"single",schemas:"uniqueArray",authorityEndpoints:"uniqueArray",archiveEndpoints:"uniqueArray"},bindingConverters:{dateCreated:function(e){return new Date(e.value)},types:function(e){return y.DataFactory.nodeFromBinding(e)},labels:function(e){return y.DataFactory.nodeFromBinding(e)},descriptions:function(e){return y.DataFactory.nodeFromBinding(e)},schemas:function(e){return new h.Schema(e.value,c.copy(r))},authorityEndpoints:function(e){return new v.RemoteEndpointConfiguration(e.value,c.copy(r))},archiveEndpoints:function(e){return new v.RemoteEndpointConfiguration(e.value,c.copy(r))},rightsHolders_labels:function(e){return y.DataFactory.nodeFromBinding(e)},rightsHolders_descriptions:function(e){return y.DataFactory.nodeFromBinding(e)},rightsHolders:function(e){return new l.Citable(e.value,c.copy(r))},compatibleSchemas:function(e){return y.DataFactory.nodeFromBinding(e)},sourceClassSettings:function(e){return o.serializationService.fromJson(e.value)},layouts:function(e){return o.serializationService.fromJson(e.value)}},bindingHandlers:{types:function(e,r,n){return e[r].add(n)},labels:function(e,r,n){return e[r].add(n)},descriptions:function(e,r,n){return e[r].add(n)}}},u=new f.UniqueObjectTracker;return n.results.bindings.forEach(function(e){return f.SparqlService.bindingsToObject(e,t.goc(e.id.value),a,e.id.value,u)}),t.values().forEach(function(r){return e.orderCitables(r.rightsHolders)}),t.values()})}}],[{key:"orderCitables",value:function(e){e.sort(function(e,r){return(e.order?e.order:Number.MAX_VALUE)-(r.order?r.order:Number.MAX_VALUE)}),e.forEach(function(e){return delete e.order})}}]),e}();c.module("fibra.services.project-service",["fibra.services.fibra-sparql-service"]).config(["$provide",function(e){e.service("projectWorkerService",m)}])},567:function(e,r,n){"use strict";function t(e){return e&&e.__esModule?e:{default:e}}Object.defineProperty(r,"__esModule",{value:!0}),r.SparqlUpdateWorkerService=r.SparqlUpdateService=void 0;var i=n(1),o=t(i),a=n(2),u=t(a),s=n(7);r.SparqlUpdateService=function(){function e(r){(0,o.default)(this,e),this.workerService=r}return e.$inject=["workerService"],(0,u.default)(e,[{key:"updateQuads",value:function(e,r,n){return this.workerService.call("sparqlUpdateWorkerService","updateQuads",[e,r,n])}},{key:"updateGraphs",value:function(e,r,n){return this.workerService.call("sparqlUpdateWorkerService","updateGraphs",[e,r,n])}}]),e}();(r.SparqlUpdateWorkerService=function(){function e(r){(0,o.default)(this,e),this.fibraSparqlService=r}return e.$inject=["fibraSparqlService"],(0,u.default)(e,[{key:"updateQuads",value:function(e){var r=arguments.length>1&&void 0!==arguments[1]?arguments[1]:[],n=arguments.length>2&&void 0!==arguments[2]?arguments[2]:[],t={},i={},o=[],a=[];return r.forEach(function(e){var r=t[e.graph.value];r||(r=new s.Graph(e.graph),t[e.graph.value]=r,o.push(r)),r.triples.push(s.DataFactory.triple(e.subject,e.predicate,e.object))}),n.forEach(function(e){var r=i[e.graph.value];r||(r=new s.Graph(e.graph),i[e.graph.value]=r,a.push(r)),r.triples.push(s.DataFactory.triple(e.subject,e.predicate,e.object))}),this.updateGraphs(e,o,a)}},{key:"updateGraphs",value:function(r){var n=arguments.length>1&&void 0!==arguments[1]?arguments[1]:[],t=arguments.length>2&&void 0!==arguments[2]?arguments[2]:[],i=n.map(function(e){return(s.DefaultGraph.instance.equals(e.graph)?"":"GRAPH"+e.graph.toCanonical())+"{"+e.triples.map(function(e){return e.toCanonical()}).join(" . ")+"}"}).join(""),o=t.map(function(e){return(s.DefaultGraph.instance.equals(e.graph)?"":"GRAPH"+e.graph.toCanonical())+"{"+e.triples.map(function(e){return e.toCanonical()}).join(" . ")+"}"}).join("");return this.fibraSparqlService.update(r,e.queryTemplate.replace(/<DELETE>/g,o).replace(/<INSERT>/g,i)).then(function(e){return!0},function(e){return!1})}}]),e}()).queryTemplate="DELETE{<DELETE>}INSERT{<INSERT>}WHERE {}"}},[564]);
+webpackJsonp([1],{
+
+/***/ 0:
+/***/ (function(module, exports) {
+
+module.exports = angular;
+
+/***/ }),
+
+/***/ 581:
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var _angular = __webpack_require__(0);
+
+var angular = _interopRequireWildcard(_angular);
+
+var _workerWorkerService = __webpack_require__(582);
+
+var _projectWorkerService = __webpack_require__(583);
+
+var _fibraSparqlService = __webpack_require__(215);
+
+var _sparqlItemService = __webpack_require__(30);
+
+var _sparqlUpdateService = __webpack_require__(584);
+
+var _sparqlAutocompleteService = __webpack_require__(73);
+
+__webpack_require__(74);
+
+__webpack_require__(71);
+
+__webpack_require__(155);
+
+__webpack_require__(216);
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+// Register modules
+var m = angular.module('fibra', ['fi.seco.sparql', 'http-auth-interceptor', 'fibra.services.serialization-service', 'fibra.services.sparql-statistics-service']);
+m.config(['$provide', function ($provide) {
+    $provide.service('fibraSparqlService', _fibraSparqlService.FibraSparqlService);
+    $provide.service('projectWorkerService', _projectWorkerService.ProjectWorkerService);
+    $provide.service('stateWorkerService', _workerWorkerService.StateWorkerService);
+    $provide.service('workerWorkerService', _workerWorkerService.WorkerWorkerService);
+    $provide.service('sparqlItemWorkerService', _sparqlItemService.SparqlItemWorkerService);
+    $provide.service('sparqlUpdateWorkerService', _sparqlUpdateService.SparqlUpdateWorkerService);
+    $provide.service('sparqlAutocompleteWorkerService', _sparqlAutocompleteService.SparqlAutocompleteWorkerService);
+}]);
+// if we get a loginRequired event, broadcast it to the UI thread
+m.run(['$rootScope', 'workerWorkerService', function ($rootScope, workerWorkerService) {
+    $rootScope.$on('event:auth-loginRequired', function (rejection) {
+        return workerWorkerService.$broadcast('event:auth-loginRequired', rejection);
+    });
+}]);
+var auths = {};
+m.config(['$httpProvider', function ($httpProvider) {
+    $httpProvider.interceptors.push(function () {
+        return {
+            request: function request(_request) {
+                if (auths[_request.url]) _request.headers['Authorization'] = auths[_request.url];
+                return _request;
+            }
+        };
+    });
+}]);
+m.run(['$rootScope', 'authService', '$http', function ($rootScope, authService, $http) {
+    $rootScope.$on('main:auth-loginAuthInfo', function (event, authorizations) {
+        auths = authorizations;
+        authService.loginConfirmed();
+    });
+}]);
+
+/***/ }),
+
+/***/ 582:
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.StateWorkerService = exports.WorkerWorkerService = undefined;
+
+var _classCallCheck2 = __webpack_require__(1);
+
+var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
+
+var _createClass2 = __webpack_require__(2);
+
+var _createClass3 = _interopRequireDefault(_createClass2);
+
+var _angular = __webpack_require__(0);
+
+var angular = _interopRequireWildcard(_angular);
+
+var _serializationService = __webpack_require__(71);
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var WorkerWorkerService = exports.WorkerWorkerService = function () {
+    WorkerWorkerService.$inject = ['serializationService', '$injector', '$q', '$rootScope'];
+
+    /* @ngInject */
+    function WorkerWorkerService(serializationService, $injector, $q, $rootScope) {
+        (0, _classCallCheck3.default)(this, WorkerWorkerService);
+
+        this.serializationService = serializationService;
+        this.$injector = $injector;
+        this.$q = $q;
+        this.$rootScope = $rootScope;
+        this.cancellers = [];
+    }
+
+    (0, _createClass3.default)(WorkerWorkerService, [{
+        key: '$broadcast',
+        value: function $broadcast(name, args) {
+            try {
+                self.postMessage({ event: 'broadcast', name: name, args: args });
+            } catch (e) {
+                console.log(args, e);
+                throw e;
+            }
+        }
+    }, {
+        key: 'onMessage',
+        value: function onMessage(message) {
+            var _this = this;
+
+            if (message.id === undefined) {
+                this.$rootScope.$broadcast(message.name, this.serializationService.restorePrototypes(message.args));
+                this.$rootScope.$apply();
+            } else if (message.cancel) {
+                var canceller = this.cancellers[message.id];
+                delete this.cancellers[message.id];
+                if (canceller) canceller.resolve();
+            } else {
+                var service = this.$injector.get(message.service);
+                var _canceller = this.$q.defer();
+                this.cancellers[message.id] = _canceller;
+                var promise = service[message.method].apply(service, this.serializationService.restorePrototypes(message.args).concat(_canceller.promise));
+                if (!promise || !promise.then) {
+                    var deferred = this.$q.defer();
+                    deferred.resolve(promise);
+                    promise = deferred.promise;
+                }
+                promise.then(function (success) {
+                    delete _this.cancellers[message.id];
+                    self.postMessage({ event: 'success', id: message.id, data: success });
+                }, function (error) {
+                    delete _this.cancellers[message.id];
+                    if (error instanceof Error) {
+                        self.postMessage({ event: 'failure', id: message.id, data: { name: error.name, message: error.message, stack: error.stack } });
+                        throw error;
+                    }
+                    self.postMessage({ event: 'failure', id: message.id, data: _serializationService.SerializationService.stripFunctions(error) });
+                }, function (update) {
+                    return self.postMessage({ event: 'update', id: message.id, data: update });
+                });
+            }
+        }
+    }]);
+    return WorkerWorkerService;
+}();
+
+var StateWorkerService = exports.StateWorkerService = function () {
+    function StateWorkerService() {
+        (0, _classCallCheck3.default)(this, StateWorkerService);
+    }
+
+    (0, _createClass3.default)(StateWorkerService, [{
+        key: 'setState',
+        value: function setState(state) {
+            this.state = state;
+        }
+    }]);
+    return StateWorkerService;
+}();
+
+angular.module('fibra.services.worker-service', ['fibra.services.serialization-service']).config(['$provide', function ($provide) {
+    $provide.service('stateWorkerService', StateWorkerService);
+    $provide.service('workerWorkerService', WorkerWorkerService);
+}]);
+
+/***/ }),
+
+/***/ 583:
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.ProjectWorkerService = undefined;
+
+var _classCallCheck2 = __webpack_require__(1);
+
+var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
+
+var _createClass2 = __webpack_require__(2);
+
+var _createClass3 = _interopRequireDefault(_createClass2);
+
+var _angular = __webpack_require__(0);
+
+var angular = _interopRequireWildcard(_angular);
+
+var _citable = __webpack_require__(31);
+
+var _project = __webpack_require__(72);
+
+var _angularSparqlService = __webpack_require__(37);
+
+var _primaryEndpointConfiguration = __webpack_require__(97);
+
+var _remoteEndpointConfiguration = __webpack_require__(136);
+
+var _schema = __webpack_require__(137);
+
+var _collectionUtils = __webpack_require__(22);
+
+var _rdf = __webpack_require__(7);
+
+var _dataModel = __webpack_require__(28);
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var ProjectWorkerService = exports.ProjectWorkerService = function () {
+    ProjectWorkerService.$inject = ['fibraSparqlService', 'serializationService', '$q'];
+
+    function ProjectWorkerService(fibraSparqlService, serializationService, $q) {
+        (0, _classCallCheck3.default)(this, ProjectWorkerService);
+
+        this.fibraSparqlService = fibraSparqlService;
+        this.serializationService = serializationService;
+        this.$q = $q;
+    }
+
+    (0, _createClass3.default)(ProjectWorkerService, [{
+        key: 'loadPrimaryEndpointConfiguration',
+        value: function loadPrimaryEndpointConfiguration(source, templateId) {
+            return this.runSingleQuery(source, _primaryEndpointConfiguration.PrimaryEndpointConfiguration.listPrimaryEndpointConfigurationsQuery, templateId, new _primaryEndpointConfiguration.PrimaryEndpointConfiguration(templateId, source));
+        }
+    }, {
+        key: 'listPrimaryEndpointConfigurations',
+        value: function listPrimaryEndpointConfigurations(source) {
+            return this.runListQuery(source, _primaryEndpointConfiguration.PrimaryEndpointConfiguration.listPrimaryEndpointConfigurationsQuery, function (id) {
+                return new _primaryEndpointConfiguration.PrimaryEndpointConfiguration(id, source);
+            });
+        }
+    }, {
+        key: 'loadRemoteEndpointConfiguration',
+        value: function loadRemoteEndpointConfiguration(source, templateId) {
+            return this.runSingleQuery(source, _remoteEndpointConfiguration.RemoteEndpointConfiguration.listRemoteEndpointConfigurationsQuery, templateId, new _remoteEndpointConfiguration.RemoteEndpointConfiguration(templateId, source));
+        }
+    }, {
+        key: 'listArchiveEndpointConfigurations',
+        value: function listArchiveEndpointConfigurations(source) {
+            return this.runListQuery(source, _remoteEndpointConfiguration.RemoteEndpointConfiguration.listRemoteEndpointConfigurationsQuery.replace(/# TYPELIMIT/g, '?id a fibra:ArchiveEndpointConfiguration'), function (id) {
+                return new _remoteEndpointConfiguration.RemoteEndpointConfiguration(id, source);
+            });
+        }
+    }, {
+        key: 'listAuthorityEndpointConfigurations',
+        value: function listAuthorityEndpointConfigurations(source) {
+            return this.runListQuery(source, _remoteEndpointConfiguration.RemoteEndpointConfiguration.listRemoteEndpointConfigurationsQuery.replace(/# TYPELIMIT/g, '?id a fibra:AuthorityEndpointConfiguration'), function (id) {
+                return new _remoteEndpointConfiguration.RemoteEndpointConfiguration(id, source);
+            });
+        }
+    }, {
+        key: 'listProjects',
+        value: function listProjects(source) {
+            return this.runListQuery(source, _project.Project.listProjectsQuery, function (id) {
+                return new _project.Project(id, source);
+            });
+        }
+    }, {
+        key: 'listSchemas',
+        value: function listSchemas(source) {
+            return this.runListQuery(source, _schema.Schema.listSchemasQuery, function (id) {
+                return new _schema.Schema(id, source);
+            });
+        }
+    }, {
+        key: 'loadSchema',
+        value: function loadSchema(source, id) {
+            return this.runSingleQuery(source, _schema.Schema.listSchemasQuery, id, new _schema.Schema(id, source));
+        }
+    }, {
+        key: 'loadDataModel',
+        value: function loadDataModel(schemas, endpoints) {
+            var _this = this;
+
+            var dataModel = new _dataModel.DataModel();
+            var classes = new _collectionUtils.EMap(function (id) {
+                var cl = new _dataModel.Class(_rdf.DataFactory.namedNode(id));
+                dataModel.classMap.set(id, cl);
+                return cl;
+            });
+            var properties = new _collectionUtils.EMap(function (id) {
+                var pr = new _dataModel.Property(_rdf.DataFactory.namedNode(id));
+                dataModel.propertyMap.set(id, pr);
+                return pr;
+            });
+            var classConf = {
+                bindingConverters: {
+                    superClasses: function superClasses(binding) {
+                        return classes.goc(binding.value);
+                    },
+                    subClasses: function subClasses(binding) {
+                        return classes.goc(binding.value);
+                    },
+                    types: function types(binding) {
+                        return classes.goc(binding.value);
+                    },
+                    labels: function labels(binding) {
+                        return _rdf.DataFactory.nodeFromBinding(binding);
+                    },
+                    descriptions: function descriptions(binding) {
+                        return _rdf.DataFactory.nodeFromBinding(binding);
+                    }
+                },
+                bindingHandlers: {
+                    types: function types(obj, prop, val) {
+                        return obj[prop].add(val);
+                    },
+                    labels: function labels(obj, prop, val) {
+                        return obj[prop].add(val);
+                    },
+                    descriptions: function descriptions(obj, prop, val) {
+                        return obj[prop].add(val);
+                    },
+                    superClasses: function superClasses(obj, prop, val) {
+                        return obj[prop].add(val);
+                    },
+                    subClasses: function subClasses(obj, prop, val) {
+                        return obj[prop].add(val);
+                    }
+                }
+            };
+            var propertyConf = {
+                bindingConverters: {
+                    superProperties: function superProperties(binding) {
+                        return properties.goc(binding.value);
+                    },
+                    subProperties: function subProperties(binding) {
+                        return properties.goc(binding.value);
+                    },
+                    inverseProperty: function inverseProperty(binding) {
+                        return properties.goc(binding.value);
+                    },
+                    types: function types(binding) {
+                        return classes.goc(binding.value);
+                    },
+                    domains: function domains(binding) {
+                        return classes.goc(binding.value);
+                    },
+                    ranges: function ranges(binding) {
+                        return classes.goc(binding.value);
+                    },
+                    labels: function labels(binding) {
+                        return _rdf.DataFactory.nodeFromBinding(binding);
+                    },
+                    descriptions: function descriptions(binding) {
+                        return _rdf.DataFactory.nodeFromBinding(binding);
+                    }
+                },
+                bindingHandlers: {
+                    superProperties: function superProperties(obj, prop, val) {
+                        return obj[prop].add(val);
+                    },
+                    subProperties: function subProperties(obj, prop, val) {
+                        return obj[prop].add(val);
+                    },
+                    types: function types(obj, prop, val) {
+                        return obj[prop].add(val);
+                    },
+                    domains: function domains(obj, prop, val) {
+                        return obj[prop].add(val);
+                    },
+                    ranges: function ranges(obj, prop, val) {
+                        return obj[prop].add(val);
+                    },
+                    labels: function labels(obj, prop, val) {
+                        return obj[prop].add(val);
+                    },
+                    descriptions: function descriptions(obj, prop, val) {
+                        return obj[prop].add(val);
+                    }
+                }
+            };
+            var promises = [];
+            schemas.forEach(function (schema) {
+                endpoints.forEach(function (ep) {
+                    if (ep.schemaEndpoint && ep.classQuery) {
+                        promises.push(_this.fibraSparqlService.query(ep.schemaEndpoint, ep.classQuery).then(function (response) {
+                            var tracker = new _angularSparqlService.UniqueObjectTracker();
+                            response.results.bindings.forEach(function (binding) {
+                                return _angularSparqlService.SparqlService.bindingsToObject(binding, classes.goc(binding['id'].value), classConf, binding['id'].value, tracker);
+                            });
+                        }));
+                        promises.push(_this.fibraSparqlService.query(ep.schemaEndpoint, ep.propertyQuery).then(function (response) {
+                            var tracker = new _angularSparqlService.UniqueObjectTracker();
+                            response.results.bindings.forEach(function (binding) {
+                                return _angularSparqlService.SparqlService.bindingsToObject(binding, properties.goc(binding['id'].value), propertyConf, binding['id'].value, tracker);
+                            });
+                        }));
+                    }
+                });
+                promises.push(_this.fibraSparqlService.query(schema.endpoint, schema.classQuery).then(function (response) {
+                    var tracker = new _angularSparqlService.UniqueObjectTracker();
+                    response.results.bindings.forEach(function (binding) {
+                        return _angularSparqlService.SparqlService.bindingsToObject(binding, classes.goc(binding['id'].value), classConf, binding['id'].value, tracker);
+                    });
+                }));
+                promises.push(_this.fibraSparqlService.query(schema.endpoint, schema.propertyQuery).then(function (response) {
+                    var tracker = new _angularSparqlService.UniqueObjectTracker();
+                    response.results.bindings.forEach(function (binding) {
+                        return _angularSparqlService.SparqlService.bindingsToObject(binding, properties.goc(binding['id'].value), propertyConf, binding['id'].value, tracker);
+                    });
+                }));
+            });
+            return this.$q.all(promises).then(function () {
+                classes.values().forEach(function (cl) {
+                    cl.superClasses.values().filter(function (spr) {
+                        return !spr.subClasses.find(function (opr) {
+                            return opr === cl;
+                        });
+                    }).forEach(function (spr) {
+                        return spr.subClasses.add(cl);
+                    });
+                    cl.subClasses.values().filter(function (spr) {
+                        return !spr.superClasses.find(function (opr) {
+                            return opr === cl;
+                        });
+                    }).forEach(function (spr) {
+                        return spr.superClasses.add(cl);
+                    });
+                });
+                classes.values().forEach(function (cl) {
+                    if (cl.superClasses.empty()) dataModel.rootClasses.push(cl);
+                });
+                properties.values().forEach(function (pr) {
+                    if (pr.inverseProperty) pr.inverseProperty.inverseProperty = pr;
+                    pr.superProperties.values().filter(function (spr) {
+                        return !spr.subProperties.find(function (opr) {
+                            return opr === pr;
+                        });
+                    }).forEach(function (spr) {
+                        return spr.subProperties.add(pr);
+                    });
+                    pr.subProperties.values().filter(function (spr) {
+                        return !spr.superProperties.find(function (opr) {
+                            return opr === pr;
+                        });
+                    }).forEach(function (spr) {
+                        return spr.superProperties.add(pr);
+                    });
+                    pr.domains.each(function (dc) {
+                        return dc.properties.add(pr);
+                    });
+                    pr.ranges.each(function (rc) {
+                        return rc.inverseProperties.add(pr);
+                    });
+                });
+                properties.values().forEach(function (pr) {
+                    if (pr.superProperties.empty()) dataModel.rootProperties.push(pr);
+                });
+                return dataModel;
+            });
+        }
+    }, {
+        key: 'loadProject',
+        value: function loadProject(source, id, loadFull) {
+            var _this2 = this;
+
+            var q = this.runSingleQuery(source, _project.Project.listProjectsQuery, id, new _project.Project(id, source));
+            if (!loadFull) return q;else return q.then(function (p) {
+                var promises = [];
+                promises.push(_this2.$q.all(p.schemas.map(function (schema) {
+                    return _this2.loadSchema(schema.source, schema.id);
+                })).then(function (schemas) {
+                    return p.schemas = schemas;
+                }));
+                promises.push(_this2.$q.all(p.archiveEndpoints.map(function (ae) {
+                    return _this2.loadRemoteEndpointConfiguration(ae.source, ae.id);
+                })).then(function (aes) {
+                    return p.archiveEndpoints = aes;
+                }));
+                promises.push(_this2.$q.all(p.authorityEndpoints.map(function (ae) {
+                    return _this2.loadRemoteEndpointConfiguration(ae.source, ae.id);
+                })).then(function (aes) {
+                    return p.authorityEndpoints = aes;
+                }));
+                return _this2.$q.all(promises).then(function () {
+                    return _this2.loadDataModel(p.schemas, p.archiveEndpoints.concat(p.authorityEndpoints)).then(function (dm) {
+                        return p.dataModel = dm;
+                    }).then(function () {
+                        return p;
+                    });
+                });
+            });
+        }
+    }, {
+        key: 'runSingleQuery',
+        value: function runSingleQuery(source, tq, id, ps) {
+            return this.runQuery(source, tq, id, function () {
+                return ps;
+            }).then(function (a) {
+                return a[0];
+            });
+        }
+    }, {
+        key: 'runListQuery',
+        value: function runListQuery(source, lq, oc) {
+            return this.runQuery(source, lq, null, oc);
+        }
+    }, {
+        key: 'runQuery',
+        value: function runQuery(source, lq, id, oc) {
+            var _this3 = this;
+
+            lq = source.graph ? lq.replace(/# STARTGRAPH/g, 'GRAPH <' + source.graph + '> {').replace(/# ENDGRAPH/g, '}') : lq.replace(/.*# STARTGRAPH\n/g, '').replace(/.*# ENDGRAPH\n/g, '');
+            if (id) lq = lq.replace(/# VALUE/g, 'VALUES ?id { <' + id + '> }').replace(/<ID>/g, '<' + id + '>');
+            return this.fibraSparqlService.query(source.sparqlEndpoint, lq).then(function (response) {
+                var projects = new _collectionUtils.EMap(oc);
+                var conf = {
+                    bindingTypes: { rightsHolders: 'uniqueArray', sourceClassSettings: 'single', layouts: 'single', schemas: 'uniqueArray', authorityEndpoints: 'uniqueArray', archiveEndpoints: 'uniqueArray' },
+                    bindingConverters: {
+                        dateCreated: function dateCreated(binding) {
+                            return new Date(binding.value);
+                        },
+                        types: function types(binding) {
+                            return _rdf.DataFactory.nodeFromBinding(binding);
+                        },
+                        labels: function labels(binding) {
+                            return _rdf.DataFactory.nodeFromBinding(binding);
+                        },
+                        descriptions: function descriptions(binding) {
+                            return _rdf.DataFactory.nodeFromBinding(binding);
+                        },
+                        schemas: function schemas(binding) {
+                            return new _schema.Schema(binding.value, angular.copy(source));
+                        },
+                        authorityEndpoints: function authorityEndpoints(binding) {
+                            return new _remoteEndpointConfiguration.RemoteEndpointConfiguration(binding.value, angular.copy(source));
+                        },
+                        archiveEndpoints: function archiveEndpoints(binding) {
+                            return new _remoteEndpointConfiguration.RemoteEndpointConfiguration(binding.value, angular.copy(source));
+                        },
+                        rightsHolders_labels: function rightsHolders_labels(binding) {
+                            return _rdf.DataFactory.nodeFromBinding(binding);
+                        },
+                        rightsHolders_descriptions: function rightsHolders_descriptions(binding) {
+                            return _rdf.DataFactory.nodeFromBinding(binding);
+                        },
+                        rightsHolders: function rightsHolders(binding) {
+                            return new _citable.Citable(binding.value, angular.copy(source));
+                        },
+                        compatibleSchemas: function compatibleSchemas(binding) {
+                            return _rdf.DataFactory.nodeFromBinding(binding);
+                        },
+                        sourceClassSettings: function sourceClassSettings(binding) {
+                            return _this3.serializationService.fromJson(binding.value);
+                        },
+                        layouts: function layouts(binding) {
+                            return _this3.serializationService.fromJson(binding.value);
+                        }
+                    },
+                    bindingHandlers: {
+                        types: function types(obj, prop, value) {
+                            return obj[prop].add(value);
+                        },
+                        labels: function labels(obj, prop, value) {
+                            return obj[prop].add(value);
+                        },
+                        descriptions: function descriptions(obj, prop, value) {
+                            return obj[prop].add(value);
+                        }
+                    }
+                };
+                var tracker = new _angularSparqlService.UniqueObjectTracker();
+                response.results.bindings.forEach(function (binding) {
+                    return _angularSparqlService.SparqlService.bindingsToObject(binding, projects.goc(binding['id'].value), conf, binding['id'].value, tracker);
+                });
+                projects.values().forEach(function (p) {
+                    return ProjectWorkerService.orderCitables(p.rightsHolders);
+                });
+                return projects.values();
+            });
+        }
+    }], [{
+        key: 'orderCitables',
+        value: function orderCitables(citables) {
+            citables.sort(function (a, b) {
+                return (a['order'] ? a['order'] : Number.MAX_VALUE) - (b['order'] ? b['order'] : Number.MAX_VALUE);
+            });
+            citables.forEach(function (rh) {
+                return delete rh['order'];
+            });
+        }
+    }]);
+    return ProjectWorkerService;
+}();
+
+angular.module('fibra.services.project-service', ['fibra.services.fibra-sparql-service']).config(['$provide', function ($provide) {
+    $provide.service('projectWorkerService', ProjectWorkerService);
+}]);
+
+/***/ }),
+
+/***/ 584:
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.SparqlUpdateWorkerService = exports.SparqlUpdateService = undefined;
+
+var _classCallCheck2 = __webpack_require__(1);
+
+var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
+
+var _createClass2 = __webpack_require__(2);
+
+var _createClass3 = _interopRequireDefault(_createClass2);
+
+var _rdf = __webpack_require__(7);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var SparqlUpdateService = exports.SparqlUpdateService = function () {
+    SparqlUpdateService.$inject = ['workerService'];
+
+    /* @ngInject */
+    function SparqlUpdateService(workerService) {
+        (0, _classCallCheck3.default)(this, SparqlUpdateService);
+
+        this.workerService = workerService;
+    }
+
+    (0, _createClass3.default)(SparqlUpdateService, [{
+        key: 'updateQuads',
+        value: function updateQuads(endpoint, quadsToAdd, quadsToRemove) {
+            return this.workerService.call('sparqlUpdateWorkerService', 'updateQuads', [endpoint, quadsToAdd, quadsToRemove]);
+        }
+    }, {
+        key: 'updateGraphs',
+        value: function updateGraphs(endpoint, graphsToAdd, graphsToRemove) {
+            return this.workerService.call('sparqlUpdateWorkerService', 'updateGraphs', [endpoint, graphsToAdd, graphsToRemove]);
+        }
+    }]);
+    return SparqlUpdateService;
+}();
+
+var SparqlUpdateWorkerService = exports.SparqlUpdateWorkerService = function () {
+    SparqlUpdateWorkerService.$inject = ['fibraSparqlService'];
+
+    /* @ngInject */
+    function SparqlUpdateWorkerService(fibraSparqlService) {
+        (0, _classCallCheck3.default)(this, SparqlUpdateWorkerService);
+
+        this.fibraSparqlService = fibraSparqlService;
+    }
+
+    (0, _createClass3.default)(SparqlUpdateWorkerService, [{
+        key: 'updateQuads',
+        value: function updateQuads(endpoint) {
+            var quadsToAdd = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
+            var quadsToRemove = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : [];
+
+            var graphsToAddMap = {};
+            var graphsToRemoveMap = {};
+            var graphsToAdd = [];
+            var graphsToRemove = [];
+            quadsToAdd.forEach(function (q) {
+                var graph = graphsToAddMap[q.graph.value];
+                if (!graph) {
+                    graph = new _rdf.Graph(q.graph);
+                    graphsToAddMap[q.graph.value] = graph;
+                    graphsToAdd.push(graph);
+                }
+                graph.triples.push(_rdf.DataFactory.triple(q.subject, q.predicate, q.object));
+            });
+            quadsToRemove.forEach(function (q) {
+                var graph = graphsToRemoveMap[q.graph.value];
+                if (!graph) {
+                    graph = new _rdf.Graph(q.graph);
+                    graphsToRemoveMap[q.graph.value] = graph;
+                    graphsToRemove.push(graph);
+                }
+                graph.triples.push(_rdf.DataFactory.triple(q.subject, q.predicate, q.object));
+            });
+            return this.updateGraphs(endpoint, graphsToAdd, graphsToRemove);
+        }
+    }, {
+        key: 'updateGraphs',
+        value: function updateGraphs(endpoint) {
+            var graphsToAdd = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
+            var graphsToRemove = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : [];
+
+            var addString = graphsToAdd.map(function (graph) {
+                return (_rdf.DefaultGraph.instance.equals(graph.graph) ? '' : 'GRAPH' + graph.graph.toCanonical()) + '{' + graph.triples.map(function (g) {
+                    return g.toCanonical();
+                }).join(' . ') + '}';
+            }).join('');
+            var removeString = graphsToRemove.map(function (graph) {
+                return (_rdf.DefaultGraph.instance.equals(graph.graph) ? '' : 'GRAPH' + graph.graph.toCanonical()) + '{' + graph.triples.map(function (g) {
+                    return g.toCanonical();
+                }).join(' . ') + '}';
+            }).join('');
+            return this.fibraSparqlService.update(endpoint, SparqlUpdateWorkerService.queryTemplate.replace(/<DELETE>/g, removeString).replace(/<INSERT>/g, addString)).then(function (r) {
+                return true;
+            }, function (r) {
+                return false;
+            });
+        }
+    }]);
+    return SparqlUpdateWorkerService;
+}();
+
+SparqlUpdateWorkerService.queryTemplate = 'DELETE{<DELETE>}INSERT{<INSERT>}WHERE {}';
+
+/***/ })
+
+},[581]);
+//# sourceMappingURL=worker-bundle.js.map
