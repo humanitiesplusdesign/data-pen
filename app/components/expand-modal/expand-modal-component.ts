@@ -24,6 +24,7 @@ export class ExpandModalComponentController {
   private itemProperties: PropertyToValues[]
 
   private expandRadius: number = 60
+  private numberFirstRing: number = 12
 
   /* @ngInject */
   constructor(
@@ -54,12 +55,18 @@ export class ExpandModalComponentController {
   }
 
   private expand(propValues: PropertyToValues): void {
+    let ring: number = 1
+    let subtract: number = 0
     this.activeActionService.addItemsToCurrentLayout(
       propValues.values.map((v, i): IFullItemState => {
-        let theta: number = ((Math.PI * 2) / propValues.values.length)
-        let angle: number = (theta * i)
-        let leftOffset: number = this.itemState.leftOffset + (this.expandRadius * Math.cos(angle))
-        let topOffset: number = this.itemState.topOffset + (this.expandRadius * Math.sin(angle))
+        if ((i - subtract) > this.numberFirstRing * ring) {
+          subtract += this.numberFirstRing * ring
+          ring += 1
+        }
+        let theta: number = ((Math.PI * 2) / ((propValues.values.length - subtract) < this.numberFirstRing * ring ? (propValues.values.length - subtract) : this.numberFirstRing * ring ))
+        let angle: number = (theta * (i - subtract))
+        let leftOffset: number = this.itemState.leftOffset + (this.expandRadius * ring * Math.cos(angle))
+        let topOffset: number = this.itemState.topOffset + (this.expandRadius * ring * Math.sin(angle))
 
         return {
           ids: [new NamedNode(v.value.value)],

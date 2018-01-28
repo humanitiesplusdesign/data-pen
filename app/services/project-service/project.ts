@@ -136,8 +136,8 @@ SELECT * {
     }
   }
   public layouts: ILayoutState[] = []
-  public dateBoundaryStart: string
-  public dateBoundaryEnd: string
+  public dateBoundaryStart: string = ''
+  public dateBoundaryEnd: string = ''
   protected __className: string = 'Project'
 
   public remoteEndpoints(): RemoteEndpointConfiguration[] {
