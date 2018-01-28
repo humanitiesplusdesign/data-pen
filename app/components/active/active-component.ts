@@ -112,6 +112,9 @@ export class ActiveComponentController {
 
   private lastClickTargetSelected: boolean = false
 
+  private gatherRadius: number = 60
+  private gatherFirstRing: number = 12
+
   /* @ngInject */
   constructor(private projectActionService: ProjectActionService,
               private activeActionService: ActiveActionService,
@@ -184,10 +187,10 @@ export class ActiveComponentController {
       backgroundHover: '#fafafa',
       diameter: 160,
       menus: [{
-        icon: 'link-icon',
-        title: 'Link',
+        icon: 'gather-icon',
+        title: 'Gather',
         click: () => {
-          // this.linkNode(this.currentMenuItem)
+          this.gatherNodes(this.currentMenuItem, this.selectedNodes)
         }
       }, {
         icon: 'properties-icon',
@@ -911,6 +914,23 @@ export class ActiveComponentController {
       }
     })
 
+  }
+
+  private gatherNodes(clickNode: IFullItemState, allSelectedNodes: IFullItemState[]): void {
+    let ring: number = 1
+    let subtract: number = 0
+    allSelectedNodes.filter(n => n !== clickNode)
+      .forEach((n, i, a) => {
+        if ((i - subtract) > this.gatherFirstRing * ring) {
+          subtract += this.gatherFirstRing * ring
+          ring += 1
+        }
+        let theta: number = ((Math.PI * 2) / ((a.length - subtract) < this.gatherFirstRing * ring ? (a.length - subtract) : this.gatherFirstRing * ring ))
+        let angle: number = (theta * (i - subtract))
+        n.leftOffset = clickNode.leftOffset + (this.gatherRadius * ring * Math.cos(angle))
+        n.topOffset = clickNode.topOffset + (this.gatherRadius * ring * Math.sin(angle))
+      })
+    this.updateCanvas()
   }
 
   private updateCanvasSize(): void {
