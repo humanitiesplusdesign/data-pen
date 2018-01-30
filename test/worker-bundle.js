@@ -536,7 +536,7 @@ var ProjectWorkerService = exports.ProjectWorkerService = function () {
             return this.fibraSparqlService.query(source.sparqlEndpoint, lq).then(function (response) {
                 var projects = new _collectionUtils.EMap(oc);
                 var conf = {
-                    bindingTypes: { rightsHolders: 'uniqueArray', sourceClassSettings: 'single', layouts: 'single', schemas: 'uniqueArray', authorityEndpoints: 'uniqueArray', archiveEndpoints: 'uniqueArray' },
+                    bindingTypes: { rightsHolders: 'uniqueArray', sourceClassSettings: 'single', layouts: 'single', dateBoundaryStart: 'single', dateBoundaryEnd: 'single', schemas: 'uniqueArray', authorityEndpoints: 'uniqueArray', archiveEndpoints: 'uniqueArray' },
                     bindingConverters: {
                         dateCreated: function dateCreated(binding) {
                             return new Date(binding.value);
@@ -575,6 +575,12 @@ var ProjectWorkerService = exports.ProjectWorkerService = function () {
                             return _this3.serializationService.fromJson(binding.value);
                         },
                         layouts: function layouts(binding) {
+                            return _this3.serializationService.fromJson(binding.value);
+                        },
+                        dateBoundaryStart: function dateBoundaryStart(binding) {
+                            return _this3.serializationService.fromJson(binding.value);
+                        },
+                        dateBoundaryEnd: function dateBoundaryEnd(binding) {
                             return _this3.serializationService.fromJson(binding.value);
                         }
                     },

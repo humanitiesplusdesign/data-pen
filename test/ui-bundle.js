@@ -56802,7 +56802,7 @@ angular.module('fibra.components.citable', []).component('citable', new CitableC
 
 var pug = __webpack_require__(10);
 
-function template(locals) {var pug_html = "", pug_mixins = {}, pug_interp;pug_html = pug_html + "\u003Cdiv class=\"col-md-4\"\u003E\u003Ch3 class=\"citable-label\" ng-if=\"!$ctrl.citable.url\" title=\"{{$ctrl.citable.labels | prefLang}}\"\u003E{{$ctrl.citable.labels | prefLang}}\u003C\u002Fh3\u003E\u003Cp class=\"citable-date\"\u003E{{ $ctrl.parseDate($ctrl.citable.dateCreated) | date : 'd MMMM, yyyy' }}\u003C\u002Fp\u003E\u003Cp class=\"citable-description\"\u003E\u003Cspan class=\"citable-proj-date-range\"\u003E1685&ndash;1815. \u003C\u002Fspan\u003E\u003Cspan ng-if=\"!$ctrl.citable.url\" title=\"{{$ctrl.citable.descriptions | prefLang}}\"\u003E{{$ctrl.citable.descriptions | prefLang}}\u003C\u002Fspan\u003E\u003C\u002Fp\u003E\u003C\u002Fdiv\u003E\u003Cspan ng-repeat=\"rightsHolder in $ctrl.citable.rightsHolders\"\u003E\u003Cspan ng-if=\"$first\"\u003E&nbsp;(\u003C\u002Fspan\u003E\u003Ca ng-if=\"rightsHolder.url\" href=\"{{rightsHolder.url}}\" title=\"{{rightsHolder.descriptions | prefLang}}\"\u003E{{rightsHolder.labels | prefLang}}\u003C\u002Fa\u003E\u003Cspan ng-if=\"!rightsHolder.url\" title=\"{{rightsHolder.descriptions | prefLang}}\"\u003E{{rightsHolder.labels | prefLang}}\u003C\u002Fspan\u003E\u003Cspan ng-if=\"$middle\"\u003E,&nbsp;\u003C\u002Fspan\u003E\u003Cspan ng-if=\"$last\"\u003E)\u003C\u002Fspan\u003E\u003C\u002Fspan\u003E";;return pug_html;};
+function template(locals) {var pug_html = "", pug_mixins = {}, pug_interp;pug_html = pug_html + "\u003Cdiv class=\"col-md-4\"\u003E\u003Ch3 class=\"citable-label\" ng-if=\"!$ctrl.citable.url\" title=\"{{$ctrl.citable.labels | prefLang}}\"\u003E{{$ctrl.citable.labels | prefLang}}\u003C\u002Fh3\u003E\u003Cp class=\"citable-date\"\u003E{{ $ctrl.parseDate($ctrl.citable.dateCreated) | date : 'd MMMM, yyyy' }}\u003C\u002Fp\u003E\u003Cp class=\"citable-description\"\u003E\u003Cspan class=\"citable-proj-date-range\" ng-if=\"$ctrl.citable.dateBoundaryStart &amp;&amp; $ctrl.citable.dateBoundaryEnd\"\u003E{{$ctrl.citable.dateBoundaryStart}}&ndash;{{$ctrl.citable.dateBoundaryEnd}}. \u003C\u002Fspan\u003E\u003Cspan ng-if=\"!$ctrl.citable.url\" title=\"{{$ctrl.citable.descriptions | prefLang}}\"\u003E{{$ctrl.citable.descriptions | prefLang}}\u003C\u002Fspan\u003E\u003C\u002Fp\u003E\u003C\u002Fdiv\u003E\u003Cspan ng-repeat=\"rightsHolder in $ctrl.citable.rightsHolders\"\u003E\u003Cspan ng-if=\"$first\"\u003E&nbsp;(\u003C\u002Fspan\u003E\u003Ca ng-if=\"rightsHolder.url\" href=\"{{rightsHolder.url}}\" title=\"{{rightsHolder.descriptions | prefLang}}\"\u003E{{rightsHolder.labels | prefLang}}\u003C\u002Fa\u003E\u003Cspan ng-if=\"!rightsHolder.url\" title=\"{{rightsHolder.descriptions | prefLang}}\"\u003E{{rightsHolder.labels | prefLang}}\u003C\u002Fspan\u003E\u003Cspan ng-if=\"$middle\"\u003E,&nbsp;\u003C\u002Fspan\u003E\u003Cspan ng-if=\"$last\"\u003E)\u003C\u002Fspan\u003E\u003C\u002Fspan\u003E";;return pug_html;};
 module.exports = template;
 
 /***/ }),
@@ -57015,6 +57015,8 @@ var ConfigureViewComponentController = exports.ConfigureViewComponentController 
         if ($stateParams.id) {
             projectService.loadProject(this.projectSource, $stateParams.id, false).then(function (p) {
                 _this.project = p;
+                _this.dateBoundaryStart = p.dateBoundaryStart;
+                _this.dateBoundaryEnd = p.dateBoundaryEnd;
                 _this.selectedTemplate = p.asTemplate();
             });
         } else {
@@ -57070,6 +57072,10 @@ var ConfigureViewComponentController = exports.ConfigureViewComponentController 
             this.project.schemas = this.schemas.filter(function (a) {
                 return _this2.selectedSchemas[a.id];
             });
+            if (this.dateBoundaryStart && this.dateBoundaryEnd && RegExp('^[0-9]+$').test(this.dateBoundaryStart) && RegExp('^[0-9]+$').test(this.dateBoundaryEnd)) {
+                this.project.dateBoundaryStart = this.dateBoundaryStart;
+                this.project.dateBoundaryEnd = this.dateBoundaryEnd;
+            }
             this.projectService.saveCitable(this.projectSource.updateEndpoint, this.projectSource.graphStoreEndpoint, this.project).then(function () {
                 return _this2.$state.go('project', { id: _this2.project.id, sparqlEndpoint: _this2.project.source.sparqlEndpoint, graph: _this2.project.source.graph, view: 'active' });
             });
@@ -57114,11 +57120,11 @@ var ConfigureViewComponentController = exports.ConfigureViewComponentController 
     }, {
         key: 'noProjects',
         value: function noProjects() {
-            if (this.projects.length == 0) {
-                return true;
-            } else {
-                return false;
-            }
+            // if (this.projects.length === 0) {
+            return true;
+            // } else {
+            //   return false
+            // }
         }
     }]);
     return ConfigureViewComponentController;
@@ -57139,7 +57145,7 @@ angular.module('fibra.components.configure', ['fibra.services']).component('conf
 
 var pug = __webpack_require__(10);
 
-function template(locals) {var pug_html = "", pug_mixins = {}, pug_interp;pug_html = pug_html + "\u003Cdiv class=\"container\" ng-init=\"titleWarning=''\"\u003E\u003Ch4 class=\"header-title\"\u003EData Pen\u003Cspan class=\"header-subtitle\" ng-hide=\"$ctrl.editingMode()\"\u003ENew project\u003C\u002Fspan\u003E\u003Cspan class=\"header-subtitle\" ng-show=\"$ctrl.editingMode()\"\u003EEdit project\u003C\u002Fspan\u003E\u003C\u002Fh4\u003E\u003Cdiv class=\"spinner-container\" ng-hide=\"$ctrl.projects\"\u003E\u003Cdiv class=\"spinner\"\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"project-setup-container\" ng-show=\"$ctrl.projects\" ng-class=\"{'col-md-10 col-md-offset-1' : !$ctrl.editingMode() &amp;&amp; !$ctrl.noProjects(), 'col-md-6 col-md-offset-3' : $ctrl.editingMode() || $ctrl.noProjects()}\"\u003E\u003Cdiv class=\"row\"\u003E\u003Cdiv class=\"header\"\u003E\u003Ch3 class=\"col-md-10 col-md-offset-1\" ng-hide=\"$ctrl.editingMode()\"\u003EStart a new project\u003C\u002Fh3\u003E\u003Ch3 class=\"col-md-10 col-md-offset-1\" ng-show=\"$ctrl.editingMode()\"\u003EEdit project details\u003C\u002Fh3\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"left-side\" ng-class=\"{'col-md-4 col-md-offset-1' : !$ctrl.editingMode() &amp;&amp; !$ctrl.noProjects(), 'col-md-10 col-md-offset-1' : $ctrl.editingMode() || $ctrl.noProjects()}\"\u003E\u003Cp class=\"title-warning transition-200\" ng-class=\"titleWarning\"\u003EPlease enter a project title\u003C\u002Fp\u003E\u003Ccitable-editor citable=\"$ctrl.project\" no-id\u003E\u003C\u002Fcitable-editor\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"right-side col-md-5 col-md-offset-1\" ng-show=\"!$ctrl.editingMode() &amp;&amp; !$ctrl.noProjects()\"\u003E\u003Ch5\u003EPull from an existing project\u003C\u002Fh5\u003E\u003Cp\u003EUse another Data Pen project as a template to start from. Pull in a sources configuration or all data.\u003C\u002Fp\u003E\u003Cdiv class=\"project-selection\"\u003E\u003Clabel class=\"input-label\"\u003EProject:  \u003C\u002Flabel\u003E\u003Cdiv class=\"project-dropdown-container\"\u003E\u003Cselect ng-model=\"item.id\" ng-selected=\"0\" ng-options=\"option.id as option.name for option in $ctrl.existingProjectOptions\"\u003E\u003Coption ng-repeat=\"option in data.availableOptions\" value=\"{{option.id}}\"\u003E{{option.name}}\u003C\u002Foption\u003E\u003C\u002Fselect\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"project-pull-options\"\u003E\u003Cdiv class=\"label-checkbox-container\"\u003E\u003Clabel\u003ESources\u003Cinput type=\"checkbox\" checked\u003E\u003C\u002Flabel\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"label-checkbox-container\"\u003E\u003Clabel\u003EAll data\u003Cinput type=\"checkbox\" checked\u003E\u003C\u002Flabel\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"action-items\" ng-class=\"{'space-above' : $ctrl.editingMode()}\"\u003E\u003Cbutton class=\"save-project text-button transition-200\" ng-hide=\"$ctrl.editingMode()\" ng-class=\"{'button-disabled' : !$ctrl.projectTitleFilled()}\" ng-click=\"$ctrl.projectTitleFilled() ? $ctrl.saveAndOpen() : titleWarning='visible'\"\u003ESave and open\u003C\u002Fbutton\u003E\u003Cbutton class=\"save-project text-button transition-200\" ng-show=\"$ctrl.editingMode()\"\u003ESave\u003C\u002Fbutton\u003E\u003Cbutton class=\"cancel-project text-button push-left transition-200\" ng-click=\"$ctrl.deleteIfNew()\"\u003ECancel\u003C\u002Fbutton\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E";;return pug_html;};
+function template(locals) {var pug_html = "", pug_mixins = {}, pug_interp;pug_html = pug_html + "\u003Cdiv class=\"container\" ng-init=\"titleWarning=''\"\u003E\u003Ch4 class=\"header-title\"\u003EData Pen\u003Cspan class=\"header-subtitle\" ng-hide=\"$ctrl.editingMode()\"\u003ENew project\u003C\u002Fspan\u003E\u003Cspan class=\"header-subtitle\" ng-show=\"$ctrl.editingMode()\"\u003EEdit project\u003C\u002Fspan\u003E\u003C\u002Fh4\u003E\u003Cdiv class=\"spinner-container\" ng-hide=\"$ctrl.projects\"\u003E\u003Cdiv class=\"spinner\"\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"project-setup-container\" ng-show=\"$ctrl.projects\" ng-class=\"{'col-md-10 col-md-offset-1' : !$ctrl.editingMode() &amp;&amp; !$ctrl.noProjects(), 'col-md-6 col-md-offset-3' : $ctrl.editingMode() || $ctrl.noProjects()}\"\u003E\u003Cdiv class=\"row\"\u003E\u003Cdiv class=\"header\"\u003E\u003Ch3 class=\"col-md-10 col-md-offset-1\" ng-hide=\"$ctrl.editingMode()\"\u003EStart a new project\u003C\u002Fh3\u003E\u003Ch3 class=\"col-md-10 col-md-offset-1\" ng-show=\"$ctrl.editingMode()\"\u003EEdit project details\u003C\u002Fh3\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"left-side\" ng-class=\"{'col-md-4 col-md-offset-1' : !$ctrl.editingMode() &amp;&amp; !$ctrl.noProjects(), 'col-md-10 col-md-offset-1' : $ctrl.editingMode() || $ctrl.noProjects()}\"\u003E\u003Cp class=\"title-warning transition-200\" ng-class=\"titleWarning\"\u003EPlease enter a project title\u003C\u002Fp\u003E\u003Ccitable-editor citable=\"$ctrl.project\" no-id\u003E\u003C\u002Fcitable-editor\u003E\u003Cdiv class=\"row\"\u003E\u003Clabel class=\"input-label\"\u003EYear boundaries\u003C\u002Flabel\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"row\"\u003E\u003Cform name=\"dateBoundaries\"\u003E\u003Cdiv class=\"form-group col-md-5\" ng-class=\"{ 'has-error': !dateBoundaries.dateBoundaryStart.$valid }\"\u003E\u003Cinput class=\"form-control\" type=\"text\" name=\"dateBoundaryStart\" ng-model=\"$ctrl.dateBoundaryStart\" pattern=\"^[0-9]+$\" placeholder=\"e.g. 1750\"\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"form-group col-md-5 col-md-offset-2\" ng-class=\"{ 'has-error': !dateBoundaries.dateBoundaryEnd.$valid }\"\u003E\u003Cinput class=\"form-control\" type=\"text\" name=\"dateBoundaryEnd\" ng-model=\"$ctrl.dateBoundaryEnd\" pattern=\"^[0-9]+$\" placeholder=\"e.g. 1850\"\u003E\u003C\u002Fdiv\u003E\u003C\u002Fform\u003E\u003C\u002Fdiv\u003E\u003Cbr\u003E\u003Cdiv class=\"row\"\u003E\u003Cp\u003ESetting these boundaries will make queries faster and reduce ambiguity when searching for entities in authority databases that span vast periods of time.  \u003C\u002Fp\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"right-side col-md-5 col-md-offset-1\" ng-show=\"!$ctrl.editingMode() &amp;&amp; !$ctrl.noProjects()\"\u003E\u003Ch5\u003EPull from an existing project\u003C\u002Fh5\u003E\u003Cp\u003EUse another Data Pen project as a template to start from. Pull in a sources configuration or all data.\u003C\u002Fp\u003E\u003Cdiv class=\"project-selection\"\u003E\u003Clabel class=\"input-label\"\u003EProject:  \u003C\u002Flabel\u003E\u003Cdiv class=\"project-dropdown-container\"\u003E\u003Cselect ng-model=\"item.id\" ng-selected=\"0\" ng-options=\"option.id as option.name for option in $ctrl.existingProjectOptions\"\u003E\u003Coption ng-repeat=\"option in data.availableOptions\" value=\"{{option.id}}\"\u003E{{option.name}}\u003C\u002Foption\u003E\u003C\u002Fselect\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"project-pull-options\"\u003E\u003Cdiv class=\"label-checkbox-container\"\u003E\u003Clabel\u003ESources\u003Cinput type=\"checkbox\" checked\u003E\u003C\u002Flabel\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"label-checkbox-container\"\u003E\u003Clabel\u003EAll data\u003Cinput type=\"checkbox\" checked\u003E\u003C\u002Flabel\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"action-items\" ng-class=\"{'space-above' : $ctrl.editingMode()}\"\u003E\u003Cbutton class=\"save-project text-button transition-200\" ng-hide=\"$ctrl.editingMode()\" ng-class=\"{'button-disabled' : !$ctrl.projectTitleFilled()}\" ng-click=\"$ctrl.projectTitleFilled() ? $ctrl.saveAndOpen() : titleWarning='visible'\"\u003ESave and open\u003C\u002Fbutton\u003E\u003Cbutton class=\"save-project text-button transition-200\" ng-show=\"$ctrl.editingMode()\"\u003ESave\u003C\u002Fbutton\u003E\u003Cbutton class=\"cancel-project text-button push-left transition-200\" ng-click=\"$ctrl.deleteIfNew()\"\u003ECancel\u003C\u002Fbutton\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E";;return pug_html;};
 module.exports = template;
 
 /***/ }),
@@ -58103,6 +58109,8 @@ var ActiveComponentController = exports.ActiveComponentController = function () 
         this.gridApis = {};
         this.snapshotEditing = false;
         this.lastClickTargetSelected = false;
+        this.gatherRadius = 60;
+        this.gatherFirstRing = 12;
         this.unsubscribe = $ngRedux.connect(function (state) {
             return {
                 project: state.project,
@@ -58164,10 +58172,10 @@ var ActiveComponentController = exports.ActiveComponentController = function () 
                 backgroundHover: '#fafafa',
                 diameter: 160,
                 menus: [{
-                    icon: 'link-icon',
-                    title: 'Link',
+                    icon: 'gather-icon',
+                    title: 'Gather',
                     click: function click() {
-                        // this.linkNode(this.currentMenuItem)
+                        _this.gatherNodes(_this.currentMenuItem, _this.selectedNodes);
                     }
                 }, {
                     icon: 'properties-icon',
@@ -58862,6 +58870,27 @@ var ActiveComponentController = exports.ActiveComponentController = function () 
             });
         }
     }, {
+        key: 'gatherNodes',
+        value: function gatherNodes(clickNode, allSelectedNodes) {
+            var _this13 = this;
+
+            var ring = 1;
+            var subtract = 0;
+            allSelectedNodes.filter(function (n) {
+                return n !== clickNode;
+            }).forEach(function (n, i, a) {
+                if (i - subtract > _this13.gatherFirstRing * ring) {
+                    subtract += _this13.gatherFirstRing * ring;
+                    ring += 1;
+                }
+                var theta = Math.PI * 2 / (a.length - subtract < _this13.gatherFirstRing * ring ? a.length - subtract : _this13.gatherFirstRing * ring);
+                var angle = theta * (i - subtract);
+                n.leftOffset = clickNode.leftOffset + _this13.gatherRadius * ring * Math.cos(angle);
+                n.topOffset = clickNode.topOffset + _this13.gatherRadius * ring * Math.sin(angle);
+            });
+            this.updateCanvas();
+        }
+    }, {
         key: 'updateCanvasSize',
         value: function updateCanvasSize() {
             var canvasSize = this.getCanvasSize();
@@ -58883,7 +58912,7 @@ var ActiveComponentController = exports.ActiveComponentController = function () 
     }, {
         key: 'dragDivider',
         value: function dragDivider(evt) {
-            var _this13 = this;
+            var _this14 = this;
 
             this.menu.hide();
             this.multiMenu.hide();
@@ -58892,7 +58921,7 @@ var ActiveComponentController = exports.ActiveComponentController = function () 
             this.forceTableResize();
             if (this.viewOptionsShowLabels) this.showTooltips();
             if (this.viewOptionsShowLinkLabels) this.$timeout(0).then(function () {
-                return _this13.showLinkTooltips();
+                return _this14.showLinkTooltips();
             });
         }
     }, {
@@ -58924,18 +58953,18 @@ var ActiveComponentController = exports.ActiveComponentController = function () 
     }, {
         key: 'allClasses',
         value: function allClasses() {
-            var _this14 = this;
+            var _this15 = this;
 
             if (this.$ngRedux.getState().project.project) {
                 return d3.keys(this.$ngRedux.getState().project.project.sourceClassSettings).reduce(function (a, b) {
-                    var sourceClasses = d3.keys(_this14.$ngRedux.getState().project.project.sourceClassSettings[b]).filter(function (k) {
-                        return _this14.$ngRedux.getState().project.project.sourceClassSettings[b][k];
+                    var sourceClasses = d3.keys(_this15.$ngRedux.getState().project.project.sourceClassSettings[b]).filter(function (k) {
+                        return _this15.$ngRedux.getState().project.project.sourceClassSettings[b][k];
                     }).filter(function (k) {
                         return a.indexOf(k) === -1;
                     });
                     return a.concat(sourceClasses);
                 }, []).map(function (c) {
-                    return _this14.state.project.project ? _this14.state.project.project.dataModel.classMap.get(c) : null;
+                    return _this15.state.project.project ? _this15.state.project.project.dataModel.classMap.get(c) : null;
                 }).filter(function (c) {
                     return c;
                 });
@@ -59010,7 +59039,7 @@ var ActiveComponentController = exports.ActiveComponentController = function () 
     }, {
         key: 'exportTable',
         value: function exportTable() {
-            var _this15 = this;
+            var _this16 = this;
 
             var exportData = this.gridOptions[this.currentTableClass.value].data.slice(0).map(function (d) {
                 var nd = {};
@@ -59021,7 +59050,7 @@ var ActiveComponentController = exports.ActiveComponentController = function () 
                         nd[key] = d[key];
                     } else {
                         nd[key] = d[key].map(function (v) {
-                            return (0, _preferredLanguageFilter.getPrefLangString)(v.value.labels, _this15.state.general.language);
+                            return (0, _preferredLanguageFilter.getPrefLangString)(v.value.labels, _this16.state.general.language);
                         }).join(', ');
                     }
                 });
@@ -59034,7 +59063,7 @@ var ActiveComponentController = exports.ActiveComponentController = function () 
     }, {
         key: 'setGridOptions',
         value: function setGridOptions() {
-            var _this16 = this;
+            var _this17 = this;
 
             if (!this.currentTableClass) this.currentTableClass = this.allClasses()[0];
             var generatedColumns = new _map2.default();
@@ -59052,7 +59081,7 @@ var ActiveComponentController = exports.ActiveComponentController = function () 
                     item.item.localProperties.concat(item.item.remoteProperties).forEach(function (p) {
                         if (p.property.value !== _rdf.RDF.type.value && p.property.value !== _rdf.SKOS.prefLabel.value) {
                             var propValue = p.values; // .map((v) => {
-                            obj[_this16.sanitizeId(p.property.value)] = p.values;
+                            obj[_this17.sanitizeId(p.property.value)] = p.values;
                             if (typeProp) {
                                 typeProp.values.forEach(function (v) {
                                     if (!generatedColumns.has(v.value.value)) {
@@ -59089,10 +59118,10 @@ var ActiveComponentController = exports.ActiveComponentController = function () 
             });
             var sortAlgo = function sortAlgo(a, b) {
                 var aString = a && a.map ? a.map(function (p) {
-                    return (0, _preferredLanguageFilter.getPrefLangString)(p.value.labels, _this16.state.general.language);
+                    return (0, _preferredLanguageFilter.getPrefLangString)(p.value.labels, _this17.state.general.language);
                 }).join() : '';
                 var bString = b && b.map ? b.map(function (p) {
-                    return (0, _preferredLanguageFilter.getPrefLangString)(p.value.labels, _this16.state.general.language);
+                    return (0, _preferredLanguageFilter.getPrefLangString)(p.value.labels, _this17.state.general.language);
                 }).join() : '';
                 if (aString < bString) {
                     return 1;
@@ -59104,31 +59133,31 @@ var ActiveComponentController = exports.ActiveComponentController = function () 
             };
             var handleRowSelection = function handleRowSelection(rows) {
                 var selectedIds = [];
-                _this16.selectedNodes.forEach(function (n) {
+                _this17.selectedNodes.forEach(function (n) {
                     return n.ids.forEach(function (id) {
                         return selectedIds.push(id.value);
                     });
                 });
                 rows.forEach(function (row) {
-                    if (row.isSelected && selectedIds.indexOf(row.entity.id) === -1 && _this16.state.active.activeLayout.items.find(function (i) {
+                    if (row.isSelected && selectedIds.indexOf(row.entity.id) === -1 && _this17.state.active.activeLayout.items.find(function (i) {
                         return i.ids[0].value === row.entity.id;
                     })) {
-                        _this16.selectedNodes.push(_this16.state.active.activeLayout.items.find(function (i) {
+                        _this17.selectedNodes.push(_this17.state.active.activeLayout.items.find(function (i) {
                             return i.ids[0].value === row.entity.id;
                         }));
                     } else if (!row.isSelected && selectedIds.indexOf(row.entity.id) !== -1) {
-                        _this16.selectedNodes.splice(_this16.selectedNodes.findIndex(function (n) {
+                        _this17.selectedNodes.splice(_this17.selectedNodes.findIndex(function (n) {
                             return n.ids.map(function (id) {
                                 return id.value;
                             }).indexOf(row.entity.id) !== -1;
                         }), 1);
                     }
                 });
-                _this16.updateCanvas();
+                _this17.updateCanvas();
             };
             var filterFunction = function filterFunction(searchTerm, cellValue, row, col) {
                 var combinedLabels = cellValue ? cellValue.map(function (v) {
-                    return (0, _preferredLanguageFilter.getPrefLangString)(v.value.labels, _this16.state.general.language, v.value.value).toLowerCase();
+                    return (0, _preferredLanguageFilter.getPrefLangString)(v.value.labels, _this17.state.general.language, v.value.value).toLowerCase();
                 }).join('||') : '';
                 return combinedLabels.indexOf(searchTerm.toLowerCase()) >= 0;
             };
@@ -59149,7 +59178,7 @@ var ActiveComponentController = exports.ActiveComponentController = function () 
                     generatedColumns.get(c).forEach(function (col, i) {
                         var cd = {
                             name: col,
-                            field: _this16.sanitizeId(col),
+                            field: _this17.sanitizeId(col),
                             displayName: generatedColumnLabels.get(c)[i].values && generatedColumnLabels.get(c)[i].values()[0] ? generatedColumnLabels.get(c)[i].values()[0].value : '',
                             width: 200,
                             sortingAlgorithm: sortAlgo,
@@ -59165,7 +59194,7 @@ var ActiveComponentController = exports.ActiveComponentController = function () 
                         columnDefs.push(cd);
                     });
                 }
-                _this16.gridOptions[c] = {
+                _this17.gridOptions[c] = {
                     data: [{}].concat(data.filter(function (d) {
                         return d['types'] ? d['types'].map(function (v) {
                             return v.value.value;
@@ -59177,19 +59206,19 @@ var ActiveComponentController = exports.ActiveComponentController = function () 
                     columnDefs: columnDefs,
                     onRegisterApi: function onRegisterApi(gridApi) {
                         // set gridApi on scope
-                        _this16.gridApis[c] = gridApi;
-                        gridApi.edit.on.afterCellEdit(_this16.$scope, function (rowEntity, colDef, newValue, oldValue) {
+                        _this17.gridApis[c] = gridApi;
+                        gridApi.edit.on.afterCellEdit(_this17.$scope, function (rowEntity, colDef, newValue, oldValue) {
                             console.log(rowEntity, colDef, newValue, oldValue);
-                            _this16.$scope.$apply();
+                            _this17.$scope.$apply();
                         });
-                        gridApi.selection.on.rowSelectionChanged(_this16.$scope, function (row) {
+                        gridApi.selection.on.rowSelectionChanged(_this17.$scope, function (row) {
                             return handleRowSelection([row]);
                         });
-                        gridApi.selection.on.rowSelectionChangedBatch(_this16.$scope, handleRowSelection);
+                        gridApi.selection.on.rowSelectionChangedBatch(_this17.$scope, handleRowSelection);
                     }
                 };
                 if (c === 'other') {
-                    _this16.gridOptions[c].data = [{}].concat(data.filter(function (d) {
+                    _this17.gridOptions[c].data = [{}].concat(data.filter(function (d) {
                         return d['types'].length === 0;
                     }));
                 }
@@ -93619,6 +93648,7 @@ var ExpandModalComponentController = exports.ExpandModalComponentController = fu
         this.actions = {};
         this.state = {};
         this.expandRadius = 60;
+        this.numberFirstRing = 12;
         var stateUnsubscribe = $ngRedux.connect(function (state) {
             return {
                 active: state.active
@@ -93643,11 +93673,17 @@ var ExpandModalComponentController = exports.ExpandModalComponentController = fu
         value: function expand(propValues) {
             var _this = this;
 
+            var ring = 1;
+            var subtract = 0;
             this.activeActionService.addItemsToCurrentLayout(propValues.values.map(function (v, i) {
-                var theta = Math.PI * 2 / propValues.values.length;
-                var angle = theta * i;
-                var leftOffset = _this.itemState.leftOffset + _this.expandRadius * Math.cos(angle);
-                var topOffset = _this.itemState.topOffset + _this.expandRadius * Math.sin(angle);
+                if (i - subtract > _this.numberFirstRing * ring) {
+                    subtract += _this.numberFirstRing * ring;
+                    ring += 1;
+                }
+                var theta = Math.PI * 2 / (propValues.values.length - subtract < _this.numberFirstRing * ring ? propValues.values.length - subtract : _this.numberFirstRing * ring);
+                var angle = theta * (i - subtract);
+                var leftOffset = _this.itemState.leftOffset + _this.expandRadius * ring * Math.cos(angle);
+                var topOffset = _this.itemState.topOffset + _this.expandRadius * ring * Math.sin(angle);
                 return {
                     ids: [new _rdf.NamedNode(v.value.value)],
                     item: null,
