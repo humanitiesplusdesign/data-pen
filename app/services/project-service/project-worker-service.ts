@@ -1,18 +1,18 @@
 'use strict'
 import * as angular from 'angular'
 
-import {ICitable, ICitableSource, CitableSource, Citable} from '../../models/citable'
-import {Project} from './project'
-import {ProjectSourceInfo} from '../../components/project-sources-view/project-sources-view-component'
-import {SparqlService, IBindingsToObjectConfiguration, UniqueObjectTracker} from 'angular-sparql-service'
-import {FibraSparqlService} from '../../services/fibra-sparql-service'
-import {PrimaryEndpointConfiguration} from './primary-endpoint-configuration'
-import {RemoteEndpointConfiguration} from './remote-endpoint-configuration'
-import {Schema} from './schema'
-import {FMap, IEMap, EMap} from '../../components/collection-utils'
-import {toTurtle} from '../../components/misc-utils'
-import {DataFactory, ONodeSet} from '../../models/rdf'
-import {DataModel, Class, Property} from './data-model'
+import { ICitable, ICitableSource, CitableSource, Citable } from '../../models/citable'
+import { Project } from './project'
+import { ProjectSourceInfo } from '../../components/project-sources-view/project-sources-view-component'
+import { SparqlService, IBindingsToObjectConfiguration, UniqueObjectTracker } from 'angular-sparql-service'
+import { FibraSparqlService } from '../../services/fibra-sparql-service'
+import { PrimaryEndpointConfiguration } from './primary-endpoint-configuration'
+import { RemoteEndpointConfiguration } from './remote-endpoint-configuration'
+import { Schema } from './schema'
+import { FMap, IEMap, EMap } from '../../components/collection-utils'
+import { toTurtle } from '../../components/misc-utils'
+import { DataFactory, ONodeSet } from '../../models/rdf'
+import { DataModel, Class, Property } from './data-model'
 import { ILiteral } from 'models/rdfjs';
 import { SerializationService } from 'services/worker-service/serialization-service';
 
@@ -22,7 +22,7 @@ export class ProjectWorkerService {
     citables.forEach(rh => delete rh['order'])
   }
 
-  constructor(private fibraSparqlService: FibraSparqlService, private serializationService: SerializationService, private $q: angular.IQService) {}
+  constructor(private fibraSparqlService: FibraSparqlService, private serializationService: SerializationService, private $q: angular.IQService) { }
 
   public loadPrimaryEndpointConfiguration(source: ICitableSource, templateId: string): angular.IPromise<PrimaryEndpointConfiguration> {
     return this.runSingleQuery(source, PrimaryEndpointConfiguration.listPrimaryEndpointConfigurationsQuery, templateId, new PrimaryEndpointConfiguration(templateId, source))
@@ -117,7 +117,8 @@ export class ProjectWorkerService {
             let tracker: UniqueObjectTracker = new UniqueObjectTracker()
             response.results.bindings.forEach(binding => SparqlService.bindingsToObject(binding, properties.goc(binding['id'].value), propertyConf, binding['id'].value, tracker))
           }))
-      }})
+        }
+      })
       promises.push(this.fibraSparqlService.query(schema.endpoint, schema.classQuery).then(response => {
         let tracker: UniqueObjectTracker = new UniqueObjectTracker()
         response.results.bindings.forEach(binding => SparqlService.bindingsToObject(binding, classes.goc(binding['id'].value), classConf, binding['id'].value, tracker))
@@ -156,7 +157,10 @@ export class ProjectWorkerService {
       promises.push(this.$q.all(p.schemas.map(schema => this.loadSchema(schema.source, schema.id))).then(schemas => p.schemas = schemas))
       promises.push(this.$q.all(p.archiveEndpoints.map(ae => this.loadRemoteEndpointConfiguration(ae.source, ae.id))).then(aes => p.archiveEndpoints = aes))
       promises.push(this.$q.all(p.authorityEndpoints.map(ae => this.loadRemoteEndpointConfiguration(ae.source, ae.id))).then(aes => p.authorityEndpoints = aes))
-      return this.$q.all(promises).then(() => this.loadDataModel(p.schemas, p.archiveEndpoints.concat(p.authorityEndpoints)).then(dm => p.dataModel = dm).then(() => p))
+      return this.$q.all(promises).then(() => this.loadDataModel(p.schemas, p.archiveEndpoints.concat(p.authorityEndpoints)).then(dm => p.dataModel = dm).then(() => {
+        p.init()
+        return p
+      }))
     })
   }
 
@@ -175,7 +179,7 @@ export class ProjectWorkerService {
       response => {
         let projects: EMap<T> = new EMap<T>(oc)
         let conf: IBindingsToObjectConfiguration = {
-          bindingTypes: { rightsHolders: 'uniqueArray', sourceClassSettings: 'single', layouts: 'single', dateBoundaryStart: 'single', dateBoundaryEnd: 'single', schemas: 'uniqueArray', authorityEndpoints: 'uniqueArray', archiveEndpoints: 'uniqueArray'},
+          bindingTypes: { rightsHolders: 'uniqueArray', sourceClassSettings: 'single', layouts: 'single', dateBoundaryStart: 'single', dateBoundaryEnd: 'single', schemas: 'uniqueArray', authorityEndpoints: 'uniqueArray', archiveEndpoints: 'uniqueArray' },
           bindingConverters: {
             dateCreated: (binding) => new Date(binding.value),
             types: (binding) => DataFactory.nodeFromBinding(binding),

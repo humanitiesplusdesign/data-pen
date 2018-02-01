@@ -2,13 +2,13 @@
 import { SerializationService } from './worker-service/serialization-service';
 import { getPrefLangString } from '../filters/preferred-language-filter';
 
-import {INode, ONodeSet, DataFactory} from '../models/rdf'
-import {WorkerService} from './worker-service/worker-service'
-import {FMap, EMap, StringSet} from 'components/collection-utils'
-import {FibraSparqlService} from './fibra-sparql-service'
-import {StateWorkerService, WorkerWorkerService} from './worker-service/worker-worker-service'
-import {DataModel} from './project-service/data-model'
-import {SparqlService, ISparqlBindingResult} from 'angular-sparql-service'
+import { INode, ONodeSet, DataFactory } from '../models/rdf'
+import { WorkerService } from './worker-service/worker-service'
+import { FMap, EMap, StringSet } from 'components/collection-utils'
+import { FibraSparqlService } from './fibra-sparql-service'
+import { StateWorkerService, WorkerWorkerService } from './worker-service/worker-worker-service'
+import { DataModel } from './project-service/data-model'
+import { SparqlService, ISparqlBindingResult } from 'angular-sparql-service'
 import * as angular from 'angular';
 import { UnifyMap } from 'services/id-consolidation-utils';
 
@@ -20,12 +20,12 @@ export class AutocompletionResults {
 
 export class ResultGroup {
   public results: Result[] = []
-  constructor(public label: string) {}
+  constructor(public label: string) { }
 }
 
 export class Result {
-  public additionalInformation: {[varName: string]: INode[]} = {}
-  constructor(public ids: INode[], public datasources: string[], public matchedLabel: INode, public prefLabel: INode) {}
+  public additionalInformation: { [varName: string]: INode[] } = {}
+  constructor(public ids: INode[], public datasources: string[], public matchedLabel: INode, public prefLabel: INode) { }
 }
 
 export class SparqlAutocompleteService {
@@ -85,10 +85,10 @@ SELECT ?groupId ?id ?prefLabel ?matchedLabel ?sameAs ?altLabel { # ADDITIONALVAR
 }
 `
 
-  constructor(private workerService: WorkerService) {}
+  constructor(private workerService: WorkerService) { }
 
-  public autocomplete(query: string, limit: number, queryRemote: boolean = false, limits: string = '', canceller?: angular.IPromise<any>): angular.IPromise<AutocompletionResults> {
-    return this.workerService.call('sparqlAutocompleteWorkerService', 'autocomplete', [query, limit, queryRemote, limits], canceller)
+  public autocomplete(query: string, limit: number, queryRemote: boolean = false, canceller?: angular.IPromise<any>): angular.IPromise<AutocompletionResults> {
+    return this.workerService.call('sparqlAutocompleteWorkerService', 'autocomplete', [query, limit, queryRemote], canceller)
   }
 
 }
@@ -100,7 +100,7 @@ class ProcessingData {
   public idToMatchedLabelSet: EMap<ONodeSet<INode>> = new EMap<ONodeSet<INode>>(() => new ONodeSet<INode>())
   public idToAltLabelSet: EMap<ONodeSet<INode>> = new EMap<ONodeSet<INode>>(() => new ONodeSet<INode>())
   public idToDatasourceSet: EMap<StringSet> = new EMap<StringSet>(() => new StringSet())
-  public processAndConsolidate(result: ISparqlBindingResult<{[id: string]: ISparqlBinding}>, endpoint: string): void {
+  public processAndConsolidate(result: ISparqlBindingResult<{ [id: string]: ISparqlBinding }>, endpoint: string): void {
     result.results.bindings.forEach(binding => {
       let id: string = binding['id'].value
       this.idToDatasourceSet.goc(id).add(endpoint)
@@ -205,22 +205,22 @@ export class SparqlAutocompleteWorkerService {
   constructor(private $q: angular.IQService, private fibraSparqlService: FibraSparqlService, private stateWorkerService: StateWorkerService) {
   }
 
-  public autocomplete(query: string, limit: number, queryRemote: boolean = false, limits: string = '', canceller?: angular.IPromise<any>): angular.IPromise<AutocompletionResults> {
+  public autocomplete(query: string, limit: number, queryRemote: boolean = false, canceller?: angular.IPromise<any>): angular.IPromise<AutocompletionResults> {
     let d: angular.IDeferred<AutocompletionResults> = this.$q.defer()
     let results: AutocompletionResults = new AutocompletionResults()
     let queryTemplate: string = this.stateWorkerService.state.project.autocompletionQuery
     queryTemplate = queryTemplate.replace(/<QUERY>/g, SparqlService.stringToSPARQLString(query))
     queryTemplate = queryTemplate.replace(/<LIMIT>/g, '' + limit)
-    queryTemplate = queryTemplate.replace(/# CONSTRAINTS/g, limits)
+    queryTemplate = queryTemplate.replace(/# CONSTRAINTS/g, this.stateWorkerService.state.project.constraints ? this.stateWorkerService.state.project.constraints : '')
     queryTemplate = queryTemplate.replace(/<PREFLANG>/g, this.stateWorkerService.state.language)
     let pd: ProcessingData = new ProcessingData()
     let localResults: StringSet = new StringSet()
-    let primaryProcessed: angular.IPromise<void> = this.fibraSparqlService.query(this.stateWorkerService.state.project.endpoint, queryTemplate, {timeout: canceller}).then(
+    let primaryProcessed: angular.IPromise<void> = this.fibraSparqlService.query(this.stateWorkerService.state.project.endpoint, queryTemplate, { timeout: canceller }).then(
       (response) => {
         pd.processAndConsolidate(response, this.stateWorkerService.state.project.endpoint)
         results.localMatchingResults = SparqlAutocompleteWorkerService.buildResults(pd, localResults, this.stateWorkerService.state.project.dataModel, this.stateWorkerService.state.language)
         if (!queryRemote) d.resolve(results)
-        else d.notify({endpointType: 'primary', endpoint: this.stateWorkerService.state.project.id, results: results})
+        else d.notify({ endpointType: 'primary', endpoint: this.stateWorkerService.state.project.id, results: results })
       }
     )
     if (queryRemote) {
@@ -231,19 +231,21 @@ export class SparqlAutocompleteWorkerService {
         queryTemplate = endpointConfiguration.autocompletionQuery
         queryTemplate = queryTemplate.replace(/<QUERY>/g, SparqlService.stringToSPARQLString(query))
         queryTemplate = queryTemplate.replace(/<LIMIT>/g, '' + limit)
+        queryTemplate = queryTemplate.replace(/# CONSTRAINTS/g, endpointConfiguration.constraints ? endpointConfiguration.constraints : '')
         queryTemplate = queryTemplate.replace(/<PREFLANG>/g, this.stateWorkerService.state.language)
-        return this.fibraSparqlService.query(endpointConfiguration.endpoint, queryTemplate, {timeout: canceller}).then(
+        return this.fibraSparqlService.query(endpointConfiguration.endpoint, queryTemplate, { timeout: canceller }).then(
           (response) => {
             if (response.results.bindings.length !== 0) {
               return primaryProcessed.then(() => {
                 pd.processAndConsolidate(response, endpointConfiguration.id)
                 results.remoteResults = SparqlAutocompleteWorkerService.buildResults(pd, localResults, this.stateWorkerService.state.project.dataModel, this.stateWorkerService.state.language)
-                d.notify({endpointType: 'remote', endpoint: endpointConfiguration.id, results: results})
+                d.notify({ endpointType: 'remote', endpoint: endpointConfiguration.id, results: results })
               })
             }
           },
-          (error) => d.notify({endpointType: 'remote', endpoint: endpointConfiguration.id, error: SerializationService.stripFunctions(error)})
-      )})).then(() => {
+          (error) => d.notify({ endpointType: 'remote', endpoint: endpointConfiguration.id, error: SerializationService.stripFunctions(error) })
+        )
+      })).then(() => {
         console.log(results)
         d.resolve(results)
       })

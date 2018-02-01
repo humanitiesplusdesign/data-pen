@@ -1,12 +1,12 @@
 'use strict'
 
-import {Citable} from 'models/citable'
-import {INode, FIBRA, VOID, RDF, ONodeSet} from 'models/rdf'
-import {SparqlAutocompleteService} from 'services/sparql-autocomplete-service'
-import {DataModel, Class, IClass} from 'services/project-service/data-model'
-import {SparqlItemService} from 'services/sparql-item-service'
-import {SparqlStatisticsService} from 'services/sparql-statistics-service'
-import {SparqlService} from 'angular-sparql-service'
+import { Citable } from 'models/citable'
+import { INode, FIBRA, VOID, RDF, ONodeSet } from 'models/rdf'
+import { SparqlAutocompleteService } from 'services/sparql-autocomplete-service'
+import { DataModel, Class, IClass } from 'services/project-service/data-model'
+import { SparqlItemService } from 'services/sparql-item-service'
+import { SparqlStatisticsService } from 'services/sparql-statistics-service'
+import { SparqlService } from 'angular-sparql-service'
 import { TurtleBuilder } from 'components/misc-utils';
 
 export class RemoteEndpointConfiguration extends Citable {
@@ -66,6 +66,7 @@ SELECT * {
   public propertyStatisticsQuery: string = SparqlStatisticsService.getPropertyStatisticsQuery
   public schemaEndpoint: string
   public endpoint: string
+  public constraints: string
   protected __className: string = 'RemoteEndpointConfiguration'
   public toTurtle(tb: TurtleBuilder): void {
     if (!tb.fragmentsById.has(this.id)) {
@@ -77,7 +78,7 @@ SELECT * {
       f = f.substring(0, f.length - 2) + ' ;'
       tb.fragmentsById.set(this.id, f)
       super.toTurtle(tb)
-      f  = tb.fragmentsById.get(this.id)
+      f = tb.fragmentsById.get(this.id)
       f = f + `
 fibra:schemaEndpoint <${this.schemaEndpoint}> ;
 void:sparqlEndpoint <${this.endpoint}> ;

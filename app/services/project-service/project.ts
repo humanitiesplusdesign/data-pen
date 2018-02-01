@@ -2,21 +2,21 @@
 import { INode } from '../../models/rdf';
 import { ISourceClassTree } from '../../reducers/sources';
 
-import {Citable} from 'models/citable'
-import {DataModel} from 'services/project-service/data-model'
-import {SparqlService} from 'angular-sparql-service'
-import {SparqlAutocompleteService} from 'services/sparql-autocomplete-service'
-import {SparqlItemService} from 'services/sparql-item-service'
-import {RemoteEndpointConfiguration} from 'services/project-service/remote-endpoint-configuration'
-import {PrimaryEndpointConfiguration} from 'services/project-service/primary-endpoint-configuration'
-import {Schema} from 'services/project-service/schema'
-import {FIBRA, VOID} from 'models/rdf'
+import { Citable } from 'models/citable'
+import { DataModel } from 'services/project-service/data-model'
+import { SparqlService } from 'angular-sparql-service'
+import { SparqlAutocompleteService } from 'services/sparql-autocomplete-service'
+import { SparqlItemService } from 'services/sparql-item-service'
+import { RemoteEndpointConfiguration } from 'services/project-service/remote-endpoint-configuration'
+import { PrimaryEndpointConfiguration } from 'services/project-service/primary-endpoint-configuration'
+import { Schema } from 'services/project-service/schema'
+import { FIBRA, VOID } from 'models/rdf'
 import { SparqlStatisticsService } from 'services/sparql-statistics-service';
 import { TurtleBuilder } from 'components/misc-utils';
 import { SerializationService } from 'services/worker-service/serialization-service';
 import { IClassCounts } from 'components/projects-view/projects-view-component';
 
-export enum Mark {Red, Yellow, Green, Blue, White}
+export enum Mark { Red, Yellow, Green, Blue, White }
 
 export interface IItemState {
   ids: INode[],
@@ -138,7 +138,34 @@ SELECT * {
   public layouts: ILayoutState[] = []
   public dateBoundaryStart: string = ''
   public dateBoundaryEnd: string = ''
+  public constraints: string
   protected __className: string = 'Project'
+
+  public init(): void {
+    if (this.dateBoundaryStart !== '') this.authorityEndpoints.filter(ae => ae.endpoint.endsWith('/viaf/sparql')).forEach(ve =>
+      ve.constraints = `
+      FILTER (NOT EXISTS { ?id a crm:E21_Person } || EXISTS {
+        OPTIONAL {
+          ?id viaf:dateOfBirth ?dob .
+          ?dob crm:P82a_begin_of_the_begin ?bdob .
+          ?dob crm:P82b_end_of_the_end ?edob .
+        }
+        OPTIONAL {
+          ?id viaf:dateOfDeath ?dod .
+          ?dod crm:P82a_begin_of_the_begin ?bdod .
+          ?dod crm:P82b_end_of_the_end ?edod .
+        }
+        OPTIONAL {
+          ?id viaf:flourished ?dof .
+          ?dof crm:P82a_begin_of_the_begin ?bdof .
+          ?dof crm:P82b_end_of_the_end ?edof .
+        }
+        BIND(COALESCE(?bdob,?bdof,?bdod) AS ?ed)
+        BIND(COALESCE(?edod,?edof,?edob) AS ?ld)
+        FILTER (?ld >= "${this.dateBoundaryStart}-01-01T00:00:00Z"^^xsd:dateTime)
+        FILTER (?ed <= "${this.dateBoundaryEnd}-12-31T23:59:59Z"^^xsd:dateTime)
+      })`)
+  }
 
   public remoteEndpoints(): RemoteEndpointConfiguration[] {
     return this.archiveEndpoints.concat(this.authorityEndpoints)
@@ -180,7 +207,7 @@ fibra:schemaReference [
   fibra:graph <${ae.source.graph}>`
             f = f + `
 ] ;`
-        })
+          })
       }
       if (this.authorityEndpoints.length > 0) {
         f = f + `
@@ -200,7 +227,7 @@ fibra:authorityEndpointReference [
   fibra:graph <${ae.source.graph}>`
             f = f + `
 ] ;`
-        })
+          })
       }
       if (this.archiveEndpoints.length > 0) {
         f = f + `
@@ -220,7 +247,7 @@ fibra:archiveEndpointReference [
   fibra:graph <${ae.source.graph}>`
             f = f + `
 ] ;`
-        })
+          })
       }
       if (this.graph) f = f + `
 fibra:graph <${this.graph}> ;`
