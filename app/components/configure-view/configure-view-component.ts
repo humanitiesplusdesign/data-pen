@@ -1,13 +1,13 @@
 'use strict'
 
-import {Project} from '../../services/project-service/project'
-import {ProjectSourceInfo} from '../project-sources-view/project-sources-view-component'
-import {PrimaryEndpointConfiguration} from '../../services/project-service/primary-endpoint-configuration'
-import {RemoteEndpointConfiguration} from '../../services/project-service/remote-endpoint-configuration'
-import {Schema} from '../../services/project-service/schema'
-import {ProjectService} from '../../services/project-service/project-service'
-import {UUID} from '../misc-utils'
-import {DataFactory, NodeSet} from '../../models/rdf'
+import { Project } from '../../services/project-service/project'
+import { ProjectSourceInfo } from '../project-sources-view/project-sources-view-component'
+import { PrimaryEndpointConfiguration } from '../../services/project-service/primary-endpoint-configuration'
+import { RemoteEndpointConfiguration } from '../../services/project-service/remote-endpoint-configuration'
+import { Schema } from '../../services/project-service/schema'
+import { ProjectService } from '../../services/project-service/project-service'
+import { UUID } from '../misc-utils'
+import { DataFactory, NodeSet } from '../../models/rdf'
 import * as angular from 'angular'
 import { IFibraNgRedux } from 'reducers';
 
@@ -17,15 +17,15 @@ export class ConfigureViewComponentController implements angular.IComponentContr
   public projectSources: ProjectSourceInfo[]
   public projectSource: ProjectSourceInfo
   public primaryEndpointConfigurations: PrimaryEndpointConfiguration[] = []
-  public selectedAuthorities: {[id: string]: boolean} = {
+  public selectedAuthorities: { [id: string]: boolean } = {
     'http://ldf.fi/fibra/geonamesCidocLiteEndpointConfiguration': true,
     'http://ldf.fi/fibra/viafCidocLiteEndpointConfiguration': true
   }
-  public selectedArchives: {[id: string]: boolean} = {
+  public selectedArchives: { [id: string]: boolean } = {
     'http://ldf.fi/fibra/sdfbCidocLiteEndpointConfiguration': true,
     'http://ldf.fi/fibra/eeCidocLiteEndpointConfiguration': true
   }
-  public selectedSchemas: {[id: string]: boolean} = {
+  public selectedSchemas: { [id: string]: boolean } = {
     'http://ldf.fi/fibra/cidocCRMSchema': true
   }
   public selectedTemplate: PrimaryEndpointConfiguration
@@ -45,8 +45,9 @@ export class ConfigureViewComponentController implements angular.IComponentContr
     if (this.dateBoundaryStart && this.dateBoundaryEnd && RegExp('^[0-9]+$').test(this.dateBoundaryStart) && RegExp('^[0-9]+$').test(this.dateBoundaryEnd)) {
       this.project.dateBoundaryStart = this.dateBoundaryStart
       this.project.dateBoundaryEnd = this.dateBoundaryEnd
+      this.project.init()
     }
-    this.projectService.saveCitable(this.projectSource.updateEndpoint, this.projectSource.graphStoreEndpoint, this.project).then(() => this.$state.go('project', { id: this.project.id, sparqlEndpoint: this.project.source.sparqlEndpoint, graph: this.project.source.graph, view: 'active'}))
+    this.projectService.saveCitable(this.projectSource.updateEndpoint, this.projectSource.graphStoreEndpoint, this.project).then(() => this.$state.go('project', { id: this.project.id, sparqlEndpoint: this.project.source.sparqlEndpoint, graph: this.project.source.graph, view: 'active' }))
   }
 
   public deleteIfNew(): void {
@@ -80,7 +81,7 @@ export class ConfigureViewComponentController implements angular.IComponentContr
 
   public noProjects(): boolean {
     // if (this.projects.length === 0) {
-      return true
+    return true
     // } else {
     //   return false
     // }
@@ -119,26 +120,26 @@ export class ConfigureViewComponentController implements angular.IComponentContr
     // Hackety hackety hack
     [new ProjectSourceInfo('Shared projects', 'http://ldf.fi/fibra/sparql', 'http://ldf.fi/fibra/update', 'http://ldf.fi/fibra/data', 'http://ldf.fi/fibra/shared-projects/', 'http://ldf.fi/fibra/fusekiEndpointWithTextIndexAndSecoFunctions')]
       .concat(this.projectSources).forEach(ps => {
-      projectService.listPrimaryEndpointConfigurations(ps).then(pt => {
-        if (!this.selectedTemplate) {
-          let matchingEC: PrimaryEndpointConfiguration = pt.find(ec => ec.compatibleEndpoints.find(et => et === this.projectSource.type) !== undefined)
-          if (matchingEC) {
-            this.selectedTemplate = matchingEC
-            this.changeTemplate()
+        projectService.listPrimaryEndpointConfigurations(ps).then(pt => {
+          if (!this.selectedTemplate) {
+            let matchingEC: PrimaryEndpointConfiguration = pt.find(ec => ec.compatibleEndpoints.find(et => et === this.projectSource.type) !== undefined)
+            if (matchingEC) {
+              this.selectedTemplate = matchingEC
+              this.changeTemplate()
+            }
           }
-        }
-        this.primaryEndpointConfigurations = this.primaryEndpointConfigurations.concat(pt)
+          this.primaryEndpointConfigurations = this.primaryEndpointConfigurations.concat(pt)
+        })
+        projectService.listAuthorityEndpointConfigurations(ps).then(pt => this.authorities = this.authorities.concat(pt))
+        projectService.listArchiveEndpointConfigurations(ps).then(pt => this.archives = this.archives.concat(pt))
+        projectService.listSchemas(ps).then(pt => this.schemas = this.schemas.concat(pt))
       })
-      projectService.listAuthorityEndpointConfigurations(ps).then(pt => this.authorities = this.authorities.concat(pt))
-      projectService.listArchiveEndpointConfigurations(ps).then(pt => this.archives = this.archives.concat(pt))
-      projectService.listSchemas(ps).then(pt => this.schemas = this.schemas.concat(pt))
-    })
   }
 }
 
 export class ConfigureViewComponent implements angular.IComponentOptions {
-    public controller: any = ConfigureViewComponentController // (new (...args: any[]) => angular.IController) = ConfigureViewComponentController
-    public template: any = require('./configure-view.pug')()
+  public controller: any = ConfigureViewComponentController // (new (...args: any[]) => angular.IController) = ConfigureViewComponentController
+  public template: any = require('./configure-view.pug')()
 }
 
 angular.module('fibra.components.configure', ['fibra.services'])
