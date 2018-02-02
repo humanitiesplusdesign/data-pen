@@ -56616,12 +56616,12 @@ var ProjectsViewComponentController = exports.ProjectsViewComponentController = 
             // http://localhost:3000/#!/project-sources?sourceId=Private projects in local browser storage&sparqlEndpoint=local:projects&type=http://ldf.fi/fibra/rdfstoreJSEndpoint
             // projectSources.push(new ProjectSourceInfo('Projects in local Fuseki SPARQL server', 'http://localhost:3030/fibra/sparql', 'http://localhost:3030/fibra/update', 'http://localhost:3030/fibra/data', '', 'http://ldf.fi/fibra/fusekiEndpoint'))
             // http://localhost:3000/#!/project-sources?sourceId=Projects in local Fuseki SPARQL server&sparqlEndpoint=http://localhost:3030/fibra/sparql&updateEndpoint=http://localhost:3030/fibra/update&graphStoreEndpoint=http://localhost:3030/fibra/data&type=http://ldf.fi/fibra/fusekiEndpoint
-            projectSources.push(new _projectSourcesViewComponent.ProjectSourceInfo('Shared projects', 'http://ldf.fi/fibra/sparql', 'http://ldf.fi/fibra/update', 'http://ldf.fi/fibra/data', 'http://ldf.fi/fibra/shared-projects/', 'http://ldf.fi/fibra/fusekiEndpointWithTextIndexAndSecoFunctions'));
+            projectSources.push(new _projectSourcesViewComponent.ProjectSourceInfo('Shared projects', 'https://ldf.fi/fibra/sparql', 'https://ldf.fi/fibra/update', 'https://ldf.fi/fibra/data', 'http://ldf.fi/fibra/shared-projects/', 'http://ldf.fi/fibra/fusekiEndpointWithTextIndexAndSecoFunctions'));
         }
         if (socialAuthService.isLoggedIn() && !projectSources.some(function (s) {
             return s.id === 'Projects';
         })) {
-            projectSources.unshift(new _projectSourcesViewComponent.ProjectSourceInfo('Projects', 'http://ldf.fi/fibra/sparql', 'http://ldf.fi/fibra/sparql', 'http://ldf.fi/fibra/sparql', socialAuthService.getSourceID(), 'http://ldf.fi/fibra/fusekiEndpointWithTextIndexAndSecoFunctions'));
+            projectSources.unshift(new _projectSourcesViewComponent.ProjectSourceInfo('Projects', 'https://ldf.fi/fibra/sparql', 'https://ldf.fi/fibra/sparql', 'https://ldf.fi/fibra/sparql', socialAuthService.getSourceID(), 'http://ldf.fi/fibra/fusekiEndpointWithTextIndexAndSecoFunctions'));
         }
         projectSources.forEach(function (source) {
             _this.projectSources[source.id] = source;
@@ -57075,6 +57075,7 @@ var ConfigureViewComponentController = exports.ConfigureViewComponentController 
             if (this.dateBoundaryStart && this.dateBoundaryEnd && RegExp('^[0-9]+$').test(this.dateBoundaryStart) && RegExp('^[0-9]+$').test(this.dateBoundaryEnd)) {
                 this.project.dateBoundaryStart = this.dateBoundaryStart;
                 this.project.dateBoundaryEnd = this.dateBoundaryEnd;
+                this.project.init();
             }
             this.projectService.saveCitable(this.projectSource.updateEndpoint, this.projectSource.graphStoreEndpoint, this.project).then(function () {
                 return _this2.$state.go('project', { id: _this2.project.id, sparqlEndpoint: _this2.project.source.sparqlEndpoint, graph: _this2.project.source.graph, view: 'active' });

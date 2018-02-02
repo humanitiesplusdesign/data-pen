@@ -507,6 +507,7 @@ var ProjectWorkerService = exports.ProjectWorkerService = function () {
                     return _this2.loadDataModel(p.schemas, p.archiveEndpoints.concat(p.authorityEndpoints)).then(function (dm) {
                         return p.dataModel = dm;
                     }).then(function () {
+                        p.init();
                         return p;
                     });
                 });

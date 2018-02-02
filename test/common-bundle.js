@@ -5034,7 +5034,7 @@ angular.module('fibra.services.serialization-service', []).config(['$provide', f
 
 
 Object.defineProperty(exports, "__esModule", {
-    value: true
+  value: true
 });
 exports.Project = exports.Mark = undefined;
 
@@ -5084,130 +5084,141 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 var Mark = exports.Mark = undefined;
 (function (Mark) {
-    Mark[Mark["Red"] = 0] = "Red";
-    Mark[Mark["Yellow"] = 1] = "Yellow";
-    Mark[Mark["Green"] = 2] = "Green";
-    Mark[Mark["Blue"] = 3] = "Blue";
-    Mark[Mark["White"] = 4] = "White";
+  Mark[Mark["Red"] = 0] = "Red";
+  Mark[Mark["Yellow"] = 1] = "Yellow";
+  Mark[Mark["Green"] = 2] = "Green";
+  Mark[Mark["Blue"] = 3] = "Blue";
+  Mark[Mark["White"] = 4] = "White";
 })(Mark || (exports.Mark = Mark = {}));
 
 var Project = exports.Project = function (_Citable) {
-    (0, _inherits3.default)(Project, _Citable);
+  (0, _inherits3.default)(Project, _Citable);
 
-    function Project() {
-        (0, _classCallCheck3.default)(this, Project);
+  function Project() {
+    (0, _classCallCheck3.default)(this, Project);
 
-        var _this = (0, _possibleConstructorReturn3.default)(this, (Project.__proto__ || (0, _getPrototypeOf2.default)(Project)).apply(this, arguments));
+    var _this = (0, _possibleConstructorReturn3.default)(this, (Project.__proto__ || (0, _getPrototypeOf2.default)(Project)).apply(this, arguments));
 
-        _this.instanceNS = 'http://ldf.fi/fibra/';
-        _this.schemaNS = 'http://ldf.fi/fibra/schema#';
-        _this.dataModel = new _dataModel.DataModel();
-        _this.autocompletionQuery = _sparqlAutocompleteService.SparqlAutocompleteService.defaultMatchQuery;
-        _this.classStatisticsQuery = _sparqlStatisticsService.SparqlStatisticsService.getClassStatisticsQuery;
-        _this.propertyStatisticsQuery = _sparqlStatisticsService.SparqlStatisticsService.getPropertyStatisticsQuery;
-        _this.itemQuery = _sparqlItemService.SparqlItemService.getItemPropertiesQuery;
-        _this.coalesceIdsQuery = _sparqlItemService.SparqlItemService.coalesceIdsQuery;
-        _this.deleteItemQuery = _sparqlItemService.SparqlItemService.deleteItemQuery;
-        _this.classQuery = _dataModel.DataModel.classQuery;
-        _this.propertyQuery = _dataModel.DataModel.propertyQuery;
-        _this.authorityEndpoints = [];
-        _this.archiveEndpoints = [];
-        _this.schemas = [];
-        _this.sourceClassSettings = {
-            'http://ldf.fi/fibra/viafCidocLiteEndpointConfiguration': {
-                'http://www.cidoc-crm.org/cidoc-crm/E21_Person': true,
-                'http://www.cidoc-crm.org/cidoc-crm/E53_Place': true
-            },
-            'http://ldf.fi/fibra/geonamesCidocLiteEndpointConfiguration': {
-                'http://www.cidoc-crm.org/cidoc-crm/E53_Place': true
-            }
-        };
-        _this.layouts = [];
-        _this.dateBoundaryStart = '';
-        _this.dateBoundaryEnd = '';
-        _this.__className = 'Project';
-        return _this;
+    _this.instanceNS = 'http://ldf.fi/fibra/';
+    _this.schemaNS = 'http://ldf.fi/fibra/schema#';
+    _this.dataModel = new _dataModel.DataModel();
+    _this.autocompletionQuery = _sparqlAutocompleteService.SparqlAutocompleteService.defaultMatchQuery;
+    _this.classStatisticsQuery = _sparqlStatisticsService.SparqlStatisticsService.getClassStatisticsQuery;
+    _this.propertyStatisticsQuery = _sparqlStatisticsService.SparqlStatisticsService.getPropertyStatisticsQuery;
+    _this.itemQuery = _sparqlItemService.SparqlItemService.getItemPropertiesQuery;
+    _this.coalesceIdsQuery = _sparqlItemService.SparqlItemService.coalesceIdsQuery;
+    _this.deleteItemQuery = _sparqlItemService.SparqlItemService.deleteItemQuery;
+    _this.classQuery = _dataModel.DataModel.classQuery;
+    _this.propertyQuery = _dataModel.DataModel.propertyQuery;
+    _this.authorityEndpoints = [];
+    _this.archiveEndpoints = [];
+    _this.schemas = [];
+    _this.sourceClassSettings = {
+      'http://ldf.fi/fibra/viafCidocLiteEndpointConfiguration': {
+        'http://www.cidoc-crm.org/cidoc-crm/E21_Person': true,
+        'http://www.cidoc-crm.org/cidoc-crm/E53_Place': true
+      },
+      'http://ldf.fi/fibra/geonamesCidocLiteEndpointConfiguration': {
+        'http://www.cidoc-crm.org/cidoc-crm/E53_Place': true
+      }
+    };
+    _this.layouts = [];
+    _this.dateBoundaryStart = '';
+    _this.dateBoundaryEnd = '';
+    _this.__className = 'Project';
+    return _this;
+  }
+
+  (0, _createClass3.default)(Project, [{
+    key: 'init',
+    value: function init() {
+      var _this2 = this;
+
+      if (this.dateBoundaryStart !== '') this.authorityEndpoints.filter(function (ae) {
+        return ae.endpoint.endsWith('/viaf/sparql');
+      }).forEach(function (ve) {
+        return ve.constraints = '\n      FILTER (NOT EXISTS { ?id a crm:E21_Person } || EXISTS {\n        OPTIONAL {\n          ?id viaf:dateOfBirth ?dob .\n          ?dob crm:P82a_begin_of_the_begin ?bdob .\n          ?dob crm:P82b_end_of_the_end ?edob .\n        }\n        OPTIONAL {\n          ?id viaf:dateOfDeath ?dod .\n          ?dod crm:P82a_begin_of_the_begin ?bdod .\n          ?dod crm:P82b_end_of_the_end ?edod .\n        }\n        OPTIONAL {\n          ?id viaf:flourished ?dof .\n          ?dof crm:P82a_begin_of_the_begin ?bdof .\n          ?dof crm:P82b_end_of_the_end ?edof .\n        }\n        BIND(COALESCE(?bdob,?bdof,?bdod) AS ?ed)\n        BIND(COALESCE(?edod,?edof,?edob) AS ?ld)\n        FILTER (?ld >= "' + _this2.dateBoundaryStart + '-01-01T00:00:00Z"^^xsd:dateTime)\n        FILTER (?ed <= "' + _this2.dateBoundaryEnd + '-12-31T23:59:59Z"^^xsd:dateTime)\n      })';
+      });
     }
+  }, {
+    key: 'remoteEndpoints',
+    value: function remoteEndpoints() {
+      return this.archiveEndpoints.concat(this.authorityEndpoints);
+    }
+  }, {
+    key: 'asTemplate',
+    value: function asTemplate() {
+      var p = new _primaryEndpointConfiguration.PrimaryEndpointConfiguration();
+      p.autocompletionQuery = this.autocompletionQuery;
+      p.itemQuery = this.itemQuery;
+      p.deleteItemQuery = this.deleteItemQuery;
+      p.classStatisticsQuery = this.classStatisticsQuery;
+      p.propertyStatisticsQuery = this.propertyStatisticsQuery;
+      p.coalesceIdsQuery = this.coalesceIdsQuery;
+      p.propertyQuery = this.propertyQuery;
+      p.classQuery = this.classQuery;
+      return p;
+    }
+  }, {
+    key: 'toTurtle',
+    value: function toTurtle(tb) {
+      var _this3 = this;
 
-    (0, _createClass3.default)(Project, [{
-        key: 'remoteEndpoints',
-        value: function remoteEndpoints() {
-            return this.archiveEndpoints.concat(this.authorityEndpoints);
+      if (!tb.fragmentsById.has(this.id)) {
+        tb.prefixes['fibra'] = _rdf.FIBRA.ns;
+        tb.prefixes['void'] = _rdf.VOID.ns;
+        tb.fragmentsById.set(this.id, '<' + this.id + '> a fibra:Project ;');
+        (0, _get3.default)(Project.prototype.__proto__ || (0, _getPrototypeOf2.default)(Project.prototype), 'toTurtle', this).call(this, tb);
+        var f = tb.fragmentsById.get(this.id);
+        if (this.schemas.length > 0) {
+          f = f + '\nfibra:schema ';
+          this.schemas.forEach(function (ae) {
+            f = f + ('<' + ae.id + '>, ');
+          });
+          f = f.substring(0, f.length - 2) + ' ;';
+          this.schemas.filter(function (ae) {
+            return ae.source.sparqlEndpoint !== _this3.source.sparqlEndpoint || _this3.source.graph !== ae.source.graph;
+          }).forEach(function (ae) {
+            f = f + ('\nfibra:schemaReference [\n  rdf:value <' + ae.id + '> ;\n  void:sparqlEndpoint <' + ae.source.sparqlEndpoint + '> ;');
+            if (ae.source.graph) f = f + ('\n  fibra:graph <' + ae.source.graph + '>');
+            f = f + '\n] ;';
+          });
         }
-    }, {
-        key: 'asTemplate',
-        value: function asTemplate() {
-            var p = new _primaryEndpointConfiguration.PrimaryEndpointConfiguration();
-            p.autocompletionQuery = this.autocompletionQuery;
-            p.itemQuery = this.itemQuery;
-            p.deleteItemQuery = this.deleteItemQuery;
-            p.classStatisticsQuery = this.classStatisticsQuery;
-            p.propertyStatisticsQuery = this.propertyStatisticsQuery;
-            p.coalesceIdsQuery = this.coalesceIdsQuery;
-            p.propertyQuery = this.propertyQuery;
-            p.classQuery = this.classQuery;
-            return p;
+        if (this.authorityEndpoints.length > 0) {
+          f = f + '\nfibra:authorityEndpoint ';
+          this.authorityEndpoints.forEach(function (ae) {
+            f = f + ('<' + ae.id + '>, ');
+          });
+          f = f.substring(0, f.length - 2) + ' ;';
+          this.authorityEndpoints.filter(function (ae) {
+            return ae.source.sparqlEndpoint !== _this3.source.sparqlEndpoint || _this3.source.graph !== ae.source.graph;
+          }).forEach(function (ae) {
+            f = f + ('\nfibra:authorityEndpointReference [\n  rdf:value <' + ae.id + '> ;\n  void:sparqlEndpoint <' + ae.source.sparqlEndpoint + '> ;');
+            if (ae.source.graph) f = f + ('\n  fibra:graph <' + ae.source.graph + '>');
+            f = f + '\n] ;';
+          });
         }
-    }, {
-        key: 'toTurtle',
-        value: function toTurtle(tb) {
-            var _this2 = this;
-
-            if (!tb.fragmentsById.has(this.id)) {
-                tb.prefixes['fibra'] = _rdf.FIBRA.ns;
-                tb.prefixes['void'] = _rdf.VOID.ns;
-                tb.fragmentsById.set(this.id, '<' + this.id + '> a fibra:Project ;');
-                (0, _get3.default)(Project.prototype.__proto__ || (0, _getPrototypeOf2.default)(Project.prototype), 'toTurtle', this).call(this, tb);
-                var f = tb.fragmentsById.get(this.id);
-                if (this.schemas.length > 0) {
-                    f = f + '\nfibra:schema ';
-                    this.schemas.forEach(function (ae) {
-                        f = f + ('<' + ae.id + '>, ');
-                    });
-                    f = f.substring(0, f.length - 2) + ' ;';
-                    this.schemas.filter(function (ae) {
-                        return ae.source.sparqlEndpoint !== _this2.source.sparqlEndpoint || _this2.source.graph !== ae.source.graph;
-                    }).forEach(function (ae) {
-                        f = f + ('\nfibra:schemaReference [\n  rdf:value <' + ae.id + '> ;\n  void:sparqlEndpoint <' + ae.source.sparqlEndpoint + '> ;');
-                        if (ae.source.graph) f = f + ('\n  fibra:graph <' + ae.source.graph + '>');
-                        f = f + '\n] ;';
-                    });
-                }
-                if (this.authorityEndpoints.length > 0) {
-                    f = f + '\nfibra:authorityEndpoint ';
-                    this.authorityEndpoints.forEach(function (ae) {
-                        f = f + ('<' + ae.id + '>, ');
-                    });
-                    f = f.substring(0, f.length - 2) + ' ;';
-                    this.authorityEndpoints.filter(function (ae) {
-                        return ae.source.sparqlEndpoint !== _this2.source.sparqlEndpoint || _this2.source.graph !== ae.source.graph;
-                    }).forEach(function (ae) {
-                        f = f + ('\nfibra:authorityEndpointReference [\n  rdf:value <' + ae.id + '> ;\n  void:sparqlEndpoint <' + ae.source.sparqlEndpoint + '> ;');
-                        if (ae.source.graph) f = f + ('\n  fibra:graph <' + ae.source.graph + '>');
-                        f = f + '\n] ;';
-                    });
-                }
-                if (this.archiveEndpoints.length > 0) {
-                    f = f + '\nfibra:archiveEndpoint ';
-                    this.archiveEndpoints.forEach(function (ae) {
-                        f = f + ('<' + ae.id + '>, ');
-                    });
-                    f = f.substring(0, f.length - 2) + ' ;';
-                    this.archiveEndpoints.filter(function (ae) {
-                        return ae.source.sparqlEndpoint !== _this2.source.sparqlEndpoint || _this2.source.graph !== ae.source.graph;
-                    }).forEach(function (ae) {
-                        f = f + ('\nfibra:archiveEndpointReference [\n  rdf:value <' + ae.id + '> ;\n  void:sparqlEndpoint <' + ae.source.sparqlEndpoint + '> ;');
-                        if (ae.source.graph) f = f + ('\n  fibra:graph <' + ae.source.graph + '>');
-                        f = f + '\n] ;';
-                    });
-                }
-                if (this.graph) f = f + ('\nfibra:graph <' + this.graph + '> ;');
-                f = f + ('\nfibra:autocompletionQuery ' + _angularSparqlService.SparqlService.stringToSPARQLString(this.autocompletionQuery) + ' ;\nfibra:classStatisticsQuery ' + _angularSparqlService.SparqlService.stringToSPARQLString(this.classStatisticsQuery) + ' ;\nfibra:propertyStatisticsQuery ' + _angularSparqlService.SparqlService.stringToSPARQLString(this.propertyStatisticsQuery) + ' ;\nfibra:itemQuery ' + _angularSparqlService.SparqlService.stringToSPARQLString(this.itemQuery) + ' ;\nfibra:coalesceIdsQuery ' + _angularSparqlService.SparqlService.stringToSPARQLString(this.coalesceIdsQuery) + ' ;\nfibra:deleteItemQuery ' + _angularSparqlService.SparqlService.stringToSPARQLString(this.deleteItemQuery) + ' ;\nfibra:classQuery ' + _angularSparqlService.SparqlService.stringToSPARQLString(this.classQuery) + ' ;\nfibra:propertyQuery ' + _angularSparqlService.SparqlService.stringToSPARQLString(this.propertyQuery) + ' ;\nvoid:sparqlEndpoint <' + this.endpoint + '> ;\nfibra:updateEndpoint <' + this.updateEndpoint + '> ;\nfibra:graphStoreEndpoint <' + this.graphStoreEndpoint + '> ;\nfibra:schemaNS ' + _angularSparqlService.SparqlService.stringToSPARQLString(this.schemaNS) + ' ;\nfibra:sourceClassSettings ' + _angularSparqlService.SparqlService.stringToSPARQLString(_serializationService.SerializationService.toJson(this.sourceClassSettings)) + ' ;\nfibra:layouts ' + _angularSparqlService.SparqlService.stringToSPARQLString(_serializationService.SerializationService.toJson(this.layouts)) + ' ;\nfibra:dateBoundaryStart ' + _angularSparqlService.SparqlService.stringToSPARQLString(_serializationService.SerializationService.toJson(this.dateBoundaryStart)) + ' ;\nfibra:dateBoundaryEnd ' + _angularSparqlService.SparqlService.stringToSPARQLString(_serializationService.SerializationService.toJson(this.dateBoundaryEnd)) + ' ;\nfibra:instanceNS ' + _angularSparqlService.SparqlService.stringToSPARQLString(this.instanceNS) + ' .');
-                tb.fragmentsById.set(this.id, f);
-            }
+        if (this.archiveEndpoints.length > 0) {
+          f = f + '\nfibra:archiveEndpoint ';
+          this.archiveEndpoints.forEach(function (ae) {
+            f = f + ('<' + ae.id + '>, ');
+          });
+          f = f.substring(0, f.length - 2) + ' ;';
+          this.archiveEndpoints.filter(function (ae) {
+            return ae.source.sparqlEndpoint !== _this3.source.sparqlEndpoint || _this3.source.graph !== ae.source.graph;
+          }).forEach(function (ae) {
+            f = f + ('\nfibra:archiveEndpointReference [\n  rdf:value <' + ae.id + '> ;\n  void:sparqlEndpoint <' + ae.source.sparqlEndpoint + '> ;');
+            if (ae.source.graph) f = f + ('\n  fibra:graph <' + ae.source.graph + '>');
+            f = f + '\n] ;';
+          });
         }
-    }]);
-    return Project;
+        if (this.graph) f = f + ('\nfibra:graph <' + this.graph + '> ;');
+        f = f + ('\nfibra:autocompletionQuery ' + _angularSparqlService.SparqlService.stringToSPARQLString(this.autocompletionQuery) + ' ;\nfibra:classStatisticsQuery ' + _angularSparqlService.SparqlService.stringToSPARQLString(this.classStatisticsQuery) + ' ;\nfibra:propertyStatisticsQuery ' + _angularSparqlService.SparqlService.stringToSPARQLString(this.propertyStatisticsQuery) + ' ;\nfibra:itemQuery ' + _angularSparqlService.SparqlService.stringToSPARQLString(this.itemQuery) + ' ;\nfibra:coalesceIdsQuery ' + _angularSparqlService.SparqlService.stringToSPARQLString(this.coalesceIdsQuery) + ' ;\nfibra:deleteItemQuery ' + _angularSparqlService.SparqlService.stringToSPARQLString(this.deleteItemQuery) + ' ;\nfibra:classQuery ' + _angularSparqlService.SparqlService.stringToSPARQLString(this.classQuery) + ' ;\nfibra:propertyQuery ' + _angularSparqlService.SparqlService.stringToSPARQLString(this.propertyQuery) + ' ;\nvoid:sparqlEndpoint <' + this.endpoint + '> ;\nfibra:updateEndpoint <' + this.updateEndpoint + '> ;\nfibra:graphStoreEndpoint <' + this.graphStoreEndpoint + '> ;\nfibra:schemaNS ' + _angularSparqlService.SparqlService.stringToSPARQLString(this.schemaNS) + ' ;\nfibra:sourceClassSettings ' + _angularSparqlService.SparqlService.stringToSPARQLString(_serializationService.SerializationService.toJson(this.sourceClassSettings)) + ' ;\nfibra:layouts ' + _angularSparqlService.SparqlService.stringToSPARQLString(_serializationService.SerializationService.toJson(this.layouts)) + ' ;\nfibra:dateBoundaryStart ' + _angularSparqlService.SparqlService.stringToSPARQLString(_serializationService.SerializationService.toJson(this.dateBoundaryStart)) + ' ;\nfibra:dateBoundaryEnd ' + _angularSparqlService.SparqlService.stringToSPARQLString(_serializationService.SerializationService.toJson(this.dateBoundaryEnd)) + ' ;\nfibra:instanceNS ' + _angularSparqlService.SparqlService.stringToSPARQLString(this.instanceNS) + ' .');
+        tb.fragmentsById.set(this.id, f);
+      }
+    }
+  }]);
+  return Project;
 }(_citable.Citable);
 
 Project.listProjectsQuery = 'PREFIX fibra: <http://hdlab.stanford.edu/fibra/ontology#>\nPREFIX skos: <http://www.w3.org/2004/02/skos/core#>\nPREFIX dcterms: <http://purl.org/dc/terms/>\nPREFIX foaf: <http://xmlns.com/foaf/0.1/>\nPREFIX void: <http://rdfs.org/ns/void#>\nPREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\nSELECT * {\n# STARTGRAPH\n# VALUE\n  ?id a fibra:Project .\n  {\n    ?id skos:prefLabel ?labels\n  } UNION {\n    ?id fibra:instanceNS ?instanceNS .\n    ?id fibra:schemaNS ?schemaNS .\n    ?id void:sparqlEndpoint ?endpoint .\n    ?id fibra:updateEndpoint ?updateEndpoint .\n    ?id fibra:graphStoreEndpoint ?graphStoreEndpoint .\n    ?id fibra:autocompletionQuery ?autocompletionQuery .\n    ?id fibra:classStatisticsQuery ?classStatisticsQuery .\n    OPTIONAL { ?id fibra:sourceClassSettings ?sourceClassSettings }\n    OPTIONAL { ?id fibra:layouts ?layouts }\n    OPTIONAL { ?id fibra:dateBoundaryStart ?dateBoundaryStart }\n    OPTIONAL { ?id fibra:dateBoundaryEnd ?dateBoundaryEnd }\n    OPTIONAL { ?id fibra:propertyStatisticsQuery ?propertyStatisticsQuery }\n    ?id fibra:itemQuery ?itemQuery .\n    ?id fibra:deleteItemQuery ?deleteItemQuery .\n    OPTIONAL { ?id fibra:graph ?graph }\n    OPTIONAL { ?id dcterms:created ?dateCreated }\n    OPTIONAL { ?id foaf:homepage ?url }\n    OPTIONAL { ?id fibra:coalesceIdsQuery ?coalesceIdsQuery }\n  } UNION {\n    ?id fibra:schema ?schemas\n  } UNION {\n    ?id fibra:schemaReference ?ar .\n    ?ar rdf:value ?schemas .\n    ?ar void:sparqlEndpoint ?schemas_source_sparqlEndpoint .\n    OPTIONAL { ?ar fibra:graph ?schemas_source_graph }\n  } UNION {\n    ?id fibra:authorityEndpoint ?authorityEndpoints\n  } UNION {\n    ?id fibra:authorityEndpointReference ?ar .\n    ?ar rdf:value ?authorityEndpoints .\n    ?ar void:sparqlEndpoint ?authorityEndpoints_source_sparqlEndpoint .\n    OPTIONAL { ?ar fibra:graph ?authorityEndpoints_source_graph }\n  } UNION {\n    ?id fibra:archiveEndpoint ?archiveEndpoints\n  } UNION {\n    ?id fibra:archiveEndpointReference ?ar .\n    ?ar rdf:value ?archiveEndpoints .\n    ?ar void:sparqlEndpoint ?archiveEndpoints_source_sparqlEndpoint .\n    OPTIONAL { ?ar fibra:graph ?archiveEndpoints_source_graph }\n  } UNION {\n    ?id dcterms:description ?descriptions\n  } UNION {\n    {\n      ?id dcterms:rightsHolder ?rightsHolders\n    } UNION {\n      ?id fibra:qualifiedAssertion ?qa .\n      ?qa rdf:predicate dcterms:rightsHolder .\n      ?qa rdf:object ?rightsHolders .\n      OPTIONAL { ?qa fibra:order ?rightsHolders_order }\n    }\n    {\n      ?rightsHolders skos:prefLabel ?rightsHolders_labels\n    } UNION {\n      ?rightsHolders foaf:homepage ?rightsHolders_url\n    } UNION {\n      ?rightsHolders dcterms:description ?rightsHolders_descriptions\n    }\n  }\n# ENDGRAPH\n}';
@@ -5290,10 +5301,9 @@ var SparqlAutocompleteService = exports.SparqlAutocompleteService = function () 
         key: 'autocomplete',
         value: function autocomplete(query, limit) {
             var queryRemote = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
-            var limits = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : '';
-            var canceller = arguments[4];
+            var canceller = arguments[3];
 
-            return this.workerService.call('sparqlAutocompleteWorkerService', 'autocomplete', [query, limit, queryRemote, limits], canceller);
+            return this.workerService.call('sparqlAutocompleteWorkerService', 'autocomplete', [query, limit, queryRemote], canceller);
         }
     }]);
     return SparqlAutocompleteService;
@@ -5404,19 +5414,17 @@ var SparqlAutocompleteWorkerService = exports.SparqlAutocompleteWorkerService = 
     (0, _createClass3.default)(SparqlAutocompleteWorkerService, [{
         key: 'autocomplete',
         value: function autocomplete(query, limit) {
-            var queryRemote = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
-
             var _this2 = this;
 
-            var limits = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : '';
-            var canceller = arguments[4];
+            var queryRemote = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
+            var canceller = arguments[3];
 
             var d = this.$q.defer();
             var results = new AutocompletionResults();
             var queryTemplate = this.stateWorkerService.state.project.autocompletionQuery;
             queryTemplate = queryTemplate.replace(/<QUERY>/g, _angularSparqlService.SparqlService.stringToSPARQLString(query));
             queryTemplate = queryTemplate.replace(/<LIMIT>/g, '' + limit);
-            queryTemplate = queryTemplate.replace(/# CONSTRAINTS/g, limits);
+            queryTemplate = queryTemplate.replace(/# CONSTRAINTS/g, this.stateWorkerService.state.project.constraints ? this.stateWorkerService.state.project.constraints : '');
             queryTemplate = queryTemplate.replace(/<PREFLANG>/g, this.stateWorkerService.state.language);
             var pd = new ProcessingData();
             var localResults = new _collectionUtils.StringSet();
@@ -5439,6 +5447,7 @@ var SparqlAutocompleteWorkerService = exports.SparqlAutocompleteWorkerService = 
                     queryTemplate = endpointConfiguration.autocompletionQuery;
                     queryTemplate = queryTemplate.replace(/<QUERY>/g, _angularSparqlService.SparqlService.stringToSPARQLString(query));
                     queryTemplate = queryTemplate.replace(/<LIMIT>/g, '' + limit);
+                    queryTemplate = queryTemplate.replace(/# CONSTRAINTS/g, endpointConfiguration.constraints ? endpointConfiguration.constraints : '');
                     queryTemplate = queryTemplate.replace(/<PREFLANG>/g, _this2.stateWorkerService.state.language);
                     return _this2.fibraSparqlService.query(endpointConfiguration.endpoint, queryTemplate, { timeout: canceller }).then(function (response) {
                         if (response.results.bindings.length !== 0) {
