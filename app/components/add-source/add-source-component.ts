@@ -43,27 +43,11 @@ export class AddSourceComponentController {
     'class': 'http://www.cidoc-crm.org/cidoc-crm/E22_Man-Made_Object'
   }]
 
-  private sourcesListOptions: {}[] = [{
-    'id': '0',
-    'description': '1st source name.',
-    'name': 'VIAF'
-  },
-  {
-    'id': '1',
-    'description': '2nd source name.',
-    'name': 'GeoNames'
-  },
-  {
-    'id': '2',
-    'description': '3rd source name.',
-    'name': 'Electronic Enlightenment'
-  }]
-
   private actions: any = {}
   private state: IAddSourceComponentControllerState = <IAddSourceComponentControllerState>{}
   private authorityEndpoints: RemoteEndpointConfiguration[]
   private archiveEndpoints: RemoteEndpointConfiguration[]
-  private primarySource: ProjectSourceInfo =  new ProjectSourceInfo('Shared projects', 'http://ldf.fi/fibra/sparql', 'http://ldf.fi/fibra/update', 'http://ldf.fi/fibra/data', 'http://ldf.fi/fibra/shared-projects/', 'http://ldf.fi/fibra/fusekiEndpointWithTextIndexAndSecoFunctions')
+  private primarySource: ProjectSourceInfo = new ProjectSourceInfo('Shared projects', 'http://ldf.fi/fibra/sparql', 'http://ldf.fi/fibra/update', 'http://ldf.fi/fibra/data', 'http://ldf.fi/fibra/shared-projects/', 'http://ldf.fi/fibra/fusekiEndpointWithTextIndexAndSecoFunctions')
   private userSource: ProjectSourceInfo
   private currentFileName: string = 'No file chosen'
   private currentFile: File
@@ -164,7 +148,7 @@ export class AddSourceComponentController {
 }
 
 export class AddSourceComponent implements angular.IComponentOptions {
-  public bindings: {[id: string]: string} = {
+  public bindings: { [id: string]: string } = {
     resolve: '<',
     close: '&',
     dismiss: '&'

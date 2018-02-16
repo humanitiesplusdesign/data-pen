@@ -33,7 +33,7 @@ export interface IAddSourceAction extends Action {
 }
 
 export class SourcesActionService {
-  constructor(private $ngRedux: IFibraNgRedux, private $q: angular.IQService, private projectService: ProjectService) {}
+  constructor(private $ngRedux: IFibraNgRedux, private $q: angular.IQService, private projectService: ProjectService) { }
 
   public setSourceClassActive(source: string, clss: string, status: boolean): ISetSourceClassActiveAction {
     let ret = this.$ngRedux.dispatch({
@@ -75,7 +75,7 @@ export class SourcesActionService {
       properties.push(new PropertyAndValue(RDF.type, type))
       properties.push(new PropertyAndValue(FIBRA.sourceFile, DataFactory.instance.literal(filename)))
 
-      localColumns.forEach((c, i) => {
+      localColumns.filter((c, i) => line[c]).forEach((c, i) => {
         properties.push(new PropertyAndValue(localColumnProperties[i], DataFactory.instance.literal(line[c])))
       })
 
@@ -90,6 +90,6 @@ export class SourcesActionService {
 }
 
 angular.module('fibra.actions.sources', [])
-.config(($provide) => {
-  $provide.service('sourcesActionService', SourcesActionService)
-})
+  .config(($provide) => {
+    $provide.service('sourcesActionService', SourcesActionService)
+  })
