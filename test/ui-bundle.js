@@ -26970,7 +26970,9 @@ var SourcesActionService = exports.SourcesActionService = function () {
                 properties.push(new _sparqlItemService.PropertyAndValue(_rdf.SKOS.prefLabel, _rdf.DataFactory.instance.literal(line[labelColumn])));
                 properties.push(new _sparqlItemService.PropertyAndValue(_rdf.RDF.type, type));
                 properties.push(new _sparqlItemService.PropertyAndValue(_rdf.FIBRA.sourceFile, _rdf.DataFactory.instance.literal(filename)));
-                localColumns.forEach(function (c, i) {
+                localColumns.filter(function (c, i) {
+                    return line[c];
+                }).forEach(function (c, i) {
                     properties.push(new _sparqlItemService.PropertyAndValue(localColumnProperties[i], _rdf.DataFactory.instance.literal(line[c])));
                 });
                 return properties;
@@ -93490,19 +93492,6 @@ var AddSourceComponentController = exports.AddSourceComponentController = functi
             'name': 'Work',
             'class': 'http://www.cidoc-crm.org/cidoc-crm/E22_Man-Made_Object'
         }];
-        this.sourcesListOptions = [{
-            'id': '0',
-            'description': '1st source name.',
-            'name': 'VIAF'
-        }, {
-            'id': '1',
-            'description': '2nd source name.',
-            'name': 'GeoNames'
-        }, {
-            'id': '2',
-            'description': '3rd source name.',
-            'name': 'Electronic Enlightenment'
-        }];
         this.actions = {};
         this.state = {};
         this.primarySource = new _projectSourcesViewComponent.ProjectSourceInfo('Shared projects', 'http://ldf.fi/fibra/sparql', 'http://ldf.fi/fibra/update', 'http://ldf.fi/fibra/data', 'http://ldf.fi/fibra/shared-projects/', 'http://ldf.fi/fibra/fusekiEndpointWithTextIndexAndSecoFunctions');
@@ -100078,7 +100067,7 @@ module.exports = {
 /* 550 */
 /***/ (function(module, exports) {
 
-module.exports = {"_args":[["yasgui-utils@1.6.7","/Users/esjewett/git_repos/data-pen"]],"_development":true,"_from":"yasgui-utils@1.6.7","_id":"yasgui-utils@1.6.7","_inBundle":false,"_integrity":"sha1-K8/FoxVojeOuYFeIPZrjQrIF8mc=","_location":"/yasgui-utils","_phantomChildren":{},"_requested":{"type":"version","registry":true,"raw":"yasgui-utils@1.6.7","name":"yasgui-utils","escapedName":"yasgui-utils","rawSpec":"1.6.7","saveSpec":null,"fetchSpec":"1.6.7"},"_requiredBy":["/yasgui-yasqe","/yasgui-yasr"],"_resolved":"https://registry.npmjs.org/yasgui-utils/-/yasgui-utils-1.6.7.tgz","_spec":"1.6.7","_where":"/Users/esjewett/git_repos/data-pen","author":{"name":"Laurens Rietveld"},"bugs":{"url":"https://github.com/YASGUI/Utils/issues"},"dependencies":{"store":"^2.0.4"},"description":"Utils for YASGUI libs","homepage":"https://github.com/YASGUI/Utils","licenses":[{"type":"MIT","url":"http://yasgui.github.io/license.txt"}],"main":"src/main.js","maintainers":[{"name":"Laurens Rietveld","email":"laurens.rietveld@gmail.com","url":"http://laurensrietveld.nl"}],"name":"yasgui-utils","repository":{"type":"git","url":"git://github.com/YASGUI/Utils.git"},"version":"1.6.7"}
+module.exports = {"_from":"yasgui-utils@^1.6.7","_id":"yasgui-utils@1.6.7","_inBundle":false,"_integrity":"sha1-K8/FoxVojeOuYFeIPZrjQrIF8mc=","_location":"/yasgui-utils","_phantomChildren":{},"_requested":{"type":"range","registry":true,"raw":"yasgui-utils@^1.6.7","name":"yasgui-utils","escapedName":"yasgui-utils","rawSpec":"^1.6.7","saveSpec":null,"fetchSpec":"^1.6.7"},"_requiredBy":["/yasgui-yasqe","/yasgui-yasr"],"_resolved":"https://registry.npmjs.org/yasgui-utils/-/yasgui-utils-1.6.7.tgz","_shasum":"2bcfc5a315688de3ae6057883d9ae342b205f267","_spec":"yasgui-utils@^1.6.7","_where":"/Users/jiemakel/tyo/fibra/node_modules/yasgui-yasqe","author":{"name":"Laurens Rietveld"},"bugs":{"url":"https://github.com/YASGUI/Utils/issues"},"bundleDependencies":false,"dependencies":{"store":"^2.0.4"},"deprecated":false,"description":"Utils for YASGUI libs","homepage":"https://github.com/YASGUI/Utils","licenses":[{"type":"MIT","url":"http://yasgui.github.io/license.txt"}],"main":"src/main.js","maintainers":[{"name":"Laurens Rietveld","email":"laurens.rietveld@gmail.com","url":"http://laurensrietveld.nl"}],"name":"yasgui-utils","repository":{"type":"git","url":"git://github.com/YASGUI/Utils.git"},"version":"1.6.7"}
 
 /***/ }),
 /* 551 */
@@ -108027,7 +108016,7 @@ YASQE.defaults = $.extend(true, {}, YASQE.defaults, {
 /* 570 */
 /***/ (function(module, exports) {
 
-module.exports = {"_args":[["yasgui-yasqe@2.11.14","/Users/esjewett/git_repos/data-pen"]],"_development":true,"_from":"yasgui-yasqe@2.11.14","_id":"yasgui-yasqe@2.11.14","_inBundle":false,"_integrity":"sha512-qtdtT+RmeQhHP6tTL7mSSKbWWuDZ5m17MTHlGbhZYPKZf2Wx3nieGLqip4Pb5eGXryj11rNywgYMm7KN0wdHmw==","_location":"/yasgui-yasqe","_phantomChildren":{},"_requested":{"type":"version","registry":true,"raw":"yasgui-yasqe@2.11.14","name":"yasgui-yasqe","escapedName":"yasgui-yasqe","rawSpec":"2.11.14","saveSpec":null,"fetchSpec":"2.11.14"},"_requiredBy":["/angular-yasqe-component"],"_resolved":"https://registry.npmjs.org/yasgui-yasqe/-/yasgui-yasqe-2.11.14.tgz","_spec":"2.11.14","_where":"/Users/esjewett/git_repos/data-pen","author":{"name":"Laurens Rietveld"},"bugs":{"url":"https://github.com/YASGUI/YASQE/issues/"},"dependencies":{"codemirror":"5.17.0","jquery":"^2.2.4","node-sass":"^3.8.0","prettier":"^1.4.4","require-dir":"^0.3.0","run-sequence":"^1.2.2","vinyl-buffer":"^1.0.0","vinyl-source-stream":"~1.1.0","vinyl-transform":"1.0.0","yasgui-utils":"^1.6.7"},"description":"Yet Another SPARQL Query Editor","devDependencies":{"bootstrap-sass":"^3.3.7","browserify":"^13.1.0","browserify-shim":"^3.8.12","browserify-transform-tools":"^1.6.0","exorcist":"^0.4.0","gulp":"^3.9.1","gulp-autoprefixer":"^3.1.0","gulp-bump":"^2.2.0","gulp-concat":"^2.6.0","gulp-connect":"^4.2.0","gulp-cssimport":"^3.1.0","gulp-cssnano":"^2.1.2","gulp-embedlr":"^0.5.2","gulp-filter":"^4.0.0","gulp-git":"^1.10.0","gulp-jsvalidate":"^2.1.0","gulp-livereload":"^3.8.1","gulp-notify":"^2.2.0","gulp-rename":"^1.2.2","gulp-sass":"^2.3.2","gulp-sourcemaps":"^1.6.0","gulp-streamify":"1.0.2","gulp-tag-version":"^1.3.0","gulp-uglify":"^1.5.4","node-sass":"^3.8.0","require-dir":"^0.3.0","run-sequence":"^1.2.2","vinyl-buffer":"^1.0.0","vinyl-source-stream":"~1.1.0","vinyl-transform":"1.0.0","watchify":"^3.7.0"},"homepage":"http://yasqe.yasgui.org","keywords":["JavaScript","SPARQL","Editor","Semantic Web","Linked Data"],"license":"MIT","main":"src/main.js","maintainers":[{"name":"Laurens Rietveld","email":"laurens.rietveld@gmail.com","url":"http://laurensrietveld.nl"}],"name":"yasgui-yasqe","optionalShim":{"codemirror":{"require":"codemirror","global":"CodeMirror"},"jquery":{"require":"jquery","global":"jQuery"},"../../lib/codemirror":{"require":"codemirror","global":"CodeMirror"}},"repository":{"type":"git","url":"git+https://github.com/YASGUI/YASQE.git"},"scripts":{"build":"gulp","dev":"gulp serve","major":"gulp major","minor":"gulp minor","patch":"gulp patch"},"version":"2.11.14"}
+module.exports = {"_args":[["yasgui-yasqe@2.11.14","/Users/jiemakel/tyo/fibra"]],"_development":true,"_from":"yasgui-yasqe@2.11.14","_id":"yasgui-yasqe@2.11.14","_inBundle":false,"_integrity":"sha512-qtdtT+RmeQhHP6tTL7mSSKbWWuDZ5m17MTHlGbhZYPKZf2Wx3nieGLqip4Pb5eGXryj11rNywgYMm7KN0wdHmw==","_location":"/yasgui-yasqe","_phantomChildren":{},"_requested":{"type":"version","registry":true,"raw":"yasgui-yasqe@2.11.14","name":"yasgui-yasqe","escapedName":"yasgui-yasqe","rawSpec":"2.11.14","saveSpec":null,"fetchSpec":"2.11.14"},"_requiredBy":["/angular-yasqe-component"],"_resolved":"https://registry.npmjs.org/yasgui-yasqe/-/yasgui-yasqe-2.11.14.tgz","_spec":"2.11.14","_where":"/Users/jiemakel/tyo/fibra","author":{"name":"Laurens Rietveld"},"bugs":{"url":"https://github.com/YASGUI/YASQE/issues/"},"dependencies":{"codemirror":"5.17.0","jquery":"^2.2.4","node-sass":"^3.8.0","prettier":"^1.4.4","require-dir":"^0.3.0","run-sequence":"^1.2.2","vinyl-buffer":"^1.0.0","vinyl-source-stream":"~1.1.0","vinyl-transform":"1.0.0","yasgui-utils":"^1.6.7"},"description":"Yet Another SPARQL Query Editor","devDependencies":{"bootstrap-sass":"^3.3.7","browserify":"^13.1.0","browserify-shim":"^3.8.12","browserify-transform-tools":"^1.6.0","exorcist":"^0.4.0","gulp":"^3.9.1","gulp-autoprefixer":"^3.1.0","gulp-bump":"^2.2.0","gulp-concat":"^2.6.0","gulp-connect":"^4.2.0","gulp-cssimport":"^3.1.0","gulp-cssnano":"^2.1.2","gulp-embedlr":"^0.5.2","gulp-filter":"^4.0.0","gulp-git":"^1.10.0","gulp-jsvalidate":"^2.1.0","gulp-livereload":"^3.8.1","gulp-notify":"^2.2.0","gulp-rename":"^1.2.2","gulp-sass":"^2.3.2","gulp-sourcemaps":"^1.6.0","gulp-streamify":"1.0.2","gulp-tag-version":"^1.3.0","gulp-uglify":"^1.5.4","node-sass":"^3.8.0","require-dir":"^0.3.0","run-sequence":"^1.2.2","vinyl-buffer":"^1.0.0","vinyl-source-stream":"~1.1.0","vinyl-transform":"1.0.0","watchify":"^3.7.0"},"homepage":"http://yasqe.yasgui.org","keywords":["JavaScript","SPARQL","Editor","Semantic Web","Linked Data"],"license":"MIT","main":"src/main.js","maintainers":[{"name":"Laurens Rietveld","email":"laurens.rietveld@gmail.com","url":"http://laurensrietveld.nl"}],"name":"yasgui-yasqe","optionalShim":{"codemirror":{"require":"codemirror","global":"CodeMirror"},"jquery":{"require":"jquery","global":"jQuery"},"../../lib/codemirror":{"require":"codemirror","global":"CodeMirror"}},"repository":{"type":"git","url":"git+https://github.com/YASGUI/YASQE.git"},"scripts":{"build":"gulp","dev":"gulp serve","major":"gulp major","minor":"gulp minor","patch":"gulp patch"},"version":"2.11.14"}
 
 /***/ }),
 /* 571 */
